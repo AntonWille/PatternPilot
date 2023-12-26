@@ -4,7 +4,7 @@ import pandas as pd
 
 def get_questions(tags=[], sort='votes', order='desc', pagesize=100, page=1):
     params = {
-        'filter': '!nNPvSNP3wf', # include body and body_markdown for questions
+        'filter': '!6WPIomnm)E*eI', # include body and comment count for questions
         'pagesize': pagesize,
         'tagged': tags,
         'sort': sort,
@@ -16,7 +16,7 @@ def get_questions(tags=[], sort='votes', order='desc', pagesize=100, page=1):
 
 def get_answers(question_ids, sort='votes', order='desc', pagesize=100, page=1):
     params = {
-        'filter': '!nNPvSNe7D9', # include body and body_markdown for answers
+        'filter': '!6WPIomqomPQfa', # include body and comment count for answers
         'pagesize': pagesize,
         'sort': sort,
         'order': order,
@@ -49,15 +49,13 @@ def data_to_csv(path, data):
        df.to_csv(path, mode='a', header=False, index=False)
     return df
 
-def main(page=1):
-    tags = ['python', 'ruby', 'perl']
-    for tag in tags:
-        questions = get_questions([tag], page=page)
-        df = data_to_json(f'data/json/questions_{tag}_{page}.json', questions)
+def main(page=1, tags=[], mode='csv'):
+    questions = get_questions([tag], page=page)
+    df = data_to_json(f'data/json/questions_{tag}_{page}.json', questions)
 
-        ids = df['question_id'].tolist()
-        answers = get_answers(ids, page=page)
-        df = data_to_json(f'data/json/answers_{tag}_{page}.json', {'items': answers})
+    ids = df['question_id'].tolist()
+    answers = get_answers(ids, page=page)
+    df = data_to_json(f'data/json/answers_{tag}_{page}.json', {'items': answers})
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(sys.argv[1], sys.argv[2])
