@@ -1,4 +1,6 @@
 .env
+data/
+.DS_Store
 
 # Ignore bundler config.
 /.bundle
@@ -23,3 +25,6 @@
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+
+# Python Stuff
+**/__pycache__/

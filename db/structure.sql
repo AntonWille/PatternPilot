@@ -20,16 +20,14 @@ SET default_table_access_method = heap;
 CREATE TABLE public.answers (
     answer_id bigint NOT NULL,
     owner_id character varying,
+    owner_display_name character varying,
     question_id bigint NOT NULL,
     body text,
     is_accepted boolean,
     comment_count integer,
     score integer,
-    link character varying,
     last_activity_date integer,
-    creation_date integer,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    creation_date integer
 );
 
 
@@ -65,26 +63,24 @@ CREATE TABLE public.ar_internal_metadata (
 
 
 --
--- Name: comments; Type: TABLE; Schema: public; Owner: -
+-- Name: codes; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.comments (
+CREATE TABLE public.codes (
     id bigint NOT NULL,
-    commentable_type character varying NOT NULL,
-    commentable_id integer NOT NULL,
-    owner_id character varying,
-    body text,
-    score integer,
+    name character varying NOT NULL,
+    description text,
+    parent_id bigint,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
 
 
 --
--- Name: comments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: codes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.comments_id_seq
+CREATE SEQUENCE public.codes_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -93,10 +89,76 @@ CREATE SEQUENCE public.comments_id_seq
 
 
 --
--- Name: comments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: codes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.comments_id_seq OWNED BY public.comments.id;
+ALTER SEQUENCE public.codes_id_seq OWNED BY public.codes.id;
+
+
+--
+-- Name: codes_sentences; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.codes_sentences (
+    id bigint NOT NULL,
+    code_id bigint,
+    sentence_id bigint,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: codes_sentences_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.codes_sentences_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: codes_sentences_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.codes_sentences_id_seq OWNED BY public.codes_sentences.id;
+
+
+--
+-- Name: comments; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.comments (
+    comment_id bigint NOT NULL,
+    commentable_type character varying NOT NULL,
+    commentable_id integer NOT NULL,
+    owner_id character varying,
+    owner_display_name character varying,
+    body text,
+    score integer
+);
+
+
+--
+-- Name: comments_comment_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.comments_comment_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: comments_comment_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.comments_comment_id_seq OWNED BY public.comments.comment_id;
 
 
 --
@@ -107,6 +169,8 @@ CREATE TABLE public.questions (
     question_id bigint NOT NULL,
     title character varying,
     owner_id character varying,
+    owner_display_name character varying,
+    tags character varying,
     body text,
     is_answered boolean,
     answer_count integer,
@@ -115,9 +179,7 @@ CREATE TABLE public.questions (
     score integer,
     link character varying,
     last_activity_date integer,
-    creation_date integer,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    creation_date integer
 );
 
 
@@ -150,6 +212,40 @@ CREATE TABLE public.schema_migrations (
 
 
 --
+-- Name: sentences; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sentences (
+    id bigint NOT NULL,
+    post_type character varying NOT NULL,
+    post_id bigint NOT NULL,
+    sequence_number integer,
+    sentence_text text,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: sentences_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.sentences_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: sentences_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.sentences_id_seq OWNED BY public.sentences.id;
+
+
+--
 -- Name: answers answer_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -157,10 +253,24 @@ ALTER TABLE ONLY public.answers ALTER COLUMN answer_id SET DEFAULT nextval('publ
 
 
 --
--- Name: comments id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: codes id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.comments ALTER COLUMN id SET DEFAULT nextval('public.comments_id_seq'::regclass);
+ALTER TABLE ONLY public.codes ALTER COLUMN id SET DEFAULT nextval('public.codes_id_seq'::regclass);
+
+
+--
+-- Name: codes_sentences id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.codes_sentences ALTER COLUMN id SET DEFAULT nextval('public.codes_sentences_id_seq'::regclass);
+
+
+--
+-- Name: comments comment_id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.comments ALTER COLUMN comment_id SET DEFAULT nextval('public.comments_comment_id_seq'::regclass);
 
 
 --
@@ -168,6 +278,13 @@ ALTER TABLE ONLY public.comments ALTER COLUMN id SET DEFAULT nextval('public.com
 --
 
 ALTER TABLE ONLY public.questions ALTER COLUMN question_id SET DEFAULT nextval('public.questions_question_id_seq'::regclass);
+
+
+--
+-- Name: sentences id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sentences ALTER COLUMN id SET DEFAULT nextval('public.sentences_id_seq'::regclass);
 
 
 --
@@ -187,11 +304,27 @@ ALTER TABLE ONLY public.ar_internal_metadata
 
 
 --
+-- Name: codes codes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.codes
+    ADD CONSTRAINT codes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: codes_sentences codes_sentences_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.codes_sentences
+    ADD CONSTRAINT codes_sentences_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: comments comments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.comments
-    ADD CONSTRAINT comments_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT comments_pkey PRIMARY KEY (comment_id);
 
 
 --
@@ -211,10 +344,47 @@ ALTER TABLE ONLY public.schema_migrations
 
 
 --
+-- Name: sentences sentences_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sentences
+    ADD CONSTRAINT sentences_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: index_codes_on_parent_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_codes_on_parent_id ON public.codes USING btree (parent_id);
+
+
+--
+-- Name: index_codes_sentences_on_code_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_codes_sentences_on_code_id ON public.codes_sentences USING btree (code_id);
+
+
+--
+-- Name: index_codes_sentences_on_sentence_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_codes_sentences_on_sentence_id ON public.codes_sentences USING btree (sentence_id);
+
+
+--
 -- Name: index_comments_on_commentable; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_comments_on_commentable ON public.comments USING btree (commentable_type, commentable_id);
+
+
+--
+-- Name: codes fk_rails_0abdec88a2; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.codes
+    ADD CONSTRAINT fk_rails_0abdec88a2 FOREIGN KEY (parent_id) REFERENCES public.codes(id);
 
 
 --
@@ -226,6 +396,22 @@ ALTER TABLE ONLY public.answers
 
 
 --
+-- Name: codes_sentences fk_rails_734e1b7fd0; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.codes_sentences
+    ADD CONSTRAINT fk_rails_734e1b7fd0 FOREIGN KEY (code_id) REFERENCES public.codes(id);
+
+
+--
+-- Name: codes_sentences fk_rails_ec10c4468e; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.codes_sentences
+    ADD CONSTRAINT fk_rails_ec10c4468e FOREIGN KEY (sentence_id) REFERENCES public.sentences(id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
@@ -234,6 +420,8 @@ SET search_path TO "$user", public;
 INSERT INTO "schema_migrations" (version) VALUES
 ('20231226075357'),
 ('20231226081732'),
-('20231226083441');
+('20231226083441'),
+('20231226112715'),
+('20231226114611');
 
 

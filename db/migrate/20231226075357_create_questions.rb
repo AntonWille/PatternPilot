@@ -4,6 +4,8 @@ class CreateQuestions < ActiveRecord::Migration[7.0]
       t.bigint :question_id, primary_key: true
       t.string :title
       t.string :owner_id
+      t.string :owner_display_name
+      t.string :tags
       t.text :body
       t.boolean :is_answered
       t.integer :answer_count
@@ -13,7 +15,6 @@ class CreateQuestions < ActiveRecord::Migration[7.0]
       t.string :link
       t.integer :last_activity_date
       t.integer :creation_date
-      t.timestamps
     end
   end
 end
