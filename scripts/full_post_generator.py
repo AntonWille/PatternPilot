@@ -1,5 +1,12 @@
 import pandas as pd
 from sqlalchemy import create_engine, text
+import html2text
+
+def html_to_text(html):
+    text_maker = html2text.HTML2Text()
+    text_maker.ignore_links = True
+    text_maker.bypass_tables = False
+    return text_maker.handle(html)
 
 def fetch_question(engine, question_id):
     query = f"SELECT * FROM questions WHERE question_id = {question_id}"
@@ -18,42 +25,51 @@ def fetch_all_question_ids(engine):
     df = pd.DataFrame(engine.execute(text(query)))
     return df['question_id'].tolist()
 
-def create_post_file(engine, question_id, filename):
+def create_post_file(engine, question_id):
     question_df = fetch_question(engine, question_id)
+    filename = f"data/{question_df['score'][0]}{question_df['category'][0]}_{question_id}.txt"
     answers_df = fetch_answers(engine, question_id)
 
-    post_ids = [question_id] + answers_df['answer_id'].tolist()
+    h = html2text.HTML2Text()
+    h.ignore_links = True
+
+    post_ids = [question_id]
+    if not answers_df.empty:
+         post_ids += answers_df['answer_id'].tolist()
     comments_df = fetch_comments(engine, post_ids)
+    if comments_df.empty:
+        comments_df = pd.DataFrame(columns=['comment_id', 'commentable_type', 'commentable_id', 'owner_id', 'owner_display_name',
+                                     'body', 'score'])
+    text = f"Title: {question_df['title'].iloc[0]}, \n Question ID: {question_id} \n Score: {question_df['score'].iloc[0]} \n"
+    text += f"Tags: {question_df['tags'].iloc[0]}\n"
+    text += h.handle(question_df['body'].iloc[0])
+    text += "\n"
+    question_comments = comments_df[comments_df['commentable_id'] == question_id]
+    for _, comment in question_comments.iterrows():
+        text += f"Comment {comment['comment_id']}:\n"
+        text += h.handle(comment['body'])
+        text += "\n"
 
-    with open(filename, 'w') as file:
-        file.write(f"TAGS: {question_df['tags'].iloc[0]}\n")
-        file.write(f"Title: {question_df['title'].iloc[0]}, Question ID: {question_id} \n\n")
-        file.write(question_df['body'].iloc[0])
-        file.write("\n\n")
+    for _, answer in answers_df.iterrows():
+        text += f"Answer {answer['answer_id']}:\n"
+        text += h.handle(answer['body'])
+        text += "\n"
 
-        for _, answer in answers_df.iterrows():
-            file.write(f"Answer {answer['answer_id']}:\n")
-            file.write(answer['body'])
-            file.write("\n\n")
+        answer_comments = comments_df[comments_df['commentable_id'] == answer['answer_id']]
+        for _, comment in answer_comments.iterrows():
+            text += f"Comment {comment['comment_id']}:\n"
+            text += h.handle(comment['body'])
+            text += "\n"
 
-            answer_comments = comments_df[comments_df['commentable_id'] == answer['answer_id']]
-            for _, comment in answer_comments.iterrows():
-                file.write(f"Comment {comment['comment_id']}:\n")
-                file.write(comment['body'])
-                file.write("\n\n")
-
-        question_comments = comments_df[comments_df['commentable_id'] == question_id]
-        for _, comment in question_comments.iterrows():
-            file.write(f"Comment {comment['comment_id']}:\n")
-            file.write(comment['body'])
-            file.write("\n\n")
+    with open(filename, 'w') as f:
+        f.write(text)
 
 def main():
     engine = create_engine('postgresql://postgres@localhost:5432/pattern_pilot_development')
     with engine.connect() as conn:
         question_ids = fetch_all_question_ids(conn)
         for question_id in question_ids:
-            create_post_file(conn, question_id, f"data/{question_id}.html")
+            create_post_file(conn, question_id)
 
 if __name__ == "__main__":
     main()

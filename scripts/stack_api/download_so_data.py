@@ -10,12 +10,13 @@ def process_response(response):
     else:
         return pd.DataFrame(response)
 
-def main(page=1, tags=[]):
+def main(category, additional_tags, page=1):
     engine = create_engine('postgresql://postgres@localhost:5432/pattern_pilot_development')
     so_client = StackOverflowAPI()
-
+    tags = [category] + additional_tags
     questions = so_client.fetch_questions(tags=tags, page=page)
     questions_df = process_response(questions['items'])
+    questions_df['category'] = category
     questionsLoader = DataLoader(questions_df)
     questionsLoader.to_db(engine, 'questions')
 
@@ -35,4 +36,4 @@ def main(page=1, tags=[]):
     answersCommentsLoader.to_db(engine, 'answers_comments')
 
 if __name__ == "__main__":
-    main(sys.argv[1], ['perl'])
+    main('python', [], page=1)

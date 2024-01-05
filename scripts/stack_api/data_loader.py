@@ -35,7 +35,7 @@ class DataLoader:
     def format_questions_df(self):
         return self.df[['question_id', 'title', 'owner_id', 'owner_display_name', 'tags',
                                      'body', 'is_answered', 'score', 'answer_count', 'comment_count',
-                                     'view_count', 'last_activity_date', 'creation_date', 'link']]
+                                     'view_count', 'last_activity_date', 'creation_date', 'category', 'link']]
 
     def format_answers_df(self):
         return self.df[['answer_id', 'question_id', 'owner_id', 'owner_display_name',

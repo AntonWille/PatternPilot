@@ -13,6 +13,7 @@ class CreateQuestions < ActiveRecord::Migration[7.0]
       t.integer :view_count
       t.integer :score
       t.string :link
+      t.string :category
       t.integer :last_activity_date
       t.integer :creation_date
     end

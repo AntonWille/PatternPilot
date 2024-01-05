@@ -178,6 +178,7 @@ CREATE TABLE public.questions (
     view_count integer,
     score integer,
     link character varying,
+    category character varying,
     last_activity_date integer,
     creation_date integer
 );
