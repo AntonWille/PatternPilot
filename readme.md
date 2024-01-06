@@ -37,13 +37,11 @@ Shortly, I also thought about doing the encoding with a very basic custom web-in
 Week 2 was primarily a holiday spent with the family and friends. I read most of the most some of the extracted posts, and thought quite a bit about possible directions, while also having some discussions with my father (also a Software Engineer) and my girlfriend, who previously used Grounded Theory in her MSc.
 
 ### WEEK 3
-After doing everything I could before actually starting with the important work; encoding the Stackoverflow Posts, I finally started doing this in earnest. First, I did one more round of pre-sorting into interesting and uninteresting posts based on the 100 most-upvoted questions tagged with each Ruby, Python and Perl. This was done mostly through a heuristic of if there is any conversation outside of basic technical information.
+After doing everything I could before actually starting with the important work; encoding the Stackoverflow Posts, I finally started doing this in earnest. The Code-System that developed over this week can be found in data/code_system_060124.
+An anxiety to not be able to find interesting cultural differences or cultural occorunces in general was quickly replaced with some concerns that there is too much volume to fit into a Bachelor thesis. Posts average around 1000 lines, so there is a very substantial amount  of discussion in just these 300 posts.
+Some early thoughts:
+- The culture is in the comments: A lot of the most interesting tidbits so far where within the comments to answers.
+- One comment mentions ‘explicit is better than implicit’ - another python mantra that’s explicitly in contrast to how the ruby community does things. I have so far not encountered this in Perl, but some research is in order. This mantra actually pairs quite well and is related to "one way vs. many".
+- Unsurprisingly, how to handle imports / how to setup a virtualenv for a Python project is a hugely controversial topic and very related to the discussion on "one way vs. many"
 
-Then I moved on with encoding all the remaining Posts with some basic codes:
-- Culture
-- - Beauty
-- - Efficiency
-- - Truth
-- - Goodness
-- Geographical cultural significance
-- Statement of "Group-Belonging"
+So far, I went through 15 posts in detail, 5 for each language, finding 218 Codes.
