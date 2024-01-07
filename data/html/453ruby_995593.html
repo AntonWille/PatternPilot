@@ -1,0 +1,411 @@
+ <h2> Title: What does ||= (or-equals) mean in Ruby? </h2> <h3> collimarco, question_id: 995593 </h3>Score: 453, Tags: {ruby,operators} <br><p>What does the following code mean in Ruby?</p>
+
+<pre><code>||=
+</code></pre>
+
+<p>Does it have any meaning or reason for the syntax?</p>
+<h4> Comment 136745347 tgreiser: </h4>Make sure you scroll down to see the answer by Steve Bennett (added after the accepted answer).<br>------------------------------------------------------------------ <br><h3> Answer 37636687 nPcomp: </h3>Basically,
+
+<p><br />
+<code>x ||= y</code> means <br /></p>
+
+<p>if <code>x</code> has any value leave it alone and do not change the value, otherwise
+set <code>x</code> to <code>y</code></p>
+<h4> Comment 112064450 Michael Cruz: </h4>Not true; <code>x</code> could still have a value and the assignment could still take place, if the value of <code>x</code> is falsey (<code>nil</code> or <code>false</code>).<br>------------------------------------------------------------------ <br><h3> Answer 24514776 Max Rogers: </h3><p>This is the default assignment notation</p>
+
+<p>for example: x ||= 1 <br>
+this will check to see if x is nil or not. If x is indeed nil it will then assign it that new value (1 in our example)</p>
+
+<p>more explicit: <br>
+if x == nil <br>
+x = 1<br>
+end</p>
+<h4> Comment 101195140 Alex Poca: </h4>either <code>nil</code> or <code>false</code>, not only <code>nil</code><br>------------------------------------------------------------------ <br><h3> Answer 33078934 Luca Guidi: </h3><p>Please also remember that <code>||=</code> isn't an atomic operation and so, it isn't thread safe. As rule of thumb, don't use it for class methods.</p>
+------------------------------------------------------------------ <br><h3> Answer 14697343 Steve Bennett: </h3><p><code>a ||= b</code> is a <em>conditional assignment operator</em>. It means:</p>
+<ul>
+<li>if <code>a</code> is undefined or <a href="https://gist.github.com/jfarmer/2647362" rel="noreferrer">falsey</a>, then evaluate <code>b</code> and set <code>a</code> to the result.</li>
+<li>Otherwise (if <code>a</code> is defined and evaluates to truthy), then <code>b</code> is not evaluated, and no assignment takes place.</li>
+</ul>
+<p>For example:</p>
+<pre class="lang-rb prettyprint-override"><code>a ||= nil # =&gt; nil
+a ||= 0 # =&gt; 0
+a ||= 2 # =&gt; 0
+
+foo = false # =&gt; false
+foo ||= true # =&gt; true
+foo ||= false # =&gt; true
+</code></pre>
+<p>Confusingly, it looks similar to other assignment operators (such as <code>+=</code>), but behaves differently.</p>
+<ul>
+<li><code>a += b</code> translates to <code>a = a + b</code></li>
+<li><code>a ||= b</code> roughly translates to <code>a || a = b</code></li>
+</ul>
+<p>It is a near-shorthand for <code>a || a = b</code>. The difference is that, when <code>a</code> is undefined, <code>a || a = b</code> would raise <code>NameError</code>, whereas <code>a ||= b</code> sets <code>a</code> to <code>b</code>. This distinction is unimportant if <code>a</code> and <code>b</code> are both local variables, but is significant if either is a getter/setter method of a class.</p>
+<p>Further reading:</p>
+<ul>
+<li><a href="http://www.rubyinside.com/what-rubys-double-pipe-or-equals-really-does-5488.html" rel="noreferrer">http://www.rubyinside.com/what-rubys-double-pipe-or-equals-really-does-5488.html</a></li>
+</ul>
+<h4> Comment 41275596 antinome: </h4>@dtc, consider <code>h = Hash.new(0); h[1] ||= 2</code>. Now consider the two possible expansions <code>h[1] = h[1] || 2</code> vs <code>h[1] || h[1] = 2</code>. Both expressions evaluate to <code>0</code> but the first unnecessarily increases the size of the hash. Perhaps that&#39;s why Matz chose to make <code>||=</code> behave more like the second expansion. (I based this on an example from one of the threads linked to in another answer.)<br><h4> Comment 37125306 dtc: </h4>havent searched enough but still dont get why you would use this as opposed to a = a || b. maybe just my personal opinion but a little ridiculous that such a nuance exists...<br><h4> Comment 43675331 Ajedi32: </h4>Fyi, <code>a || a = b</code> raises a <code>NameError</code> if <code>a</code> is undefined. <code>a ||= b</code> does not, but instead initializes <code>a</code> and sets it to <code>b</code>. That&#39;s the only distinction between the two as far as I know. Similarly, the only difference between <code>a = a || b</code> and <code>a ||= b</code> that I&#39;m aware of is that if <code>a=</code> is a method, it will get called regardless of what <code>a</code> returns. Also, the only difference between <code>a = b unless a</code> and <code>a ||= b</code> that I&#39;m aware of is that that statement evaluates to <code>nil</code> instead of <code>a</code> if <code>a</code> is truthy. Lots of approximations, but nothing quite equivalent...<br><h4> Comment 43099285 OBCENEIKON: </h4>I like the other answer for how in-depth it goes, but I love this answer for it&#39;s simplicity.For someone learning Ruby, this is the type of answer we need. If we knew what ||= meant, then the question would probably have been worded differently.<br><h4> Comment 122947983 s89_: </h4>@dtc - agreed.  I&#39;d argue that it just adds confusion to your code. It&#39;s not immediately obvious what the hell it&#39;s doing and is an unnecessary shorthand.<br><h4> Comment 96558349 Ajedi32: </h4>@3limin4t0r No, that&#39;s also not an exact equivalent because if <code>a</code> is truthy or <code>b</code> is falsy <code>a</code> would get evaluated twice (which could make a difference if <code>a</code> is a method).<br><h4> Comment 96586906 3limin4t0r: </h4>@Ajedi32 You&#39;re correct, but I didn&#39;t think it would matter much. Here are 2 variants that exactly mimic the behaviour (although somewhat cumbersome): 1. <code>defined?(a) ? a || a = b : a = b</code> 2. <code>(a = nil if false) || a || a = b</code><br><h4> Comment 96588059 Ajedi32: </h4>@3limin4t0r That first one could have different behavior if <code>a</code> is a method defined via <code>method_missing</code> (<code>defined?(a)</code> will return false even though the method does effectively exist). The second one is correct. Both of those variants I previously covered in <a href="https://stackoverflow.com/a/27628662/1157054">my answer</a> to the question.<br><h4> Comment 96591965 3limin4t0r: </h4>If you implement a custom version of <code>method_missing</code> you should also implement a version of <code>respond_to_missing?</code> which resolves the issue. <code>class A; def method_missing(method, *args, &amp;block); 3.respond_to?(method) ? 3.public_send(method, *args, &amp;block) : super; end; def respond_to_missing?(*args); 3.respond_to?(*args); end; end; a = A.new; defined?(a + 3) #=&gt; &quot;method&quot;</code><br><h4> Comment 51359997 Muhammad Umer: </h4>please take a look at comment under  question<br><h4> Comment 51371127 Steve Bennett: </h4>Yep, that&#39;s addressed under the &quot;Sort of but not quite&quot;.<br>------------------------------------------------------------------ <br><h3> Answer 2505285 J&#246;rg W Mittag: </h3><p>This question has been discussed so often on the Ruby mailing-lists and Ruby blogs that there are now even threads on the Ruby mailing-list whose only purpose is to collect links to <em>all the other threads</em> on the Ruby mailing-list that discuss this issue.</p>
+<p>Here's one: <a href="https://www.ruby-forum.com/t/the-definitive-list-of-or-equal-threads-and-pages/136446" rel="nofollow noreferrer">The definitive list of ||= (OR Equal) threads and pages</a></p>
+<p>If you <em>really</em> want to know what is going on, take a look at Section 11.4.2.3 &quot;Abbreviated assignments&quot; of the <a href="https://web.archive.org/web/20181224023130/https://www.ipa.go.jp/files/000011432.pdf" rel="nofollow noreferrer">Ruby Language Draft Specification</a>.</p>
+<p>As a first approximation,</p>
+<pre><code>a ||= b
+</code></pre>
+<p>is equivalent to</p>
+<pre><code>a || a = b
+</code></pre>
+<p>and <em>not</em> equivalent to</p>
+<pre><code>a = a || b
+</code></pre>
+<p>However, that is only a first approximation, especially if <code>a</code> is undefined. The semantics also differ depending on whether it is a simple variable assignment, a method assignment or an indexing assignment:</p>
+<pre><code>a    ||= b
+a.c  ||= b
+a[c] ||= b
+</code></pre>
+<p>are all treated differently.</p>
+<h4> Comment 20449899 Steve Bennett: </h4>That&#39;s a very cryptic non-answer. The short answer seems to be: a ||= b means, if a is undefined then assign it the value of b, otherwise leave it alone. (Ok, there are nuances and special cases, but that&#39;s the basic case.)<br><h4> Comment 47746198 einnocent: </h4>Maybe this question has been asked so many times because people keep responding that this question has been asked so many times.<br><h4> Comment 20518913 J&#246;rg W Mittag: </h4>@SteveBennett: I wouldn&#39;t call the fact that <code>a = false; a ||= true</code> does <i>not</i> do what your answer says it does a &quot;nuance&quot;.<br><h4> Comment 55887840 Arnold Roa: </h4>With this answer is easy to see why there are multiple threads. If you try to search for an answer to this question using a novice hat, you will notice that all answers are not clear. For example, with this one you are just saying what is not. I suggest to improve your answer and give a easy answers for novices: a = b unless a<br><h4> Comment 67714152 theGreenCabbage: </h4>Not a good answer at all. Not sure why this was accepted. It barely tries to explain what <code>||=</code> is, instead tries to point someone to another thread (which is ironic because you&#39;re <i>trying</i> to end this chase). Why not just say it straight up what it is? I&#39;m sure it would have spared both you and the reader more work. Downvoted.<br><h4> Comment 70428016 Yehonatan: </h4>Very lacking answer. You didn&#39;t explain what does it do<br><h4> Comment 77109339 Steve: </h4>for ruby newbie, they may don&#39;t know a || a = b either. Better to at lease give an example and say what is the result. Otherwise, you are just introducing another question instead of answering<br><h4> Comment 9393035 Andrew Grimm: </h4>The second link has suffered from bit rot (comment from meta by <a href="http://stackoverflow.com/users/540162/nightfirecat">stackoverflow.com/users/540162/nightfirecat</a>).<br><h4> Comment 50915180 bondarenko.dev: </h4>why <b>a ||= b</b> is a equivalent to <b>a || a = b</b> if its have different behavior:  <code>a ||= 10 #=&gt; 10</code> <code>a = a || 10 #=&gt; 10</code> <code>a || a = 10 #=&gt; NameError: undefined local variable or method &#39;a&#39; for main:Object</code> ? It depends on the Ruby version?<br><h4> Comment 50916378 J&#246;rg W Mittag: </h4>@bondarenko.dev: it is not equivalent, and I never said it was. I <i>explicitly</i> said it is only an approximation, and that behavior differs <i>especially</i> if <code>a</code> is undefined.<br>------------------------------------------------------------------ <br><h3> Answer 18404007 frediy: </h3><h2>Concise and complete answer</h2>
+
+<pre><code>a ||= b
+</code></pre>
+
+<p>evaluates the same way as <em>each</em> of the following lines</p>
+
+<pre><code>a || a = b
+a ? a : a = b
+if a then a else a = b end
+</code></pre>
+
+<p>-</p>
+
+<p>On the other hand,</p>
+
+<pre><code>a = a || b
+</code></pre>
+
+<p>evaluates the same way as <em>each</em> of the following lines</p>
+
+<pre><code>a = a ? a : b
+if a then a = a else a = b end
+</code></pre>
+
+<p>-</p>
+
+<p><em>Edit: As AJedi32 pointed out in the comments, this only holds true if: 1. a is a defined variable. 2. Evaluating a one time and two times does not result in a difference in program or system state.</em></p>
+<h4> Comment 43674426 Ajedi32: </h4>This isn&#39;t quite right. <code>a || a = b</code>, <code>a ? a : a = b</code>, <code>if a then a else a = b end</code>, and <code>if a then a = a else a = b end</code> will throw an error if <code>a</code> is undefined, whereas <code>a ||= b</code> and <code>a = a || b</code> will not. Also, <code>a || a = b</code>, <code>a ? a : a = b</code>, <code>if a then a else a = b end</code>, <code>a = a ? a : b</code>, and <code>if a then a = a else a = b end</code> evaluate <code>a</code> twice when <code>a</code> is truthy, whereas <code>a ||= b</code> and <code>a = a || b</code> do not.<br><h4> Comment 27879810 Steve Bennett: </h4>are you certain? This implies that if <code>a</code> is false/zero/undefined, it is evaluated twice. (But I don&#39;t know Ruby, so I don&#39;t know if lvalues can be &#39;evaluated&#39; exactly...)<br><h4> Comment 43674805 Ajedi32: </h4>*correction: <code>a || a = b</code> will not evaluate <code>a</code> twice when <code>a</code> is true.<br><h4> Comment 43674932 Ajedi32: </h4>@the_minted <code>the end state will be equivalent after the whole line has been evaluated</code> That&#39;s not necessarily true though. What if <code>a</code> is a method? Methods can have side effects. E.g. With <code>public; def a=n; @a=n; end; def a; @a+=1; end; self.a = 5</code>, <code>self.a ||= b</code> will return 6, but <code>self.a ? self.a : self.a = b</code> will return 7.<br><h4> Comment 56814358 Xavier Nayrac: </h4>@the_minted <code>this only holds true if: 1. a is a defined variable</code> So this is definitely <b>not</b> equivalent.<br><h4> Comment 59881722 frediy: </h4>@XavierNayrac Updated to say evaluates in the same way rather than equals.<br><h4> Comment 29036161 frediy: </h4>I see what you&#39;re saying. What I meant by two lines being equivalent is that the end state will be equivalent after the whole line has been evaluated, meaning the value of a, b and what is returned. Whether or not ruby interpreters use different states - like several evaluations of a - to get there is entirely possible. Any ruby interpreter experts out there?<br>------------------------------------------------------------------ <br><h3> Answer 21062438 vidang: </h3><p>In short, <code>a||=b</code> means: If <code>a</code> is <code>undefined, nil or false</code>, assign <code>b</code> to <code>a</code>. Otherwise, keep <code>a</code> intact.</p>
+------------------------------------------------------------------ <br><h3> Answer 995620 Jamie Rumbelow: </h3><p>It means or-equals to. It checks to see if the value on the left is defined, then use that. If it's not, use the value on the right. You can use it in Rails to cache instance variables in models.</p>
+
+<p>A quick Rails-based example, where we create a function to fetch the currently logged in user:</p>
+
+<pre><code>class User &gt; ActiveRecord::Base
+
+  def current_user
+    @current_user ||= User.find_by_id(session[:user_id])
+  end
+
+end
+</code></pre>
+
+<p>It checks to see if the @current_user instance variable is set. If it is, it will return it, thereby saving a database call. If it's not set however, we make the call and then set the @current_user variable to that. It's a really simple caching technique but is great for when you're fetching the same instance variable across the application multiple times.</p>
+<h4> Comment 2500233 J&#246;rg W Mittag: </h4>This is wrong. Please read <a href="http://Ruby-Forum.Com/topic/151660/" rel="nofollow noreferrer">Ruby-Forum.Com/topic/151660</a> and the links provided therein.<br><h4> Comment 92457631 Jonathan Tuzman: </h4>Despite whatever incompleteness this answer may exhibit (not working for nil/false), it&#39;s the first that explains why you&#39;d want to use ||=, so thank you!<br><h4> Comment 37076895 eggmatters: </h4>@Jo(umlaut)rg, I&#39;m not seeing what is wrong about it. Your link is a list of other links. No real explanation why it&#39;s wrong, just sounds like a value judgment on your end.<br><h4> Comment 80598044 dfherr: </h4>this answer is wrong, because it not only triggers on <code>undefined</code>, but also on <code>false</code> and <code>nil</code>, which might not be relevant for <code>current_user</code>, but especially the <code>false</code> can be unexpectecd in other cases<br>------------------------------------------------------------------ <br><h3> Answer 60123752 z atef: </h3><p>If <code>X</code> does NOT have a value, it will be assigned the value of <code>Y</code>. Else, it will preserve it's original value, 5 in this example: </p>
+
+<pre><code>irb(main):020:0&gt; x = 5
+=&gt; 5
+irb(main):021:0&gt; y = 10
+=&gt; 10
+irb(main):022:0&gt; x ||= y
+=&gt; 5
+
+# Now set x to nil. 
+
+irb(main):025:0&gt; x = nil
+=&gt; nil
+irb(main):026:0&gt; x ||= y
+=&gt; 10
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 27628662 Ajedi32: </h3><p>To be precise, <code>a ||= b</code> means &quot;if <code>a</code> is undefined or falsy (<code>false</code> or <code>nil</code>), set <code>a</code> to <code>b</code> and evaluate to (i.e. return) <code>b</code>, otherwise evaluate to <code>a</code>&quot;.</p>
+<p>Others often try to illustrate this by saying that <code>a ||= b</code> is equivalent to <code>a || a = b</code> or <code>a = a || b</code>. These equivalencies can be helpful for understanding the concept, but be aware that they are <strong>not</strong> accurate under all conditions. Allow me to explain:</p>
+<ul>
+<li><p><strong><code>a ||= b</code> ⇔ <code>a || a = b</code></strong>?</p>
+<p>The behavior of these statements differs when <code>a</code> is an undefined local variable. In that case, <code>a ||= b</code> will set <code>a</code> to <code>b</code> (and evaluate to <code>b</code>), whereas <code>a || a = b</code> will raise <code>NameError: undefined local variable or method 'a' for main:Object</code>.</p>
+</li>
+<li><p><strong><code>a ||= b</code> ⇔ <code>a = a || b</code></strong>?</p>
+<p>The equivalency of these statements are often assumed, since a similar equivalence is true for other <a href="http://ruby-doc.org/core/doc/syntax/assignment_rdoc.html#label-Abbreviated+Assignment" rel="nofollow noreferrer">abbreviated assignment</a> operators (i.e. <code>+=</code>,<code>-=</code>,<code>*=</code>,<code>/=</code>,<code>%=</code>,<code>**=</code>,<code>&amp;=</code>,<code>|=</code>,<code>^=</code>,<code>&lt;&lt;=</code>, and <code>&gt;&gt;=</code>). However, for <code>||=</code> the behavior of these statements <em>may</em> differ when <code>a=</code> is a method on an object and <code>a</code> is truthy. In that case, <code>a ||= b</code> will do nothing (other than evaluate to <code>a</code>), whereas <code>a = a || b</code> will call <code>a=(a)</code> on <code>a</code>'s receiver. As <a href="https://stackoverflow.com/a/16526847/1157054">others</a> have pointed out, this can make a difference when calling <code>a=a</code> has side effects, such as adding keys to a hash.</p>
+</li>
+<li><p><strong><code>a ||= b</code> ⇔ <code>a = b unless a</code></strong>??</p>
+<p>The behavior of these statements differs only in what they evaluate to when <code>a</code> is truthy. In that case, <code>a = b unless a</code> will evaluate to <code>nil</code> (though <code>a</code> will still not be set, as expected), whereas <code>a ||= b</code> will evaluate to <code>a</code>.</p>
+</li>
+<li><p><strong><code>a ||= b</code> ⇔ <code>defined?(a) ? (a || a = b) : (a = b)</code></strong>????</p>
+<p>Still no. These statements can differ when a <code>method_missing</code> method exists which returns a truthy value for <code>a</code>. In this case, <code>a ||= b</code> will evaluate to whatever <code>method_missing</code> returns, and not attempt to set <code>a</code>, whereas <code>defined?(a) ? (a || a = b) : (a = b)</code> will set <code>a</code> to <code>b</code> and evaluate to <code>b</code>.</p>
+</li>
+</ul>
+<p>Okay, okay, so what <em>is</em> <code>a ||= b</code> equivalent to? Is there a way to express this in Ruby?</p>
+<p>Well, assuming that I'm not overlooking anything, I believe <code>a ||= b</code> is functionally equivalent to... (<em>drumroll</em>)</p>
+<pre><code>begin
+  a = nil if false
+  a || a = b
+end
+</code></pre>
+<p>Hold on! Isn't that just the first example with a noop before it? Well, not quite. Remember how I said before that <code>a ||= b</code> is only not equivalent to <code>a || a = b</code> when <code>a</code> is an undefined local variable? Well, <code>a = nil if false</code> ensures that <code>a</code> is never undefined, even though that line is never executed. Local variables in Ruby are lexically scoped.</p>
+<h4> Comment 44721875 Ajedi32: </h4>@vol7ron That has a similar problem as #2. If <code>a</code> is a method, it will be called twice instead of once (if it returns a truthy value the first time). That could cause behaviors to differ if, for example, <code>a</code> takes a long time to return or has side effects.<br><h4> Comment 45546662 vol7ron: </h4>Also, first sentence, shouldn&#39;t it say <i>assign <code>b</code> to <code>a</code></i>, doesn&#39;t the rhs still assign to the lhs, or in other words, doesn&#39;t the lhs still set its value to the rhs?<br><h4> Comment 44720737 vol7ron: </h4>So your extended third example: <code>(a=b unless a) or a</code><br>------------------------------------------------------------------ <br><h3> Answer 15946945 Kiattisak Anoochitarom: </h3><pre><code>x ||= y
+</code></pre>
+
+<p>is</p>
+
+<pre><code>x || x = y
+</code></pre>
+
+<p>"if x is false or undefined, then x point to y"</p>
+------------------------------------------------------------------ <br><h3> Answer 52116981 Sunda: </h3><p><strong>||=</strong> is a <strong>conditional assignment operator</strong></p>
+
+<pre><code>  x ||= y
+</code></pre>
+
+<p>is equivalent to</p>
+
+<pre><code>  x = x || y
+</code></pre>
+
+<p><strong>or alternatively</strong></p>
+
+<pre><code>if defined?(x) and x
+    x = x
+else 
+    x = y
+end
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 18159473 Pankhuri: </h3><p>Suppose  <code>a = 2</code> and <code>b = 3</code></p>
+
+<p>THEN, <code>a ||= b</code>  will be resulted to <code>a</code>'s value i.e. <code>2</code>.</p>
+
+<p>As when a evaluates to some value not resulted to <code>false</code> or <code>nil</code>.. That's why it <code>ll</code> not evaluate <code>b</code>'s value.</p>
+
+<p>Now Suppose  <code>a = nil</code> and <code>b = 3</code>.</p>
+
+<p>Then <code>a ||= b</code> will be resulted to  <code>3</code> i.e. <code>b</code>'s value.</p>
+
+<p>As it first try to evaluates a's value which resulted to <code>nil</code>.. so it evaluated <code>b</code>'s value.</p>
+
+<p>The best example used in ror app is :</p>
+
+<pre><code>#To get currently logged in iser
+def current_user
+  @current_user ||= User.find_by_id(session[:user_id])
+end
+
+# Make current_user available in templates as a helper
+helper_method :current_user
+</code></pre>
+
+<p>Where, <code>User.find_by_id(session[:user_id])</code> is fired if and only if <code>@current_user</code> is not initialized before.</p>
+------------------------------------------------------------------ <br><h3> Answer 33156764 0r4cl3: </h3><p><code>unless x
+  x = y
+end</code></p>
+
+<p>unless x has a value (it's not nil or false), set it equal to y</p>
+
+<p>is equivalent to </p>
+
+<p><code>x ||= y</code></p>
+------------------------------------------------------------------ <br><h3> Answer 43182423 Charlie Wood: </h3><p><code>||=</code> is called a conditional assignment operator. </p>
+
+<p>It basically works as <code>=</code> but with the exception that if a variable <strong>has already been assigned</strong> it will do nothing. </p>
+
+<p>First example:</p>
+
+<pre><code>x ||= 10
+</code></pre>
+
+<p>Second example:</p>
+
+<pre><code>x = 20
+x ||= 10
+</code></pre>
+
+<p>In the first example <code>x</code> is now equal to 10. However, in the second example <code>x</code> is already defined as 20. So the conditional operator has no effect. <code>x</code> is still 20 after running <code>x ||= 10</code>.</p>
+------------------------------------------------------------------ <br><h3> Answer 55898648 SHUBHAM SHARMA: </h3><p>a ||= b</p>
+
+<p>Signifies if any value is present in 'a' and you dont want to alter it the keep using that value, else if 'a' doesnt have any value, use value of 'b'.</p>
+
+<p>Simple words, if left hand side if not null, point to existing value, else point to value at right side.</p>
+------------------------------------------------------------------ <br><h3> Answer 16526847 RileyE: </h3><pre><code>a ||= b
+</code></pre>
+
+<p>is equivalent to</p>
+
+<pre><code>a || a = b
+</code></pre>
+
+<p>and not</p>
+
+<pre><code>a = a || b
+</code></pre>
+
+<p>because of the situation where you define a hash with a default (the hash will return the default for any undefined keys)</p>
+
+<pre><code>a = Hash.new(true) #Which is: {}
+</code></pre>
+
+<p>if you use:</p>
+
+<pre><code>a[10] ||= 10 #same as a[10] || a[10] = 10
+</code></pre>
+
+<p>a is still:</p>
+
+<pre><code>{}
+</code></pre>
+
+<p>but when you write it like so:</p>
+
+<pre><code>a[10] = a[10] || 10
+</code></pre>
+
+<p>a becomes:</p>
+
+<pre><code>{10 =&gt; true}
+</code></pre>
+
+<p>because you've assigned the value of itself at key <code>10</code>, which defaults to true, so now the hash is defined for the key <code>10</code>, rather than never performing the assignment in the first place.</p>
+------------------------------------------------------------------ <br><h3> Answer 19075712 mukh007: </h3><p>It's like lazy instantiation.
+If the variable is already defined it will take that value instead of creating the value again.</p>
+------------------------------------------------------------------ <br><h3> Answer 39137922 tessie: </h3><p>As a common misconception, <code>a ||= b</code> is not equivalent to <code>a = a || b</code>, but it behaves like <code>a || a = b</code>.</p>
+
+<p>But here comes a tricky case. If <code>a</code> is not defined, <code>a || a = 42</code> raises <code>NameError</code>, while <code>a ||= 42</code> returns <code>42</code>. So, they don't seem to be equivalent expressions.</p>
+------------------------------------------------------------------ <br><h3> Answer 40166148 siva krishna reddy: </h3><pre><code>b = 5
+a ||= b
+</code></pre>
+
+<p>This translates to:</p>
+
+<pre><code>a = a || b
+</code></pre>
+
+<p>which will be</p>
+
+<pre><code>a = nil || 5
+</code></pre>
+
+<p>so finally</p>
+
+<pre><code>a = 5
+</code></pre>
+
+<p>Now if you call this again:</p>
+
+<pre><code>a ||= b
+a = a || b
+a = 5 || 5
+a = 5
+
+b = 6
+</code></pre>
+
+<p>Now if you call this again:</p>
+
+<pre><code>a ||= b
+a = a || b
+a = 5 || 6
+a = 5 
+</code></pre>
+
+<p>If you observe, <code>b</code> value will not be assigned to <code>a</code>. <code>a</code> will still have <code>5</code>.</p>
+
+<p>Its a Memoization Pattern that is being used in Ruby to speed up accessors.</p>
+
+<pre><code>def users
+  @users ||= User.all
+end
+</code></pre>
+
+<p>This basically translates to:</p>
+
+<pre><code>@users = @users || User.all
+</code></pre>
+
+<p>So you will make a call to database for the first time you call this method.</p>
+
+<p>Future calls to this method will just return the value of <code>@users</code> instance variable.</p>
+------------------------------------------------------------------ <br><h3> Answer 27975040 gotnull: </h3><pre><code>irb(main):001:0&gt; a = 1
+=&gt; 1
+irb(main):002:0&gt; a ||= 2
+=&gt; 1
+</code></pre>
+
+<p>Because <code>a</code> was already set to <code>1</code></p>
+
+<pre><code>irb(main):003:0&gt; a = nil
+=&gt; nil
+irb(main):004:0&gt; a ||= 2
+=&gt; 2
+</code></pre>
+
+<p>Because <code>a</code> was <code>nil</code></p>
+------------------------------------------------------------------ <br><h3> Answer 59634271 meh: </h3><p>This ruby-lang syntax. The correct answer is to check the ruby-lang documentation. <strong>All other explanations obfuscate</strong>.</p>
+
+<h1>Google</h1>
+
+<p>"ruby-lang docs Abbreviated Assignment". </p>
+
+<h1>Ruby-lang docs</h1>
+
+<p><a href="https://docs.ruby-lang.org/en/2.4.0/syntax/assignment_rdoc.html#label-Abbreviated+Assignment" rel="nofollow noreferrer">https://docs.ruby-lang.org/en/2.4.0/syntax/assignment_rdoc.html#label-Abbreviated+Assignment</a></p>
+------------------------------------------------------------------ <br><h3> Answer 52061869 Ymox: </h3><p><code>a ||= b</code> is the same as saying <code>a = b if a.nil?</code> or <code>a = b unless a</code></p>
+
+<p>But do all 3 options show the same performance? With Ruby 2.5.1 this</p>
+
+<pre><code>1000000.times do
+  a ||= 1
+  a ||= 1
+  a ||= 1
+  a ||= 1
+  a ||= 1
+  a ||= 1
+  a ||= 1
+  a ||= 1
+  a ||= 1
+  a ||= 1
+end
+</code></pre>
+
+<p>takes 0.099 Seconds on my PC, while</p>
+
+<pre><code>1000000.times do
+  a = 1 unless a
+  a = 1 unless a
+  a = 1 unless a
+  a = 1 unless a
+  a = 1 unless a
+  a = 1 unless a
+  a = 1 unless a
+  a = 1 unless a
+  a = 1 unless a
+  a = 1 unless a
+end
+</code></pre>
+
+<p>takes 0.062 Seconds. That's almost 40% faster.</p>
+
+<p>and then we also have:</p>
+
+<pre><code>1000000.times do
+  a = 1 if a.nil?
+  a = 1 if a.nil?
+  a = 1 if a.nil?
+  a = 1 if a.nil?
+  a = 1 if a.nil?
+  a = 1 if a.nil?
+  a = 1 if a.nil?
+  a = 1 if a.nil?
+  a = 1 if a.nil?
+  a = 1 if a.nil?
+end
+</code></pre>
+
+<p>which takes 0.166 Seconds.</p>
+
+<p>Not that this will make a significant performance impact in general, but if you do need that last bit of optimization, then consider this result.
+By the way: <code>a = 1 unless a</code> is easier to read for the novice, it is self-explanatory.</p>
+
+<p>Note 1: reason for repeating the assignment line multiple times is to reduce the overhead of the loop on the time measured.</p>
+
+<p>Note 2: The results are similar if I do <code>a=nil</code> nil before each assignment.</p>

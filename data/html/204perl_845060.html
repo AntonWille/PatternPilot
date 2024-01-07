@@ -1,0 +1,257 @@
+ <h2> Title: What is the difference between &#39;my&#39; and &#39;our&#39; in Perl? </h2> <h3> Nathan Fellman, question_id: 845060 </h3>Score: 204, Tags: {perl,scope} <br><p>I know what <code>my</code> is in Perl. It defines a variable that exists only in the scope of the block in which it is defined. What does <code>our</code> do?</p>
+
+<p>How does <code>our</code> differ from <code>my</code>?</p>
+------------------------------------------------------------------ <br><h3> Answer 885888 Fran Corpier: </h3><p>How does <em><strong><code>our</code></strong></em> differ from <em><strong><code>my</code></strong></em> and what does <em><code>our</code></em> do?</p>
+<p>In Summary:</p>
+<p>Available since Perl 5, <em><strong><code>my</code></strong></em> is a way to declare non-package variables, that are:</p>
+<ul>
+<li>private</li>
+<li>new</li>
+<li>non-global</li>
+<li>separate from any package, so that the variable <em>cannot</em> be accessed in the form of <code>$package_name::variable</code>.</li>
+</ul>
+<br>
+<p>On the other hand, <em><strong><code>our</code></strong></em> variables are package variables, and thus automatically:</p>
+<ul>
+<li><em>global</em> variables</li>
+<li>definitely <em>not private</em></li>
+<li>not necessarily new</li>
+<li><em>can</em> be accessed outside the package (or lexical scope) with the
+qualified namespace, as <code>$package_name::variable</code>.</li>
+</ul>
+<br>
+<p>Declaring a variable with <em><strong><code>our</code></strong></em> allows you to predeclare variables in order to use them under <em><code>use strict</code></em> without getting typo warnings or compile-time errors. Since Perl 5.6, it has replaced the obsolete <em><code>use vars</code></em>, which was only file-scoped, and not lexically scoped as is <em><strong><code>our</code></strong></em>.</p>
+<p>For example, the formal, qualified name for variable <code>$x</code> inside <code>package main</code> is <code>$main::x</code>. Declaring <em><strong><code>our $x</code></strong></em> allows you to use the bare <code>$x</code> variable without penalty (i.e., without a resulting error), in the scope of the declaration, when the script uses <em><code>use strict</code></em> or <em><code>use strict &quot;vars&quot;</code></em>. The scope might be one, or two, or more packages, or one small block.</p>
+<h4> Comment 9085530 ikegami: </h4>@Nathan Fellman, <code>local</code> doesn&#39;t create variables. It doesn&#39;t relate to <code>my</code> and <code>our</code> at all. <code>local</code> temporarily backs up the value of variable and clears its current value.<br><h4> Comment 68628287 ikegami: </h4><code>our</code> variables are not package variables. They aren&#39;t globally-scoped, but lexically-scoped variables just like <code>my</code> variables. You can see that in the following program: <code>package Foo; our $x = 123; package Bar; say $x;</code>. If you want to &quot;declare&quot; a package variable, you need to use <code>use vars qw( $x );</code>. <code>our $x;</code> declares a lexically-scoped variable that is aliased to the same-named variable in the package in which the <code>our</code> was compiled.<br><h4> Comment 1151636 Nathan Fellman: </h4>So how does our differ from local?<br>------------------------------------------------------------------ <br><h3> Answer 845382 bubaker: </h3><p>The PerlMonks and PerlDoc links from cartman and Olafur are a great reference - below is my crack at a summary:</p>
+
+<p><code>my</code> variables are lexically scoped within a single block defined by <code>{}</code> or within the  same file if not in <code>{}</code>s.  They are not accessible from packages/subroutines defined outside of the same lexical scope / block.</p>
+
+<p><code>our</code> variables are scoped within a package/file and accessible from any code that <code>use</code> or <code>require</code> that package/file - name conflicts are resolved between packages by prepending the appropriate namespace.</p>
+
+<p>Just to round it out, <code>local</code> variables are "dynamically" scoped, differing from <code>my</code> variables in that they are also accessible from subroutines called within the same block.</p>
+<h4> Comment 66899331 Georg: </h4>+1 for &quot;<code>my</code> variables are lexically scoped [...] within the same file if not in <code>{}</code>s&quot;. That was useful for me, thanks.<br>------------------------------------------------------------------ <br><h3> Answer 990945 FMc: </h3><p>An example:</p>
+
+<pre><code>use strict;
+
+for (1 .. 2){
+    # Both variables are lexically scoped to the block.
+    our ($o);  # Belongs to 'main' package.
+    my  ($m);  # Does not belong to a package.
+
+    # The variables differ with respect to newness.
+    $o ++;
+    $m ++;
+    print __PACKAGE__, " &gt;&gt; o=$o m=$m\n";  # $m is always 1.
+
+    # The package has changed, but we still have direct,
+    # unqualified access to both variables, because the
+    # lexical scope has not changed.
+    package Fubb;
+    print __PACKAGE__, " &gt;&gt; o=$o m=$m\n";
+}
+
+# The our() and my() variables differ with respect to privacy.
+# We can still access the variable declared with our(), provided
+# that we fully qualify its name, but the variable declared
+# with my() is unavailable.
+print __PACKAGE__, " &gt;&gt; main::o=$main::o\n";  # 2
+print __PACKAGE__, " &gt;&gt; main::m=$main::m\n";  # Undefined.
+
+# Attempts to access the variables directly won't compile.
+# print __PACKAGE__, " &gt;&gt; o=$o\n";
+# print __PACKAGE__, " &gt;&gt; m=$m\n";
+
+# Variables declared with use vars() are like those declared
+# with our(): belong to a package; not private; and not new.
+# However, their scoping is package-based rather than lexical.
+for (1 .. 9){
+    use vars qw($uv);
+    $uv ++;
+}
+
+# Even though we are outside the lexical scope where the
+# use vars() variable was declared, we have direct access
+# because the package has not changed.
+print __PACKAGE__, " &gt;&gt; uv=$uv\n";
+
+# And we can access it from another package.
+package Bubb;
+print __PACKAGE__, " &gt;&gt; main::uv=$main::uv\n";
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 845621 daotoad: </h3><p><a href="http://perl.plover.com/FAQs/Namespaces.html" rel="noreferrer">Coping with Scoping</a> is a good overview of Perl scoping rules.  It's old enough that <code>our</code> is not discussed in the body of the text.  It is addressed in the <strong>Notes</strong> section at the end.</p>
+
+<p>The article talks about package variables and dynamic scope and how that differs from lexical variables and lexical scope.  </p>
+------------------------------------------------------------------ <br><h3> Answer 845062 &#211;lafur Waage: </h3><p>The <a href="http://perldoc.perl.org/functions/our.html" rel="nofollow noreferrer">perldoc</a> has a good definition of our.</p>
+
+<blockquote>
+  <p>Unlike my, which both allocates storage for a variable and associates a simple name with that storage for use within the current scope, our associates a simple name with a package variable in the current package, for use within the current scope. In other words, our has the same scoping rules as my, but does not necessarily create a variable.</p>
+</blockquote>
+------------------------------------------------------------------ <br><h3> Answer 845067 ismail: </h3><p><code>my</code> is used for local variables, whereas <code>our</code> is used for global variables.</p>
+
+<p>More reading over at <em><a href="http://www.perlmonks.org/?node_id=66677" rel="nofollow noreferrer">Variable Scoping in Perl: the basics</a></em>.</p>
+<h4> Comment 654828 Chas. Owens: </h4>Be careful tossing around the words local and global.  The proper terms are lexical and package.  You can&#39;t create true global variables in Perl, but some already exist like $_, and local refers to package variables with localized values (created by local), not to lexical variables (created with my).<br><h4> Comment 28455720 Mark Dominus: </h4><code>${^Potato}</code> is global.  It refers to the same variable regardless of where you use it.<br>------------------------------------------------------------------ <br><h3> Answer 19839877 Logan Ding: </h3><p>I ever met some pitfalls about lexical declarations in Perl that messed me up, which are also related to this question, so I just add my summary here:</p>
+
+<p><strong>1. Definition or declaration?</strong></p>
+
+<pre><code>local $var = 42;
+print "var: $var\n";
+</code></pre>
+
+<p>The output is <code>var: 42</code>. However we couldn't tell if <code>local $var = 42;</code> is a definition or declaration. But how about this:</p>
+
+<pre><code>use strict;
+use warnings;
+
+local $var = 42;
+print "var: $var\n";
+</code></pre>
+
+<p>The second program will throw an error:</p>
+
+<pre><code>Global symbol "$var" requires explicit package name.
+</code></pre>
+
+<p><code>$var</code> is not defined, which means <code>local $var;</code> is just a declaration! Before using <code>local</code> to declare a variable, make sure that it is defined as a global variable previously.</p>
+
+<p>But why this won't fail?</p>
+
+<pre><code>use strict;
+use warnings;
+
+local $a = 42;
+print "var: $a\n";
+</code></pre>
+
+<p>The output is: <code>var: 42</code>.</p>
+
+<p>That's because <code>$a</code>, as well as <code>$b</code>, is a global variable pre-defined in Perl. Remember the <a href="http://perldoc.perl.org/functions/sort.html" rel="nofollow noreferrer">sort</a> function?</p>
+
+<p><strong>2. Lexical or global?</strong></p>
+
+<p>I was a C programmer before starting using Perl, so the concept of lexical and global variables seems straightforward to me: it just corresponds to auto and external variables in C. But there're small differences:</p>
+
+<p>In C, an external variable is a variable defined outside any function block. On the other hand, an automatic variable is a variable defined inside a function block. Like this:</p>
+
+<pre><code>int global;
+
+int main(void) {
+    int local;
+}
+</code></pre>
+
+<p>While in Perl, things are subtle:</p>
+
+<pre><code>sub main {
+    $var = 42;
+}
+
+&amp;main;
+
+print "var: $var\n";
+</code></pre>
+
+<p>The output is <code>var: 42</code>. <code>$var</code> is a global variable even if it's defined in a function block! Actually in Perl, any variable is declared as global by default.</p>
+
+<p>The lesson is to always add <code>use strict; use warnings;</code> at the beginning of a Perl program, which will force the programmer to declare the lexical variable explicitly, so that we don't get messed up by some mistakes taken for granted.</p>
+<h4> Comment 45210529 ruffin: </h4>More on [&quot;remembering [$a and $b in] sort&quot; here](<a href="http://stackoverflow.com/a/26128328/1028230">stackoverflow.com/a/26128328/1028230</a>). Perl never ceases to, um, astound me.<br>------------------------------------------------------------------ <br><h3> Answer 8358256 Misha Gale: </h3><p>This is only somewhat related to the question, but I've just discovered a (to me) obscure bit of perl syntax that you can use with "our" (package) variables that you can't use with "my" (local) variables.</p>
+
+<pre><code>#!/usr/bin/perl
+
+our $foo = "BAR";
+
+print $foo . "\n";
+${"foo"} = "BAZ";
+print $foo . "\n";
+</code></pre>
+
+<p>Output:</p>
+
+<pre><code>BAR
+BAZ
+</code></pre>
+
+<p>This won't work if you change 'our' to 'my'.</p>
+<h4> Comment 42666370 Cosmicnet: </h4>My test (on windows):  <code>perl -e &quot;my $foo = &#39;bar&#39;; print $foo; ${foo} = &#39;baz&#39;; pr int $foo&quot;</code> output: <code>barbaz</code> <code>perl -e &quot;my $foo = &#39;bar&#39;; print $foo; ${&quot;foo&quot;} = &#39;baz&#39;; print $foo&quot;</code> output: <code>barbaz</code> <code>perl -e &quot;my $foo = &#39;bar&#39;; print $foo; ${\&quot;foo\&quot;} = &#39;baz&#39;; print $foo&quot;</code> output: <code>barbar</code>     So in my testing I&#39;d fallen into the same trap. ${foo} is the same as $foo, the brackets are useful when interpolating. ${&quot;foo&quot;} is actually a look up to $main::{} which is the main symbol table, as such only contains package scoped variables.<br><h4> Comment 42666598 Cosmicnet: </h4>${&quot;main::foo&quot;}, ${&quot;::foo&quot;}, and $main::foo are the same as ${&quot;foo&quot;}.  The shorthand is package sensitive <code>perl -e &quot;package test; our $foo = &#39;bar&#39;; print $foo; ${\&quot;foo\&quot;} = &#39;baz&#39;; print $foo&quot;</code> works, as in this context ${&quot;foo&quot;} is now equal to ${&quot;test::foo&quot;}. <a href="http://www.perlmonks.org/?node_id=211441" rel="nofollow noreferrer">Of Symbol Tables and Globs</a> has some information on it, as does the Advanced Perl programming book. Sorry for my previous mistake.<br><h4> Comment 41611454 Cosmicnet: </h4>Not so. $foo ${foo} ${&#39;foo&#39;} ${&quot;foo&quot;} all work the same for variable assignment or dereferencing. Swapping the <i>our</i> in the above example for <i>my</i> does work. What you probably experienced was trying to dereference $foo as a package variable, such as $main::foo or $::foo which will only work for package globals, such as those defined with <i>our</i>.<br><h4> Comment 41619664 Misha Gale: </h4>Just retested using v5.20, and it definitely doesn&#39;t give the same output with my (it prints BAR twice.)<br>------------------------------------------------------------------ <br><h3> Answer 25685583 Lavi Buchnik: </h3><pre><code>print "package is: " . __PACKAGE__ . "\n";
+our $test = 1;
+print "trying to print global var from main package: $test\n";
+
+package Changed;
+
+{
+        my $test = 10;
+        my $test1 = 11;
+        print "trying to print local vars from a closed block: $test, $test1\n";
+}
+
+&amp;Check_global;
+
+sub Check_global {
+        print "trying to print global var from a function: $test\n";
+}
+print "package is: " . __PACKAGE__ . "\n";
+print "trying to print global var outside the func and from \"Changed\" package:     $test\n";
+print "trying to print local var outside the block $test1\n";
+</code></pre>
+
+<p>Will Output this:</p>
+
+<pre><code>package is: main
+trying to print global var from main package: 1
+trying to print local vars from a closed block: 10, 11
+trying to print global var from a function: 1
+package is: Changed
+trying to print global var outside the func and from "Changed" package: 1
+trying to print local var outside the block 
+</code></pre>
+
+<p>In case using "use strict" will get this failure while attempting to run the script:</p>
+
+<pre><code>Global symbol "$test1" requires explicit package name at ./check_global.pl line 24.
+Execution of ./check_global.pl aborted due to compilation errors.
+</code></pre>
+<h4> Comment 40144156 Scott Solmer: </h4>Please provide some kind of explanation. Dumping code like this is rarely considered appropriate.<br><h4> Comment 40178463 Lavi Buchnik: </h4>in simple words: Our (as the name sais) is a variable decliration to use that variable from any place in the script (function, block etc ...), every variable by default (in case not declared) belong to &quot;main&quot; package, our variable still can be used even after decliration of another package in the script. &quot;my&quot; variable in case declared in a block or function, can be used in that block/function only. in case &quot;my&quot; variable was declared not closed in a block, it can be used any where in the scriot, in a closed block as well or in a function as &quot;our&quot; variable, but can&#39;t used in case package changed<br><h4> Comment 40178530 Lavi Buchnik: </h4>My script above shows that by default we are in the &quot;main&quot; package, then the script print an &quot;our&quot; variable from &quot;main&quot; package (not closed in a block), then we declare two &quot;my&quot; variables in a function and print them from that function. then we print an &quot;our&quot; variable from another function to show it can be used in a function. then we changing the package to &quot;changed&quot; (not &quot;main&quot; no more), and we print again the &quot;our&quot; variable successfully. then trying to print a &quot;my&quot; variable outside of the function and failed. the script just showing the difference between &quot;our&quot; and &quot;my&quot; usage.<br>------------------------------------------------------------------ <br><h3> Answer 33543039 Yugdev: </h3><p>Just try to use the following program :</p>
+
+<pre><code>#!/usr/local/bin/perl
+use feature ':5.10';
+#use warnings;
+package a;
+{
+my $b = 100;
+our $a = 10;
+
+
+print "$a \n";
+print "$b \n";
+}
+
+package b;
+
+#my $b = 200;
+#our $a = 20 ;
+
+print "in package b value of  my b $a::b \n";
+print "in package b value of our a  $a::a \n";
+</code></pre>
+<h4> Comment 54872707 Yugdev: </h4>This explains the difference between my and our. The my variable goes out of scope outside the curly braces and is garbage collected  but the our variable still lives.<br>------------------------------------------------------------------ <br><h3> Answer 35029208 Evgeniy: </h3><p>Let us think what an interpreter actually is: it's a piece of code that stores values in memory and lets the instructions in a program that it interprets access those values by their names, which are specified inside these instructions. So, the big job of an interpreter is to shape the rules of how we should use the names in those instructions to access the values that the interpreter stores.</p>
+
+<p>On encountering "my", the interpreter creates a lexical variable: a named value that the interpreter can access only while it executes a block, and only from within that syntactic block. On encountering "our", the interpreter makes a lexical alias of a package variable: it binds a name, which the interpreter is supposed from then on to process as a lexical variable's name, until the block is finished, to the value of the package variable with the same name.</p>
+
+<p>The effect is that you can then pretend that you're using a lexical variable and bypass the rules of 'use strict' on full qualification of package variables. Since the interpreter automatically creates package variables when they are first used, the side effect of using "our" may also be that the interpreter creates a package variable as well. In this case, two things are created: a package variable, which the interpreter can access from everywhere, provided it's properly designated as requested by 'use strict' (prepended with the name of its package and two colons), <i>and</i> its lexical alias.</p>
+
+<p>Sources:</p>
+
+<ul><li><a href="http://perldoc.perl.org/functions/our.html" rel="nofollow">http://perldoc.perl.org/functions/our.html</a>
+<li><a href="http://perldoc.perl.org/perlsub.html#Private-Variables-via-my()" rel="nofollow">http://perldoc.perl.org/perlsub.html#Private-Variables-via-my()</a></ul>
+------------------------------------------------------------------ <br><h3> Answer 16582016 xoid: </h3><pre><code>#!/usr/bin/perl -l
+
+use strict;
+
+# if string below commented out, prints 'lol' , if the string enabled, prints 'eeeeeeeee'
+#my $lol = 'eeeeeeeeeee' ;
+# no errors or warnings at any case, despite of 'strict'
+
+our $lol = eval {$lol} || 'lol' ;
+
+print $lol;
+</code></pre>
+<h4> Comment 23835743 Nathan Fellman: </h4>Can you explain what this code is meant to demonstrate?  Why are <code>our</code> and <code>my</code> different?  How does this example show it?<br>

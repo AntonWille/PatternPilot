@@ -1,0 +1,115 @@
+ <h2> Title: How are nested capturing groups numbered in regular expressions? </h2> <h3> Alana Storm, question_id: 1313934 </h3>Score: 113, Tags: {java,.net,regex,perl,language-agnostic} <br><p>Is there a defined behavior for how regular expressions should handle the capturing behavior of nested parentheses?  More specifically, can you reasonably expect that different engines will capture the outer parentheses in the first position, and nested parentheses in subsequent positions?</p>
+
+<p>Consider the following PHP code (using PCRE regular expressions)</p>
+
+<pre><code>&lt;?php
+  $test_string = 'I want to test sub patterns';
+  preg_match('{(I (want) (to) test) sub (patterns)}', $test_string, $matches);
+  print_r($matches);
+?&gt;
+
+Array
+(
+    [0] =&gt; I want to test sub patterns  //entire pattern
+    [1] =&gt; I want to test           //entire outer parenthesis
+    [2] =&gt; want             //first inner
+    [3] =&gt; to               //second inner
+    [4] =&gt; patterns             //next parentheses set
+)
+</code></pre>
+
+<p>The entire parenthesized expression is captured first (I want to test), and then the inner parenthesized patterns are captured next ("want" and "to").  This makes logical sense, but I could see an equally logical case being made for first capturing the sub parentheses, and THEN capturing the entire pattern.</p>
+
+<p>So, is this "capture the entire thing first" defined behavior in regular expression engines, or is it going to depend on the context of the pattern and/or the behavior of the engine (PCRE being different than C#'s being different than Java's being different than etc.)?</p>
+<h4> Comment 4932854 LionHeart: </h4>The group can be accessed using $1, $2, $3....etc. How to access the 10th group? Will it be $10? I don&#39;t think $10 will work because it will be interpreted as $1 followed by 0. Does this mean we can have max 9 groups only? If author can, please, include this as part of the question then this will be single place to know all about nested groups in regular expressions.<br><h4> Comment 1149028 Alan Moore: </h4>If you&#39;re really interested in all regex flavors, the &quot;language-agnostic&quot; tag is what you want.  There are way too many flavors to list them all, and most of them don&#39;t conform to any real standard (although they&#39;re remarkably consistent when it comes to capture-group numbering).<br>------------------------------------------------------------------ <br><h3> Answer 1313948 Devin Ceartas: </h3><p>The order of capturing in the order of the left paren is standard across all the platforms I've worked in. (perl, php, ruby, egrep)</p>
+<h4> Comment 1158399 Brad Gilbert: </h4>You can re-number the captures in Perl 5.10, and Perl 6.<br><h4> Comment 1146527 Alana Storm: </h4>&quot;capturing in the order of the left paren&quot;  Thanks for that, it&#39;s a much more succinct way of describing the behavior.<br>------------------------------------------------------------------ <br><h3> Answer 1313958 daotoad: </h3><p>From <a href="http://perldoc.perl.org/perlrequick.html#Extracting-matches" rel="noreferrer">perlrequick</a></p>
+
+<blockquote>
+  <p>If the groupings in a regex are
+  nested, $1  gets the group with the
+  leftmost opening parenthesis, $2  the
+  next opening parenthesis, etc.</p>
+</blockquote>
+
+<p><strong>Caveat</strong>: Excluding non-capture group opening parenthesis (?=)</p>
+
+<p><strong>Update</strong></p>
+
+<p>I don't use PCRE much, as I generally use the real thing ;), but <a href="http://www.pcre.org/pcre.txt" rel="noreferrer">PCRE's docs</a> show the same as Perl's:</p>
+
+<blockquote>
+  <p>SUBPATTERNS</p>
+  
+  <p></p>
+  
+  <p><code>2.</code> It sets up the subpattern as a capturing subpattern.  This means that, when the whole pattern matches, that portion of the subject string that matched the subpattern is passed back to the caller via the <code>ovector</code> argument of <code>pcre_exec()</code>.  Opening parentheses are counted from left to right (starting from 1) to obtain number for the capturing subpatterns.</p>
+  
+  <p>For example, if the string "the red king" is matched against the pattern</p>
+
+<pre><code>the ((red|white) (king|queen))
+</code></pre>
+  
+  <p>the captured substrings are "red king", "red", and "king", and are numbered 1, 2, and 3, respectively.</p>
+</blockquote>
+
+<p>If PCRE is drifting away from Perl regex compatibility, perhaps the acronym should be redefined--"Perl Cognate Regular Expressions", "Perl Comparable Regular Expressions" or something.  Or just divest the letters of meaning.</p>
+<h4> Comment 1146819 Alana Storm: </h4>Pascal, PCRE started as an attempt to be a Perl Compatible Regular Expression set, but in recent years the two have diverged slightly.  Still very similar, but there are subtle differences in teh advanced feature sets.  (Also, per the question, I&#39;m interested in all platforms)<br><h4> Comment 88019407 JGFMK: </h4>I added this under first quote <b>Caveat</b>: Excluding non-capture group opening parenthesis (?=). I  didn&#39; realise I wasn&#39;t logged in when I edited it. It was only when I add this comment I was prompted for credentials. So, it now needs 1 more person to approve!<br><h4> Comment 1146718 Pascal MARTIN: </h4>@Sinan : he is using PCRE in PHP, which is &quot;Perl-Compatible Regular Expressions&quot; ; so it should be quite the same as using Perl directly<br><h4> Comment 1148949 Alan Moore: </h4>Actually, it&#39;s Perl that&#39;s doing most of the &quot;drifting away&quot; these days, but you&#39;re right: &quot;Perl-compatible&quot; is quickly changing from a misnomer to a non sequitur. :D<br><h4> Comment 1153795 daotoad: </h4>@Alan, Perl is definitely on the move. P5.10 changed a few things, but 6 will be vastly different.  The P will almost certainly need to be interpreted as &quot;Perl 5&quot;.  PCRE is a great project, that I can&#39;t praise enough, it has been a godsend on more than a few projects.<br><h4> Comment 1146860 user7116: </h4>He can pick any RE engine out there, it should all be the same.<br><h4> Comment 129477301 code_conundrum: </h4><b>Caveat:</b> Excluding non-capture group opening parenthesis (?=). This is what I am looking for.  <b><i>Test string:</i></b>  ```  /wiki/Special:Random /wiki/Special:Random: /wiki/Wikipedia:About /wiki/Kevin:Bacon?filmography /wiki/Kevin_Bacon_(disambiguation) /wiki/Philadelphia,_Pennsylvania ```   <b>regex:</b> <code>^(&#47;wiki)((?!:).)+</code><br>------------------------------------------------------------------ <br><h3> Answer 1315046 Alan Donnelly: </h3><p>Yeah, this is all pretty much well defined for all the languages you're interested in:</p>
+
+<ul>
+<li><strong>Java</strong> - <a href="http://java.sun.com/javase/6/docs/api/java/util/regex/Pattern.html#cg" rel="noreferrer">http://java.sun.com/javase/6/docs/api/java/util/regex/Pattern.html#cg</a><br>
+"Capturing groups are numbered by counting their opening parentheses from left to right. ... Group zero always stands for the entire expression."</li>
+<li><strong>.Net</strong> - <a href="http://msdn.microsoft.com/en-us/library/bs2twtah(VS.71).aspx" rel="noreferrer">http://msdn.microsoft.com/en-us/library/bs2twtah(VS.71).aspx</a><br>
+"Captures using () are numbered automatically based on the order of the opening parenthesis, starting from one. The first capture, capture element number zero, is the text matched by the whole regular expression pattern.")</li>
+<li><strong>PHP (PCRE functions)</strong> - <a href="http://www.php.net/manual/en/function.preg-replace.php#function.preg-replace.parameters" rel="noreferrer">http://www.php.net/manual/en/function.preg-replace.php#function.preg-replace.parameters</a><br>
+"\0 or $0 refers to the text matched by the whole pattern. Opening parentheses are counted from left to right (starting from 1) to obtain the number of the capturing subpattern." (It was also true of the deprecated POSIX functions)</li>
+<li><p><strong>PCRE</strong> - <a href="http://www.pcre.org/pcre.txt" rel="noreferrer">http://www.pcre.org/pcre.txt</a><br>
+To add to what Alan M said, search for "How pcre_exec() returns captured substrings" and read the fifth paragraph that follows:</p>
+
+<pre>
+The  first  pair  of  integers, ovector[0] and ovector[1], identify the
+portion of the subject string matched by the entire pattern.  The next
+pair  is  used for the first capturing subpattern, and so on. The value
+returned by pcre_exec() is one more than the highest numbered pair that
+has  been  set.  For example, if two substrings have been captured, the
+returned value is 3. If there are no capturing subpatterns, the  return
+value from a successful match is 1, indicating that just the first pair
+of offsets has been set.
+</pre></li>
+<li><strong>Perl's different</strong> - <a href="http://perldoc.perl.org/perlre.html#Capture-buffers" rel="noreferrer">http://perldoc.perl.org/perlre.html#Capture-buffers</a><br>
+$1, $2 etc. match capturing groups as you'd expect (i.e. by occurrence of opening bracket), however $0 returns the program name, not the entire query string - to get that you use $&amp; instead. </li>
+</ul>
+
+<p>You'll more than likely find similar results for other languages (Python, Ruby, and others).</p>
+
+<p>You say that it's equally logical to list the inner capture groups first and you're right - it's just be a matter of indexing on closing, rather than opening, parens. (if I understand you correctly). Doing this is less natural though (for example it doesn't follow reading direction convention) and so makes it more difficult (probably not significantly) to determine, by insepection, which capturing group will be at a given result index.</p>
+
+<p>Putting the entire match string being in position 0 also makes sense - mostly for consistency. It allows the entire matched string to remain at the same index regardless of the number capturing groups from regex to regex and regardless of the number of capturing groups that actually match anything (Java for example will collapse the length of the matched groups array for each capturing group does not match any content (think for example something like "a (.*)pattern"). You could always inspect capturing_group_results[capturing_group_results_length - 2], but that doesn't translate well to languages to Perl which dynamically create variables  ($1, $2 etc.) (Perl's a bad example of course, since it uses $&amp; for the matched expression, but you get the idea :).</p>
+<h4> Comment 88004539 JGFMK: </h4>Nice answer.. But how about updating for Python (2 &amp; 3) too :-)<br><h4> Comment 110946235 mesqueeb: </h4>What about JavaScript!?!<br>------------------------------------------------------------------ <br><h3> Answer 1314363 Alan Moore: </h3><p>Every regex flavor I know numbers groups by the order in which the opening parentheses appear.  That outer groups are numbered before their contained sub-groups is just a natural outcome, not explicit policy.</p>
+
+<p>Where it gets interesting is with <em>named groups</em>.  In most cases, they follow the same policy of numbering by the relative positions of the parens--the name is merely an alias for the number.  However, in .NET regexes the named groups are numbered separately from numbered groups.  For example:</p>
+
+<pre><code>Regex.Replace(@"one two three four", 
+              @"(?&lt;one&gt;\w+) (\w+) (?&lt;three&gt;\w+) (\w+)",
+              @"$1 $2 $3 $4")
+
+// result: "two four one three"
+</code></pre>
+
+<p>In effect, the <em>number</em> is an alias for the <em>name</em>; the numbers assigned to named groups start where the "real" numbered groups leave off.  That may seem like a bizarre policy, but there's a good reason for it: in .NET regexes you can use the same group name more than once in a regex.  That makes possible regexes like the one from <a href="https://stackoverflow.com/questions/1295327/regex-to-parse-international-floating-point-numbers">this thread</a> for matching floating-point numbers from different locales:</p>
+
+<pre><code>^[+-]?[0-9]{1,3}
+(?:
+    (?:(?&lt;thousand&gt;\,)[0-9]{3})*
+    (?:(?&lt;decimal&gt;\.)[0-9]{2})?
+|
+    (?:(?&lt;thousand&gt;\.)[0-9]{3})*
+    (?:(?&lt;decimal&gt;\,)[0-9]{2})?
+|
+    [0-9]*
+    (?:(?&lt;decimal&gt;[\.\,])[0-9]{2})?
+)$
+</code></pre>
+
+<p>If there's a thousands separator, it will be saved in group "thousand" no matter which part of the regex matched it.  Similarly, the decimal separator (if there is one) will always be saved in group "decimal".  Of course, there are ways to identify and extract the separators without reusable named groups, but this way is so much more convenient, I think it more than justifies the weird numbering scheme.</p>
+
+<p>And then there's Perl 5.10+, which gives us more control over capturing groups than I know what to do with. :D</p>

@@ -1,0 +1,69 @@
+ <h2> Title: Ruby: kind_of? vs. instance_of? vs. is_a? </h2> <h3> Claudiu, question_id: 3893278 </h3>Score: 566, Tags: {ruby,inheritance,introspection} <br><p>What is the difference? When should I use which? Why are there so many of them?</p>
+<h4> Comment 6082239 Nathan Long: </h4>As to why both <code>is_a?</code> and <code>kind_of?</code> exist: I suppose it&#39;s part of Ruby&#39;s design philosophy. Python would say there should only be one way to do something; Ruby often has synonymous methods so you can use the one that sounds better. It&#39;s a matter of preference. It may partly be due to Japanese influence: I&#39;m told that they will use a different word for the same number depending on the sentence in order to make it sound nicer. Matz may have carried that idea into his language design.<br><h4> Comment 117165675 RubyTuesdayDONO: </h4>@Casey, Nathan is probably referring to 四 (four), which can be pronounced both &quot;shi&quot; and &quot;yon&quot;. Japanese speakers will sometimes avoid the &quot;shi&quot; pronunciation because it&#39;s a homophone with (sounds the same as) 死 (death). see <a href="https://www.omniglot.com/language/numbers/japanese.htm" rel="nofollow noreferrer">this omniglot article</a> for example:  &#171; The numbers 4 and 9 are considered unlucky in Japanese: 4, when pronounced shi, sounds like the word for death (死), and 9, when pronounced ku, sounds like the word for suffering (苦). So they are often pronounced yon and kyu instead. &#187;<br><h4> Comment 117181735 Casey: </h4>@RubyTuesdayDONO It&#39;s not really about avoiding that association; in many situations only one or the other is correct and you can&#39;t substitute willy-nilly.<br><h4> Comment 64867081 Casey: </h4>@NathanLong I don&#39;t think Japanese counters have much to do with it; all languages have some sort of agreement and you can&#39;t go substituting one counter for another most of time (like, you can&#39;t use the cylinder counter for flat objects; it&#39;s just wrong).  And it has more to do with semantics than euphony.<br>------------------------------------------------------------------ <br><h3> Answer 3893305 sepp2k: </h3><p><code>kind_of?</code> and <code>is_a?</code> are synonymous.</p>
+
+<p><code>instance_of?</code> is different from the other two in that it only returns <code>true</code> if the object is an instance of that exact class, not a subclass.</p>
+
+<p>Example:</p>
+
+<ul>
+<li><code>"hello".is_a? Object</code> and <code>"hello".kind_of? Object</code> return <code>true</code> because <code>"hello"</code> is a <code>String</code> and <code>String</code> is a subclass of <code>Object</code>.</li>
+<li>However <code>"hello".instance_of? Object</code> returns <code>false</code>.</li>
+</ul>
+<h4> Comment 4147181 rfunduk: </h4>It just reads better sometimes. Think <code>@honda.kind_of? Car</code> and <code>@person.is_a? Administrator</code>, Ruby&#39;s all about the aesthetics. In fact, notice the grammatical error... with active support you can write <code>@person.is_an? Administrator</code> :)... That might have made it into Ruby core by now, actually.<br><h4> Comment 5479727 sepp2k: </h4>@Matt: You can override an alias without overriding the aliased function. So yes, you can override <code>kind_of?</code> without overriding <code>is_a?</code>.<br><h4> Comment 44842033 Tom Lord: </h4>Where is this ActiceSupport <code>is_an?</code> method?! It&#39;s not in the current rails version, and I can&#39;t find anything on google about it being deprecated either.<br><h4> Comment 5479695 ma11hew28: </h4>@thenduks, <code>is_an?</code> is not in ruby-1.9.2-p0. @Claudiu, no. <a href="https://github.com/ruby/ruby/blob/trunk/object.c#L2582" rel="nofollow noreferrer"><code>is_a?</code> is just an alias of <code>kind_of?</code></a>. Both methods invoke the same c function, <a href="https://github.com/ruby/ruby/blob/trunk/object.c#L471" rel="nofollow noreferrer"><code>rb_obj_is_kind_of</code></a>.<br><h4> Comment 4147371 Claudiu: </h4>heh that&#39;s an interesting reason. can you break this, thouugh? like can you override <code>kind_of?</code> but not <code>is_a?</code>?<br><h4> Comment 4146899 Claudiu: </h4>ah is <code>is_a?</code> just for backwards compatibility then?<br><h4> Comment 19945598 SpaceGhost: </h4>@Claudiu Ruby&#39;s core and standard library has historically had multiple objects whose methods may be actually aliases of another method. Sometimes, I believe it was for the ability to express yourself in something close to natural language. Backwards compatibility has likely also been a factor.<br><h4> Comment 96310518 lokanadham100: </h4>So, is_a? is similar to === ?<br><h4> Comment 96331552 sepp2k: </h4>@LokanadhamMotumarri Yes, <code>SomeClassOrModule === some_object</code> is equivalent to <code>some_object.is_a? SomeClassOrModule</code>.<br><h4> Comment 55674575 sepp2k: </h4>@Joel Both <code>kind_of?</code> and <code>is_a?</code> match subclasses. Only <code>instance_of?</code> accepts the exact class only.<br><h4> Comment 66255078 dubek: </h4>Ruby 2.4 unifies <code>Fixnum</code> and <code>Bignum</code> into one class (<code>Integer</code>) - see  <a href="https://www.ruby-lang.org/en/news/2016/06/20/ruby-2-4-0-preview1-released/" rel="nofollow noreferrer">ruby-lang.org/en/news/2016/06/20/ruby-2-4-0-preview1-release&zwnj;&#8203;d</a> . Might be a good idea to update the example (e.g., <code>5.is_a? Object</code> returns true but <code>5.instance_of? Object</code> return false).<br>------------------------------------------------------------------ <br><h3> Answer 3893403 J&#246;rg W Mittag: </h3><blockquote>
+<p>What is the difference?</p>
+</blockquote>
+<p>From the documentation:</p>
+<blockquote>
+<dl><dt>- (<em>Boolean</em>) <code>instance_of?(class)</code></dt><dd>Returns <code>true</code> if <code>obj</code> is an instance of the given class.</dd></dl>
+</blockquote>
+<p>and:</p>
+<blockquote>
+<dl><dt>- (<em>Boolean</em>) <code>is_a?(class)</code><br />- (<em>Boolean</em>) <code>kind_of?(class)</code></dt><dd>Returns <code>true</code> if <code>class</code> is the class of <code>obj</code>, or if <code>class</code> is one of the superclasses of <code>obj</code> or modules included in <code>obj</code>.</dd></dl>
+</blockquote>
+<p>If that is unclear, it would be nice to know what <em>exactly</em> is unclear, so that the documentation can be improved.</p>
+<blockquote>
+<p>When should I use which?</p>
+</blockquote>
+<p>Never. Use polymorphism instead.</p>
+<blockquote>
+<p>Why are there so many of them?</p>
+</blockquote>
+<p>I wouldn't call <em>two</em> &quot;many&quot;. There are two of them, because they do two different things.</p>
+<h4> Comment 4147022 Claudiu: </h4>I think my confusion was that there are 3, and that 2 just do the same thing and have different names. About using polymorphism - I agree, but the ruby standard library is full of uses of each of these<br><h4> Comment 14900807 Andrew Grimm: </h4>What do you mean by polymorphism? Is it the same as duck typing?<br><h4> Comment 44359217 Automatico: </h4>It is often better to do polymorphism, yes, but there are border cases where you really want to know that you have a specific class, such as when you are dealing with files.<br><h4> Comment 19945555 SpaceGhost: </h4>Yes, they&#39;re the same. Duck typing is a form of polymorphism.<br>------------------------------------------------------------------ <br><h3> Answer 16461690 kuonirat: </h3><p>It is more Ruby-like to ask objects whether they respond to a method you need or not, using <code>respond_to?</code>. This allows both minimal interface and implementation unaware programming. </p>
+
+<p>It is not always applicable of course, thus there is still a possibility to ask about more conservative understanding of "type", which is class or a base class, using the methods you're asking about.</p>
+<h4> Comment 23882941 penkovsky: </h4>It depends on situation. Both Comment and Blog may respond to created_at. In such situation is_a? is more appropriate IMHO<br><h4> Comment 100263946 Kingdon: </h4>That doesn&#39;t make sense, if you needed to distinguish a Comment and a Blog object from each other, you simply wouldn&#39;t use created_at to do it.  That doesn&#39;t preclude that you could write a method which takes an object that responds to created_at.  If it doesn&#39;t need anything else to do its job, then you could safely use it on Comment or Blog, or fairly any other ActiveRecord model.<br>------------------------------------------------------------------ <br><h3> Answer 17029722 Boris Stitnicky: </h3><p>I also wouldn't call two many (<code>is_a?</code> and <code>kind_of?</code> are aliases of the same method), but if you want to see more possibilities, turn your attention to <code>#class</code> method:</p>
+
+<pre><code>A = Class.new
+B = Class.new A
+
+a, b = A.new, B.new
+b.class &lt; A # true - means that b.class is a subclass of A
+a.class &lt; B # false - means that a.class is not a subclass of A
+# Another possibility: Use #ancestors
+b.class.ancestors.include? A # true - means that b.class has A among its ancestors
+a.class.ancestors.include? B # false - means that B is not an ancestor of a.class
+</code></pre>
+<h4> Comment 24662437 Claudiu: </h4>Thanks - i was indeed asking in a general sense of &quot;what run-time type information can be gathered in Ruby and how&quot; - and this provides ample examples<br><h4> Comment 116568441 Ridhwaan Shakeel: </h4>when is it best to use <code>.class</code> versus <code>.instance_of?</code>?<br>------------------------------------------------------------------ <br><h3> Answer 69700031 Adam Scott: </h3><p><a href="https://stackoverflow.com/a/3893305/10392483">https://stackoverflow.com/a/3893305/10392483</a> is a great explanation ... to add some more colour to this, I tend to use <code>is_a?</code> for &quot;primatives&quot; (String, Array, maybe Hash, etc.)</p>
+<p>So <code>&quot;hello&quot;.is_a?(String)</code>, <code>[].is_a?(Array)</code>, <code>{}.is_a?(Hash)</code></p>
+<p>For anything else, I tend to use <code>instance_of? (Animal.new.instance_of?(Animal)</code></p>
+<p>I say tend to because it's not quite that clear cut. Take for example:</p>
+<pre><code>class Animal;end
+
+class Dog &lt; Animal;end
+
+x = Dog.new
+
+x.is_a?(Dog) # =&gt; true
+x.is_a?(Animal) # =&gt; true
+x.instance_of?(Dog) # =&gt; true
+x.instance_of?(Animal) # =&gt; false
+</code></pre>
+<p>As you can see, x is both a Dog and an Animal, but it's only an instance of Dog.</p>
+<p>I see it as a question of specificity:</p>
+<ul>
+<li>If I just want to know that it's an <code>Animal</code> and not a <code>Plant</code> I'll use <code>is_a?</code></li>
+<li>If I care that it's a <code>Dog</code> and not a <code>Cat</code> I'll use <code>instance_of?</code></li>
+</ul>
+<p>You can then take this further. If I care that it's a <code>Sighthound</code> and not a <code>Bloodhound</code>, assuming both are subclasses of <code>Dog</code>. Then I may want to make it even more specific.</p>
+<p>That said, <code>is_a?(Animal|Dog|Sighthound)</code> will always work. But if you care about the specific subclass, <code>instance_of?</code> is always more specific.</p>

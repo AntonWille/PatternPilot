@@ -1,0 +1,1988 @@
+ <h2> Title: How do I print colored text to the terminal? </h2> <h3> aboSamoor, question_id: 287871 </h3>Score: 3154, Tags: {python,terminal,output,ansi-colors} <br><p>How do I output colored text to the terminal in Python?</p>
+<h4> Comment 28410217 Samie Bencherif: </h4>This symbol would make a great colored block: <code>█</code>   Only problem is that it is extended ASCII, maybe you could get it to work using <code>http:&#47;&#47;stackoverflow.com&#47;questions&#47;8465226&#47;using-extended-as&zwnj;&#8203;cii-codes-with-pytho&zwnj;&#8203;n</code><br><h4> Comment 29915884 ayke: </h4>Some terminals also can display Unicode characters. If that is true for your terminal, the possible characters are almost unlimited.<br>------------------------------------------------------------------ <br><h3> Answer 287987 suhib-alsisan: </h3><p>If you are programming a game perhaps you would like to change the background color and use only spaces? For example:</p>
+
+<pre><code>print " "+ "\033[01;41m" + " " +"\033[01;46m"  + "  " + "\033[01;42m"
+</code></pre>
+<h4> Comment 19713500 pragmatic: </h4>More on this can be found here-  <a href="http://linux.byexamples.com/archives/184/print-text-in-colors-with-a-simple-command-line/" rel="nofollow noreferrer">linux.byexamples.com/archives/184/&hellip;</a><br>------------------------------------------------------------------ <br><h3> Answer 63551578 ijoseph: </h3><pre class="lang-py prettyprint-override"><code>import click
+
+click.secho('Hello, World!', fg='green')
+click.secho('Some more text', bg='blue', fg='white')
+click.secho('ATTENTION', blink=True, bold=True)
+</code></pre>
+<p><a href="https://click.palletsprojects.com/en/7.x/utils/" rel="nofollow noreferrer"><code>click</code> (CLI library)</a> has a very convenient way of doing this, and is worth considering if you're writing a command-line tool, anyway.</p>
+<h4> Comment 112544545 Victor Cordeiro Costa: </h4>Perfect, this worked for me! The <code>color-it</code> solution didn&#39;t work for me because my texts were not colorized by the color provided on the Colors.etc... All my texts were turning into gray texts, but with different tone (lighter / darker)<br><h4> Comment 128319666 Yaroslav Nikitenko: </h4>There are maybe more powerful color libraries, but this one also provides test scrolling and CL arguments autocomplete, which is perfect!<br>------------------------------------------------------------------ <br><h3> Answer 70599663 Vinod Srivastav: </h3><h2>ANSI Escape Codes</h2>
+<p>ANSI escape sequences are a standard for in-band signaling to control <code>cursor location</code>, <code>color</code>, <code>font styling</code>, and other options on video text terminals and terminal emulators. Certain sequences of bytes, most starting with an ASCII escape character and a bracket character, are embedded into text. The terminal interprets these sequences as commands, rather than text to display verbatim.</p>
+<p>And as per the <a href="https://en.wikipedia.org/wiki/ANSI_escape_code" rel="nofollow noreferrer">Wikipedia Article</a> we are using <strong>38</strong> &amp; <strong>48</strong> to set the background color by passing <code>2;r;g;b</code> in the below <strong>Example 1</strong> and using the same with a twist of <code>Html Hex colors</code> in <strong>Example 2</strong></p>
+<p><a href="https://i.stack.imgur.com/pMJaM.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/pMJaM.png" alt="enter image description here" /></a></p>
+<hr />
+<h3>Example 1 (RGB)</h3>
+<p>In <strong>windows 10</strong> &amp; other <strong>ANSI escape code supported terminals</strong> you can try this tiny script called <code>holi.py</code>, which works as a color mixer with values from 0-255 for Red, Green and blue:</p>
+<pre class="lang-py prettyprint-override"><code># filename: holi.py
+import os
+
+os.system('')
+
+
+def RGB(red=None, green=None, blue=None,bg=False):
+    if(bg==False and red!=None and green!=None and blue!=None):
+        return f'\u001b[38;2;{red};{green};{blue}m'
+    elif(bg==True and red!=None and green!=None and blue!=None):
+        return f'\u001b[48;2;{red};{green};{blue}m'
+    elif(red==None and green==None and blue==None):
+        return '\u001b[0m'
+</code></pre>
+<p>and call the RGB function to make any combination of colors as:</p>
+<pre class="lang-py prettyprint-override"><code>from holi import *
+
+
+g0 = RGB()
+g1 = RGB(0,255,0)
+g2 = RGB(0,100,0,True)+&quot;&quot;+RGB(100,255,100)
+g3 = RGB(0,255,0,True)+&quot;&quot;+RGB(0,50,0)
+
+print(f&quot;{g1}green1{g0}&quot;)
+print(f&quot;{g2}green2{g0}&quot;)
+print(f&quot;{g3}green3{g0}&quot;)
+</code></pre>
+<p><code>RGB()</code> with no parameter will cleanup and set the <strong>foreground/background</strong> color to <strong>default</strong>. In case you want <strong>black</strong> you should call it as <code>RGB(0,0,0)</code> and for <strong>white</strong> <code>RGB(255,255,255)</code>. While <code>RGB(0,255,0)</code> creates <strong>absolute green</strong> <code>RGB(150,255,150)</code> will produce <strong>light green</strong>.</p>
+<p>This supports <strong>background</strong> &amp; <strong>foreground</strong> color, to set the color as <strong>background color</strong> you must pass it with <code>bg=True</code> which is <code>False</code> by default.</p>
+<p>For Example: To set <strong>red</strong> as the <strong>background color</strong> it should be called as <code>RGB(255,0,0,True)</code> but to choose <strong>red</strong> as <strong>font color</strong> just call it as <code>RGB(255,0,0,False)</code> since <code>bg</code> is by default <code>False</code> this simplifies to just call it as <code>RGB(255,0,0)</code></p>
+<hr />
+<h3>Example 2 (HEX)</h3>
+<p>In case you don't what to play with 3 different values and rather use <code>html hex colors</code> you can try the below method</p>
+<pre class="lang-py prettyprint-override"><code># filename: holi.py
+import os
+
+os.system('')
+
+def HRGB(value=None,bg=False):
+    if(value==None):
+        return '\u001b[0m'
+    
+    value = value.lstrip('#')
+    lv = len(value)
+    rgb = tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
+    if(bg==False):
+        return f'\u001b[38;2;{rgb[0]};{rgb[1]};{rgb[2]}m'
+    elif(bg==True):
+        return f'\u001b[48;2;{rgb[0]};{rgb[1]};{rgb[2]}m'
+</code></pre>
+<p>So you can again use the same example above:</p>
+<pre class="lang-py prettyprint-override"><code>from holi import *
+
+g0 = HRGB()
+g1 = HRGB(&quot;#00FF00&quot;)
+g2 = HRGB(&quot;#006400&quot;,True)+&quot;&quot;+ HRGB(&quot;#64FF64&quot;)
+g3 = HRGB(&quot;#00FF00&quot;,True)+&quot;&quot;+ HRGB(&quot;#003200&quot;)
+
+print(f&quot;{g1}green1{g0}&quot;)
+print(f&quot;{g2}green2{g0}&quot;)
+print(f&quot;{g3}green3{g0}&quot;)
+</code></pre>
+<p>And it produces same result.</p>
+<p><a href="https://i.stack.imgur.com/3kxrm.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/3kxrm.png" alt="enter image description here" /></a></p>
+<hr />
+<p><em>You can select either of the two version(rgb/hex) than save &amp; <code>import holi</code> to get the desired effect</em></p>
+<h4> Comment 124864399 alexzander: </h4>everyone keep in mind that these colors are <code>terminal independent</code>, meaning that if you want some type of green that is not from your terminal&#39;s <code>TERM 256 colors</code> its <code>going to work</code><br><h4> Comment 133945420 panofish: </h4>All suggested solutions have their tradeoffs, but I like this one because I have full control over background and foreground colors and I don&#39;t need to install a python module.  Thanks.<br><h4> Comment 133954074 Vinod Srivastav: </h4>@Brōtsyorfuzthrāx ANSI escape codes are often used in UNIX and UNIX-like terminals, so this should work. You can read lot more about it here <a href="https://en.wikipedia.org/wiki/ANSI_escape_code" rel="nofollow noreferrer">en.wikipedia.org/wiki/ANSI_escape_code</a><br><h4> Comment 130774335 Brōtsyorfuzthrāx: </h4>I don&#39;t suppose you know how to do the same thing in Linux in gnome-terminal, or xfce4-terminal, do you?<br>------------------------------------------------------------------ <br><h3> Answer 287944 joeld: </h3><p>This somewhat depends on what platform you are on. The most common way to do this is by printing ANSI escape sequences. For a simple example, here's some Python code from the <a href="https://svn.blender.org/svnroot/bf-blender/trunk/blender/build_files/scons/tools/bcolors.py" rel="noreferrer">Blender build scripts</a>:</p>
+<pre><code>class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+</code></pre>
+<p>To use code like this, you can do something like:</p>
+<pre><code>print(bcolors.WARNING + &quot;Warning: No active frommets remain. Continue?&quot; + bcolors.ENDC)
+</code></pre>
+<p>Or, with Python 3.6+:</p>
+<pre><code>print(f&quot;{bcolors.WARNING}Warning: No active frommets remain. Continue?{bcolors.ENDC}&quot;)
+</code></pre>
+<p>This will work on unixes including OS X, Linux and Windows (provided you use <a href="https://github.com/adoxa/ansicon" rel="noreferrer">ANSICON</a>, or in Windows 10 provided you enable <a href="https://msdn.microsoft.com/en-us/library/mt638032" rel="noreferrer">VT100 emulation</a>). There are ANSI codes for setting the color, moving the cursor, and more.</p>
+<p>If you are going to get complicated with this (and it sounds like you are if you are writing a game), you should look into the &quot;<a href="https://en.wikipedia.org/wiki/Curses_%28programming_library%29" rel="noreferrer">curses</a>&quot; module, which handles a lot of the complicated parts of this for you. The <a href="http://docs.python.org/howto/curses.html" rel="noreferrer" title="Python Curses howto">Python Curses HowTO</a> is a good introduction.</p>
+<p>If you are not using extended ASCII (i.e., not on a PC), you are stuck with the ASCII characters below 127, and '#' or '@' is probably your best bet for a block. If you can ensure your terminal is using a IBM <a href="http://telecom.tbi.net/asc-ibm.html" rel="noreferrer">extended ASCII character set</a>, you have many more options. Characters 176, 177, 178 and 219 are the &quot;block characters&quot;.</p>
+<p>Some modern text-based programs, such as &quot;Dwarf Fortress&quot;, emulate text mode in a graphical mode, and use images of the classic PC font. You can find some of these bitmaps that you can use on the <a href="http://dwarffortresswiki.org/DF2014:Tilesets" rel="noreferrer">Dwarf Fortress Wiki</a> see (<a href="http://dwarffortresswiki.org/Tileset_repository" rel="noreferrer">user-made tilesets</a>).</p>
+<p>The <a href="http://en.wikipedia.org/wiki/TMDC" rel="noreferrer" title="text mode demo contest">Text Mode Demo Contest</a> has more resources for doing graphics in text mode.</p>
+<h4> Comment 17984827 Martin Ueding: </h4>On Linux, you might want to use <code>tput</code>, <a href="https://gist.github.com/4007035" rel="nofollow noreferrer">like so</a> since it results in more portable code.<br><h4> Comment 65899112 Eryk Sun: </h4>@AlexanderSimko, here&#39;s a ctypes code snippet to enable VT100 support in Windows 10: <code>import ctypes;</code> <code>kernel32 = ctypes.WinDLL(&#39;kernel32&#39;);</code> <code>hStdOut = kernel32.GetStdHandle(-11);</code> <code>mode = ctypes.c_ulong();</code> <code>kernel32.GetConsoleMode(hStdOut, ctypes.byref(mode));</code> <code>mode.value |= 4;</code> <code>kernel32.SetConsoleMode(hStdOut, mode)</code>.<br><h4> Comment 80208748 balu: </h4>To anyone using the Python example code from the answer: It should be noted that the colors in the range 90-97 and 100-107 are <i>non-standard</i> and, indeed, on my terminal they don&#39;t all give the colors indicated by the variable names. It&#39;s better to use the standard ranges 30-37 and 40-47. Source: <a href="https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_.28Select_Graphic_Rendition.29_parameters" rel="nofollow noreferrer">en.wikipedia.org/wiki/&hellip;</a><br><h4> Comment 120900550 crxyz: </h4>On windows, you can make ansi escape codes work by running the color command in cmd. Just put in <code>os.system(&quot;color&quot;)</code><br><h4> Comment 35045987 Sebastian Mach: </h4>@Cawas: A real use case for <code>disable</code> is when you pipe the output to a file; while tools like <code>cat</code> may support colors, it is generally better to not print color information to files.<br><h4> Comment 83373357 Joren: </h4>So when I run a python script with <code>print(&#39;\033[94mfoo&#39;)</code> in my terminal, all the text in my terminal after that is blue... How do I prevent that?<br><h4> Comment 62697809 Samie Bencherif: </h4>Try this snippet to see all the colors and styles your system supports: <code>print(&#39;&#39;.join([&#39;\033[&#39; + str(x) + &#39;mfoo&#39; for x in range(0,150)]) +&#39;\033[0m&#39;)</code><br><h4> Comment 113793365 Mike Pennington: </h4>A <a href="http://jafrog.com/2013/11/23/colors-in-terminal.html" rel="nofollow noreferrer">good reference</a> for how term colors work: <a href="http://jafrog.com/2013/11/23/colors-in-terminal.html" rel="nofollow noreferrer">jafrog.com/2013/11/23/colors-in-terminal.html</a><br><h4> Comment 83717161 Noel: </h4>@Joren You need the end the cursor with <code>\033[0m</code>. With the example above, appending <code>bcolors.ENDC</code> after a previously initiated color.<br><h4> Comment 124326056 rbaleksandar: </h4>One thing to note that is important imho is that the code posted in this answer (as also stated by its author) is part of the Blender codebase. As such it is susceptible to Blender&#39;s license, which is GPL. I think the code should be changed in a way that it is not longer a problem or write own version of it.<br><h4> Comment 100244394 gjois: </h4>adding <code>1;</code> will also make it bold. Like <code>\033[1;Xm</code> (where X is color code)<br><h4> Comment 113568917 BayesianMonk: </h4>And how one would combine BOLD and COLOURED type? <code>print(f&#39;{bcolors.OKBLUE}{bcolors.BOLD}Test{bcolors.ENDC}&#39;)</code> will display in blue but not in bold.<br><h4> Comment 15606861 Adobe: </h4>But suppose my default prompt is not black - do You think it&#39;s possible to make python resotre after these tricks?<br><h4> Comment 17113585 Dennis: </h4>Another useful one is <code>UNDERLINE = &#39;\033[4m&#39;</code>.  What happens if <code>ansi.sys</code> is disabled on Windows and you try to use these ANSI escape sequences?<br><h4> Comment 35140765 cregox: </h4>@phresnel I see... If so I believe for this answer it should not even be mentioned as it only confuses the objectivity of it. Even if it was <i>Steven Oxley</i>&#39;s usage case (from the previous comment addressing this same issue) it&#39;s still the same matter. Maybe I should suggest an edit.<br><h4> Comment 35348004 Ethan Bierlein: </h4>@joeld is it possible to do variants of one color?<br><h4> Comment 50434132 user393267: </h4>What is the difference between the \033[ and the \x1b[ ? They seem to do the same thing<br><h4> Comment 50810085 mike: </h4>Just noting: The Python Curses module is also available in Python 3 <a href="https://docs.python.org/3/howto/curses.html" rel="nofollow noreferrer">docs.python.org/3/howto/curses.html</a><br><h4> Comment 59043378 Alexander Simko: </h4>Just noting: in windows 10, there is no need to enable ansi.sys because the terminal recognizes escape characters.<br><h4> Comment 59135960 Toby Speight: </h4>Don&#39;t just throw out terminal codes without checking the value of <code>$TERM</code>!  Better, use a standard termcap library to refer to them by name...<br><h4> Comment 65899095 Eryk Sun: </h4>@AlexanderSimko, I&#39;m not sure what you mean by ansi.sys. That was an MS-DOS driver. Maybe you&#39;re referring to ANSICON, which hooks and hacks the Windows console API.  The Windows 10 console does natively supports VT100 emulation, but it has to be enabled. If you start Python via cmd.exe it&#39;s enabled, but this isn&#39;t the default for new consoles, such as running py.exe or python.exe by clicking on a script.<br><h4> Comment 80208702 balu: </h4>@newbiez There is no difference, both give the same character <code>ESC</code> (i.e. the character #27 in the ASCII table). <code>33</code> and <code>1B</code> are simply the octal and the hexadecimal representation of the decimal number 27.<br>------------------------------------------------------------------ <br><h3> Answer 293633 Samat Jain: </h3><p>There is also the <a href="http://pypi.python.org/pypi/termcolor" rel="noreferrer">Python termcolor module</a>. Usage is pretty simple:</p>
+<pre><code>from termcolor import colored
+
+print colored('hello', 'red'), colored('world', 'green')
+</code></pre>
+<p>Or in Python 3:</p>
+<pre><code>print(colored('hello', 'red'), colored('world', 'green'))
+</code></pre>
+<p>It may not be sophisticated enough, however, for game programming and the &quot;colored blocks&quot; that you want to do...</p>
+<p>To get the ANSI codes working on windows, first run</p>
+<pre><code>os.system('color')
+</code></pre>
+<h4> Comment 94348025 Szabolcs: </h4>On Windows run <code>os.system(&#39;color&#39;)</code> first, then the ANSI escape sequences start working.<br><h4> Comment 9680273 Alexander Tsepkov: </h4>Just noticed that as of 13/01/2011, it&#39;s now under MIT license<br><h4> Comment 55180937 akxlr: </h4><code>termcolor.COLORS</code> gives you a list of colours<br><h4> Comment 8171071 Phil P: </h4>Since it&#39;s emitting ANSI codes, does it work on Windows (DOS consoles) if ansi.sys is loaded?  <a href="http://support.microsoft.com/kb/101875" rel="nofollow noreferrer">support.microsoft.com/kb/101875</a><br><h4> Comment 92606077 ivanleoncz: </h4>Hey Samat! Would it be nice to mention that you can still use <code>.format()</code> for adding variables to the printed string, like this: <code>print(colored(&#39;{0}&#39;, &#39;red&#39;).format(var_with_msg))</code>. Nice solution! Tks<br><h4> Comment 97159457 wizzwizz4: </h4>@Szabolcs You should find that you don&#39;t need that on the Windows 10 new terminal, which supports them natively.<br><h4> Comment 45780642 ereOn: </h4>There is also <a href="https://github.com/freelan-developers/chromalog" rel="nofollow noreferrer">chromalog</a> which has the ability to detect the color-capability of the displaying terminal (and to eventually fall back to other decoration methods if needed). (Disclaimer: I&#39;m the author)<br><h4> Comment 113701941 Yan King Yin: </h4>On Linux do: <code>pip install python-termcolor</code><br><h4> Comment 122519076 Carl Walsh: </h4><code>termcolor</code> module&#39;s <a href="https://pypi.org/project/termcolor/#history" rel="nofollow noreferrer">last release</a> was in Jan 2011.<br><h4> Comment 129401614 Abraham Murciano Benzadon: </h4>I created constyle <a href="https://github.com/abrahammurciano/python-constyle" rel="nofollow noreferrer">github.com/abrahammurciano/python-constyle</a> which IMO has a much neater API than termcolor<br><h4> Comment 129952568 Mujtaba: </h4>You can also use <code>os.system(&#39;cls&#39;)</code> or <code>os.system(&#39;clear&#39;)</code> to show ANSI colors.<br><h4> Comment 129975218 tommy.carstensen: </h4>It seems <code>termcolor</code> does not support black.<br><h4> Comment 136508646 plswork04: </h4>Last release: Apr 23, 2023. But yes. Was dormant from 2011 to 2022<br><h4> Comment 115752714 sakiM: </h4>Indeed <code>os.system(&#39;color&#39;) </code> work, furthermore even <code>os.system(&#39;&#39;)</code> work well. very strange<br><h4> Comment 50225599 dtk: </h4><a href="https://pypi.python.org/pypi/termcolor#changes" rel="nofollow noreferrer">Version 1.1.0</a> added a <code>cprint()</code> function: <a href="https://pypi.python.org/pypi/termcolor#example" rel="nofollow noreferrer"><code>cprint(&#39;Hello, World!&#39;, &#39;green&#39;, &#39;on_red&#39;)</code></a>.<br>------------------------------------------------------------------ <br><h3> Answer 3332860 priestc: </h3><p>The answer is <a href="https://pypi.python.org/pypi/colorama" rel="noreferrer">Colorama</a> for all cross-platform coloring in Python.</p>
+<p>It supports Python 3.5+ as well as Python 2.7.</p>
+<p>And as of January 2023, it is maintained.</p>
+<p>Example Code:</p>
+<pre class="lang-py prettyprint-override"><code>from colorama import init as colorama_init
+from colorama import Fore
+from colorama import Style
+
+colorama_init()
+
+print(f&quot;This is {Fore.GREEN}color{Style.RESET_ALL}!&quot;)
+</code></pre>
+<p>Example Screenshot:
+<a href="https://i.stack.imgur.com/q3D4W.png" rel="noreferrer"><img src="https://i.stack.imgur.com/q3D4W.png" alt="example screenshot" /></a></p>
+<h4> Comment 97269511 mazunki: </h4>How do you suggest to mix both of them together?<br><h4> Comment 3901803 Jonathan Hartley: </h4>As the author of Colorama, thanks for the mention @nbv4. I&#39;ll try and clarify a bit: Colorama aims to let Python programs print colored terminal text on all platforms, using the same ANSI codes as described in many other answers on this page. On Windows, Colorama strips these ANSI characters from stdout and converts them into equivalent win32 calls for colored text. On other platforms, Colorama does nothing. Hence you can use ANSI codes, or modules like Termcolor, and with Colorama, they &#39;just work&#39; on all platforms. Is that idea, anyhow.<br><h4> Comment 25204209 daviewales: </h4>This should be in the standard library... Cross platform colour support is important, I think.<br><h4> Comment 84721737 Smit Johnth: </h4>This doesn&#39;t work without calling colorama.init(). Vote up!<br><h4> Comment 71812943 gvalkov: </h4>Colorama is great! Also have a look at <a href="https://github.com/gvalkov/python-ansimarkup" rel="nofollow noreferrer">ansimarkup</a>, which is built on colorama and allows you to use a simple tag-based markup (e.g. <code>&lt;b&gt;bold&lt;&#47;b&gt;</code>) for adding style to terminal text<br><h4> Comment 18721615 Demolishun: </h4>@Jonathan, This is truly an awesome library!  The ability to cross platform color Python output is really really nice and useful.  I am providing tools for a library that colors its own console.  I can redirect the output of that console to the terminal and colorize the output.  Now I can even one up the library and let the user select colors.  This will allow color blind people to set things to work so they can actually see the output correctly.  Thanks<br><h4> Comment 97269380 Jonathan Hartley: </h4>@mazunki The main purpose of Colorama is to allow existing ANSI color codes in a stream to work on Windows. Or, it also allows the author of a Python program to explicitly add their own color codes into things they print (but really, use blessings for that instead.)  Colorama does not automatically &#39;colorize&#39; things like JSON dumps. Use something like `pygmentize&#39; (from Pygments) for that.<br><h4> Comment 84432773 pretzlstyle: </h4><code>Colorama</code> comes with Anaconda, whereas <code>termcolor</code>, suggested in an answer above, does not. This maked <code>Colorama</code> highly preferable for many Python users.<br><h4> Comment 86706935 Michael Leonard: </h4>@SmitJohnth only on Windows.<br><h4> Comment 98704144 Jonathan Hartley: </h4>I bet you can can use &#39;pygments&#39; to add colors to some json from within a python program. Then, in the same program, <code>import colorama</code> and call <code>colorama.init()</code> so that when you print the result to stdout, it works on Windows as well as elsewhere.<br><h4> Comment 119911143 CervEd: </h4>it&#39;s an oversimplification that <code>colorama.init()</code> is required to work on Windows, in-fact, it may even break color output on Windows. It depends on the terminal/enviroment<br><h4> Comment 126543201 Cagy79: </h4>Doesn&#39;t seem to work in Powershell:     ←[31mOFFLINE←[0m<br><h4> Comment 111008631 Nathan Chappell: </h4>@gvalkov thanks for the tip, love your little library.  One liner highlighting is clear and concise: <code>ansiprint(f&#39;&lt;bg white&gt;&lt;blue&gt;{h}&lt;&#47;blue&gt;&lt;&#47;bg white&gt;&#39;.join(s.split(h)))</code><br><h4> Comment 113512255 Abdul Haseeb: </h4>As suggested by @SmitJohnth, You have to run this line of code to work the above code snipped, colorama.init()<br><h4> Comment 86745000 Smit Johnth: </h4>@MichaelLeonard this answer shoud be crossplatform, right?<br><h4> Comment 87170269 Leogout: </h4>If you use the Pycharm console, calling init() on Windows will instead deactivate the colors as it already interprets the ANSI codes and ignores the win32 ones.<br><h4> Comment 87260433 Michael Leonard: </h4>@SmitJohnth, yes that would make the answer cross platform, which is unarguably good. But saying the code doesn&#39;t work without calling init() also isn&#39;t right, it works just fine on Unixy systems without it.<br><h4> Comment 88639148 gcharbon: </h4>@SmitJohnth thanks for the additional info I was struggling to make it work on windows ! This is definetely useful and could be included in the answer.<br><h4> Comment 97266565 mazunki: </h4>Does Colorama work for JSON dumps, @JonathanHartley?<br>------------------------------------------------------------------ <br><h3> Answer 21786287 rabin utam: </h3><p>Print a string that starts a color/style, then the string, and then end the color/style change with <code>'\x1b[0m'</code>:</p>
+<pre><code>print('\x1b[6;30;42m' + 'Success!' + '\x1b[0m')
+</code></pre>
+<p><a href="https://i.stack.imgur.com/RN3MN.png" rel="noreferrer"><img src="https://i.stack.imgur.com/RN3MN.png" alt="Success with green background example" /></a></p>
+<p>Get a table of format options for shell text with the following code:</p>
+<pre><code>def print_format_table():
+    &quot;&quot;&quot;
+    prints table of formatted text format options
+    &quot;&quot;&quot;
+    for style in range(8):
+        for fg in range(30,38):
+            s1 = ''
+            for bg in range(40,48):
+                format = ';'.join([str(style), str(fg), str(bg)])
+                s1 += '\x1b[%sm %s \x1b[0m' % (format, format)
+            print(s1)
+        print('\n')
+
+print_format_table()
+</code></pre>
+<h1>Light-on-dark example (complete)</h1>
+<p><a href="https://i.stack.imgur.com/6otvY.png" rel="noreferrer"><img src="https://i.stack.imgur.com/6otvY.png" alt="Enter image description here" /></a></p>
+<h1>Dark-on-light example (partial)</h1>
+<p><img src="https://i.stack.imgur.com/lZr23.png" alt="Top part of output" /></p>
+<p>Reference: <a href="https://en.wikipedia.org/wiki/ANSI_escape_code#Colors" rel="noreferrer">https://en.wikipedia.org/wiki/ANSI_escape_code#Colors</a></p>
+<h4> Comment 33067813 dashesy: </h4>this works in most shells as well as ipython, good enough for most applications<br><h4> Comment 70404489 Ruggero Turra: </h4>how portable is it?<br><h4> Comment 69111047 FlipTack: </h4>can I ask, which terminal is this?<br><h4> Comment 72430455 Jonathan H: </h4>Short standalone implementation: <a href="https://gist.github.com/Sheljohn/68ca3be74139f66dbc6127784f638920" rel="nofollow noreferrer">gist.github.com/Sheljohn/68ca3be74139f66dbc6127784f638920</a><br><h4> Comment 113206663 DoomGoober: </h4>To make this work in Windows 10 Powershell, in you Python import os then do os.system(&#39;color&#39;). From then on, ANSI escape sequences will magically work.<br><h4> Comment 127491246 mousetail: </h4>@DoomGoober Running <code>os.system(&#39;&#39;)</code> will also work, IDK why<br><h4> Comment 126442697 Glen Thompson: </h4>@rabin-utam Would be nice if there was a link to these vs just screenshots<br><h4> Comment 117983001 NegaOverflow: </h4>kind reminder: code begin with 5 or 6 are blinking. e.g. <code>5;37;41</code> or <code>6;37;41</code> and the last number can be reaching &gt;=48, which is fully white background.<br><h4> Comment 111877497 wjandrea: </h4>@Flip This will work in any terminal/console that supports ANSI escape sequences.<br>------------------------------------------------------------------ <br><h3> Answer 39452138 qubodup: </h3><p>Define a string that starts a color and a string that ends the color. Then print your text with the start string at the front and the end string at the end.</p>
+<pre class="lang-py prettyprint-override"><code>CRED = '\033[91m'
+CEND = '\033[0m'
+print(CRED + &quot;Error, does not compute!&quot; + CEND)
+</code></pre>
+<p>This produces the following in Bash, in <code>urxvt</code> with a Zenburn-style color scheme:</p>
+<p><a href="https://i.stack.imgur.com/Iu3I1.png" rel="noreferrer"><img src="https://i.stack.imgur.com/Iu3I1.png" alt="Output colors" /></a></p>
+<p>Through experimentation, we can get more colors:</p>
+<p><a href="https://i.stack.imgur.com/j7e4i.gif" rel="noreferrer"><img src="https://i.stack.imgur.com/j7e4i.gif" alt="Color matrix" /></a></p>
+<p>Note: <code>\33[5m</code> and <code>\33[6m</code> are blinking.</p>
+<p>This way we can create a full color collection:</p>
+<pre><code>CEND      = '\33[0m'
+CBOLD     = '\33[1m'
+CITALIC   = '\33[3m'
+CURL      = '\33[4m'
+CBLINK    = '\33[5m'
+CBLINK2   = '\33[6m'
+CSELECTED = '\33[7m'
+
+CBLACK  = '\33[30m'
+CRED    = '\33[31m'
+CGREEN  = '\33[32m'
+CYELLOW = '\33[33m'
+CBLUE   = '\33[34m'
+CVIOLET = '\33[35m'
+CBEIGE  = '\33[36m'
+CWHITE  = '\33[37m'
+
+CBLACKBG  = '\33[40m'
+CREDBG    = '\33[41m'
+CGREENBG  = '\33[42m'
+CYELLOWBG = '\33[43m'
+CBLUEBG   = '\33[44m'
+CVIOLETBG = '\33[45m'
+CBEIGEBG  = '\33[46m'
+CWHITEBG  = '\33[47m'
+
+CGREY    = '\33[90m'
+CRED2    = '\33[91m'
+CGREEN2  = '\33[92m'
+CYELLOW2 = '\33[93m'
+CBLUE2   = '\33[94m'
+CVIOLET2 = '\33[95m'
+CBEIGE2  = '\33[96m'
+CWHITE2  = '\33[97m'
+
+CGREYBG    = '\33[100m'
+CREDBG2    = '\33[101m'
+CGREENBG2  = '\33[102m'
+CYELLOWBG2 = '\33[103m'
+CBLUEBG2   = '\33[104m'
+CVIOLETBG2 = '\33[105m'
+CBEIGEBG2  = '\33[106m'
+CWHITEBG2  = '\33[107m'
+</code></pre>
+<p>Here is the code to generate the test:</p>
+<pre class="lang-py prettyprint-override"><code>x = 0
+for i in range(24):
+  colors = &quot;&quot;
+  for j in range(5):
+    code = str(x+j)
+    colors = colors + &quot;\33[&quot; + code + &quot;m\\33[&quot; + code + &quot;m\033[0m &quot;
+  print(colors)
+  x = x + 5
+</code></pre>
+<h4> Comment 75825479 Zypps987: </h4>What shell or terminal makes it blink?<br><h4> Comment 121581591 Roland Pihlakas: </h4>@captain <code>\33[25m</code> should also mean &quot;Not blinking&quot;, without resetting other styles - <a href="https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters" rel="nofollow noreferrer">en.wikipedia.org/wiki/&hellip;</a><br><h4> Comment 75983781 qubodup: </h4>(u)rxvt for example<br><h4> Comment 129617795 kevin walker: </h4>Turned your list into a class. Love it. Use it often. Thank you!<br><h4> Comment 118046704 uliwitness: </h4>FYI - What is labeled &quot;beige&quot; above is a light cyan on Apple&#39;s Terminal (and also in many other lists of color names for Python). Also, some of the double colors are light/dark versions, and the white variants I would call white and grey ...<br>------------------------------------------------------------------ <br><h3> Answer 54955094 SimpleBinary: </h3><p>Here's a solution that works on Windows 10 natively.</p>
+<p>Using a system call, such as <code>os.system(&quot;&quot;)</code>, allows colours to be printed in Command Prompt and Powershell natively:</p>
+<pre class="lang-py prettyprint-override"><code>import os
+
+# System call
+os.system(&quot;&quot;)
+
+# Class of different styles
+class style():
+    BLACK = '\033[30m'
+    RED = '\033[31m'
+    GREEN = '\033[32m'
+    YELLOW = '\033[33m'
+    BLUE = '\033[34m'
+    MAGENTA = '\033[35m'
+    CYAN = '\033[36m'
+    WHITE = '\033[37m'
+    UNDERLINE = '\033[4m'
+    RESET = '\033[0m'
+
+print(style.YELLOW + &quot;Hello, World!&quot;)
+</code></pre>
+<p>Note: Windows does not fully support ANSI codes, whether through system calls or modules. Not all text decoration is supported, and although the bright colours display, they are identical to the regular colours.</p>
+<p>Thanks to @j-l for finding an even shorter method.</p>
+<p><strong>tl;dr</strong>: Add <code>os.system(&quot;&quot;)</code></p>
+<h4> Comment 107634646 J-L: </h4>Thanks so much for your answer, @SimpleBinary!  Playing around with your answer, I&#39;ve found that you can simplify <code>if sys.platform.lower() == &quot;win32&quot;: os.system(&#39;color&#39;)</code> even further by simply replacing it with just <code>os.system(&#39;&#39;)</code>.  No condition is needed, and the code runs in both Windows 10 and Linux (when I tested it).  As you can see, you don&#39;t have to make a system call to <code>color</code>.  Calls to <code>dir</code>, <code>cd</code>, <code>abcdef</code>, and just an empty string work fine (although the non-empty strings will likely print output you don&#39;t want to see).<br><h4> Comment 113817400 starwarswii: </h4>this is really interesting! why does <code>os.system(&quot;&quot;)</code> cause color codes to work?<br><h4> Comment 107636441 J-L: </h4>In short, the call to <code>color</code> isn&#39;t the crucial part; it&#39;s the <code>os.system(command)</code> line itself that makes printing colors possible when running on Windows 10.  And the &quot;command&quot; can be anything, really -- even just an empty string.<br><h4> Comment 99454933 Stuart Axon: </h4>This works - I&#39;m really surprised that the color command enables ANSI codes in the Windows terminal, I&#39;ve gone for years without knowing this was possible - the command itself doesn&#39;t give any clue that it does this.<br><h4> Comment 120177725 some dev: </h4>@Starwarswii It&#39;s not python&#39;s implementation, in C running <code>printf(fmt, ...);</code> with ASNI codes in windows after calling <code>system(&quot;&quot;);</code> (<code>include &lt;stdlib.h&gt;</code>) does prints the color text, I&#39;m still curious why is that?<br><h4> Comment 124648740 not2qubit: </h4>The most likely reason why <code>os.system(&quot;&quot;)</code> makes this work, is that it <i>somehow</i> enables the (Windows10) <code>Virtual Terminal</code> (<b>VT</b>) settings and <b>UTF-8</b> (without BOM), when opening a pipe or console handle. Perhaps <a href="https://superuser.com/a/1300251/116221">this</a> answer is correct. You may want to experiment with setting <code>ENABLE_VIRTUAL_TERMINAL_PROCESSING</code> using methods from <a href="https://stackoverflow.com/questions/53753106/how-to-change-the-console-ouptut-mode-using-setconsolemode-in-powershell">here</a>.<br><h4> Comment 107023014 SimpleBinary: </h4>@MaxDoesStuff Really? Which Python version are you using? Also which version of MacOS?<br><h4> Comment 107023071 SimpleBinary: </h4>@Nikos Sorry, I forgot to say that it only works on Windows 10.<br><h4> Comment 105554207 SimpleBinary: </h4>@anaksunaman This will work on all Operating Systems that support coloured text already, as well as supporting Windows 10.<br><h4> Comment 134336242 Furkan G&#246;z&#252;kara: </h4>this didnt work for me<br><h4> Comment 123045358 MatsK: </h4>Just some housekeeping, I would have changed the print to <code>print(style.YELLOW + &quot;Hello, World!&quot; + style.RESET)</code><br><h4> Comment 123992133 alper: </h4>how can I make them bold?<br><h4> Comment 113876760 SimpleBinary: </h4>@Starwarswii Any system call seems to work. No idea why. If I find out, I&#39;ll put it on here.<br>------------------------------------------------------------------ <br><h3> Answer 287934 Bryan Oakley: </h3><p>You want to learn about ANSI escape sequences. Here's a brief example:</p>
+<pre><code>CSI = &quot;\x1B[&quot;
+print(CSI+&quot;31;40m&quot; + &quot;Colored Text&quot; + CSI + &quot;0m&quot;)
+</code></pre>
+<p>For more information, see <em><a href="http://en.wikipedia.org/wiki/ANSI_escape_code" rel="noreferrer">ANSI escape code</a></em>.</p>
+<p>For a block character, try a Unicode character like \u2588:</p>
+<pre><code>print(u&quot;\u2588&quot;)
+</code></pre>
+<p>Putting it all together:</p>
+<pre><code>print(CSI+&quot;31;40m&quot; + u&quot;\u2588&quot; + CSI + &quot;0m&quot;)
+</code></pre>
+<h4> Comment 117147713 Qohelet: </h4>I&#39;ve been trying this solution. What is the purpose of <code>&quot;31;40m&quot; </code> and <code>&quot;0m&quot;</code>?<br><h4> Comment 31228223 Evgeni Sergeev: </h4>Try <code>def d(*v): return &#39;\x1B[&#39;+&#39;;&#39;.join(map(str, v))+&#39;m&#39;</code> then <code>print &#39; &#39;.join([d(k,i)+str(i%10)+d(0) for i in range(30,38)+range(40,48) for k in range(2)])</code><br><h4> Comment 82925992 MohitC: </h4>what is the meaning of reset here?<br><h4> Comment 117149746 Bryan Oakley: </h4>@Qohelet: did you follow the link to &quot;ANSI escape code&quot;? It explains how ANSI escape sequences work. The first set of numbers tell the terminal to start using a specific foreground and background color, the <code>0m</code> tells the terminal to stop using that color.<br><h4> Comment 117150287 Qohelet: </h4>@BryanOakley - I wonder as this is not happening. Python3.7 prints it as regular text.<br><h4> Comment 117150650 Bryan Oakley: </h4>Are you running it in a terminal window that supports ANSI escape sequences?<br><h4> Comment 122129412 starriet: </h4>Compact but informative. Should be upvoted more. Quick question: There seems to be different kinds of <i>&quot;escape&quot;</i> stuff, such as ^[, \033, \u001b, \x1b (you used <b>x1b</b> I guess). What are the differences between them? I tried to search but not very clear.<br>------------------------------------------------------------------ <br><h3> Answer 48723332 Rotareti: </h3><p><a href="https://github.com/feluxe/sty" rel="noreferrer">sty</a> is similar to colorama, but it's less verbose, supports <a href="https://sty.mewo.dev/docs/coloring.html#coloring-with-8-bit-codes" rel="noreferrer">8-bit</a> and <a href="https://sty.mewo.dev/docs/coloring.html#coloring-with-24bit-codes" rel="noreferrer">24-bit</a> (RGB) colors, supports all <a href="https://sty.mewo.dev/docs/effects.html" rel="noreferrer">effects</a> (bold, underline, etc.), allows you to <a href="https://sty.mewo.dev/docs/customizing.html#add-custom-styles-to-a-register-object" rel="noreferrer">register your own styles</a>, is fully typed and high performant, supports <a href="https://sty.mewo.dev/docs/muting.html#the-mute-and-unmute-methods" rel="noreferrer">muting</a>, is not messing with globals such as <code>sys.stdout</code>, is really flexible, well <a href="https://sty.mewo.dev/" rel="noreferrer">documented</a> and more...</p>
+<p><strong>Examples:</strong></p>
+<pre class="lang-py prettyprint-override"><code>from sty import fg, bg, ef, rs
+
+foo = fg.red + 'This is red text!' + fg.rs
+bar = bg.blue + 'This has a blue background!' + bg.rs
+baz = ef.italic + 'This is italic text' + rs.italic
+qux = fg(201) + 'This is pink text using 8bit colors' + fg.rs
+qui = fg(255, 10, 10) + 'This is red text using 24bit colors.' + fg.rs
+
+# Add custom colors:
+
+from sty import Style, RgbFg
+
+fg.orange = Style(RgbFg(255, 150, 50))
+
+buf = fg.orange + 'Yay, Im orange.' + fg.rs
+
+print(foo, bar, baz, qux, qui, buf, sep='\n')
+</code></pre>
+<p>prints:</p>
+<p><a href="https://i.stack.imgur.com/4BIdi.png" rel="noreferrer"><img src="https://i.stack.imgur.com/4BIdi.png" alt="Enter image description here" /></a></p>
+<p><strong>Demo:</strong></p>
+<p><a href="https://i.stack.imgur.com/S8wtO.png" rel="noreferrer"><img src="https://i.stack.imgur.com/S8wtO.png" alt="Enter image description here" /></a></p>
+<h4> Comment 136506667 Adam Dingle: </h4>Sty is great.  In my opinion it should be added to Python&#39;s standard library.<br><h4> Comment 100024848 Rotareti: </h4>@intijk Your question doesn&#39;t really fit the comment section. For this kind of question please create a new SO Question or use the github issue tracker.<br><h4> Comment 90634802 Victor Gavro: </h4>It would be very useful if you consider to compare it with colorama, I prefer your library, but just because more short api from the box, and it would be great if it will be more popular. Thanks!<br><h4> Comment 100018011 intijk: </h4>I like sty and I am trying to format my string with sty, one issue is that , when I print multiple colors, can I reset to previous color instead of default color?<br><h4> Comment 100024722 Rotareti: </h4>@VictorGavro That&#39;s a good idea! I may add a comparison to the documentation.<br><h4> Comment 119729190 MRule: </h4>@intijk : use the codes <code>fg.rs</code> and <code>bg.rs</code> to reset the foreground and background colors to default, respectively.<br>------------------------------------------------------------------ <br><h3> Answer 65088582 Will McGugan: </h3><p><a href="https://github.com/willmcgugan/rich" rel="noreferrer">Rich</a> is a relatively new Python library for working with color in the terminal.</p>
+<p>There are a few ways of working with color in Rich. The quickest way to get started would be the rich print method which renders a <a href="https://en.wikipedia.org/wiki/BBCode" rel="noreferrer">BBCode</a>-like syntax in to ANSI control codes:</p>
+<pre class="lang-py prettyprint-override"><code>from rich import print
+print(&quot;[red]Color[/] in the [bold magenta]Terminal[/]!&quot;)
+</code></pre>
+<p>There are other ways of applying color with Rich (regex, syntax) and related formatting features.</p>
+<p><a href="https://i.stack.imgur.com/4jJaD.png" rel="noreferrer"><img src="https://i.stack.imgur.com/4jJaD.png" alt="Screenshot of Rich" /></a></p>
+------------------------------------------------------------------ <br><h3> Answer 61960902 CircuitSacul: </h3><p>This is, in my opinion, the easiest method. As long as you have the RGB values of the color you want, this should work:</p>
+<pre class="lang-py prettyprint-override"><code>def colored(r, g, b, text):
+    return f&quot;\033[38;2;{r};{g};{b}m{text}\033[0m&quot;
+</code></pre>
+<p>An example of printing red text:</p>
+<pre class="lang-py prettyprint-override"><code>text = 'Hello, World!'
+colored_text = colored(255, 0, 0, text)
+print(colored_text)
+
+#or
+
+print(colored(255, 0, 0, 'Hello, World!'))
+</code></pre>
+<p>Multi-colored text</p>
+<pre class="lang-py prettyprint-override"><code>text = colored(255, 0, 0, 'Hello, ') + colored(0, 255, 0, 'World')
+print(text)
+</code></pre>
+<h4> Comment 121374574 nosbor: </h4>This is actually the proper answer to the question and should be selected. The question is how to print colours in python and NOT what external libraries can be used.<br><h4> Comment 127568057 CircuitSacul: </h4>@Mehdi this wasn&#39;t written for python2. Almost everyone is using python3 now, and maintaining backwards compatibility isn&#39;t worth the time. If you want it to work for python2, you&#39;ll need to use .format() instead of f-strings. Hardly deserves a downvote for not working for an unsupported version of python.<br><h4> Comment 128121358 Fisher: </h4>When terminal background color is white, exit color will cause problem. Also the exit color is hard coded, even for blackground, it will overtake user specified font color. Better change it to: return f&quot;\033[38;2;{r};{g};{b}m{text}\033[0m&quot;.<br><h4> Comment 124713875 USLTD: </h4>@mike_rodent This isn&#39;t *nix specific but depends on whether terminal supports <b>ANSI</b><br><h4> Comment 125022210 P i: </h4>This can be further tidied using a lambda and f-strings: `coloured = lambda r, g, b, text: f&#39;\033[38;2;{r};{g};{b}m{text} \033[38;2;255;255;255m&#39;<br><h4> Comment 126494639 Elyasaf755: </h4>There is a side effect trailing space after the current implementation. You can get rid of by removing the trailing space from the string format. Use this instead: f&quot;\033[38;2;{r};{g};{b}m{text}\033[38;2;255;255;255m&quot;<br><h4> Comment 127542255 Mehdi: </h4>Invalid syntax for Python2<br><h4> Comment 123582170 mike rodent: </h4>This printed &quot;←[38;2;255;0;0mbubble ←[38;2;255;255;255m&quot; when I created a red string &quot;bubble&quot;. This is a W10 machine... is your solution *nix-specific?<br>------------------------------------------------------------------ <br><h3> Answer 8548994 Erik Rose: </h3><p>My favorite way is with the <a href="http://pypi.python.org/pypi/blessings/">Blessings</a> library (full disclosure: I wrote it). For example:</p>
+
+<pre><code>from blessings import Terminal
+
+t = Terminal()
+print t.red('This is red.')
+print t.bold_bright_red_on_black('Bright red on black')
+</code></pre>
+
+<p>To print colored bricks, the most reliable way is to print spaces with background colors. I use this technique to draw the progress bar in <a href="http://pypi.python.org/pypi/nose-progressive/">nose-progressive</a>:</p>
+
+<pre><code>print t.on_green(' ')
+</code></pre>
+
+<p>You can print in specific locations as well:</p>
+
+<pre><code>with t.location(0, 5):
+    print t.on_yellow(' ')
+</code></pre>
+
+<p>If you have to muck with other terminal capabilities in the course of your game, you can do that as well. You can use Python's standard string formatting to keep it readable:</p>
+
+<pre><code>print '{t.clear_eol}You just cleared a {t.bold}whole{t.normal} line!'.format(t=t)
+</code></pre>
+
+<p>The nice thing about Blessings is that it does its best to work on all sorts of terminals, not just the (overwhelmingly common) ANSI-color ones. It also keeps unreadable escape sequences out of your code while remaining concise to use. Have fun!</p>
+<h4> Comment 18763384 LtWorf: </h4>Putting the color as a function name and not as a parameter is a questionable practice.<br><h4> Comment 53554435 LtWorf: </h4>@progo the fact that you can do it doesn&#39;t mean that you should do it. It&#39;s more generic if the colour is a parameter that you can just pass.<br><h4> Comment 55439990 MaxNoe: </h4>You <code>can just pass</code> a python function.<br><h4> Comment 98386480 Adversus: </h4>Note that importing blessings does not work on windows so don&#39;t use it if your script needs to be cross-platform.<br><h4> Comment 119758601 bluenote10: </h4>@LtWorf I disagree. (1) Use cases for passing around the color as a value are pretty rare. Typical use cases are just to use a specific color, and auto-complettion has a big practical benefit. (2) In a language that supports functions as first-class entities, having <code>Fore.GREEN</code> or <code>t.on_green</code> is equivalent, i.e., it is still possible to pass around colors. Look at how <a href="https://github.com/chalk/chalk" rel="nofollow noreferrer">chalk</a> does it, the best library I&#39;ve ever used for colors.<br><h4> Comment 119779581 bluenote10: </h4>@LtWorf: Apologies if my comment sounded harsh! I just wanted to offer an alternative view, to avoid readers discarding the beautiful <code>blessings</code> library prematurely. Cheers ;)<br><h4> Comment 35283716 jfs: </h4>@LtWorf: you could easily make it a parameter using <code>getattr</code> if you need it. Or more likely, just create the format string dynamically instead.<br><h4> Comment 53551580 mike3996: </h4>@LtWorf: why? Python&#39;s functions and methods are first-class citizens<br><h4> Comment 119778702 LtWorf: </h4>@bluenote10 it has been 10 years since that comment. Let it go…<br>------------------------------------------------------------------ <br><h3> Answer 26445590 GI Jack: </h3><p>I generated a class with all the colors using a <code>for</code> loop to iterate every combination of color up to 100, and then wrote a class with Python colors. Copy and paste as you will, GPLv2 by me:</p>
+<pre><code>class colors:
+    '''Colors class:
+    Reset all colors with colors.reset
+    Two subclasses fg for foreground and bg for background.
+    Use as colors.subclass.colorname.
+    i.e. colors.fg.red or colors.bg.green
+    Also, the generic bold, disable, underline, reverse, strikethrough,
+    and invisible work with the main class
+    i.e. colors.bold
+    '''
+    reset='\033[0m'
+    bold='\033[01m'
+    disable='\033[02m'
+    underline='\033[04m'
+    reverse='\033[07m'
+    strikethrough='\033[09m'
+    invisible='\033[08m'
+    class fg:
+        black='\033[30m'
+        red='\033[31m'
+        green='\033[32m'
+        orange='\033[33m'
+        blue='\033[34m'
+        purple='\033[35m'
+        cyan='\033[36m'
+        lightgrey='\033[37m'
+        darkgrey='\033[90m'
+        lightred='\033[91m'
+        lightgreen='\033[92m'
+        yellow='\033[93m'
+        lightblue='\033[94m'
+        pink='\033[95m'
+        lightcyan='\033[96m'
+    class bg:
+        black='\033[40m'
+        red='\033[41m'
+        green='\033[42m'
+        orange='\033[43m'
+        blue='\033[44m'
+        purple='\033[45m'
+        cyan='\033[46m'
+        lightgrey='\033[47m'
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 34443116 gauravds: </h3><p>Try this simple code</p>
+<pre class="lang-py prettyprint-override"><code>def prRed(prt):
+    print(f&quot;\033[91m{prt}\033[00m&quot;)
+
+def prGreen(prt):
+    print(f&quot;\033[92m{prt}\033[00m&quot;)
+
+def prYellow(prt):
+    print(f&quot;\033[93m{prt}\033[00m&quot;)
+
+def prLightPurple(prt):
+    print(f&quot;\033[94m{prt}\033[00m&quot;)
+
+def prPurple(prt):
+    print(f&quot;\033[95m{prt}\033[00m&quot;)
+
+def prCyan(prt):
+    print(f&quot;\033[96m{prt}\033[00m&quot;)
+
+def prLightGray(prt):
+    print(f&quot;\033[97m{prt}\033[00m&quot;)
+
+def prBlack(prt):
+    print(f&quot;\033[98m{prt}\033[00m&quot;)
+
+def prReset(prt):
+    print(f&quot;\033[0m{prt}\033[00m&quot;)
+
+prGreen(&quot;Hello, Green World!&quot;)
+prBlack(&quot;Hello, Black World!&quot;)
+prCyan(&quot;Hello, Cyan World!&quot;)
+prGreen(&quot;Hello, Green World!&quot;)
+prLightGray(&quot;Hello, Light Grey World!&quot;)
+prLightPurple(&quot;Hello, Light Purple World!&quot;)
+prPurple(&quot;Hello, Purple World!&quot;)
+prRed(&quot;Hello, Red World!&quot;)
+prYellow(&quot;Hello, Yellow World!&quot;)
+prReset(&quot;Hello, Reset World!&quot;)
+</code></pre>
+<p>Python 3 Example
+<a href="https://i.stack.imgur.com/VsUHx.png" rel="noreferrer"><img src="https://i.stack.imgur.com/VsUHx.png" alt="Python 3 Example." /></a></p>
+<pre><code># python2
+    def prRed(prt): print(&quot;\033[91m {}\033[00m&quot; .format(prt))
+    def prGreen(prt): print(&quot;\033[92m {}\033[00m&quot; .format(prt))
+    def prYellow(prt): print(&quot;\033[93m {}\033[00m&quot; .format(prt))
+    def prLightPurple(prt): print(&quot;\033[94m {}\033[00m&quot; .format(prt))
+    def prPurple(prt): print(&quot;\033[95m {}\033[00m&quot; .format(prt))
+    def prCyan(prt): print(&quot;\033[96m {}\033[00m&quot; .format(prt))
+    def prLightGray(prt): print(&quot;\033[97m {}\033[00m&quot; .format(prt))
+    def prBlack(prt): print(&quot;\033[98m {}\033[00m&quot; .format(prt))
+
+    prGreen(&quot;Hello, World!&quot;)
+</code></pre>
+<h4> Comment 57644387 gustafbstrom: </h4>Suggestion: define lambdas that returns that colored string, instead of printing them directly, so that it can be used in conjunction with other strings.<br><h4> Comment 112213128 MACE: </h4>Thanks @gustafbstron. This is what I decided to use: <code>def prGreen: return &#39;&quot;\033[91m {}\033[00m&quot; .format(prt)</code> which is used like this: <code>print(f&#39;This will turn {prGreen(&quot;Hello world&quot;)} and change back&#39;)</code><br>------------------------------------------------------------------ <br><h3> Answer 288556 orip: </h3><p>On Windows you can use module 'win32console' (available in some Python distributions) or module 'ctypes' (Python 2.5 and up) to access the Win32 API.</p>
+
+<p>To see complete code that supports both ways, see the <a href="https://github.com/testoob/testoob/blob/master/src/testoob/reporting/colored.py" rel="noreferrer">color console reporting code</a> from <a href="https://github.com/testoob/testoob" rel="noreferrer">Testoob</a>.</p>
+
+<p>ctypes example:</p>
+
+<pre><code>import ctypes
+
+# Constants from the Windows API
+STD_OUTPUT_HANDLE = -11
+FOREGROUND_RED    = 0x0004 # text color contains red.
+
+def get_csbi_attributes(handle):
+    # Based on IPython's winconsole.py, written by Alexander Belchenko
+    import struct
+    csbi = ctypes.create_string_buffer(22)
+    res = ctypes.windll.kernel32.GetConsoleScreenBufferInfo(handle, csbi)
+    assert res
+
+    (bufx, bufy, curx, cury, wattr,
+    left, top, right, bottom, maxx, maxy) = struct.unpack("hhhhHhhhhhh", csbi.raw)
+    return wattr
+
+
+handle = ctypes.windll.kernel32.GetStdHandle(STD_OUTPUT_HANDLE)
+reset = get_csbi_attributes(handle)
+
+ctypes.windll.kernel32.SetConsoleTextAttribute(handle, FOREGROUND_RED)
+print "Cherry on top"
+ctypes.windll.kernel32.SetConsoleTextAttribute(handle, reset)
+</code></pre>
+<h4> Comment 102590123 Danilo: </h4>Honestly this is only solution that works with windows. All other answers are just copy of eachothers.<br><h4> Comment 110629678 Ekrem Din&#231;el: </h4>@Danilo notice this answer: <a href="https://stackoverflow.com/a/3332860/12291742">stackoverflow.com/a/3332860/12291742</a><br><h4> Comment 109070177 Sorry IwontTell: </h4>I am with Danilo.<br><h4> Comment 104638433 Endre Both: </h4>FWIW, on Windows it might be less pain to use ConEmu which supports ANSI sequences (apart from a host of other advantages over the native terminal). Still great to have a native solution though.<br>------------------------------------------------------------------ <br><h3> Answer 50025330 Andriy Makukha: </h3><pre><code># Pure Python 3.x demo, 256 colors
+# Works with bash under Linux and MacOS
+
+fg = lambda text, color: &quot;\33[38;5;&quot; + str(color) + &quot;m&quot; + text + &quot;\33[0m&quot;
+bg = lambda text, color: &quot;\33[48;5;&quot; + str(color) + &quot;m&quot; + text + &quot;\33[0m&quot;
+
+def print_six(row, format, end=&quot;\n&quot;):
+    for col in range(6):
+        color = row*6 + col - 2
+        if color&gt;=0:
+            text = &quot;{:3d}&quot;.format(color)
+            print (format(text,color), end=&quot; &quot;)
+        else:
+            print(end=&quot;    &quot;)   # four spaces
+    print(end=end)
+
+for row in range(0, 43):
+    print_six(row, fg, &quot; &quot;)
+    print_six(row, bg)
+
+# Simple usage: print(fg(&quot;text&quot;, 160))
+</code></pre>
+<p><a href="https://i.stack.imgur.com/qqMmX.png" rel="noreferrer"><img src="https://i.stack.imgur.com/qqMmX.png" alt="Text with altering foreground and background, colors 0..141" /></a>
+<a href="https://i.stack.imgur.com/3X16v.png" rel="noreferrer"><img src="https://i.stack.imgur.com/3X16v.png" alt="Text with altering foreground and background, colors 142..255" /></a></p>
+<p><a href="https://code.labstack.com/VfphHQ14" rel="noreferrer">Try it online</a></p>
+<h4> Comment 111965061 Andriy Makukha: </h4>@Jay, this is an <a href="https://en.wikipedia.org/wiki/ANSI_escape_code" rel="nofollow noreferrer">escape sequence</a>. <code>&#39;\33&#39;</code> is the escape character (in octal).<br><h4> Comment 113078276 n1c9: </h4>Excellent pure python solution.<br><h4> Comment 111767688 Shane Smiskol: </h4>The formatting is so nice and it has a lot of color range. I keep coming back to this, thanks!<br><h4> Comment 111959369 Jay: </h4>very nice, could you please give me some explanation about  <code>&quot;\33[38;5;&quot; </code> .<br>------------------------------------------------------------------ <br><h3> Answer 59582215 BeastCoder: </h3><p>I have a <a href="https://github.com/SuperMaZingCoder/ColorIt" rel="noreferrer">library called colorit</a>. It is super simple.</p>
+<p>Here are some examples:</p>
+<pre class="lang-py prettyprint-override"><code>from colorit import *
+
+# Use this to ensure that ColorIt will be usable by certain command line interfaces
+# Note: This clears the terminal
+init_colorit()
+
+# Foreground
+print(color(&quot;This text is red&quot;, Colors.red))
+print(color(&quot;This text is orange&quot;, Colors.orange))
+print(color(&quot;This text is yellow&quot;, Colors.yellow))
+print(color(&quot;This text is green&quot;, Colors.green))
+print(color(&quot;This text is blue&quot;, Colors.blue))
+print(color(&quot;This text is purple&quot;, Colors.purple))
+print(color(&quot;This text is white&quot;, Colors.white))
+
+# Background
+print(background(&quot;This text has a background that is red&quot;, Colors.red))
+print(background(&quot;This text has a background that is orange&quot;, Colors.orange))
+print(background(&quot;This text has a background that is yellow&quot;, Colors.yellow))
+print(background(&quot;This text has a background that is green&quot;, Colors.green))
+print(background(&quot;This text has a background that is blue&quot;, Colors.blue))
+print(background(&quot;This text has a background that is purple&quot;, Colors.purple))
+print(background(&quot;This text has a background that is white&quot;, Colors.white))
+
+# Custom
+print(color(&quot;This color has a custom grey text color&quot;, (150, 150, 150)))
+print(background(&quot;This color has a custom grey background&quot;, (150, 150, 150)))
+
+# Combination
+print(
+    background(
+        color(&quot;This text is blue with a white background&quot;, Colors.blue), Colors.white
+    )
+)
+
+# If you are using Windows Command Line, this is so that it doesn't close immediately
+input()
+</code></pre>
+<p>This gives you:</p>
+<p><a href="https://i.stack.imgur.com/AESCH.png" rel="noreferrer"><img src="https://i.stack.imgur.com/AESCH.png" alt="Picture of ColorIt" /></a></p>
+<p>It's also worth noting that this is cross platform and has been tested on Mac, Linux, and Windows.</p>
+<p>You might want to try it out: <a href="https://github.com/SuperMaZingCoder/colorit" rel="noreferrer">https://github.com/SuperMaZingCoder/colorit</a></p>
+<p><code>colorit</code> is now available to be installed with PyPi! You can install it with <code>pip install color-it</code> on Windows and <code>pip3 install color-it</code> on macOS and Linux.</p>
+<h4> Comment 112544521 Victor Cordeiro Costa: </h4>I don&#39;t know why, but my texts are not colorized by the color provided on the Colors.etc... All my texts are turning into gray texts, but with different tone (lighter / darker)...<br><h4> Comment 112689660 BeastCoder: </h4>@Victor Hmm, assuming you have an <code>init_colorit()</code> statement somewhere, it may be your terminal. What does it do in other terminals?<br><h4> Comment 112726784 BeastCoder: </h4>@Victor The other might ne that whatever terminal you are using doesn&#39;t support RGB colors, in that case I can work on adding a solution.<br><h4> Comment 112927706 BeastCoder: </h4>@Victor Alright, if you are still interested, I fixed the problem, it had to do with how I was initializing <code>colorit</code>, I ended up reverting back to the way I was doing so and removing <code>colorama</code>&#39;s init method.<br><h4> Comment 112949412 Victor Cordeiro Costa: </h4>@BeastCoder It is not working at all =&gt; <a href="https://i.imgur.com/qGqMnxs.jpg" rel="nofollow noreferrer">i.imgur.com/qGqMnxs.jpg</a> I experienced the same issue I said before, I&#39;m using the <code>click</code> library to be able to colorize my texts with success.<br><h4> Comment 110314475 ncopiy: </h4>when it will be possibility to install it with pip usage?<br><h4> Comment 110317739 BeastCoder: </h4>@ncopiy Hello! I am actually planning to do that within the next two days! :D For now, you can install it with the install instructions on the page.<br><h4> Comment 111590437 BeastCoder: </h4>@ncopiy It is now available to be installed with <code>pip3</code> (or <code>pip</code>). The command is <code>pip3 install color-it</code> or <code>pip install color-it</code> and can be imported with <code>import colorit</code>.<br>------------------------------------------------------------------ <br><h3> Answer 17064509 mms: </h3><p>I have wrapped <a href="https://stackoverflow.com/questions/287871/how-to-print-colored-text-in-python/287944#287944">joeld's answer</a> into a module with global functions that I can use anywhere in my code.</p>
+<p>File: log.py</p>
+<pre class="lang-py prettyprint-override"><code>def enable():
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = &quot;\033[1m&quot;
+
+def disable():
+    HEADER = ''
+    OKBLUE = ''
+    OKGREEN = ''
+    WARNING = ''
+    FAIL = ''
+    ENDC = ''
+
+def infog(msg):
+    print(OKGREEN + msg + ENDC)
+
+def info(msg):
+    print(OKBLUE + msg + ENDC)
+
+def warn(msg):
+    print(WARNING + msg + ENDC)
+
+def err(msg):
+    print(FAIL + msg + ENDC)
+
+enable()
+</code></pre>
+<p>Use as follows:</p>
+<pre class="lang-py prettyprint-override"><code>import log
+log.info(&quot;Hello, World!&quot;)
+log.err(&quot;System Error&quot;)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 68428529 bluenote10: </h3><p>Here is my modern (2021) solution: <a href="https://github.com/bluenote10/yachalk" rel="nofollow noreferrer">yachalk</a></p>
+<p>It is one of the few libraries that properly supports nested styles:</p>
+<p><a href="https://i.stack.imgur.com/piYe5.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/piYe5.png" alt="enter image description here" /></a></p>
+<p>Apart from that yachalk is auto-complete-friendly, has 256/truecolor support, comes with terminal-capability detection, and is fully typed.</p>
+<p>Here are some design decision you may consider for choosing your solution.</p>
+<h2>High-level libraries vs low-level libraries / manual style handling?</h2>
+<p>Many answers to this question demonstrate how to ANSI escape codes directly, or suggest low-level libraries that require manual style enabling/disabling.</p>
+<p>These approaches have subtle issues: Inserting on/off styles manually is</p>
+<ul>
+<li>more verbose syntactically, because resets have to be specified explicitly,</li>
+<li>more error prone, because you can accidentally forget to reset a style,</li>
+<li>fails to get edge cases right: For instance in some terminals it is necessary to reset styles before newlines, and re-activate them after the line break. Also, some terminal have problems with simply overriding mutually exclusive styles, and require inserting &quot;unnecessary&quot; reset codes. If a developer's local terminal doesn't have these quirks, the developer will not discover these quirks immediately. The issue will only be reported later by others or cause problems e.g. on CI terminals.</li>
+</ul>
+<p>Therefore if compatibility with many terminals is a goal, it's best to use a high-level library that offers automatic handling of style resets. This allows the library to take care of all edge cases by inserting the &quot;spurious&quot; ANSI escape codes where needed.</p>
+<h2>Why yet another library?</h2>
+<p>In JavaScript the de-facto standard library for the task is <a href="https://github.com/chalk/chalk" rel="nofollow noreferrer">chalk</a>, and after using it for a while in JS projects, the solutions available in the Python world were lacking in comparison. Not only is the chalk API more convenient to use (fully auto-complete compatible), it also gets all the edge cases right.</p>
+<p>The idea of <a href="https://github.com/bluenote10/yachalk" rel="nofollow noreferrer">yachalk</a> is to bring the same convenience to the Python ecosystem. If you're interested in a comparison to other libraries I've started <a href="https://github.com/bluenote10/yachalk#prior-art-why-yet-another-chalk-clone" rel="nofollow noreferrer">feature comparison</a> on the projects page. In addition, here is a long (but still incomplete) list of alternatives that came up during my research -- a lot to choose from :)</p>
+<ul>
+<li><a href="https://pypi.org/project/colored/" rel="nofollow noreferrer">colored</a></li>
+<li><a href="https://pypi.org/project/ansicolors/" rel="nofollow noreferrer">ansicolors</a></li>
+<li><a href="https://pypi.org/project/termcolor/" rel="nofollow noreferrer">termcolor</a></li>
+<li><a href="https://pypi.org/project/colorama/" rel="nofollow noreferrer">colorama</a></li>
+<li><a href="https://github.com/jakob-bagterp/colorist-for-python" rel="nofollow noreferrer">colorist</a></li>
+<li><a href="https://pypi.org/project/sty/" rel="nofollow noreferrer">sty</a></li>
+<li><a href="https://pypi.org/project/blessings/" rel="nofollow noreferrer">blessings</a></li>
+<li><a href="https://pypi.org/project/rich/" rel="nofollow noreferrer">rich</a></li>
+<li><a href="https://pypi.org/project/colorit/" rel="nofollow noreferrer">colorit</a></li>
+<li><a href="https://pypi.org/project/colorprint/" rel="nofollow noreferrer">colorprint</a></li>
+<li><a href="https://pypi.org/project/console-color/" rel="nofollow noreferrer">console-color</a></li>
+<li><a href="https://pypi.org/project/pyfancy/" rel="nofollow noreferrer">pyfance</a></li>
+<li><a href="https://pypi.org/project/couleur/" rel="nofollow noreferrer">couleur</a></li>
+<li><a href="https://github.com/lmittmann/style" rel="nofollow noreferrer">style</a> (formerly known as clr)</li>
+<li><a href="https://github.com/anthonyalmarza/chalk" rel="nofollow noreferrer">pychalk</a></li>
+<li><a href="https://pypi.org/project/simple-chalk/" rel="nofollow noreferrer">simple-chalk</a></li>
+<li><a href="https://pypi.org/project/chlk/" rel="nofollow noreferrer">chlk</a></li>
+<li><a href="https://pypi.org/project/chalky/" rel="nofollow noreferrer">chalky</a></li>
+<li><a href="https://pypi.org/project/constyle" rel="nofollow noreferrer">constyle</a></li>
+</ul>
+<h4> Comment 126362226 Qiulang: </h4>But you seem to miss  colorful, <a href="https://github.com/timofurrer/colorful" rel="nofollow noreferrer">github.com/timofurrer/colorful</a><br>------------------------------------------------------------------ <br><h3> Answer 58149095 Vishal: </h3><pre class="lang-py prettyprint-override"><code>def black(text):
+    print('\033[30m', text, '\033[0m', sep='')
+
+def red(text):
+    print('\033[31m', text, '\033[0m', sep='')
+
+def green(text):
+    print('\033[32m', text, '\033[0m', sep='')
+
+def yellow(text):
+    print('\033[33m', text, '\033[0m', sep='')
+
+def blue(text):
+    print('\033[34m', text, '\033[0m', sep='')
+
+def magenta(text):
+    print('\033[35m', text, '\033[0m', sep='')
+
+def cyan(text):
+    print('\033[36m', text, '\033[0m', sep='')
+
+def gray(text):
+    print('\033[90m', text, '\033[0m', sep='')
+
+
+black("BLACK")
+red("RED")
+green("GREEN")
+yellow("YELLOW")
+blue("BLACK")
+magenta("MAGENTA")
+cyan("CYAN")
+gray("GRAY")
+</code></pre>
+
+<p><a href="https://code.labstack.com/EoyDRCvJ" rel="noreferrer"><strong>Try online</strong></a> </p>
+<h4> Comment 103833171 ScipioAfricanus: </h4>Is this for python3 only? got an error on sep=&#39;&#39; with python2<br><h4> Comment 112397345 vfxdev: </h4>This should be the accepted answer for python3. Works perfectly.<br>------------------------------------------------------------------ <br><h3> Answer 39005305 Ben174: </h3><p>I ended up doing this, and I felt it was cleanest:</p>
+<pre><code>formatters = {
+    'RED': '\033[91m',
+    'GREEN': '\033[92m',
+    'END': '\033[0m',
+}
+
+print 'Master is currently {RED}red{END}!'.format(**formatters)
+print 'Help make master {GREEN}green{END} again!'.format(**formatters)
+</code></pre>
+<h4> Comment 72924682 Jamie Counsell: </h4>This is really nice for doing it without a third party package.<br>------------------------------------------------------------------ <br><h3> Answer 287896 UberJumper: </h3><p>For Windows you cannot print to console with colors unless you're using the <a href="https://en.wikipedia.org/wiki/Windows_API" rel="noreferrer">Win32</a> API.</p>
+<p>For Linux it's as simple as using print, with the escape sequences outlined here:</p>
+<p><a href="http://www.linuxhowtos.org/Tips%20and%20Tricks/ansi_escape_sequences.htm" rel="noreferrer">Colors</a></p>
+<p>For the character to print like a box, it really depends on what font you are using for the console window. The pound symbol works well, but it depends on the font:</p>
+<pre><code>#
+</code></pre>
+<h4> Comment 113499549 mousetail: </h4>In windows 10 colors work like linux if you call <code>os.system(&#39;&#39;)</code> at the beginning of your code<br>------------------------------------------------------------------ <br><h3> Answer 29723536 zahanm: </h3><p>Stupidly simple, based on <a href="https://stackoverflow.com/questions/287871/how-to-print-colored-text-in-python/287944#287944">joeld's answer</a>:</p>
+<pre><code>class PrintInColor:
+    RED = '\033[91m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    LIGHT_PURPLE = '\033[94m'
+    PURPLE = '\033[95m'
+    END = '\033[0m'
+
+    @classmethod
+    def red(cls, s, **kwargs):
+        print(cls.RED + s + cls.END, **kwargs)
+
+    @classmethod
+    def green(cls, s, **kwargs):
+        print(cls.GREEN + s + cls.END, **kwargs)
+
+    @classmethod
+    def yellow(cls, s, **kwargs):
+        print(cls.YELLOW + s + cls.END, **kwargs)
+
+    @classmethod
+    def lightPurple(cls, s, **kwargs):
+        print(cls.LIGHT_PURPLE + s + cls.END, **kwargs)
+
+    @classmethod
+    def purple(cls, s, **kwargs):
+        print(cls.PURPLE + s + cls.END, **kwargs)
+</code></pre>
+<p>Then just</p>
+<pre><code>PrintInColor.red('hello', end=' ')
+PrintInColor.green('world')
+</code></pre>
+<h4> Comment 85710541 Romain Vincent: </h4>This will crash if you pass more than one positional argument or anything other than a string type<br><h4> Comment 97169304 Romain Vincent: </h4>@wizzwizz4 I&#39;m not sure what you meant with this comment, I don&#39;t see the point anyway. If you are going to propose a class..., to replace a method as simple as print, you might as well avoid making it so easily breakable. Just my opinion.<br><h4> Comment 97193085 wizzwizz4: </h4>@RomainVincent I was going to say that your objection was wrong, but for replacing a function as versatile as <code>print</code> one should make sure to properly replicate its functionality.<br><h4> Comment 103843213 Emilien Baudet: </h4>@RomainVincent Implements to use infinite arguments :  &lt;code&gt; <code>def purple(cls, *args, **kwargs):     print(cls.PURPLE, *args, cls.END, **kwargs)</code> &lt;/code&gt;<br><h4> Comment 97159574 wizzwizz4: </h4>@RomainVincent Then don&#39;t pass more than one positional argument or anything other than a string ty— wait, these are <i><code>print</code>-replacements</i>? Objection rescinded.<br>------------------------------------------------------------------ <br><h3> Answer 42528796 alvas: </h3><p>Building on <a href="https://stackoverflow.com/questions/287871/how-to-print-colored-text-in-python/287944#287944">joeld's answer</a>, using <a href="https://pypi.python.org/pypi/lazyme" rel="nofollow noreferrer">https://pypi.python.org/pypi/lazyme</a> <br/>
+<code>pip install -U lazyme</code>:</p>
+<pre><code>from lazyme.string import color_print
+&gt;&gt;&gt; color_print('abc')
+abc
+&gt;&gt;&gt; color_print('abc', color='pink')
+abc
+&gt;&gt;&gt; color_print('abc', color='red')
+abc
+&gt;&gt;&gt; color_print('abc', color='yellow')
+abc
+&gt;&gt;&gt; color_print('abc', color='green')
+abc
+&gt;&gt;&gt; color_print('abc', color='blue', underline=True)
+abc
+&gt;&gt;&gt; color_print('abc', color='blue', underline=True, bold=True)
+abc
+&gt;&gt;&gt; color_print('abc', color='pink', underline=True, bold=True)
+abc
+</code></pre>
+<p>Screenshot:</p>
+<p><a href="https://i.stack.imgur.com/9NgeB.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/9NgeB.png" alt="Enter image description here" /></a></p>
+<hr />
+<p>Some updates to the <code>color_print</code> with new formatters, e.g.:</p>
+<pre><code>&gt;&gt;&gt; from lazyme.string import palette, highlighter, formatter
+&gt;&gt;&gt; from lazyme.string import color_print
+&gt;&gt;&gt; palette.keys() # Available colors.
+['pink', 'yellow', 'cyan', 'magenta', 'blue', 'gray', 'default', 'black', 'green', 'white', 'red']
+&gt;&gt;&gt; highlighter.keys() # Available highlights.
+['blue', 'pink', 'gray', 'black', 'yellow', 'cyan', 'green', 'magenta', 'white', 'red']
+&gt;&gt;&gt; formatter.keys() # Available formatter,
+['hide', 'bold', 'italic', 'default', 'fast_blinking', 'faint', 'strikethrough', 'underline', 'blinking', 'reverse']
+</code></pre>
+<p>Note: <code>italic</code>, <code>fast blinking</code>, and <code>strikethrough</code> may not work on all terminals, and they don't work on Mac and Ubuntu.</p>
+<p>E.g.,</p>
+<pre><code>&gt;&gt;&gt; color_print('foo bar', color='pink', highlight='white')
+foo bar
+&gt;&gt;&gt; color_print('foo bar', color='pink', highlight='white', reverse=True)
+foo bar
+&gt;&gt;&gt; color_print('foo bar', color='pink', highlight='white', bold=True)
+foo bar
+&gt;&gt;&gt; color_print('foo bar', color='pink', highlight='white', faint=True)
+foo bar
+&gt;&gt;&gt; color_print('foo bar', color='pink', highlight='white', faint=True, reverse=True)
+foo bar
+&gt;&gt;&gt; color_print('foo bar', color='pink', highlight='white', underline=True, reverse=True)
+foo bar
+</code></pre>
+<p>Screenshot:</p>
+<p><a href="https://i.stack.imgur.com/HGNPc.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/HGNPc.png" alt="Enter image description here" /></a></p>
+------------------------------------------------------------------ <br><h3> Answer 11278750 Janus Troelsen: </h3><p>Note how well the <code>with</code> keyword mixes with modifiers like these that need to be reset (using Python 3 and Colorama):</p>
+<pre><code>from colorama import Fore, Style
+import sys
+
+class Highlight:
+  def __init__(self, clazz, color):
+    self.color = color
+    self.clazz = clazz
+  def __enter__(self):
+    print(self.color, end=&quot;&quot;)
+  def __exit__(self, type, value, traceback):
+    if self.clazz == Fore:
+      print(Fore.RESET, end=&quot;&quot;)
+    else:
+      assert self.clazz == Style
+      print(Style.RESET_ALL, end=&quot;&quot;)
+    sys.stdout.flush()
+
+with Highlight(Fore, Fore.GREEN):
+  print(&quot;this is highlighted&quot;)
+print(&quot;this is not&quot;)
+</code></pre>
+<h4> Comment 57417601 Janus Troelsen: </h4>@cat: Why? Works great without.<br><h4> Comment 29504296 Tom: </h4>Tried out colorama, used <code>print(Style.BRIGHT + &quot;Header Test&quot;)</code> and <code>print (Style.DIM + word)</code> to create a really nice prompt.<br><h4> Comment 57383159 cat: </h4>This will need to change to use <code>contextlib</code> for Py3.<br><h4> Comment 57393897 Janus Troelsen: </h4>@cat: From what version of Python will that be necessary?<br><h4> Comment 57398040 cat: </h4>I believe 3 and up -- it should have a <code>@contextlib.contextmanager</code> decorator on it, no?<br><h4> Comment 97159658 wizzwizz4: </h4>@cat That&#39;s not <i>necessary</i>; <code>@contextlib.contextmanager</code> is a shorthand for making it easier to produce context managers, but you can still use <i>normal</i> context managers.<br>------------------------------------------------------------------ <br><h3> Answer 8774709 Giacomo Lacava: </h3><p>You could use <a href="https://github.com/kennethreitz/clint" rel="nofollow noreferrer">Clint</a>:</p>
+<pre><code>from clint.textui import colored
+print colored.red('some warning message')
+print colored.green('nicely done!')
+</code></pre>
+<h4> Comment 90937104 Giacomo Lacava: </h4>First link has gone so I removed it; the GH link is still good (although the project is &quot;archived&quot; and basically abandoned, from what I can gather).<br>------------------------------------------------------------------ <br><h3> Answer 287919 daharon: </h3><p>You can use the Python implementation of the <a href="https://en.wikipedia.org/wiki/Curses_%28programming_library%29" rel="nofollow noreferrer">curses</a> library:
+<em><a href="http://docs.python.org/library/curses.html" rel="nofollow noreferrer">curses — Terminal handling for character-cell displays</a></em></p>
+<p>Also, run this and you'll find your box:</p>
+<pre><code>for i in range(255):
+    print i, chr(i)
+</code></pre>
+<h4> Comment 52038173 Jonathan Hartley: </h4>Personally I think that the &#39;curses&#39; library has been totally eclipsed by &#39;blessings&#39;, in the same way &#39;requests&#39; has eclipsed &#39;urllib&#39;, etc.<br>------------------------------------------------------------------ <br><h3> Answer 64099955 Mojtaba Hosseini: </h3><h1>Emoji</h1>
+<p>You can use colors for text as others mentioned in their answers to have colorful text with a background or foreground color.</p>
+<p>But you can use <strong>emojis</strong> instead! for example, you can use<code>⚠️</code> for warning messages and <code>🛑</code> for error messages.</p>
+<p>Or simply use these notebooks as a color:</p>
+<pre><code>📕: error message
+📙: warning message
+📗: ok status message
+📘: action message
+📓: canceled status message
+📔: Or anything you like and want to recognize immediately by color
+
+</code></pre>
+<h3>🎁 Bonus:</h3>
+<p>This method also helps you to quickly scan and find logs <strong>directly in the source code</strong>.</p>
+<p><sub>But some operating systems (including some Linux distributions in some version with some window managers) default emoji font is not colorful by default and you may want to make them colorful, first.</sub></p>
+<hr />
+<h3>How to open emoji picker?</h3>
+<p><a href="https://support.apple.com/guide/mac-help/use-emoji-and-symbols-on-mac-mchlp1560/mac" rel="noreferrer"><strong>mac os</strong>:</a> <kbd>control</kbd> + <kbd>command</kbd> + <kbd>space</kbd></p>
+<p><a href="https://support.microsoft.com/en-us/windows/windows-10-keyboard-tips-and-tricks-588e0b72-0fff-6d3f-aeee-6e5116097942" rel="noreferrer"><strong>windows</strong>:</a> <kbd>win</kbd> + <kbd>.</kbd></p>
+<p><a href="https://www.omgubuntu.co.uk/2018/06/use-emoji-linux-ubuntu-apps" rel="noreferrer"><strong>linux</strong>:</a> <kbd>control</kbd> + <kbd>.</kbd> or  <kbd>control</kbd> + <kbd>;</kbd></p>
+<h4> Comment 116067946 Mojtaba Hosseini: </h4>Answer updated for more being precise. Thanks to point out @PeterMortensen<br><h4> Comment 127696432 Mojtaba Hosseini: </h4>Emojis are unicodes. you can find out more about them online by searching &quot;emoji&quot; 😉<br><h4> Comment 128892828 Kuba Szostak: </h4>There are my emoji favourites:  print(&quot;❌&quot;, &quot;ERROR:&quot;, &quot;Cross Mark Emoji&quot;) print(&quot;✔️&quot;, &quot;SUCCESS:&quot;, &quot;Heavy Check Mark Emoji&quot;)<br><h4> Comment 113519646 smassey: </h4>This wasn&#39;t asked but I&#39;m glad you shared it regardless! I really prefer this to text colors.<br><h4> Comment 116067660 Peter Mortensen: </h4>Linux? What distribution, version, and window manager? <a href="https://en.wikipedia.org/wiki/Ubuntu_version_history#Ubuntu_20.04_LTS_(Focal_Fossa)" rel="nofollow noreferrer">Ubuntu 20.04 (Focal Fossa)</a>?<br><h4> Comment 127696283 hekimgil: </h4>You say &quot;you can use [...]&quot; but I don&#39;t see an explanation on how to do it? Am I missing something? Any links, libraries, code, etc. explaining how to do what you mention?<br><h4> Comment 127696305 Mojtaba Hosseini: </h4>Do you mean using emojis ? @hekimgil I have added the instruction of that<br><h4> Comment 127696396 hekimgil: </h4>Yes. Is there a special library to put emojis or what? I don&#39;t get it? Oh, okay, now you added the emoji picker at the end of the post, thank you... How does that work though? Are the emojis posted as non-ASCII characters or are they a combination of ASCII characters that are interpreted by the displays? More information would be appreciated.<br>------------------------------------------------------------------ <br><h3> Answer 50447424 kmario23: </h3><p>An easier option would be to use the <code>cprint</code> function from the <a href="https://pypi.org/project/termcolor/" rel="nofollow noreferrer"><code>termcolor</code></a> package.</p>
+<p><a href="https://i.stack.imgur.com/v35jK.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/v35jK.png" alt="color-print-python" /></a></p>
+<p>It also supports <code>%s, %d</code> format of printing:</p>
+<p><a href="https://i.stack.imgur.com/BvgXH.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/BvgXH.png" alt="Enter image description here" /></a></p>
+<p>Results can be terminal dependant, so review the <strong>Terminal Properties</strong> section of the package documentation.</p>
+<ul>
+<li>Windows Command Prompt and Python IDLE don't work</li>
+</ul>
+<p><a href="https://i.stack.imgur.com/46mp4.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/46mp4.png" alt="enter image description here" /></a></p>
+<p><a href="https://i.stack.imgur.com/4A7ug.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/4A7ug.png" alt="enter image description here" /></a></p>
+<ul>
+<li>JupyterLab notebook does work</li>
+</ul>
+<p><a href="https://i.stack.imgur.com/kFhyO.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/kFhyO.png" alt="enter image description here" /></a></p>
+<h4> Comment 124982767 Vinod Srivastav: </h4>In case if you are looking for a solution for <b>windows 10</b>, have as look here =&gt; <a href="https://stackoverflow.com/a/70599663/3057246">stackoverflow.com/a/70599663/3057246</a><br>------------------------------------------------------------------ <br><h3> Answer 72752520 Abhijeet: </h3><p>The <strong>simplest</strong> and <strong>convenient</strong> way of doing this, considering if you're writing a command-line tool.
+This method will work anywhere on all consoles, without installing any fancy packages.</p>
+<p>To get the ANSI codes working on <strong>Windows</strong>, first, run <code>os.system('color')</code></p>
+<pre><code>import os
+os.system('color')
+
+COLOR = '\033[91m'  # change it, according to the color need
+
+END = '\033[0m'
+
+print(COLOR + &quot;Hello World&quot; + END) #print a message
+
+
+exit=input() #to avoid closing the terminal windows
+</code></pre>
+<br/>
+<br/>
+<p><strong>For more colours</strong> :<br/></p>
+<p><a href="https://i.stack.imgur.com/7xsyK.png" rel="noreferrer"><img src="https://i.stack.imgur.com/7xsyK.png" alt="enter image description here" /></a></p>
+<p>Note: \33[5m and \33[6m are blinking.</p>
+<p>Thanks to @qubodup</p>
+------------------------------------------------------------------ <br><h3> Answer 28388343 Jossef Harush Kadouri: </h3><h2>YAY! Another version</h2>
+<p>While I find <a href="https://stackoverflow.com/a/26445590/3191896">this answer</a> useful, I modified it a bit. This <a href="https://gist.github.com/Jossef/0ee20314577925b4027f" rel="nofollow noreferrer">GitHub Gist</a> is the result</p>
+<h3>Usage</h3>
+<pre><code>print colors.draw(&quot;i'm yellow&quot;, bold=True, fg_yellow=True)
+</code></pre>
+<p><img src="https://i.stack.imgur.com/q1mJ3.png" alt="Enter image description here" /></p>
+<p>In addition, you can wrap common usages:</p>
+<pre><code>print colors.error('sorry, ')
+</code></pre>
+<p><img src="https://i.stack.imgur.com/uGgd7.png" alt="Asd" /></p>
+<h3><a href="https://gist.github.com/Jossef/0ee20314577925b4027f" rel="nofollow noreferrer">https://gist.github.com/Jossef/0ee20314577925b4027f</a></h3>
+------------------------------------------------------------------ <br><h3> Answer 11193790 Navweb: </h3><p>If you are using Windows, then here you go!</p>
+<pre><code># Display text on a Windows console
+# Windows XP with Python 2.7 or Python&amp;nbsp;3.2
+from ctypes import windll
+
+# Needed for Python2/Python3 diff
+try:
+    input = raw_input
+except:
+    pass
+STD_OUTPUT_HANDLE = -11
+stdout_handle = windll.kernel32.GetStdHandle(STD_OUTPUT_HANDLE)
+# Look at the output and select the color you want.
+# For instance, hex E is yellow on black.
+# Hex 1E is yellow on blue.
+# Hex 2E is yellow on green and so on.
+for color in range(0, 75):
+     windll.kernel32.SetConsoleTextAttribute(stdout_handle, color)
+     print(&quot;%X --&gt; %s&quot; % (color, &quot;Have a fine day!&quot;))
+     input(&quot;Press Enter to go on ... &quot;)
+</code></pre>
+<h4> Comment 96172515 user2023861: </h4>If you want different colors on the same line, flush the stdout stream in between calls: <code>print(&quot;%X --&gt; %s&quot; % (color, &quot;Have a fine day!&quot;), end=&#39;&#39;, flush=True)</code><br>------------------------------------------------------------------ <br><h3> Answer 29806601 Grijesh Chauhan: </h3><p>If you are using <a href="https://www.djangoproject.com/" rel="nofollow noreferrer">Django</a>:</p>
+<pre><code>&gt;&gt;&gt; from django.utils.termcolors import colorize
+&gt;&gt;&gt; print colorize(&quot;Hello, World!&quot;, fg=&quot;blue&quot;, bg='red',
+...                 opts=('bold', 'blink', 'underscore',))
+Hello World!
+&gt;&gt;&gt; help(colorize)
+</code></pre>
+<p>Snapshot:</p>
+<p><img src="https://i.stack.imgur.com/vq4Rs.png" alt="Image" /></p>
+<p>(I generally use colored output for debugging on runserver terminal, so I added it.)</p>
+<p><sub>You can test if it is installed in your machine:
+<code>$ python -c &quot;import django; print django.VERSION&quot;</code>. To install it, check: <a href="https://docs.djangoproject.com/en/1.8/topics/install/" rel="nofollow noreferrer">How to install Django</a></sub></p>
+<p>Give it a <em>try</em>!!</p>
+<h4> Comment 123483504 Benyamin Jafari: </h4>Note that, in python3.x you should add an extra parenthesis after print: <code>print(colorize(...))</code><br>------------------------------------------------------------------ <br><h3> Answer 37051472 jfs: </h3><p><a href="http://asciimatics.readthedocs.io/en/stable/intro.html" rel="noreferrer">asciimatics</a> provides a portable support for building text UI and animations:</p>
+
+<pre><code>#!/usr/bin/env python
+from asciimatics.effects import RandomNoise  # $ pip install asciimatics
+from asciimatics.renderers import SpeechBubble, Rainbow
+from asciimatics.scene import Scene
+from asciimatics.screen import Screen
+from asciimatics.exceptions import ResizeScreenError
+
+
+def demo(screen):
+    render = Rainbow(screen, SpeechBubble('Rainbow'))
+    effects = [RandomNoise(screen, signal=render)]
+    screen.play([Scene(effects, -1)], stop_on_resize=True)
+
+while True:
+    try:
+        Screen.wrapper(demo)
+        break
+    except ResizeScreenError:
+        pass
+</code></pre>
+
+<p>Asciicast:</p>
+
+<p><a href="https://asciinema.org/a/06sabwtc1bw5wfiq23a71ccxq?autoplay=1" rel="noreferrer"><img src="https://asciinema.org/a/06sabwtc1bw5wfiq23a71ccxq.png" alt="rainbow-colored text among ascii noise"></a></p>
+------------------------------------------------------------------ <br><h3> Answer 1073959 nosklo: </h3><p>Here's a <a href="https://en.wikipedia.org/wiki/Curses_%28programming_library%29" rel="nofollow noreferrer">curses</a> example:</p>
+<pre><code>import curses
+
+def main(stdscr):
+    stdscr.clear()
+    if curses.has_colors():
+        for i in xrange(1, curses.COLORS):
+            curses.init_pair(i, i, curses.COLOR_BLACK)
+            stdscr.addstr(&quot;COLOR %d! &quot; % i, curses.color_pair(i))
+            stdscr.addstr(&quot;BOLD! &quot;, curses.color_pair(i) | curses.A_BOLD)
+            stdscr.addstr(&quot;STANDOUT! &quot;, curses.color_pair(i) | curses.A_STANDOUT)
+            stdscr.addstr(&quot;UNDERLINE! &quot;, curses.color_pair(i) | curses.A_UNDERLINE)
+            stdscr.addstr(&quot;BLINK! &quot;, curses.color_pair(i) | curses.A_BLINK)
+            stdscr.addstr(&quot;DIM! &quot;, curses.color_pair(i) | curses.A_DIM)
+            stdscr.addstr(&quot;REVERSE! &quot;, curses.color_pair(i) | curses.A_REVERSE)
+    stdscr.refresh()
+    stdscr.getch()
+
+if __name__ == '__main__':
+    print &quot;init...&quot;
+    curses.wrapper(main)
+</code></pre>
+<h4> Comment 1164539 nosklo: </h4>@Sorin Sbarnea: Accordingly to python curses official documentation in <a href="http://docs.python.org/library/curses.html" rel="nofollow noreferrer">docs.python.org/library/curses.html</a> , the curses module is not supported on windows. Maybe you got this error instead of &quot;No Such Module&quot; or something like this, because you probably named your test file &quot;curses.py&quot; so it is importing itself.<br><h4> Comment 1163712 sorin: </h4>Your code does fail under Windows (x64) with this error: AttributeError: &#39;module&#39; object has no attribute &#39;wrapper&#39;<br><h4> Comment 123501315 schneiderfelipe: </h4>This will always fail if the screen is not large enough (<code>_curses.error: addwstr() returned ERR</code>) since it will attempt to write outside the screen... (<a href="https://docs.python.org/3/library/curses.html#curses.window.addstr" rel="nofollow noreferrer">see here</a>)<br>------------------------------------------------------------------ <br><h3> Answer 15647557 Vishal: </h3><p><a href="https://raw.github.com/fabric/fabric/master/fabric/colors.py">https://raw.github.com/fabric/fabric/master/fabric/colors.py</a></p>
+
+<pre><code>"""
+.. versionadded:: 0.9.2
+
+Functions for wrapping strings in ANSI color codes.
+
+Each function within this module returns the input string ``text``, wrapped
+with ANSI color codes for the appropriate color.
+
+For example, to print some text as green on supporting terminals::
+
+    from fabric.colors import green
+
+    print(green("This text is green!"))
+
+Because these functions simply return modified strings, you can nest them::
+
+    from fabric.colors import red, green
+
+    print(red("This sentence is red, except for " + \
+          green("these words, which are green") + "."))
+
+If ``bold`` is set to ``True``, the ANSI flag for bolding will be flipped on
+for that particular invocation, which usually shows up as a bold or brighter
+version of the original color on most terminals.
+"""
+
+
+def _wrap_with(code):
+
+    def inner(text, bold=False):
+        c = code
+        if bold:
+            c = "1;%s" % c
+        return "\033[%sm%s\033[0m" % (c, text)
+    return inner
+
+red = _wrap_with('31')
+green = _wrap_with('32')
+yellow = _wrap_with('33')
+blue = _wrap_with('34')
+magenta = _wrap_with('35')
+cyan = _wrap_with('36')
+white = _wrap_with('37')
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 31310228 drevicko: </h3><p>Yet another <a href="https://en.wikipedia.org/wiki/Python_Package_Index" rel="nofollow noreferrer">PyPI</a> module that wraps the Python 3 <em>print</em> function:</p>
+<p><a href="https://pypi.python.org/pypi/colorprint" rel="nofollow noreferrer">https://pypi.python.org/pypi/colorprint</a></p>
+<p>It's usable in Python 2.x if you also <code>from __future__ import print</code>. Here is a Python 2 example from the modules PyPI page:</p>
+<pre><code>from __future__ import print_function
+from colorprint import *
+
+print('Hello', 'world', color='blue', end='', sep=', ')
+print('!', color='red', format=['bold', 'blink'])
+</code></pre>
+<p>It outputs &quot;Hello, world!&quot; with the words in blue and the exclamation mark bold red and blinking.</p>
+------------------------------------------------------------------ <br><h3> Answer 66780271 Benyamin Jafari: </h3><p>If you want to use just built-in packages, follow this structure:</p>
+<p>Actually, I enhanced the <a href="https://stackoverflow.com/a/17064509/3702377">Mohamed Samy</a> answer which is now responsible for multiple inputs as well as numbers. Also, it supports other <code>print()</code> arguments such as <code>end=</code>. Additionally, I added a <code>.store()</code> method in order to write down logs into a file as well.</p>
+<p>You can create a utility to use that anywhere into your codes:</p>
+<pre class="lang-py prettyprint-override"><code># utility.py
+
+from datetime import datetime
+
+class ColoredPrint:
+    def __init__(self):
+        self.PINK = '\033[95m'
+        self.OKBLUE = '\033[94m'
+        self.OKGREEN = '\033[92m'
+        self.WARNING = '\033[93m'
+        self.FAIL = '\033[91m'
+        self.ENDC = '\033[0m'
+
+    def disable(self):
+        self.PINK = ''
+        self.OKBLUE = ''
+        self.OKGREEN = ''
+        self.WARNING = ''
+        self.FAIL = ''
+        self.ENDC = ''
+
+    def store(self):
+        date = datetime.now().strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)
+        with open('logfile.log', mode='a') as file_:
+            file_.write(f&quot;{self.msg} -- {date}&quot;)
+            file_.write(&quot;\n&quot;)
+
+    def success(self, *args, **kwargs):
+        self.msg = ' '.join(map(str, args))
+        print(self.OKGREEN + self.msg + self.ENDC, **kwargs)
+        return self
+
+    def info(self, *args, **kwargs):
+        self.msg = ' '.join(map(str, args))
+        print(self.OKBLUE + self.msg + self.ENDC, **kwargs)
+        return self
+
+    def warn(self, *args, **kwargs):
+        self.msg = ' '.join(map(str, args))
+        print(self.WARNING + self.msg + self.ENDC, **kwargs)
+        return self
+
+    def err(self, *args, **kwargs):
+        self.msg = ' '.join(map(str, args))
+        print(self.FAIL + self.msg + self.ENDC, **kwargs)
+        return self
+
+    def pink(self, *args, **kwargs):
+        self.msg = ' '.join(map(str, args))
+        print(self.PINK + self.msg + self.ENDC, **kwargs)
+        return self
+</code></pre>
+<p>e.g.</p>
+<pre class="lang-py prettyprint-override"><code>from utility import ColoredPrint
+
+log = ColoredPrint()
+
+log.success(&quot;Hello&quot; , 123, &quot;Bye&quot;).store()
+log.info(&quot;Hello&quot; , 123, &quot;Bye&quot;)
+log.warn(&quot;Hello&quot; , 123, &quot;Bye&quot;)
+log.err(&quot;Hello&quot; , 123, &quot;Bye&quot;).store()
+log.pink(&quot;Hello&quot; , 123, &quot;Bye&quot;)
+</code></pre>
+<p>Out:</p>
+<p><a href="https://i.stack.imgur.com/HMVP6.png" rel="noreferrer"><img src="https://i.stack.imgur.com/HMVP6.png" alt="enter image description here" /></a></p>
+<hr />
+<p>[UPDATE]:</p>
+<p>Now, its PyPI <a href="https://github.com/agn-7/colored-print" rel="noreferrer">package🔗</a> is available:</p>
+<pre class="lang-sh prettyprint-override"><code>pip install python-colored-print
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 72768499 catwith: </h3><p>Minimal Class:</p>
+<pre class="lang-py prettyprint-override"><code>class log:
+    f = lambda color: lambda string: print(color + string + &quot;\33[0m&quot;)
+
+    black = f(&quot;\33[30m&quot;)
+    red = f(&quot;\33[31m&quot;)
+    green = f(&quot;\33[32m&quot;)
+    yellow = f(&quot;\33[33m&quot;)
+    blue = f(&quot;\33[34m&quot;)
+    magenta = f(&quot;\33[35m&quot;)
+    cyan = f(&quot;\33[36m&quot;)
+    white = f(&quot;\33[37m&quot;)
+
+# Usage
+log.blue(&quot;Blue World!&quot;)
+</code></pre>
+<h4> Comment 128600722 Slothario: </h4>Thanks, this is much cleaner than the other solutions<br>------------------------------------------------------------------ <br><h3> Answer 288030 tzot: </h3><h2>For the characters</h2>
+
+<p>Your terminal most probably uses Unicode (typically UTF-8 encoded) characters, so it's only a matter of the appropriate font selection to see your favorite character. Unicode char U+2588, "Full block" is the one I would suggest you use.</p>
+
+<p>Try the following:</p>
+
+<pre><code>import unicodedata
+fp= open("character_list", "w")
+for index in xrange(65536):
+    char= unichr(index)
+    try: its_name= unicodedata.name(char)
+    except ValueError: its_name= "N/A"
+    fp.write("%05d %04x %s %s\n" % (index, index, char.encode("UTF-8"), its_name)
+fp.close()
+</code></pre>
+
+<p>Examine the file later with your favourite viewer.</p>
+
+<h2>For the colors</h2>
+
+<p><a href="http://www.python.org/doc/2.5.2/lib/module-curses.html" rel="noreferrer">curses</a> is the module you want to use. Check this <a href="http://docs.python.org/howto/curses.html" rel="noreferrer">tutorial</a>.</p>
+------------------------------------------------------------------ <br><h3> Answer 61219634 Edgardo Obreg&#243;n: </h3><p>I suggest this new library <strong>Printy</strong>. They just released version 1.2.0 as a cross-platform library.</p>
+<p>Check it out:
+<a href="https://github.com/edraobdu/printy" rel="nofollow noreferrer">Printy on GitHub</a></p>
+<p>It is based on flags so you can do stuff like</p>
+<pre class="lang-py prettyprint-override"><code>from printy import printy
+
+# With global flags, this will apply a bold (B) red (r) color and an underline (U) to the whole text
+printy(&quot;Hello, World!&quot;, &quot;rBU&quot;)
+
+# With inline formats, this will apply a dim (D)
+#blue (b) to the word 'Hello' and a stroken (S)
+#yellow (y) to the word 'world', and the rest will remain as the predefined format
+printy(&quot;this is a [bD]Hello@ [yS]world@ text&quot;)
+</code></pre>
+<p><a href="https://i.stack.imgur.com/1YRLS.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/1YRLS.png" alt="Enter image description here" /></a></p>
+------------------------------------------------------------------ <br><h3> Answer 73036565 CPP_is_no_STANDARD: </h3><p>There is a more efficient way here.</p>
+<pre><code># Colours
+pure_red = &quot;\033[0;31m&quot;
+dark_green = &quot;\033[0;32m&quot;
+orange = &quot;\033[0;33m&quot;
+dark_blue = &quot;\033[0;34m&quot;
+bright_purple = &quot;\033[0;35m&quot;
+dark_cyan = &quot;\033[0;36m&quot;
+dull_white = &quot;\033[0;37m&quot;
+pure_black = &quot;\033[0;30m&quot;
+bright_red = &quot;\033[0;91m&quot;
+light_green = &quot;\033[0;92m&quot;
+yellow = &quot;\033[0;93m&quot;
+bright_blue = &quot;\033[0;94m&quot;
+magenta = &quot;\033[0;95m&quot;
+light_cyan = &quot;\033[0;96m&quot;
+bright_black = &quot;\033[0;90m&quot;
+bright_white = &quot;\033[0;97m&quot;
+cyan_back = &quot;\033[0;46m&quot;
+purple_back = &quot;\033[0;45m&quot;
+white_back = &quot;\033[0;47m&quot;
+blue_back = &quot;\033[0;44m&quot;
+orange_back = &quot;\033[0;43m&quot;
+green_back = &quot;\033[0;42m&quot;
+pink_back = &quot;\033[0;41m&quot;
+grey_back = &quot;\033[0;40m&quot;
+grey = '\033[38;4;236m'
+bold = &quot;\033[1m&quot;
+underline = &quot;\033[4m&quot;
+italic = &quot;\033[3m&quot;
+darken = &quot;\033[2m&quot;
+invisible = '\033[08m'
+reverse_colour = '\033[07m'
+reset_colour = '\033[0m'
+grey = &quot;\x1b[90m&quot;
+</code></pre>
+<h3>User Manual</h3>
+<ul>
+<li><p><code>reverse_colour</code> means that you reverse the colour that you just chose but in highlight mode (default is white).</p>
+</li>
+<li><p><code>pink_back</code> (<code>green_back</code> etc... those with back) means that it is highlighted in pink (based on the name).</p>
+</li>
+<li><p><code>reset_colour</code> resets the colour (see picture 1 for more details).</p>
+</li>
+</ul>
+<p>I believe I don't need to explain much more as it is listed at the <em>variable name</em>.</p>
+<p>If you wish to try the code, please go to <a href="http://www.replit.com" rel="noreferrer">replit</a> IDE to test the code. The sample code is <a href="https://replit.com/@indexaker/Trial#main.py" rel="noreferrer">here</a></p>
+<hr>
+<p>Code (Picture 1):</p>
+<p><a href="https://i.stack.imgur.com/7hifz.png" rel="noreferrer"><img src="https://i.stack.imgur.com/7hifz.png" alt="My coding" /></a></p>
+<p>Output (Picture 2):</p>
+<p><a href="https://i.stack.imgur.com/E652Q.png" rel="noreferrer"><img src="https://i.stack.imgur.com/E652Q.png" alt="Code output" /></a></p>
+------------------------------------------------------------------ <br><h3> Answer 75054413 Federico Ba&#249;: </h3><p>Here a quick Class that wraps a print function for quick adding colors without installing additional packages.</p>
+<pre><code>class PrintColored:
+    DEFAULT = '\033[0m'
+    # Styles
+    BOLD = '\033[1m'
+    ITALIC = '\033[3m'
+    UNDERLINE = '\033[4m'
+    UNDERLINE_THICK = '\033[21m'
+    HIGHLIGHTED = '\033[7m'
+    HIGHLIGHTED_BLACK = '\033[40m'
+    HIGHLIGHTED_RED = '\033[41m'
+    HIGHLIGHTED_GREEN = '\033[42m'
+    HIGHLIGHTED_YELLOW = '\033[43m'
+    HIGHLIGHTED_BLUE = '\033[44m'
+    HIGHLIGHTED_PURPLE = '\033[45m'
+    HIGHLIGHTED_CYAN = '\033[46m'
+    HIGHLIGHTED_GREY = '\033[47m'
+
+    HIGHLIGHTED_GREY_LIGHT = '\033[100m'
+    HIGHLIGHTED_RED_LIGHT = '\033[101m'
+    HIGHLIGHTED_GREEN_LIGHT = '\033[102m'
+    HIGHLIGHTED_YELLOW_LIGHT = '\033[103m'
+    HIGHLIGHTED_BLUE_LIGHT = '\033[104m'
+    HIGHLIGHTED_PURPLE_LIGHT = '\033[105m'
+    HIGHLIGHTED_CYAN_LIGHT = '\033[106m'
+    HIGHLIGHTED_WHITE_LIGHT = '\033[107m'
+
+    STRIKE_THROUGH = '\033[9m'
+    MARGIN_1 = '\033[51m'
+    MARGIN_2 = '\033[52m' # seems equal to MARGIN_1
+    # colors
+    BLACK = '\033[30m'
+    RED_DARK = '\033[31m'
+    GREEN_DARK = '\033[32m'
+    YELLOW_DARK = '\033[33m'
+    BLUE_DARK = '\033[34m'
+    PURPLE_DARK = '\033[35m'
+    CYAN_DARK = '\033[36m'
+    GREY_DARK = '\033[37m'
+
+    BLACK_LIGHT = '\033[90m'
+    RED = '\033[91m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    BLUE = '\033[94m'
+    PURPLE = '\033[95m'
+    CYAN = '\033[96m'
+    WHITE = '\033[96m'
+
+    def __init__(self):
+        self.print_original = print # old value to the original print function
+        self.current_color = self.DEFAULT
+
+    def __call__(self,
+                 *values: object, sep: str | None = None,
+                 end: str | None = None,
+                 file: str | None = None,
+                 flush: bool = False,
+                 color: str|None = None,
+                 default_color: str|None = None,
+    ):
+        if default_color:
+            self.current_color = default_color
+
+        default = self.current_color
+        if color:
+            values = (color, *values, default)  # wrap the content within a selected color an a default
+        else:
+            values = (*values, default)  # wrap the content within a selected color an a default
+        self.print_original(*values, end=end, file=file, flush=flush)
+</code></pre>
+<h3>Usage</h3>
+<pre><code>class PrintColored:
+    DEFAULT = '\033[0m'
+    # Styles
+    BOLD = '\033[1m'
+    ITALIC = '\033[3m'
+    UNDERLINE = '\033[4m'
+    UNDERLINE_THICK = '\033[21m'
+    HIGHLIGHTED = '\033[7m'
+    HIGHLIGHTED_BLACK = '\033[40m'
+    HIGHLIGHTED_RED = '\033[41m'
+    HIGHLIGHTED_GREEN = '\033[42m'
+    HIGHLIGHTED_YELLOW = '\033[43m'
+    HIGHLIGHTED_BLUE = '\033[44m'
+    HIGHLIGHTED_PURPLE = '\033[45m'
+    HIGHLIGHTED_CYAN = '\033[46m'
+    HIGHLIGHTED_GREY = '\033[47m'
+
+    HIGHLIGHTED_GREY_LIGHT = '\033[100m'
+    HIGHLIGHTED_RED_LIGHT = '\033[101m'
+    HIGHLIGHTED_GREEN_LIGHT = '\033[102m'
+    HIGHLIGHTED_YELLOW_LIGHT = '\033[103m'
+    HIGHLIGHTED_BLUE_LIGHT = '\033[104m'
+    HIGHLIGHTED_PURPLE_LIGHT = '\033[105m'
+    HIGHLIGHTED_CYAN_LIGHT = '\033[106m'
+    HIGHLIGHTED_WHITE_LIGHT = '\033[107m'
+
+    STRIKE_THROUGH = '\033[9m'
+    MARGIN_1 = '\033[51m'
+    MARGIN_2 = '\033[52m' # seems equal to MARGIN_1
+    # colors
+    BLACK = '\033[30m'
+    RED_DARK = '\033[31m'
+    GREEN_DARK = '\033[32m'
+    YELLOW_DARK = '\033[33m'
+    BLUE_DARK = '\033[34m'
+    PURPLE_DARK = '\033[35m'
+    CYAN_DARK = '\033[36m'
+    GREY_DARK = '\033[37m'
+
+    BLACK_LIGHT = '\033[90m'
+    RED = '\033[91m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    BLUE = '\033[94m'
+    PURPLE = '\033[95m'
+    CYAN = '\033[96m'
+    WHITE = '\033[96m'
+
+    def __init__(self):
+        self.print_original = print # old value to the original print function
+        self.current_color = self.DEFAULT
+
+    def __call__(self,
+                 *values: object, sep: str | None = None,
+                 end: str | None = None,
+                 file: str | None = None,
+                 flush: bool = False,
+                 color: str|None = None,
+                 default_color: str|None = None,
+    ):
+        if default_color:
+            self.current_color = default_color
+
+        default = self.current_color
+        if color:
+            values = (color, *values, default)  # wrap the content within a selected color an a default
+        else:
+            values = (*values, default)  # wrap the content within a selected color an a default
+        self.print_original(*values, end=end, file=file, flush=flush)
+
+if __name__ == '__main__':
+    print = PrintColored()
+
+    print(&quot;Hello world - default&quot;)
+    print(&quot;Hello world - Bold&quot;, color=print.BOLD)
+    print(&quot;Hello world - Italic&quot;, color=print.ITALIC)
+    print(&quot;Hello world - Underline&quot;, color=print.UNDERLINE)
+    print(&quot;Hello world - UNDERLINE_THICK&quot;, color=print.UNDERLINE_THICK)
+    print(&quot;Hello world - HighLithted&quot;, color=print.HIGHLIGHTED)
+    print(&quot;Hello world - HIGHLIGHTED_BLACK&quot;, color=print.HIGHLIGHTED_BLACK)
+    print(&quot;Hello world - HIGHLIGHTED_RED&quot;, color=print.HIGHLIGHTED_RED)
+    print(&quot;Hello world - HIGHLIGHTED_GREEN&quot;, color=print.HIGHLIGHTED_GREEN)
+    print(&quot;Hello world - HIGHLIGHTED_YELLOW&quot;, color=print.HIGHLIGHTED_YELLOW)
+    print(&quot;Hello world - HIGHLIGHTED_BLUE&quot;, color=print.HIGHLIGHTED_BLUE)
+    print(&quot;Hello world - HIGHLIGHTED_PURPLE&quot;, color=print.HIGHLIGHTED_PURPLE)
+    print(&quot;Hello world - HIGHLIGHTED_CYAN&quot;, color=print.HIGHLIGHTED_CYAN)
+    print(&quot;Hello world - HIGHLIGHTED_GREY&quot;, color=print.HIGHLIGHTED_GREY)
+    print(&quot;Hello world - HIGHLIGHTED_GREY_LIGHT&quot;, color=print.HIGHLIGHTED_GREY_LIGHT)
+    print(&quot;Hello world - HIGHLIGHTED_RED_LIGHT&quot;, color=print.HIGHLIGHTED_RED_LIGHT)
+    print(&quot;Hello world - HIGHLIGHTED_GREEN_LIGHT&quot;, color=print.HIGHLIGHTED_GREEN_LIGHT)
+    print(&quot;Hello world - HIGHLIGHTED_YELLOW_LIGHT&quot;, color=print.HIGHLIGHTED_YELLOW_LIGHT)
+    print(&quot;Hello world - HIGHLIGHTED_BLUE_LIGHT&quot;, color=print.HIGHLIGHTED_BLUE_LIGHT)
+    print(&quot;Hello world - HIGHLIGHTED_PURPLE_LIGHT&quot;, color=print.HIGHLIGHTED_PURPLE_LIGHT)
+    print(&quot;Hello world - HIGHLIGHTED_CYAN_LIGHT&quot;, color=print.HIGHLIGHTED_CYAN_LIGHT)
+    print(&quot;Hello world - HIGHLIGHTED_WHITE_LIGHT&quot;, color=print.HIGHLIGHTED_WHITE_LIGHT)
+    print(&quot;Hello world - STRIKE_THROUGH&quot;, color=print.STRIKE_THROUGH)
+    print(&quot;Hello world - MARGIN_1&quot;, color=print.MARGIN_1)
+    print(&quot;Hello world - MARGIN_2&quot;, color=print.MARGIN_2)
+
+    print(&quot;Hello world - BLACK&quot;, color=print.BLACK)
+    print(&quot;Hello world - RED_DARK&quot;, color=print.RED_DARK)
+    print(&quot;Hello world - GREEN_DARK&quot;, color=print.GREEN_DARK)
+    print(&quot;Hello world - YELLOW_DARK&quot;, color=print.YELLOW_DARK)
+    print(&quot;Hello world - BLUE_DARK&quot;, color=print.BLUE_DARK)
+    print(&quot;Hello world - PURPLE_DARK&quot;, color=print.PURPLE_DARK)
+    print(&quot;Hello world - CYAN_DARK&quot;, color=print.CYAN_DARK)
+    print(&quot;Hello world - GREY_DARK&quot;, color=print.GREY_DARK)
+    print(&quot;Hello world - BLACK_LIGHT&quot;, color=print.BLACK_LIGHT)
+    print(&quot;Hello world - BLACK_LIGHT&quot;, color=print.BLACK_LIGHT)
+    print(&quot;Hello world - RED&quot;, color=print.RED)
+    print(&quot;Hello world - GREEN&quot;, color=print.GREEN)
+    print(&quot;Hello world - YELLOW&quot;, color=print.YELLOW)
+    print(&quot;Hello world - BLUE&quot;, color=print.BLUE)
+    print(&quot;Hello world - PURPLE&quot;, color=print.PURPLE)
+    print(&quot;Hello world - CYAN&quot;, color=print.CYAN)
+    print(&quot;Hello world - WHITE&quot;, color=print.WHITE)
+
+    # Back to normal
+    print(&quot;&quot;, default_color=print.DEFAULT)
+    print(&quot;Hello world - default&quot;)
+
+
+</code></pre>
+<h3>Output</h3>
+<p><a href="https://i.stack.imgur.com/YDjPQ.png" rel="noreferrer"><img src="https://i.stack.imgur.com/YDjPQ.png" alt="enter image description here" /></a></p>
+------------------------------------------------------------------ <br><h3> Answer 75984148 Jakob Bagterp: </h3><p>You can find multiple great Python packages that can solve your problem so you don't have to build it from scratch. In full disclosure, I'm the author of the <a href="https://jakob-bagterp.github.io/colorist-for-python/" rel="nofollow noreferrer">Colorist</a> package. <a href="https://jakob-bagterp.github.io/colorist-for-python/" rel="nofollow noreferrer">Colorist</a> is lightweight and less verbose. Simply install the package with <code>pip install colorist</code> and type:</p>
+<pre class="lang-py prettyprint-override"><code>from colorist import red
+
+red(&quot;some text in red color&quot;)
+</code></pre>
+<p><a href="https://i.stack.imgur.com/9F6IP.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/9F6IP.png" alt="some text in red color" /></a></p>
+<p>Sometimes you may want a little more control over the terminal style, so you can also do this:</p>
+<pre class="lang-py prettyprint-override"><code>from colorist import Color
+
+print(f&quot;Only {Color.CYAN}this part{Color.OFF} is in colour&quot;)
+</code></pre>
+<p><a href="https://i.stack.imgur.com/sjVyd.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/sjVyd.png" alt="Only this part is in colour" /></a></p>
+<p>Moreover, <a href="https://jakob-bagterp.github.io/colorist-for-python/" rel="nofollow noreferrer">Colorist</a> also supports color defined as RGB, HSL or Hex if your terminal supports advanced ANSI colors:</p>
+<pre class="lang-py prettyprint-override"><code>from colorist import ColorRGB, BgColorRGB
+
+dusty_pink = ColorRGB(194, 145, 164)
+bg_steel_blue = BgColorRGB(70, 130, 180)
+
+print(f&quot;I want to use {dusty_pink}dusty pink{dusty_pink.OFF} and {bg_steel_blue}steel blue{bg_steel_blue.OFF} colors inside this paragraph&quot;)
+</code></pre>
+<p><a href="https://i.stack.imgur.com/qd690.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/qd690.png" alt="Examples of RGB color in terminal" /></a></p>
+<pre class="lang-py prettyprint-override"><code>from colorist import ColorHSL, BgColorHSL
+
+mustard_green = ColorHSL(60, 56, 43)
+bg_steel_gray = BgColorHSL(190, 2, 49)
+
+print(f&quot;I want to use {mustard_green}mustard green{mustard_green.OFF} and {bg_steel_gray}steel blue{bg_steel_gray.OFF} colors inside this paragraph&quot;)
+</code></pre>
+<p><a href="https://i.stack.imgur.com/AbrxY.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/AbrxY.png" alt="Examples of HSL color in terminal" /></a></p>
+<pre class="lang-py prettyprint-override"><code>from colorist import ColorHex, BgColorHex
+
+watermelon_red = ColorHex(&quot;#ff5733&quot;)
+bg_mint_green = BgColorHex(&quot;#99ff99&quot;)
+
+print(f&quot;I want to use {watermelon_red}watermelon pink{watermelon_red.OFF} and {bg_mint_green}mint green{bg_mint_green.OFF} colors inside this paragraph&quot;)
+</code></pre>
+<p><a href="https://i.stack.imgur.com/zVwLu.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/zVwLu.png" alt="Examples of Hex color in terminal" /></a></p>
+<h4> Comment 134165568 MoonCactus: </h4>This is pretty cool. Minimalist as I love it. thanks for sharing.<br>------------------------------------------------------------------ <br><h3> Answer 28159385 WebMaster: </h3><p>Use <a href="https://github.com/ilovecode1/pyfancy" rel="nofollow noreferrer">pyfancy</a>. It is a simple way to do color in the terminal!</p>
+<p>Example:</p>
+<pre><code>print(pyfancy.RED + &quot;Hello Red&quot; + pyfancy.END)
+</code></pre>
+<h4> Comment 47243652 Floyd: </h4>Not very nice code, it even contains a reference to pythonw.exe ;)<br>------------------------------------------------------------------ <br><h3> Answer 62530462 Carson: </h3><p>I created a project (<code>console-color</code>) and already published it to <a href="https://pypi.org/project/console-color/" rel="nofollow noreferrer">PyPI</a>.</p>
+<p>You can throw <code>pip install console-color</code> to install it.</p>
+<p>And I write the document with Sphinx-read-the-doc, see <a href="https://carsonslovoka.github.io/console-color/en/source/introduction.html" rel="nofollow noreferrer">here</a>.</p>
+<p>You can get more example from <a href="https://colab.research.google.com/drive/1cAYcC6DyiMCyD0RDcEo25LDFCh527TUQ?usp=sharing" rel="nofollow noreferrer">google-colab</a>.</p>
+<p>I still post some example to attract the user to click the above link:</p>
+<pre class="lang-py prettyprint-override"><code># cprint is something like below
+# cprint(text: str, fore: T_RGB = None, bg: T_RGB = None, style: Style = '')
+# where T_RGB = Union[Tuple[int, int, int], str] for example. You can input (255, 0, 0) or '#ff0000' or 'ff0000'. They are OK.
+# The Style you can input the ``Style.`` (the IDE will help you to choose what you wanted)
+
+# from console_color import RGB, Fore, Style, cprint, create_print
+from console_color import *
+
+cprint(&quot;Hello, World!&quot;, RGB.RED, RGB.YELLOW, Style.BOLD+Style.URL+Style.STRIKE)
+cprint(&quot;Hello, World!&quot;, fore=(255, 0, 0), bg=&quot;ffff00&quot;, style=Style.BOLD+Style.URL+Style.STRIKE)
+</code></pre>
+<p><a href="https://i.stack.imgur.com/ZzWF9.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/ZzWF9.png" alt="Enter image description here" /></a></p>
+<p><em>Of course, you don’t have to enter all the parameters. You can just add the attributes you want.</em></p>
+<hr />
+<p>To be honest, this project is not special. It just uses the <code>f&quot;\033[{target};2;{r};{g};{b}m{text}{style}&quot;</code>
+where target is 38 or 48, text is your input string, and style is '\33[0m', '\33[1m' ... '\033[9m'. Some kind of stuff.</p>
+<p>And I just make it easy to use (at least for me).</p>
+------------------------------------------------------------------ <br><h3> Answer 52032616 qpaycm: </h3><p>I am new to Python and I'm excited every time I discover topics, like this one. But this time (suddenly) I feel like I have what to say. Especially because a few minutes ago I discovered a <em>wow</em> thing in Python (at least for me now):</p>
+<p><a href="https://docs.python.org/3/library/contextlib.html#contextlib.contextmanager" rel="nofollow noreferrer"><strong>Context Managers</strong></a></p>
+<pre><code>from contextlib import contextmanager
+# FORECOLOR
+BLACKFC,REDFC,GREENFC,YELLOWFC,BLUEFC = '38;30m','38;31m','38;32m','38;33m','38;34m'
+# BACKGOUND
+BLACKBG,REDBG,GREENBG,YELLOWBG,BLUEBG = '48;40m','48;41m','48;42m','48;43m','48;44m'
+
+@contextmanager
+def printESC(prefix, color, text):
+  print(&quot;{prefix}{color}{text}&quot;.format(prefix=prefix, color=color, text=text), end='')
+  yield
+  print(&quot;{prefix}0m&quot;.format(prefix=prefix))
+
+with printESC('\x1B[', REDFC, 'Colored Text'):
+  pass
+</code></pre>
+<p><a href="https://repl.it/@VoldemarShalomo/Escape-sequences-for-visual-effects-in-terminal" rel="nofollow noreferrer">Example</a></p>
+<p>Or just like this:</p>
+<pre><code># FORECOLOR
+BLACKFC,REDFC,GREENFC,YELLOWFC,BLUEFC = '38;30m','38;31m','38;32m','38;33m','38;34m'
+# BACKGOUND
+BLACKBG,REDBG,GREENBG,YELLOWBG,BLUEBG = '48;40m','48;41m','48;42m','48;43m','48;44m'
+
+def printESC(prefix, color, text):
+  print(&quot;{prefix}{color}{text}&quot;.format(prefix=prefix, color=color, text=text), end='')
+  print(&quot;{prefix}0m&quot;.format(prefix=prefix))
+
+printESC('\x1B[', REDFC, 'Colored Text')
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 68748316 ToTamire: </h3><p>I was moved there by google when I was looking how to color logs so:</p>
+<h1>coloredlogs</h1>
+<h2>Instalation</h2>
+<pre><code>pip install coloredlogs
+</code></pre>
+<h2>Usage</h2>
+<h5>Minimal usage:</h5>
+<pre class="lang-python prettyprint-override"><code>import logging
+import coloredlogs
+
+coloredlogs.install()  # install a handler on the root logger
+
+logging.debug('message with level debug')
+logging.info('message with level info')
+logging.warning('message with level warning')
+logging.error('message with level error')
+logging.critical('message with level critical')
+</code></pre>
+<p>Results with:
+<a href="https://i.stack.imgur.com/A1axw.png" rel="noreferrer"><img src="https://i.stack.imgur.com/A1axw.png" alt="minimal usage" /></a></p>
+<h5>Start from message level debug:</h5>
+<pre class="lang-python prettyprint-override"><code>import logging
+import coloredlogs
+
+coloredlogs.install(level='DEBUG')  # install a handler on the root logger with level debug
+
+logging.debug('message with level debug')
+logging.info('message with level info')
+logging.warning('message with level warning')
+logging.error('message with level error')
+logging.critical('message with level critical')
+</code></pre>
+<p>Results with:
+<a href="https://i.stack.imgur.com/S3AAi.png" rel="noreferrer"><img src="https://i.stack.imgur.com/S3AAi.png" alt="debug level" /></a></p>
+<h5>Hide messages from libraries:</h5>
+<pre class="lang-python prettyprint-override"><code>import logging
+import coloredlogs
+
+logger = logging.getLogger(__name__)  # get a specific logger object
+coloredlogs.install(level='DEBUG')  # install a handler on the root logger with level debug
+coloredlogs.install(level='DEBUG', logger=logger)  # pass a specific logger object
+
+logging.debug('message with level debug')
+logging.info('message with level info')
+logging.warning('message with level warning')
+logging.error('message with level error')
+logging.critical('message with level critical')
+</code></pre>
+<p>Results with:
+<a href="https://i.stack.imgur.com/S3AAi.png" rel="noreferrer"><img src="https://i.stack.imgur.com/S3AAi.png" alt="debug level" /></a></p>
+<h5>Format log messages:</h5>
+<pre class="lang-python prettyprint-override"><code>import logging
+import coloredlogs
+
+logger = logging.getLogger(__name__)  # get a specific logger object
+coloredlogs.install(level='DEBUG')  # install a handler on the root logger with level debug
+coloredlogs.install(level='DEBUG', logger=logger)  # pass a specific logger object
+coloredlogs.install(
+    level='DEBUG', logger=logger,
+    fmt='%(asctime)s.%(msecs)03d %(filename)s:%(lineno)d %(levelname)s %(message)s'
+)
+
+logging.debug('message with level debug')
+logging.info('message with level info')
+logging.warning('message with level warning')
+logging.error('message with level error')
+logging.critical('message with level critical')
+</code></pre>
+<p>Results with:
+<a href="https://i.stack.imgur.com/0aBWR.png" rel="noreferrer"><img src="https://i.stack.imgur.com/0aBWR.png" alt="format log messages" /></a></p>
+<h5>Available format attributes:</h5>
+<ul>
+<li><code>%(asctime)s</code> - Time as human-readable string, when logging call was issued</li>
+<li><code>%(created)f</code> - Time as float when logging call was issued</li>
+<li><code>%(filename)s</code> - File name</li>
+<li><code>%(funcName)s</code> - Name of function containing the logging call</li>
+<li><code>%(hostname)s</code> - System hostname</li>
+<li><code>%(levelname)s</code> - Text logging level</li>
+<li><code>%(levelno)s</code> - Integer logging level</li>
+<li><code>%(lineno)d</code> - Line number where the logging call was issued</li>
+<li><code>%(message)s</code> - Message passed to logging call (same as <code>%(msg)s</code>)</li>
+<li><code>%(module)s</code> - File name without extension where the logging call was issued</li>
+<li><code>%(msecs)d</code> - Millisecond part of the time when logging call was issued</li>
+<li><code>%(msg)s</code> - Message passed to logging call (same as <code>%(message)s</code>)</li>
+<li><code>%(name)s</code> - Logger name</li>
+<li><code>%(pathname)s</code> - Full pathname to file containing the logging call</li>
+<li><code>%(process)d</code> - Process ID</li>
+<li><code>%(processName)s</code> - Process name</li>
+<li><code>%(programname)s</code> - System programname</li>
+<li><code>%(relativeCreated)d</code> - Time as integer in milliseconds when logging call was issued, relative to the time when logging module was loaded</li>
+<li><code>%(thread)d</code> -  Thread ID</li>
+<li><code>%(threadName)s</code> - Thread name</li>
+<li><code>%(username)s</code> - System username</li>
+</ul>
+<h2>Sources:</h2>
+<p><a href="https://pypi.org/project/coloredlogs/" rel="noreferrer">Coloredlogs package</a></p>
+<p><a href="https://docs.python.org/3/library/logging.html#logrecord-attributes" rel="noreferrer">Logging library</a></p>
+------------------------------------------------------------------ <br><h3> Answer 73917459 stackunderflow: </h3><p>as a fan of the RGB standard, I would do it like this:</p>
+<pre><code>def color_text(text, rgb):
+    r, g, b = rgb
+    return f&quot;\033[38;2;{r};{g};{b}m{text}\033[0m&quot;
+
+class rgb():
+    BLACK = (0, 0, 0)
+    RED = (255, 0, 0)
+    GREEN = (0, 255, 0)
+    BLUE = (0, 0, 255)
+    YELLOW = (255, 255, 0)
+    # and so on ...
+
+print(color_text(&quot;hello colored world&quot;, rgb.GREEN))
+</code></pre>
+<p><em>PS: strongly inspired by CircuitSacul's answer</em></p>
+------------------------------------------------------------------ <br><h3> Answer 7839185 nmenezes: </h3><p>I wrote a simple module, available at:
+<a href="http://pypi.python.org/pypi/colorconsole" rel="nofollow">http://pypi.python.org/pypi/colorconsole</a></p>
+
+<p>It works with Windows, Mac OS X and Linux.
+It uses ANSI for Linux and Mac, but native calls to console functions on Windows.
+You have colors, cursor positioning and keyboard input. It is not a replacement for curses, but can be very useful if you need to use in simple scripts or ASCII games.</p>
+------------------------------------------------------------------ <br><h3> Answer 26695185 Robpol86: </h3><p>I wrote a module that handles colors in Linux, OS X, and Windows. It supports all 16 colors on all platforms, you can set foreground and background colors at different times, and the string objects give sane results for things like len() and .capitalize().</p>
+<p><a href="https://github.com/Robpol86/colorclass" rel="nofollow noreferrer">https://github.com/Robpol86/colorclass</a></p>
+<p><img src="https://i.stack.imgur.com/j7EjM.png" alt="Example on Windows cmd.exe" /></p>
+------------------------------------------------------------------ <br><h3> Answer 59274139 monkey: </h3><p>The simplest way I can find is not to use ANSI escape codes, but use <code>Fore</code> from import module <code>colorama</code>. Take a look at the code below:</p>
+
+<pre><code>from colorama import Fore, Style
+
+print(Fore.MAGENTA + "IZZ MAGENTA BRUH.")
+
+print(Style.RESET_ALL + "IZZ BACK TO NORMALZ.")
+</code></pre>
+
+<p>compared to the ANSI escape code:</p>
+
+<pre><code>print("\u001b[31m IZZ RED (NO MAGENTA ON ANSI CODES).\u001b[0m")
+
+print("BACK TO NORMALZ.")
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 60252056 Gerry P: </h3><p>Here is a simple function I use to print a text message in color without having to remember ANSI codes but rather using standard RGB tuples to define the foreground and background colors.</p>
+<pre><code>def print_in_color(txt_msg, fore_tuple, back_tuple, ):
+    # Prints the text_msg in the foreground color specified by fore_tuple with the background specified by back_tuple
+    # text_msg is the text, fore_tuple is foreground color tuple (r,g,b), back_tuple is background tuple (r,g,b)
+    rf,bf,gf = fore_tuple
+    rb,gb,bb = back_tuple
+    msg = '{0}' + txt_msg
+    mat = '\33[38;2;' + str(rf) + ';' + str(gf) + ';' + str(bf) + ';48;2;' + str(rb) + ';' +str(gb) + ';' + str(bb) + 'm'
+    print(msg .format(mat))
+    print('\33[0m') # Returns default print color to back to black
+
+# Example of use using a message with variables
+fore_color = 'cyan'
+back_color = 'dark green'
+msg = 'foreground color is {0} and the background color is {1}'.format(fore_color, back_color)
+print_in_color(msg, (0,255,255), (0,127,127))
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 65475628 Proud: </h3><pre class="lang-py prettyprint-override"><code>print(&quot;\033[1;32;40m Bright Green  \n&quot;)
+</code></pre>
+<p><img src="https://i.stack.imgur.com/esbQu.png" alt="1" /></p>
+<h4> Comment 116069322 Peter Mortensen: </h4>An explanation would be in order.<br>------------------------------------------------------------------ <br><h3> Answer 11178541 Brian M. Hunt: </h3><p>To address this problem I created a mind-numbingly simple package to print strings with interpolated color codes, called <a href="https://github.com/brianmhunt/icolor" rel="nofollow">icolor</a>.</p>
+
+<p>icolor includes two functions: <code>cformat</code> and <code>cprint</code>, each of which takes a string with substrings that are interpolated to map to ANSI escape sequences e.g.</p>
+
+<pre><code>from icolor import cformat # there is also cprint
+
+cformat("This is #RED;a red string, partially with a #xBLUE;blue background")
+'This is \x1b[31ma red string, partially with a \x1b[44mblue background\x1b[0m'
+</code></pre>
+
+<p>All the ANSI colors are included (e.g. <code>#RED;</code>, <code>#BLUE;</code>, etc.), as well as <code>#RESET;</code>, <code>#BOLD;</code> and others.</p>
+
+<p>Background colors have an <code>x</code> prefix, so a green background would be <code>#xGREEN;</code>.</p>
+
+<p>One can escape <code>#</code> with <code>##</code>.</p>
+
+<p>Given its simplicity, the best documentation is probably <a href="https://github.com/brianmhunt/icolor/blob/master/icolor.py" rel="nofollow">the code itself</a>.</p>
+
+<p>It is <a href="http://pypi.python.org/pypi/icolor/1.0" rel="nofollow">on PYPI</a>, so one can <code>sudo easy_install icolor</code>.</p>
+------------------------------------------------------------------ <br><h3> Answer 27233961 Igor Šarčević: </h3><p>You can use shell escape characters that are available from any language.
+These escape characters start with the ESC character followed by a number of arguments.</p>
+<p>For example, to output a red <em>&quot;Hello, World!&quot;</em> string in your terminal:</p>
+<pre><code>echo &quot;\e[31m Hello, World! \e[0m&quot;
+</code></pre>
+<p>Or from a Python script:</p>
+<pre><code>print(&quot;\e[31m Hello world \e[0m&quot;)
+</code></pre>
+<p>Also, I wrote an article about <a href="http://shiroyasha.github.io/escape-sequences-a-quick-guide.html" rel="nofollow noreferrer">Escape sequences</a> that can probably help you get a better grasp of this mechanism.</p>
+<h4> Comment 81192471 Martijn Pieters: </h4>Python has no <code>\e</code> escape sequence. Just because <i>some</i> <code>echo</code> implementations support it doesn&#39;t make those sequences universally available.<br><h4> Comment 81192698 Martijn Pieters: </h4>And <code>\e </code>is not part of the POSIX specification for <code>echo</code>, so it is not universal there either. The GNU coreutils version supports it, but not the one used on OS X (a BSD variant). Last but not least, the sequence is <i>not a shell feature</i> either, it is specific to the <code>echo</code> command.<br><h4> Comment 81193908 rnso: </h4>Please see this question <a href="https://stackoverflow.com/questions/47121421/not-able-to-print-in-color-on-terminal/" title="not able to print in color on terminal">stackoverflow.com/questions/47121421/&hellip;</a> which has led to these comments.<br>------------------------------------------------------------------ <br><h3> Answer 65238905 prerakl123: </h3><p>Some of the solutions like:</p>
+<pre class="lang-py prettyprint-override"><code>fg = lambda text, color: &quot;\33[38;5;&quot; + str(color) + &quot;m&quot; + text + &quot;\33[0m&quot;
+bg = lambda text, color: &quot;\33[48;5;&quot; + str(color) + &quot;m&quot; + text + &quot;\33[0m&quot;
+
+def print_six(row, format, end=&quot;\n&quot;):
+    for col in range(6):
+        color = row*6 + col - 2
+        if color&gt;=0:
+            text = &quot;{:3d}&quot;.format(color)
+            print (format(text,color), end=&quot; &quot;)
+        else:
+            print(end=&quot;    &quot;)   # Four spaces
+    print(end=end)
+
+for row in range(0, 43):
+    print_six(row, fg, &quot; &quot;)
+    print_six(row, bg)
+
+print(fg(&quot;text&quot;, 160))
+
+</code></pre>
+<p><strong>OR</strong></p>
+<pre class="lang-py prettyprint-override"><code>def colored(r, g, b, text):
+    return &quot;\033[38;2;{};{};{}m{} \033[38;2;255;255;255m&quot;.format(r, g, b, text)
+
+
+text = 'Hello, World!'
+colored_text = colored(255, 0, 0, text)
+print(colored_text)
+
+</code></pre>
+<p><strong>OR</strong></p>
+<pre class="lang-py prettyprint-override"><code>class Color:
+    COLOR = [f&quot;\33[{i}m&quot; for i in range(44)]
+
+for i in range(44):
+    print(Color.COLOR[i] + 'text')
+
+</code></pre>
+<p><strong>might not work</strong> on Windows 10 terminals or PowerShell windows or their might be other cases where these might not work directly.</p>
+<p>But on inserting, these two small lines at the beginning of the program might help:</p>
+<pre class="lang-py prettyprint-override"><code>import os
+os.system('')
+</code></pre>
+<p><code>os.system('')</code> allows you to print ANSI codes in the Terminal which colors your output according to your choice (but there can be other system specific functions that you might need to call, to be able to print colored text in terminal).</p>
+------------------------------------------------------------------ <br><h3> Answer 69050278 Sylvester Kruin - try Codidact: </h3><p>You could use the <code>pygments</code> module to do this. For example:</p>
+<pre><code>from pygments import console
+print(pygments.console.colorize(&quot;red&quot;, &quot;This text is red.&quot;))
+</code></pre>
+<p>This doesn't allow you to provide a hexadecimal color for the terminal, but there are many built-in colors that you can try, like &quot;blue&quot;, &quot;darkgreen&quot;, &quot;yellow&quot;, etc.</p>
+------------------------------------------------------------------ <br><h3> Answer 18923126 Diego Navarro: </h3><p>My two cents (<a href="https://github.com/dnmellen/pycolorterm" rel="nofollow">PyColorTerm</a>):</p>
+
+<p>Installation:</p>
+
+<pre><code>sudo apt-get install python-pip
+pip install pycolorterm
+</code></pre>
+
+<p>Python script:</p>
+
+<pre><code>from pycolorterm import pycolorterm
+
+with pycolorterm.pretty_output(pycolorterm.FG_GREEN) as out:
+    out.write('Works OK!')
+</code></pre>
+
+<p>"works OK!" shows in green.</p>
+------------------------------------------------------------------ <br><h3> Answer 68132906 Life is complex: </h3><p>This answer attempts to expand the concept of writing colorized text to the terminal by using a <em>regular expression</em> to colorize keywords in a block of text.</p>
+<p>This answer also use the <em>Python</em> library <a href="https://github.com/willmcgugan/rich" rel="nofollow noreferrer">Rich</a>, which was briefly covered in a previous answer to this question.  In this answer I use the function <em>rich.color.ANSI_COLOR_NAMES</em> to obtain a random list of colors that will be used to highlight predefined search terms.</p>
+<pre><code>import random
+import re as regex
+from rich import color
+from rich import print
+
+
+def create_dynamic_regex(search_words):
+    &quot;&quot;&quot;
+    This function is used to create a dynamic regular expression
+    string and a list of random colors. Both these elements will
+    be used in the function colorize_text()
+
+    :param search_words: list of search terms
+    :return: regular expression search string and a list of colors
+    :rtype: string, list
+    &quot;&quot;&quot;
+    colors_required = create_list_of_colors(len(search_words))
+    number_of_search_words = len(search_words)
+    combined_string = ''
+    for search_word in search_words:
+        number_of_search_words -= 1
+        if number_of_search_words != 0:
+            current_string = ''.join(r'(\b' + search_word + r'\b)|')
+            combined_string = (combined_string + current_string)
+        elif number_of_search_words == 0:
+            current_string = ''.join(r'(\b' + search_word + r'\b)')
+            combined_string = (combined_string + current_string)
+    return combined_string, colors_required
+
+
+def random_color():
+    &quot;&quot;&quot;
+    This function is used to create a random color using the
+    Python package rich.
+    :return: color name
+    :rtype: string
+    &quot;&quot;&quot;
+    selected_color = random.choice(list(color.ANSI_COLOR_NAMES.keys()))
+    return selected_color
+
+
+def create_list_of_colors(number_of_colors):
+    &quot;&quot;&quot;
+    This function is used to generate a list of colors,
+    which will be used in the function colorize_text()
+    :param number_of_colors:
+    :return: list of colors
+    :rtype: list
+    &quot;&quot;&quot;
+    list_of_colors = [random_color() for _ in range(number_of_colors)]
+    return list_of_colors
+
+
+def colorize_text(text, regex_string, array_of_colors):
+    &quot;&quot;&quot;
+    This function is used to colorize specific words in a text string.
+    :param text: text string potentially containing specific words to colorize.
+    :param regex_string: regular expression search string
+    :param array_of_colors: list of colors
+    :return: colorized text
+    :rtype: string
+    &quot;&quot;&quot;
+    available_colors = array_of_colors
+    word_regex = regex.compile(f&quot;{regex_string}&quot;, regex.IGNORECASE)
+    i = 0
+    output = &quot;&quot;
+    for word in word_regex.finditer(text):
+        get_color = available_colors[word.lastindex - 1]
+        output += &quot;&quot;.join([text[i:word.start()],
+                           &quot;[%s]&quot; % available_colors[word.lastindex - 1],
+                           text[word.start():word.end()], &quot;[/%s]&quot; % available_colors[word.lastindex - 1]])
+        i = word.end()
+    return ''.join([output, text[word.end():]])
+
+
+def generate_console_output(text_to_search, words_to_find):
+    &quot;&quot;&quot;
+    This function is used generate colorized text that will
+    be outputting to the console.
+
+    :param text_to_search: text string potentially containing specific words to colorize.
+    :param words_to_find: list of search terms.
+    :return: A string containing colorized words.
+    :rtype: string
+    &quot;&quot;&quot;
+    search_terms, colors = create_dynamic_regex(words_to_find)
+    colorize_html = colorize_text(text_to_search, search_terms, colors)
+    print(colorize_html)
+
+
+text = &quot;The dog chased the cat that was looking for the mouse that the dog was playing with.&quot;
+words = ['dog', 'cat', 'mouse']
+generate_console_output(text, words)
+</code></pre>
+<p>Here is the print output from the code above:</p>
+<p><a href="https://i.stack.imgur.com/Z3qX4.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/Z3qX4.png" alt="enter image description here" /></a></p>
+<p>I created two GISTs for colorizing text.</p>
+<ul>
+<li><a href="https://gist.github.com/johnbumgarner/035fd1dda6044a03cefca0ea1d66fbec" rel="nofollow noreferrer">colorized text terminal output</a></li>
+<li><a href="https://gist.github.com/johnbumgarner/5f7139b00bff22d9faa6a2badcc824fe#file-colorize_keywords_in_text_html_output-py" rel="nofollow noreferrer">colorized text HTML output</a></li>
+</ul>
+------------------------------------------------------------------ <br><h3> Answer 73158800 Nazime Lakehal: </h3><p>I wrote a library which is available on PyPI, with a simple API that follows the standard print function.</p>
+<p>You can install it with <code>pip install coloring</code>.</p>
+<pre class="lang-py prettyprint-override"><code>import coloring
+
+# Directly use print-like functions
+coloring.print_red('Hello', 12)
+coloring.print_green('Hey', end=&quot;&quot;, sep=&quot;;&quot;)
+print()
+
+# Get str as return
+print(coloring.red('hello'))
+
+# Use the generic colorize function
+print(coloring.colorize(&quot;I'm red&quot;, &quot;red&quot;)) # Using color names
+print(coloring.colorize(&quot;I'm green&quot;, (0, 255, 0)))  # Using RGB colors
+print(coloring.colorize(&quot;I'm blue&quot;, &quot;#0000ff&quot;))  # Using hex colors
+
+# Or using styles (underline, bold, italic, ...)
+print(coloring.colorize('Hello', 'red', s='ub'))  # underline and bold
+
+</code></pre>
+<p>Executed code:</p>
+<p><a href="https://i.stack.imgur.com/4lCwT.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/4lCwT.png" alt="enter image description here" /></a></p>
+<p>You can check all the features here: <a href="https://github.com/Nazime/coloring" rel="nofollow noreferrer">https://github.com/Nazime/coloring</a>.</p>
+------------------------------------------------------------------ <br><h3> Answer 74238803 BML: </h3><pre><code>class ColorText:
+    &quot;&quot;&quot;
+    Use ANSI escape sequences to print colors +/- bold/underline to bash terminal.
+
+    Examples
+    --------
+    &gt;&gt;&gt; ColorText('HelloWorld').bold()
+    &gt;&gt;&gt; ColorText('HelloWorld').blue()
+    &gt;&gt;&gt; ColorText('HelloWorld').bold().custom(&quot;#bebebe&quot;)
+    &gt;&gt;&gt; ColorText('HelloWorld').underline().custom('dodgerblue')
+    &gt;&gt;&gt; ColorText.demo()
+
+    Notes
+    -----
+    - execute ColorText.demo() for a printout of colors.
+    &quot;&quot;&quot;
+
+    @classmethod
+    def demo(cls):
+        &quot;&quot;&quot;Prints examples of all colors in normal, bold, underline, bold+underline.&quot;&quot;&quot;
+        for color in dir(ColorText):
+            if all([color.startswith(&quot;_&quot;) is False,
+                    color not in [&quot;bold&quot;, &quot;underline&quot;, &quot;demo&quot;, &quot;custom&quot;],
+                    callable(getattr(ColorText, color))]):
+                print(getattr(ColorText(color), color)(),
+                      &quot;\t&quot;,
+                      getattr(ColorText(f&quot;bold {color}&quot;).bold(), color)(),
+                      &quot;\t&quot;,
+                      getattr(ColorText(f&quot;underline {color}&quot;).underline(), color)(),
+                      &quot;\t&quot;,
+                      getattr(ColorText(f&quot;bold underline {color}&quot;).underline().bold(), color)())
+        print(ColorText(&quot;Input can also be color hex or R,G,B with ColorText.custom()&quot;).bold())
+        pass
+
+    def __init__(self, text: str = &quot;&quot;):
+        self.text = text
+        self.ending = &quot;\033[0m&quot;
+        self.colors = []
+        pass
+
+    def __repr__(self):
+        return self.text
+
+    def __str__(self):
+        return self.text
+
+    def bold(self):
+        self.text = &quot;\033[1m&quot; + self.text + self.ending
+        return self
+
+    def underline(self):
+        self.text = &quot;\033[4m&quot; + self.text + self.ending
+        return self
+
+    def green(self):
+        self.text = &quot;\033[92m&quot; + self.text + self.ending
+        self.colors.append(&quot;green&quot;)
+        return self
+
+    def purple(self):
+        self.text = &quot;\033[95m&quot; + self.text + self.ending
+        self.colors.append(&quot;purple&quot;)
+        return self
+
+    def blue(self):
+        self.text = &quot;\033[94m&quot; + self.text + self.ending
+        self.colors.append(&quot;blue&quot;)
+        return self
+
+    def ltblue(self):
+        self.text = &quot;\033[34m&quot; + self.text + self.ending
+        self.colors.append(&quot;lightblue&quot;)
+        return self
+
+    def pink(self):
+        self.text = &quot;\033[35m&quot; + self.text + self.ending
+        self.colors.append(&quot;pink&quot;)
+        return self
+
+    def gray(self):
+        self.text = &quot;\033[30m&quot; + self.text + self.ending
+        self.colors.append(&quot;gray&quot;)
+        return self
+
+    def ltgray(self):
+        self.text = &quot;\033[37m&quot; + self.text + self.ending
+        self.colors.append(&quot;ltgray&quot;)
+        return self
+
+    def warn(self):
+        self.text = &quot;\033[93m&quot; + self.text + self.ending
+        self.colors.append(&quot;yellow&quot;)
+        return self
+
+    def fail(self):
+        self.text = &quot;\033[91m&quot; + self.text + self.ending
+        self.colors.append(&quot;red&quot;)
+        return self
+
+    def ltred(self):
+        self.text = &quot;\033[31m&quot; + self.text + self.ending
+        self.colors.append(&quot;lightred&quot;)
+        return self
+
+    def cyan(self):
+        self.text = &quot;\033[36m&quot; + self.text + self.ending
+        self.colors.append(&quot;cyan&quot;)
+        return self
+
+    def custom(self, *color_hex):
+        &quot;&quot;&quot;Print in custom color, `color_hex` - either actual hex, or tuple(r,g,b)&quot;&quot;&quot;
+        if color_hex != (None, ):  # allows printing white on black background, black otherwise
+            if len(color_hex) == 1:
+                c = rgb2hex(colorConverter.to_rgb(color_hex[0]))
+                rgb = ImageColor.getcolor(c, &quot;RGB&quot;)
+            else:
+                assert (
+                    len(color_hex) == 3
+                ), &quot;If not a color hex, ColorText.custom should have R,G,B as input&quot;
+                rgb = color_hex
+            self.text = &quot;\033[{};2;{};{};{}m&quot;.format(38, *rgb) + self.text + self.ending
+            self.colors.append(rgb)
+        return self
+
+    pass
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 74439656 Tim: </h3><p>Here's an implementation that you can use like this:</p>
+<pre><code>from stryle import Stryle
+
+print(Stryle.okgreen.bold@&quot;Hello World&quot; + Stryle.underline@'!' + ' back to normal')
+print(f&quot;{Stryle.red}Merry {Stryle.underline.okgreen}Christmas!{Stryle.off}&quot;)
+print(&quot;Merry &quot;@Stryle.red + &quot;Christmas&quot;@Stryle.okgreen.underline)
+</code></pre>
+<p><a href="https://i.stack.imgur.com/LWIFA.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/LWIFA.png" alt="enter image description here" /></a></p>
+<pre><code>_decorations = {
+    &quot;header&quot; : '\033[95m',
+    &quot;okblue&quot; : '\033[94m',
+    &quot;okcyan&quot; : '\033[96m',
+    &quot;okgreen&quot; : '\033[92m',
+    &quot;yellow&quot; : '\033[93m',
+    &quot;red&quot; : '\033[91m',
+    &quot;warning&quot; : '\033[93m',
+    &quot;fail&quot; : '\033[91m',
+    &quot;off&quot; : '\033[0m',
+    &quot;bold&quot; : '\033[1m',
+    &quot;underline&quot; : '\033[4m',
+}
+
+class _StringStyle(str):
+  def __getattribute__(self, decoration: str = _decorations[&quot;off&quot;]):
+    if decoration in _decorations:
+      return _StringStyle(self.decorations + _decorations[decoration])
+    return self
+  def __matmul__(self, other):
+    return self.decorations + str(other) + _decorations[&quot;off&quot;]
+  def __rmatmul__(self, other):
+    return self.decorations + str(other) + _decorations[&quot;off&quot;]
+  def __str__(self):
+    return self.decorations
+
+Stryle = _StringStyle()
+</code></pre>

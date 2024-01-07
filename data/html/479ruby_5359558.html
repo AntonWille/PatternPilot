@@ -1,0 +1,160 @@
+ <h2> Title: When to use RSpec let()? </h2> <h3> sent-hil, question_id: 5359558 </h3>Score: 479, Tags: {ruby,rspec} <br><p>I tend to use before blocks to set instance variables. I then use those variables across my examples.  I recently came upon <code>let()</code>. According to RSpec docs, it is used to</p>
+<blockquote>
+<p>... to define a memoized helper method. The value will be cached across multiple calls in the same example but not across examples.</p>
+</blockquote>
+<p>How is this different from using instance variables in before blocks? And also when should you use <code>let()</code> vs <code>before {}</code>?</p>
+<h4> Comment 84377363 Nesha Zoric: </h4>Let blocks are lazily-evaluated, while before blocks run before each example (they are overall slower). Using before blocks depends on personal preference (coding style, mocks/stubs...). Let blocks are usually preferred. You can check a more detailed <a href="https://kolosek.com/rspec-let-vs-before" rel="nofollow noreferrer">info about let</a><br><h4> Comment 102639447 Allison: </h4>It is not good practice to set instance variables in a before hook. Check out <a href="http://www.betterspecs.org/" rel="nofollow noreferrer">betterspecs.org</a><br>------------------------------------------------------------------ <br><h3> Answer 5359979 Myron Marston: </h3><p>I always prefer <code>let</code> to an instance variable for a couple of reasons:</p>
+
+<ul>
+<li>Instance variables spring into existence when referenced.  This means that if you fat finger the spelling of the instance variable, a new one will be created and initialized to <code>nil</code>, which can lead to subtle bugs and false positives.  Since <code>let</code> creates a method, you'll get a <code>NameError</code> when you misspell it, which I find preferable.  It makes it easier to refactor specs, too.</li>
+<li>A <code>before(:each)</code> hook will run before each example, even if the example doesn't use any of the instance variables defined in the hook.  This isn't usually a big deal, but if the setup of the instance variable takes a long time, then you're wasting cycles.  For the method defined by <code>let</code>, the initialization code only runs if the example calls it.</li>
+<li>You can refactor from a local variable in an example directly into a let without changing the
+referencing syntax in the example.  If you refactor to an instance variable, you have to change
+how you reference the object in the example (e.g. add an <code>@</code>).</li>
+<li>This is a bit subjective, but as Mike Lewis pointed out, I think it makes the spec easier to read.  I like the organization of defining all my dependent objects with <code>let</code> and keeping my <code>it</code> block nice and short.</li>
+</ul>
+
+<p><em>A related link can be found here: <a href="http://www.betterspecs.org/#let" rel="noreferrer">http://www.betterspecs.org/#let</a></em> </p>
+<h4> Comment 6055819 Myron Marston: </h4>As I said, it&#39;s a bit subjective, but I find it helpful to use <code>let</code> to define all of the dependent objects, and to use <code>before(:each)</code> to setup needed configuration or any mocks/stubs needed by the examples.  I prefer this to one large before hook containing all of this.  Also, <code>let(:foo) { Foo.new }</code> is less noisy (and more to the point) then <code>before(:each) { @foo = Foo.new }</code>.  Here&#39;s an example of how I use it: <a href="https://github.com/myronmarston/vcr/blob/v1.7.0/spec/vcr/util/hooks_spec.rb#L9-16" rel="nofollow noreferrer">github.com/myronmarston/vcr/blob/v1.7.0/spec/vcr/util/&hellip;</a><br><h4> Comment 12268463 Myron Marston: </h4>Andrew Grimm: true, but warnings may generate tons of noise (i.e. from gems your using that don&#39;t run warning-free). Plus, I prefer getting a <code>NoMethodError</code> to getting a warning, but YMMV.<br><h4> Comment 6055597 sent-hil: </h4>I really like the first advantage you mentioned, but could you explain a bit more about the third one? So far the examples I&#39;ve seen (mongoid specs: <a href="https://github.com/mongoid/mongoid/blob/master/spec/functional/mongoid/config_spec.rb" rel="nofollow noreferrer">github.com/mongoid/mongoid/blob/master/spec/functional/mongo&zwnj;&#8203;id/&hellip;</a> ) use single line blocks and I don&#39;t see how not having &quot;@&quot; makes it easier to read.<br><h4> Comment 60210962 Myron Marston: </h4>@Jwan622: you might start by writing one example, which has <code>foo = Foo.new(...)</code> and then users <code>foo</code> on later lines.  Later, you write a new example in the same example group that also needs a <code>Foo</code> instantiated in the same way. At this point, you want to refactor to eliminate the duplication.  You can remove the <code>foo = Foo.new(...)</code> lines from your examples and replace it with a <code>let(:foo) { Foo.new(...) }</code> w/o changing how the examples use <code>foo</code>.  But if you refactor to <code>before { @foo = Foo.new(...) }</code> you also have to update references in the examples from <code>foo</code> to <code>@foo</code>.<br><h4> Comment 12041145 Andrew Grimm: </h4>I think you&#39;d be able to detect a misseplt instance variable by turning warnings on.<br><h4> Comment 62901312 Tony: </h4>@MyronMarston About your first point, I totally agree.  Extend that point from tests to all code, and I think it&#39;s a mistake that Ruby variables spring into existence at all.<br><h4> Comment 60157518 Jwan622: </h4>Sorry I don&#39;t understand the third point: &quot;You can refactor from a local variable in an example directly into a let without changing the referencing syntax in the example. If you refactor to an instance variable, you have to change how you reference the object in the example (e.g. add an @).&quot; What is a referencing syntax? Why would you refactor a local variable directly into a let?<br><h4> Comment 60266158 Jwan622: </h4>@MyronMarston perfect explanation!<br><h4> Comment 69598735 fl-web: </h4>How to prefer <code>let</code> for <a href="http://stackoverflow.com/questions/41198066/testing-interaction-requests-sequences">testing interaction requests sequences</a><br>------------------------------------------------------------------ <br><h3> Answer 5359713 Mike Lewis: </h3><p>The difference between using instances variables and <code>let()</code> is that <code>let()</code> is <strong>lazy-evaluated</strong>. This means that <code>let()</code> is not evaluated until the method that it defines is run for the first time.</p>
+
+<p>The difference between <code>before</code> and <code>let</code> is that <code>let()</code> gives you a nice way of defining a group of variables in a 'cascading' style. By doing this, the spec looks a little better by simplifying the code.</p>
+<h4> Comment 8940105 David Chelimsky: </h4>Senthil - it&#39;s actually not necessarily run in every example when you use let(). It&#39;s lazy, so it&#39;s only run if it&#39;s referenced. Generally speaking this doesn&#39;t matter much because the point of an example group is to have several examples run in a common context.<br><h4> Comment 12709306 Harmon: </h4>@gar - I would use a Factory (like FactoryGirl) which allows you to create those required child associations when you instantiate the parent. If you do it this way, then it doesn&#39;t really matter if you use let() or a setup block. The let() is nice if you don&#39;t need to use EVERYTHING for each test in your sub-contexts. Setup should have only what&#39;s required for each one.<br><h4> Comment 6055066 Mike Lewis: </h4>It is easier to read IMO, and readability is a huge factor in programming languages.<br><h4> Comment 6055054 sent-hil: </h4>I see, is that really an advantage? The code is being run for each example regardless.<br><h4> Comment 9436077 Gar: </h4>So does that mean you shouldn&#39;t use <code>let</code> if you need something to be evaluated every time? e.g. I need a child model to be present in the database before some behavior is triggered on the parent model. I&#39;m not necessarily referencing that child model in the test, because I&#39;m testing the parent models behavior. At the moment I&#39;m using the <code>let!</code> method instead, but maybe it would be more explicit to put that setup in <code>before(:each)</code>?<br>------------------------------------------------------------------ <br><h3> Answer 5364266 Ho-Sheng Hsiao: </h3><p>I have completely replaced all uses of instance variables in my rspec tests to use let(). I've written a quickie example for a friend who used it to teach a small Rspec class: <a href="http://ruby-lambda.blogspot.com/2011/02/agile-rspec-with-let.html">http://ruby-lambda.blogspot.com/2011/02/agile-rspec-with-let.html</a></p>
+
+<p>As some of the other answers here says, let() is lazy evaluated so it will only load the ones that require loading. It DRYs up the spec and make it more readable. I've in fact ported the Rspec let() code to use in my controllers, in the style of inherited_resource gem. <a href="http://ruby-lambda.blogspot.com/2010/06/stealing-let-from-rspec.html">http://ruby-lambda.blogspot.com/2010/06/stealing-let-from-rspec.html</a></p>
+
+<p>Along with lazy evaluation, the other advantage is that, combined with ActiveSupport::Concern, and the load-everything-in spec/support/ behavior, you can create your very own spec mini-DSL specific to your application. I've written ones for testing against Rack and RESTful resources. </p>
+
+<p>The strategy I use is Factory-everything (via Machinist+Forgery/Faker). However, it is possible to use it in combination with before(:each) blocks to preload factories for an entire set of example groups, allowing the specs to run faster: <a href="http://makandra.com/notes/770-taking-advantage-of-rspec-s-let-in-before-blocks">http://makandra.com/notes/770-taking-advantage-of-rspec-s-let-in-before-blocks</a></p>
+<h4> Comment 6069956 Ho-Sheng Hsiao: </h4>The biggest gotcha I&#39;ve run into is accidentally using let(:subject) {} instead of subject {}. subject() is set up differently from let(:subject), but let(:subject) will override it.<br><h4> Comment 6070056 Ho-Sheng Hsiao: </h4>If you can let go &quot;drilling down&quot; into the code, then you&#39;ll find scanning a code with let() declarations much, much faster. It is easier to pick out let() declarations when scanning code than to find @variables embedded into the code. Using @variables, I don&#39;t have a good &quot;shape&quot; for which lines refer to assigning to the variables and which lines refer to testing the variables. Using let(), all assignments are done with let() so you know &quot;instantly&quot; by the shape of the letters where your declarations are.<br><h4> Comment 6078326 sent-hil: </h4>You can make the same argument about instance variables being easier to pick out, especially since some editors, like mine (gedit) highlight instance variables. I&#39;ve been using <code>let()</code> the past couple days and personally I don&#39;t see a difference, except for the first advantage Myron mentioned. And I&#39;m not so sure about letting go and what not, maybe because I&#39;m lazy and I like seeing code upfront without having to open up yet another file. Thanks for your comments.<br><h4> Comment 6069983 Ho-Sheng Hsiao: </h4>You&#39;ll probably find <i>writing</i> specs this way much easier and faster than <i>reading</i> specs like this. It helps a great deal to name the let() with obvious names -- if you are good at that, then the specs are easier to read. At the same time though, if you are having difficulty reading those examples I suggest two actions: (1) it is likely you are not skilled at reading code in general or (2) continue using @variable style in specs<br><h4> Comment 6070010 Ho-Sheng Hsiao: </h4>Regarding gaining skill in reading code: the trick is to manage the level of abstractions and knowing when to &quot;let go&quot;. When I read the declaration &quot;has_many :comments&quot; in an ActiveRecord, I don&#39;t process through it and remind myself of every single detail of what code that opens up to (though I have, before). Likewise, it is the same thing with reading spec code using let(). My first pass is just reading it at a high level, I don&#39;t think about how users is constructed, I just know I am testing against a bunch of users. I drill down into it only when I need to.<br><h4> Comment 6063694 sent-hil: </h4>Hey Ho-Sheng, I actually read several of your blog posts before asking this question. Regarding your <code># spec&#47;friendship_spec.rb</code> and <code># spec&#47;comment_spec.rb</code> example, don&#39;t you think they make it less readable? I&#39;ve no idea where <code>users</code> come from and will need to dig deeper.<br><h4> Comment 6069935 Ho-Sheng Hsiao: </h4>The first dozen or so people I&#39;ve shown the format to all find it much more readable, and a few of them started writing with it. I&#39;ve got enough spec code now using let() that I run into some of those problems too. I find myself going to the example, and starting from the innermost example group, work myself back up. It is the same skill as using a highly meta-programmable environment.<br>------------------------------------------------------------------ <br><h3> Answer 7046176 Pikachu: </h3><p>It is important to keep in mind that <strong>let</strong> is lazy evaluated and not putting side-effect methods in it otherwise you would not be able to change from <strong>let</strong> to <strong>before(:each)</strong> easily.
+You can use <strong><em>let!</em></strong> instead of <strong><em>let</em></strong> so that it is evaluated before each scenario.</p>
+------------------------------------------------------------------ <br><h3> Answer 60959083 iftheshoefritz: </h3><p>Dissenting voice here: after 5 years of rspec I don't like <code>let</code> very much. </p>
+
+<h3>1. Lazy evaluation often makes test setup confusing</h3>
+
+<p>It becomes difficult to reason about setup when some things that have been declared in setup are not actually affecting state, while others are.</p>
+
+<p>Eventually, out of frustration someone just changes <code>let</code> to <code>let!</code> (same thing without lazy evaluation) in order to get their spec working. If this works out for them, a new habit is born: when a new spec is added to an older suite and it doesn't work, the <em>first</em> thing the writer tries is to add bangs to random <code>let</code> calls.</p>
+
+<p>Pretty soon all the performance benefits are gone.</p>
+
+<h3>2. Special syntax is unusual to non-rspec users</h3>
+
+<p>I would rather teach Ruby to my team than the tricks of rspec. Instance variables or method calls are useful everywhere in this project and others, <code>let</code> syntax will only be useful in rspec.</p>
+
+<h3>3. The "benefits" allow us to easily ignore good design changes</h3>
+
+<p><code>let()</code> is good for expensive dependencies that we don't want to create over and over. 
+It also pairs well with <code>subject</code>, allowing you to dry up repeated calls to multi-argument methods</p>
+
+<p>Expensive dependencies repeated in many times, and methods with big signatures are both points where we could make the code better:</p>
+
+<ul>
+<li>maybe I can introduce a new abstraction that isolates a dependency from the rest of my code (which would mean fewer tests need it)</li>
+<li>maybe the code under test is doing too much</li>
+<li>maybe I need to inject smarter objects instead of a long list of primitives</li>
+<li>maybe I have a violation of tell-don't-ask</li>
+<li>maybe the expensive code can be made faster (rarer - beware of premature optimisation here)</li>
+</ul>
+
+<p>In all these cases, I can address the symptom of difficult tests with a soothing balm of rspec magic, or I can try address the cause. I feel like I spent way too much of the last few years on the former and now I want some better code.</p>
+
+<p>To answer the original question: I would prefer not to, but I do still use <code>let</code>. I <em>mostly</em> use it to fit in with the style of the rest of the team (it seems like most Rails programmers in the world are now deep into their rspec magic so that is very often). Sometimes I use it when I'm adding a test to some code that I don't have control of, or don't have time to refactor to a better abstraction: i.e. when the only option is the painkiller. </p>
+------------------------------------------------------------------ <br><h3> Answer 9994464 Jon Kern: </h3><p>In general, <code>let()</code> is a nicer syntax, and it saves you typing <code>@name</code> symbols all over the place. But, <em>caveat emptor!</em> I have found <code>let()</code> also introduces subtle bugs (or at least head scratching) because the variable doesn't really exist until you try to use it... Tell tale sign: if adding a <code>puts</code> after the <code>let()</code> to see that the variable is correct allows a spec to pass, but without the <code>puts</code> the spec fails -- you have found this subtlety.</p>
+
+<p>I have also found that <code>let()</code> doesn't seem to cache in all circumstances! I wrote it up in my blog: <a href="http://technicaldebt.com/?p=1242" rel="noreferrer">http://technicaldebt.com/?p=1242</a></p>
+
+<p>Maybe it is just me?</p>
+<h4> Comment 14970850 Myron Marston: </h4><code>let</code> always memoizes the value for the duration of a single example.  It does not memoize the value across multiple examples. <code>before(:all)</code>, in contrast, allows you to re-use an initialized variable in multiple examples.<br><h4> Comment 31857211 Jacob: </h4>if you want to use let (as now seems to be considered best practice), but need a particular variable to be instantiated right away, that&#39;s what <code>let!</code> is designed for.   <a href="https://www.relishapp.com/rspec/rspec-core/v/2-6/docs/helper-methods/let-and-let" rel="nofollow noreferrer">relishapp.com/rspec/rspec-core/v/2-6/docs/helper-methods/&hellip;</a><br>------------------------------------------------------------------ <br><h3> Answer 16427072 engineerDave: </h3><p>let is functional as its essentially a Proc. Also its cached. </p>
+
+<p>One gotcha I found right away with let... In a Spec block that is evaluating a change. </p>
+
+<pre><code>let(:object) {FactoryGirl.create :object}
+
+expect {
+  post :destroy, id: review.id
+}.to change(Object, :count).by(-1)
+</code></pre>
+
+<p>You'll need to be sure to call <code>let</code> outside of your expect block. i.e. you're calling <code>FactoryGirl.create</code> in your let block. I usually do this by verifying the object is persisted. </p>
+
+<pre><code>object.persisted?.should eq true
+</code></pre>
+
+<p>Otherwise when the <code>let</code> block is called the first time a change in the database will actually happen due to the lazy instantiation.</p>
+
+<p><strong>Update</strong></p>
+
+<p>Just adding a note. Be careful playing <a href="http://codegolf.com/" rel="nofollow noreferrer">code golf</a> or in this case rspec golf with this answer. </p>
+
+<p>In this case, I just have to call some method to which the object responds. So I invoke the <code>_.persisted?</code>_ method on the object as its truthy. All I'm trying to do is instantiate the object. You could call empty? or nil? too. The point isn't the test but bringing the object ot life by calling it. </p>
+
+<p>So you can't refactor </p>
+
+<pre><code>object.persisted?.should eq true
+</code></pre>
+
+<p>to be</p>
+
+<pre><code>object.should be_persisted 
+</code></pre>
+
+<p>as the object hasn't been instantiated... its lazy. :)</p>
+
+<p><strong>Update 2</strong></p>
+
+<p>leverage the <a href="https://relishapp.com/rspec/rspec-core/v/2-6/docs/helper-methods/let-and-let" rel="nofollow noreferrer">let! syntax</a> for instant object creation, which should avoid this issue altogether. Note though it will defeat a lot of the purpose of the laziness of the non banged let.</p>
+
+<p>Also in some instances you might actually want to leverage the <a href="https://www.relishapp.com/rspec/rspec-core/v/2-0/docs/subject/explicit-subject" rel="nofollow noreferrer">subject syntax</a> instead of let as it may give you additional options.</p>
+
+<pre><code>subject(:object) {FactoryGirl.create :object}
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 15012052 konyak: </h3><p>"before" by default implies <code>before(:each)</code>. Ref The Rspec Book, copyright 2010, page 228.</p>
+
+<pre><code>before(scope = :each, options={}, &amp;block)
+</code></pre>
+
+<p>I use <code>before(:each)</code> to seed some data for each example group without having to call the <code>let</code> method to create the data in the "it" block. Less code in the "it" block in this case.</p>
+
+<p>I use <code>let</code> if I want some data in some examples but not others. </p>
+
+<p>Both before and let are great for DRYing up the "it" blocks.</p>
+
+<p>To avoid any confusion, "let" is not the same as <code>before(:all)</code>. "Let" re-evaluates its method and value for each example ("it"), but caches the value across multiple calls in the same example. You can read more about it here: <a href="https://www.relishapp.com/rspec/rspec-core/v/2-6/docs/helper-methods/let-and-let" rel="nofollow noreferrer">https://www.relishapp.com/rspec/rspec-core/v/2-6/docs/helper-methods/let-and-let</a> </p>
+------------------------------------------------------------------ <br><h3> Answer 18493823 dotdotdotPaul: </h3><p>Note to Joseph -- if you are creating database objects in a <code>before(:all)</code> they won't be captured in a transaction and you're much more likely to leave cruft in your test database.  Use <code>before(:each)</code> instead.</p>
+
+<p>The other reason to use let and its lazy evaluation is so you can take a complicated object and test individual pieces by overriding lets in contexts, as in this very contrived example:</p>
+
+<pre><code>context "foo" do
+  let(:params) do
+     { :foo =&gt; foo,  :bar =&gt; "bar" }
+  end
+  let(:foo) { "foo" }
+  it "is set to foo" do
+    params[:foo].should eq("foo")
+  end
+  context "when foo is bar" do
+    let(:foo) { "bar" }
+    # NOTE we didn't have to redefine params entirely!
+    it "is set to bar" do
+      params[:foo].should eq("bar")
+    end
+  end
+end
+</code></pre>
+<h4> Comment 34194755 Michael Durrant: </h4>+1 before(:all) bugs have wasted many days of our developers time.<br>------------------------------------------------------------------ <br><h3> Answer 48786042 vinibrsl: </h3><p>I use <code>let</code> to test my HTTP 404 responses in my API specs using contexts.</p>
+
+<p>To create the resource, I use <code>let!</code>. But to store the resource identifier, I use <code>let</code>. Take a look how it looks like:</p>
+
+<pre><code>let!(:country)   { create(:country) }
+let(:country_id) { country.id }
+before           { get "api/countries/#{country_id}" }
+
+it 'responds with HTTP 200' { should respond_with(200) }
+
+context 'when the country does not exist' do
+  let(:country_id) { -1 }
+  it 'responds with HTTP 404' { should respond_with(404) }
+end
+</code></pre>
+
+<p>That keeps the specs clean and readable.</p>

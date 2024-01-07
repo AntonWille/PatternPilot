@@ -1,0 +1,234 @@
+ <h2> Title: How to catch multiple exceptions in one line? (in the &quot;except&quot; block) </h2> <h3> inspectorG4dget, question_id: 6470428 </h3>Score: 3805, Tags: {python,exception} <br><p>I know that I can do:</p>
+<pre><code>try:
+    # do something that may fail
+except:
+    # do this if ANYTHING goes wrong
+</code></pre>
+<p>I can also do this:</p>
+<pre><code>try:
+    # do something that may fail
+except IDontLikeYouException:
+    # say please
+except YouAreTooShortException:
+    # stand on a ladder
+</code></pre>
+<p>But if I want to do the same thing inside two different exceptions, the best I can think of right now is to do this:</p>
+<pre><code>try:
+    # do something that may fail
+except IDontLikeYouException:
+    # say please
+except YouAreBeingMeanException:
+    # say please
+</code></pre>
+<p>Is there any way that I can do something like this (since the action to take in both exceptions is to <code>say please</code>):</p>
+<pre><code>try:
+    # do something that may fail
+except IDontLikeYouException, YouAreBeingMeanException:
+    # say please
+</code></pre>
+<p>Now this really won't work, as it matches the syntax for:</p>
+<pre><code>try:
+    # do something that may fail
+except Exception, e:
+    # say please
+</code></pre>
+<p>So, my effort to catch the two distinct exceptions doesn't exactly come through.</p>
+<p>Is there a way to do this?</p>
+<h4> Comment 98137638 gerrit: </h4>Note that in Python 3, the latter is no longer valid syntax.<br><h4> Comment 131100246 royce3: </h4>Your first code snippet triggered me a bit - see <a href="https://www.wilfred.me.uk/blog/2013/11/03/no-naked-excepts/" rel="nofollow noreferrer">wilfred.me.uk/blog/2013/11/03/no-naked-excepts</a><br>------------------------------------------------------------------ <br><h3> Answer 6470452 mechanical_meat: </h3><p>From <a href="https://docs.python.org/3/tutorial/errors.html#handling-exceptions" rel="noreferrer">Python Documentation</a>:</p>
+
+<blockquote>
+  <p>An except clause may name multiple exceptions as a parenthesized tuple, for example</p>
+</blockquote>
+
+<pre><code>except (IDontLikeYouException, YouAreBeingMeanException) as e:
+    pass
+</code></pre>
+
+<p>Or, for Python 2 only:</p>
+
+<pre><code>except (IDontLikeYouException, YouAreBeingMeanException), e:
+    pass
+</code></pre>
+
+<p>Separating the exception from the variable with a comma will still work in Python 2.6 and 2.7, but is now deprecated and does not work in Python 3; now you should be using <code>as</code>.</p>
+<h4> Comment 100559336 Soren Bjornstad: </h4>@JosephBani That&#39;s not true at all. In <code>2 + (x * 2)</code>, <code>(x * 2)</code> is certainly not a tuple. Parentheses are a general grouping construct. The defining characteristic of a tuple is that it contains a <i>comma</i> -- see <a href="https://docs.python.org/3.5/library/stdtypes.html#typesseq-tuple" rel="nofollow noreferrer">the Python documentation</a>: &quot;Note that it is actually the comma which makes a tuple, not the parentheses.&quot;<br><h4> Comment 85868319 BallpointBen: </h4>I did try it... with a <code>list</code>, and it resulted in a <code>TypeError</code>. Looks like the errors must be in a <code>tuple</code> for catching to work as expected.<br><h4> Comment 85870245 BallpointBen: </h4>It was unclear whether the &quot;parenthesized tuple&quot; was merely syntactical  or that a bona fide tuple was required. &quot;Parenthesized&quot; is misleading because you may create a tuple without parentheses elsewhere and then use it in the <code>except</code> line. It is only necessarily parenthesized if created in the <code>except</code> line.<br><h4> Comment 97975631 jammertheprogrammer: </h4>@JosephBani, what about generator expressions?<br><h4> Comment 85841101 BallpointBen: </h4>Is it possible to store desired exceptions in an iterable, and then catch the iterable? I&#39;m trying to turn a list of warnings into errors using <code>warnings.filterwarnings</code>, and I don&#39;t want to have to specify the list of warnings twice.<br><h4> Comment 106544029 Chris Norris: </h4>So why doesn&#39;t (except ValueError OR IndexError:) work? This is what I originally tried, but it seemed like only the first error was getting looked at.<br><h4> Comment 106544055 mechanical_meat: </h4>@ChrisNorris: <code>or</code> is tricky. In that example <code>IndexError</code> wouldn&#39;t be tied to anything so it would simply be ignored.<br><h4> Comment 103427603 fantabolous: </h4>When you&#39;re not actually using the <code>e</code> (as in this case) you can just drop the <code>as e</code> or <code>, e</code> and then python 2 and 3 are the same ;)<br><h4> Comment 96493227 Joseph Bani: </h4>Anything parenthesized in python is a tuple<br><h4> Comment 134796655 Roland: </h4>@BallpointBen try: <code>print(type((&#39;foo&#39;, &#39;bar&#39;)))</code>, should give you <code>tuple</code>. BTW: This is also how you can test your program units (when writing on such lexers/parsers).<br>------------------------------------------------------------------ <br><h3> Answer 24338247 Russia Must Remove Putin: </h3><blockquote>
+  <h2>How do I catch multiple exceptions in one line (except block)</h2>
+</blockquote>
+
+<p>Do this:</p>
+
+<pre><code>try:
+    may_raise_specific_errors():
+except (SpecificErrorOne, SpecificErrorTwo) as error:
+    handle(error) # might log or have some other default behavior...
+</code></pre>
+
+<p>The parentheses are required due to older syntax that used the commas to assign the error object to a name. The <code>as</code> keyword is used for the assignment. You can use any name for the error object, I prefer <code>error</code> personally.</p>
+
+<h2>Best Practice</h2>
+
+<p>To do this in a manner currently and forward compatible with Python, you need to separate the Exceptions with commas and wrap them with parentheses to differentiate from earlier syntax that assigned the exception instance to a variable name by following the Exception type to be caught with a comma. </p>
+
+<p>Here's an example of simple usage:</p>
+
+<pre><code>import sys
+
+try:
+    mainstuff()
+except (KeyboardInterrupt, EOFError): # the parens are necessary
+    sys.exit(0)
+</code></pre>
+
+<p>I'm specifying only these exceptions to avoid hiding bugs, which if I encounter I expect the full stack trace from.</p>
+
+<p>This is documented here: <a href="https://docs.python.org/tutorial/errors.html" rel="noreferrer">https://docs.python.org/tutorial/errors.html</a></p>
+
+<p>You can assign the exception to a variable, (<code>e</code> is common, but you might prefer a more verbose variable if you have long exception handling or your IDE only highlights selections larger than that, as mine does.) The instance has an args attribute. Here is an example:</p>
+
+<pre><code>import sys
+
+try:
+    mainstuff()
+except (KeyboardInterrupt, EOFError) as err: 
+    print(err)
+    print(err.args)
+    sys.exit(0)
+</code></pre>
+
+<p>Note that in Python 3, the <code>err</code> object falls out of scope when the <code>except</code> block is concluded.</p>
+
+<h2>Deprecated</h2>
+
+<p>You may see code that assigns the error with a comma. This usage, the only form available in Python 2.5 and earlier, is deprecated, and if you wish your code to be forward compatible in Python 3, you should update the syntax to use the new form:</p>
+
+<pre><code>import sys
+
+try:
+    mainstuff()
+except (KeyboardInterrupt, EOFError), err: # don't do this in Python 2.6+
+    print err
+    print err.args
+    sys.exit(0)
+</code></pre>
+
+<p>If you see the comma name assignment in your codebase, and you're using Python 2.5 or higher, switch to the new way of doing it so your code remains compatible when you upgrade.</p>
+
+<h2>The <code>suppress</code> context manager</h2>
+
+<p>The accepted answer is really 4 lines of code, minimum:</p>
+
+<pre><code>try:
+    do_something()
+except (IDontLikeYouException, YouAreBeingMeanException) as e:
+    pass
+</code></pre>
+
+<p>The <code>try</code>, <code>except</code>, <code>pass</code> lines can be handled in a single line with the <a href="https://docs.python.org/3/library/contextlib.html#contextlib.suppress" rel="noreferrer">suppress context manager, available in Python 3.4</a>:</p>
+
+<pre><code>from contextlib import suppress
+
+with suppress(IDontLikeYouException, YouAreBeingMeanException):
+     do_something()
+</code></pre>
+
+<p>So when you want to <code>pass</code> on certain exceptions, use <code>suppress</code>.</p>
+<h4> Comment 104934615 Mache: </h4>Good addition of <code>suppress</code>, a lot more readable than just doing <code>pass</code> on <code>except</code><br><h4> Comment 133120511 An old man in the sea.: </h4>Can you log the exception and then pass it outside the with context manager?<br>------------------------------------------------------------------ <br><h3> Answer 26650022 fedorqui: </h3><p>From <a href="https://docs.python.org/2/tutorial/errors.html#handling-exceptions">Python documentation -> 8.3 Handling Exceptions</a>:</p>
+
+<blockquote>
+  <p>A <code>try</code> statement may have more than one except clause, to specify
+  handlers for different exceptions. At most one handler will be
+  executed. Handlers only handle exceptions that occur in the
+  corresponding try clause, not in other handlers of the same try
+  statement. An except clause may name multiple exceptions as a
+  parenthesized tuple, for example:</p>
+
+<pre><code>except (RuntimeError, TypeError, NameError):
+    pass
+</code></pre>
+  
+  <p>Note that the parentheses around this tuple are required, because
+  except <code>ValueError, e:</code> was the syntax used for what is normally
+  written as <code>except ValueError as e:</code> in modern Python (described
+  below). The old syntax is still supported for backwards compatibility.
+  This means <code>except RuntimeError, TypeError</code> is not equivalent to
+  <code>except (RuntimeError, TypeError):</code> but to <code>except RuntimeError as</code>
+  <code>TypeError:</code> which is not what you want.</p>
+</blockquote>
+------------------------------------------------------------------ <br><h3> Answer 46270444 whitebeard: </h3><p>If you frequently use a large number of exceptions, you can pre-define a tuple, so you don't have to re-type them many times. </p>
+
+<pre><code>#This example code is a technique I use in a library that connects with websites to gather data
+
+ConnectErrs  = (URLError, SSLError, SocketTimeoutError, BadStatusLine, ConnectionResetError)
+
+def connect(url, data):
+    #do connection and return some data
+    return(received_data)
+
+def some_function(var_a, var_b, ...):
+    try: o = connect(url, data)
+    except ConnectErrs as e:
+        #do the recovery stuff
+    blah #do normal stuff you would do if no exception occurred
+</code></pre>
+
+<p><strong>NOTES:</strong> </p>
+
+<ol>
+<li><p>If you, also, need to catch other exceptions than those in the
+pre-defined tuple, you will need to define another except block.  </p></li>
+<li><p>If you just cannot tolerate a global variable, define it in main()
+and pass it around where needed...</p></li>
+</ol>
+------------------------------------------------------------------ <br><h3> Answer 45734488 M.Usman: </h3><p>One of the way to do this is..</p>
+
+<pre><code>try:
+   You do your operations here;
+   ......................
+except(Exception1[, Exception2[,...ExceptionN]]]):
+   If there is any exception from the given exception list, 
+   then execute this block.
+   ......................
+else:
+   If there is no exception then execute this block. 
+</code></pre>
+
+<p>and another way is to create method which performs task executed by <code>except</code> block and call it through all of the <code>except</code> block that you write..</p>
+
+<pre><code>try:
+   You do your operations here;
+   ......................
+except Exception1:
+    functionname(parameterList)
+except Exception2:
+    functionname(parameterList)
+except Exception3:
+    functionname(parameterList)
+else:
+   If there is no exception then execute this block. 
+
+def functionname( parameters ):
+   //your task..
+   return [expression]
+</code></pre>
+
+<p>I know that second one is not the best way to do this, but i'm just showing number of ways to do this thing.</p>
+<h4> Comment 101439673 Eponymous: </h4>@majikman The second method with multiple clauses each calling the same function is not the best when you&#39;re trying to not repeat yourself and doing the same thing for two exceptions. (See the other answers for the right way to do that). However, having multiple <code>except</code> clauses is normal when you want to handle the exceptions differently.<br><h4> Comment 100240963 chizou: </h4>I&#39;m using the second one because I have two different exceptions that each need to be processed differently. Is there something wrong with doing it that way?<br><h4> Comment 124261015 &#233;tale-cohomology: </h4>The second way is actually awesome<br>------------------------------------------------------------------ <br><h3> Answer 71713881 Giorgos Myrianthous: </h3><p>As of Python 3.11 you can take advantage of the <code>except*</code> clause that is used to handle multiple exceptions.</p>
+<p>PEP-654 introduced a new standard exception type called <code>ExceptionGroup</code> that corresponds to a group of exceptions that are being propagated together. The <code>ExceptionGroup</code> can be handled using a new <code>except*</code> syntax. The <code>*</code> symbol indicates that multiple exceptions can be handled by each <code>except*</code> clause.</p>
+<hr />
+<p>For example, you can handle multiple exceptions</p>
+<pre><code>try:
+    raise ExceptionGroup('Example ExceptionGroup', (
+        TypeError('Example TypeError'),
+        ValueError('Example ValueError'),
+        KeyError('Example KeyError'),
+        AttributeError('Example AttributeError')
+    ))
+except* TypeError:
+    ...
+except* ValueError as e:
+    ...
+except* (KeyError, AttributeError) as e:
+    ...
+</code></pre>
+<hr />
+<p>For more details see <a href="https://peps.python.org/pep-0654/" rel="noreferrer">PEP-654</a>.</p>

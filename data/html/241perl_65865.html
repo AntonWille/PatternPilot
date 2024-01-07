@@ -1,0 +1,293 @@
+ <h2> Title: What&#39;s the easiest way to install a missing Perl module? </h2> <h3> dreeves, question_id: 65865 </h3>Score: 241, Tags: {perl,module,cpan} <br><p>I get this error:</p>
+
+<p><code>Can't locate Foo.pm in @INC</code></p>
+
+<p>Is there an easier way to install it than downloading, untarring, making, etc?</p>
+<h4> Comment 82565865 ikegami: </h4>If the module in question is a core module, consult <a href="https://stackoverflow.com/q/47801223/589924">How to fix “Can&#39;t locate Archive/Tar.pm”</a>.<br><h4> Comment 103437935 vinc17: </h4>Be very careful concerning the security: what is needed to ensure that the modules have not been modified must be downloaded in a secure way from a trusted site. See <a href="https://stackoverflow.com/a/58559309/3782797">my answer</a> about the use of <code>cpan</code>.<br>------------------------------------------------------------------ <br><h3> Answer 65883 Benedikt Waldvogel: </h3><p><strong>On Unix</strong>:</p>
+<p>usually you start <em>cpan</em> in your shell:</p>
+<p><code>$ cpan</code></p>
+<p>and type</p>
+<p><code>install Chocolate::Belgian</code></p>
+<p>or in short form:</p>
+<p><code>cpan Chocolate::Belgian</code></p>
+<p><strong>On Windows</strong>:</p>
+<blockquote>
+<p>If you're using ActivePerl on Windows, the <a href="http://docs.activestate.com/activeperl/5.10/faq/ActivePerl-faq2.html#pkg_operations" rel="noreferrer">PPM (Perl Package Manager)</a> has much of the same functionality as CPAN.pm.</p>
+</blockquote>
+<p>Example:</p>
+<p><code>$ ppm</code><br/>
+<code>ppm&gt; search net-smtp</code><br/>
+<code>ppm&gt; install Net-SMTP-Multipart</code></p>
+<p><strong>see <a href="http://www.cpan.org/misc/cpan-faq.html#How_install_Perl_modules" rel="noreferrer">How do I install Perl modules?</a> in the CPAN FAQ</strong></p>
+<p>Many distributions ship a lot of perl modules as packages.</p>
+<ul>
+<li>Debian/Ubuntu: <code>apt-cache search 'perl$'</code></li>
+<li>Arch Linux: <code>pacman -Ss '^perl-'</code></li>
+<li>Gentoo: category <code>dev-perl</code></li>
+</ul>
+<p>You should <em>always</em> prefer them as you benefit from automatic (security) <strong>updates</strong> and the ease of <strong>removal</strong>. This can be pretty tricky with the <em>cpan</em> tool itself.</p>
+<p>For Gentoo there's a nice tool called <strong><a href="https://wiki.gentoo.org/wiki/Project:Perl/g-cpan" rel="noreferrer">g-cpan</a></strong> which builds/installs the module from CPAN and creates a Gentoo package (<a href="http://en.wikipedia.org/wiki/Ebuild" rel="noreferrer">ebuild</a>) for you.</p>
+<h4> Comment 13015453 Bill Ruppert: </h4>Just &quot;ppm&quot; opens the GUI, but followed by commands it stays at the command line.  So, &quot;ppm help&quot;, &quot;ppm install ...&quot;, etc.<br><h4> Comment 127824 Kev: </h4>IIRC the latest ActivePerl no longer has command-line ppm, it now opens a fancy GUI.<br><h4> Comment 37271058 Borodin: </h4>@MatthewLock: <code>ppm</code> uses hyphens <code>-</code> because you specify the <i>distribution</i> that you want to install, which is a lot more honest. For instance, if you use <code>cpan</code> to install <code>LWP</code>, <code>LWP::Simple</code> or <code>LWP::UserAgent</code> it will install the distribution <code>libwww-perl</code> for you. The majority of distributions contain a single module with an equivalent name, but there are several exceptions like that<br><h4> Comment 79582876 flow2k: </h4>For UNIX and MacOS, need to execute as root or with sudo. Otherwise,  there will be a permission error.<br><h4> Comment 123128910 Matthew Lock: </h4>note that the module name is case sensitive!<br><h4> Comment 26894714 Matthew Lock: </h4>Note that ppm uses dashes for the module path separator not the usual double colons. (Perhaps because colons mean drives in dos?) That has got me a few times ;)<br><h4> Comment 123188399 Matthew Lock: </h4>It&#39;s possible to install modules with Cpan in Windows too, even with ActiveState perl. Note that it doesn&#39;t always seem to install dependent modules which you can see as errors in your Cpan installs. So I ended up using Cpan to install some modules that weren&#39;t in PPM, and PPM to install the dependent modules.<br>------------------------------------------------------------------ <br><h3> Answer 3590064 Philip Potter: </h3><p>Try <a href="http://search.cpan.org/perldoc/App::cpanminus" rel="noreferrer">App::cpanminus</a>:</p>
+
+<pre><code># cpanm Chocolate::Belgian
+</code></pre>
+
+<p>It's great for just getting stuff installed. It provides none of the more complex functionality of CPAN or CPANPLUS, so it's easy to use, provided you know which module you want to install. If you haven't already got cpanminus, just type:</p>
+
+<pre><code># cpan App::cpanminus
+</code></pre>
+
+<p>to install it.</p>
+
+<p>It is also possible to install it without using cpan at all.  The basic bootstrap procedure is,</p>
+
+<pre><code>curl -L http://cpanmin.us | perl - --sudo App::cpanminus
+</code></pre>
+
+<p>For more information go to the App::cpanminus page and look at the section on installation.</p>
+<h4> Comment 7833026 Chas. Owens: </h4>Using <code>cpan</code> to install <code>App::cpanminus</code> is a bit odd.  The normal install instructions involve a bootstrapping procedure of downloading a part of it from <a href="http://cpanmin.us" rel="nofollow noreferrer">cpanmin.us</a> and using that to install the rest.  This avoids the configuration of <code>cpan</code> and the creation of a (thereafter) useless <code>.cpan</code> directory.<br><h4> Comment 65907790 user13107: </h4>On Ubuntu, you can just install <code>cpanminus</code> from terminal. I find <code>cpanm</code> better than <code>cpan</code> because it doesn&#39;t put error logs on screen rather stores them in temporary log files and gives the path in case of errors.<br><h4> Comment 71071065 IgorGanapolsky: </h4>I am getting this error when trying your command: <b>Can&#39;t locate strict.pm in @INC (you may need to install the strict module) (@INC contains: /etc/perl</b><br>------------------------------------------------------------------ <br><h3> Answer 66430 Dave Rolsky: </h3><p>I note some folks suggesting one run cpan under sudo. That used to be necessary to install into the system directory, but modern versions of the CPAN shell allow you to configure it to use sudo <strong>just</strong> for installing. This is much safer, since it means that tests don't run as root.</p>
+
+<p>If you have an old CPAN shell, simply install the new cpan ("install CPAN") and when you reload the shell, it should prompt you to configure these new directives.</p>
+
+<p>Nowadays, when I'm on a system with an old CPAN, the first thing I do is update the shell and set it up to do this so I can do most of my cpan work as a normal user.</p>
+
+<p>Also, I'd strongly suggest that Windows users investigate <a href="http://strawberryperl.com" rel="noreferrer">strawberry Perl</a>. This is a version of Perl that comes packaged with a pre-configured CPAN shell as well as a compiler. It also includes some hard-to-compile Perl modules with their external C library dependencies, notably XML::Parser. This means that you can do the same thing as every other Perl user when it comes to installing modules, and things tend to "just work" a lot more often.</p>
+<h4> Comment 5985233 isomorphismes: </h4><code>install CPAN</code> from where? <code>$sudo apt-get install cpan</code>?<br><h4> Comment 6099985 w.k: </h4>@Lao Tzu: no, as CPAN is Perl core module and is not available  as separate DEB package. I think in most situations is even better to use <code>App::cpanminus</code>, it is such a joy to use it. Philip Potter suggest it in his answer here and you could try <a href="http://stackoverflow.com/questions/2980297/how-can-i-use-cpan-as-a-non-root-user">this Chas. Owens answer</a>.<br>------------------------------------------------------------------ <br><h3> Answer 65911 Otto: </h3><p>If you're on Ubuntu and you want to install the pre-packaged perl module (for example, geo::ipfree) try this:</p>
+
+<pre>
+    $ apt-cache search perl geo::ipfree
+    libgeo-ipfree-perl - A look up country of ip address Perl module
+
+    $ sudo apt-get install libgeo-ipfree-perl
+</pre>
+<h4> Comment 122649342 Slaven Rezic: </h4><code>apt-cache search perl</code> seems only to work for simple cases (probably only if the search term resembles the debian package name). It fails for e.g. <code>apt-cache search perl DDP</code> --- the correct answer would be <code>libdata-printer-perl</code>.<br>------------------------------------------------------------------ <br><h3> Answer 67720 brian d foy: </h3><p>A couple of people mentioned the cpan utility, but it's more than just starting a shell. Just give it the modules that you want to install and let it do it's work. </p>
+
+<pre><code>$prompt&gt; cpan Foo::Bar
+</code></pre>
+
+<p>If you don't give it any arguments it starts the CPAN.pm shell. This works on Unix, Mac, and should be just fine on Windows (especially Strawberry Perl).</p>
+
+<p>There are several other things that you can do with the cpan tool as well. Here's a summary of the current features (which might be newer than the one that comes with CPAN.pm and perl):</p>
+
+<pre class="lang-none prettyprint-override"><code>-a
+Creates the CPAN.pm autobundle with CPAN::Shell-&gt;autobundle.
+
+-A module [ module ... ]
+Shows the primary maintainers for the specified modules
+
+-C module [ module ... ]
+Show the Changes files for the specified modules
+
+-D module [ module ... ]
+Show the module details. This prints one line for each out-of-date module (meaning,
+modules locally installed but have newer versions on CPAN). Each line has three columns:
+module name, local version, and CPAN version.
+
+-L author [ author ... ]
+List the modules by the specified authors.
+
+-h
+Prints a help message.
+
+-O
+Show the out-of-date modules.
+
+-r
+Recompiles dynamically loaded modules with CPAN::Shell-&gt;recompile.
+
+-v
+Print the script version and CPAN.pm version.
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 65876 dreeves: </h3><p><code>sudo perl -MCPAN -e 'install Foo'</code></p>
+<h4> Comment 98374072 wytten: </h4>Brilliant, this worked for me just now on Windows with Git perl, but I had to install GnuWin make first<br>------------------------------------------------------------------ <br><h3> Answer 69838 Corion: </h3><p>Also see <a href="http://perlmonks.org/?node=693828" rel="noreferrer">Yes, even you can use CPAN</a>. It shows how you can use CPAN without having root or sudo access.</p>
+------------------------------------------------------------------ <br><h3> Answer 6089839 clt60: </h3><p>Already answered and accepted answer - but anyway:</p>
+
+<p>IMHO the easiest way installing CPAN modules (on unix like systems, and have no idea about the wondows) is:</p>
+
+<pre><code>curl -L http://cpanmin.us | perl - --sudo App::cpanminus
+</code></pre>
+
+<p>The above is installing the "zero configuration CPAN modules installer" called <code>cpanm</code>. (Can take several minutes to install - don't break the process)</p>
+
+<p>and after - simply:</p>
+
+<pre><code>cpanm Foo
+cpanm Module::One
+cpanm Another::Module
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 73546 Dave Cross: </h3><p>Lots of recommendation for <code>CPAN.pm</code>, which is great, but if you're using <code>Perl 5.10</code> then you've also got access to <code>CPANPLUS.pm</code> which is like <code>CPAN.pm</code> but better.</p>
+
+<p>And, of course, it's available on <code>CPAN</code> for people still using older versions of Perl. Why not try:</p>
+
+<pre><code>$ cpan CPANPLUS
+</code></pre>
+<h4> Comment 63845 brian d foy: </h4>Heh, that&#39;s cute. Use CPAN.pm to replace itself with CPANPLUS. :)<br>------------------------------------------------------------------ <br><h3> Answer 75985 mikegrb: </h3><p>Otto made a <a href="https://stackoverflow.com/questions/65865/cant-locate-foopm-in-inc-how-to-install-a-missing-perl-module#65911">good suggestion</a>.  This works for Debian too, as well as any other Debian derivative.  The missing piece is what to do when apt-cache search doesn't find something.</p>
+
+<pre><code>$ sudo apt-get install dh-make-perl build-essential apt-file
+$ sudo apt-file update
+</code></pre>
+
+<p>Then whenever you have a random module you wish to install:</p>
+
+<pre><code>$ cd ~/some/path
+$ dh-make-perl --build --cpan Some::Random::Module
+$ sudo dpkg -i libsome-random-module-perl-0.01-1_i386.deb
+</code></pre>
+
+<p>This will give you a deb package that you can install to get Some::Random::Module.  One of the big benefits here is man pages and sample scripts in addition to the module itself will be placed in your distro's location of choice.  If the distro ever comes out with an official package for a newer version of Some::Random::Module, it will automatically be installed when you apt-get upgrade.</p>
+------------------------------------------------------------------ <br><h3> Answer 13318638 jaxbihani: </h3><p>Many times it does happen that cpan install command fails with the message like
+<strong>"make test had returned bad status, won't install without force"</strong></p>
+
+<p>In that case following is the way to install the module:</p>
+
+<pre><code>perl -MCPAN -e "CPAN::Shell-&gt;force(qw(install Foo::Bar));"
+</code></pre>
+<h4> Comment 71071106 IgorGanapolsky: </h4>Unfortunately this yields: <b>Can&#39;t locate CPAN.pm in @INC (you may need to install the CPAN module) (@INC contains: /etc/perl</b><br>------------------------------------------------------------------ <br><h3> Answer 23646437 Chankey Pathak: </h3><p>Use cpan command as <code>cpan Modulename</code></p>
+
+<pre><code>$ cpan HTML::Parser
+</code></pre>
+
+<p>To install dependencies automatically follow the below</p>
+
+<pre><code>$ perl -MCPAN -e shell
+cpan[1]&gt;  o conf prerequisites_policy follow
+cpan[2]&gt;  o conf commit
+exit
+</code></pre>
+
+<p>I prefer <a href="https://metacpan.org/pod/App::cpanminus" rel="noreferrer">App::cpanminus</a>, it installs dependencies automatically. Just do</p>
+
+<pre><code>$ cpanm HTML::Parser
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 6089068 Mandar Pande: </h3><p>Even it should work:</p>
+
+<pre><code>cpan -i module_name
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 15024907 Myforwik: </h3><p>On ubuntu most perl modules are already packaged, so installing is much faster than most other systems which have to compile.</p>
+
+<p>To install <code>Foo::Bar</code> at a commmand prompt for example usually you just do:</p>
+
+<pre><code>sudo apt-get install libfoo-bar-perl
+</code></pre>
+
+<p>Sadly not all modules follow that naming convention.</p>
+------------------------------------------------------------------ <br><h3> Answer 26650808 Michal Ingeli: </h3><p>On <code>Fedora Linux</code> or <code>Enterprise Linux</code>, <code>yum</code> also tracks perl library dependencies. So, if the perl module is available, and some rpm package exports that dependency, it will install the right package for you.</p>
+
+<pre><code>yum install 'perl(Chocolate::Belgian)'
+</code></pre>
+
+<p>(most likely perl-Chocolate-Belgian package, or even ChocolateFactory package)</p>
+------------------------------------------------------------------ <br><h3> Answer 58559309 vinc17: </h3><p><strong>Secure solution</strong></p>
+
+<p>Many answers mention the use of the <code>cpan</code> utility (which uses <code>CPAN.pm</code>) without a word on security. By default, <code>CPAN</code> 2.27 and earlier configures <code>urllist</code> to use a http URL (namely, <a href="http://www.cpan.org/" rel="nofollow noreferrer">http://www.cpan.org/</a>), which allows MITM attacks, thus is insecure. This is what is used to download the <code>CHECKSUMS</code> files, so that it needs to be changed to a secure URL (e.g. <a href="https://www.cpan.org/" rel="nofollow noreferrer">https://www.cpan.org/</a>).</p>
+
+<p>So, after running cpan and accepting the default configuration, you need to modify the generated <code>MyConfig.pm</code> file (the full path is output) in the following way. Replace</p>
+
+<pre><code>'urllist' =&gt; [q[http://www.cpan.org/]],
+</code></pre>
+
+<p>by</p>
+
+<pre><code>'urllist' =&gt; [q[https://www.cpan.org/]],
+</code></pre>
+
+<p>Note: https is not sufficient; you also need a web site you can trust. So, be careful if you want to choose some arbitrary mirror.</p>
+
+<p>Then you can use <code>cpan</code> in the usual way.</p>
+
+<p>My <a href="https://rt.cpan.org/Public/Bug/Display.html?id=130819" rel="nofollow noreferrer">bug report</a> on rt.cpan.org about the insecure URL.</p>
+<h4> Comment 108257852 vinc17: </h4>@DaveEveritt The redirection from http to https is useful only for privacy, e.g. against someone who can only look at the data transiting on the network. But if an attacker controls the network (e.g. a public wifi hotspot or some not protected local network), a <a href="https://en.wikipedia.org/wiki/Man-in-the-middle_attack" rel="nofollow noreferrer">man-in-the-middle attack</a> may be possible, and the attacker will use his own server (obviously not <code>https:&#47;&#47;www.cpan.org&#47;</code>).<br><h4> Comment 108217352 Dave Everitt: </h4>Does &quot;<a href="http://www.cpan.org/" rel="nofollow noreferrer">cpan.org</a>&quot; not get redirected to &quot;<a href="https://www.cpan.org/" rel="nofollow noreferrer">cpan.org</a>&quot;?<br>------------------------------------------------------------------ <br><h3> Answer 65960 JWHEAT: </h3><p>2 ways that I know of :</p>
+
+<p><strong>USING PPM :</strong></p>
+
+<p>With <strong>Windows</strong> (ActivePerl) I've used ppm</p>
+
+<p>from the command line type ppm. At the ppm prompt ...  </p>
+
+<pre><code>ppm&gt; install foo
+</code></pre>
+
+<p>or </p>
+
+<pre><code>ppm&gt; search foo
+</code></pre>
+
+<p>to get a list of foo modules available.  Type <strong>help</strong> for all the commands</p>
+
+<p><strong>USING CPAN :</strong></p>
+
+<p>you can also use CPAN like this (<strong>*nix systems</strong>) :</p>
+
+<pre><code>perl -MCPAN -e 'shell'
+</code></pre>
+
+<p>gets you a prompt</p>
+
+<pre><code>cpan&gt;
+</code></pre>
+
+<p>at the prompt ...</p>
+
+<pre><code>cpan&gt; install foo  (again to install the foo module)
+</code></pre>
+
+<p>type h to get a list of commands for cpan</p>
+<h4> Comment 39918 brian d foy: </h4>You can also just say &quot;$ cpan  Foo::Bar&quot; to install directly from the command line. No fancy one-liner or CPAN shell necessary. :)<br>------------------------------------------------------------------ <br><h3> Answer 309989 Bruce Alderman: </h3><p>On Fedora you can use</p>
+
+<pre><code># yum install foo
+</code></pre>
+
+<p>as long as Fedora has an existing package for the module.</p>
+------------------------------------------------------------------ <br><h3> Answer 41360933 Mister X: </h3><p>Easiest way for me is this:</p>
+
+<pre><code>PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'install DateTime::TimeZone'
+</code></pre>
+
+<p>a) automatic recursive dependency detection/resolving/installing </p>
+
+<p>b) it's a shell onliner, good for setup-scripts</p>
+------------------------------------------------------------------ <br><h3> Answer 18748245 venkrao: </h3><p>If you want to put the new module into a custom location that your cpan shell isn't configured to use, then perhaps, the following will be handy.</p>
+
+<pre><code> #wget &lt;URL to the module.tgz&gt;
+ ##unpack
+ perl Build.PL
+./Build destdir=$HOME install_base=$HOME
+./Build destdir=$HOME install_base=$HOME install
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 23754365 Chris Forever: </h3><p>Sometimes you can use the <code>yum search foo</code> to search the relative perl module, then use <code>yum install xxx</code> to install.</p>
+------------------------------------------------------------------ <br><h3> Answer 32884636 Kamal Nayan: </h3><p>Simply executing <code>cpan Foo::Bar</code> on shell would serve the purpose.</p>
+------------------------------------------------------------------ <br><h3> Answer 40426333 Ed Dunn: </h3><p>Seems like you've already got your answer but I figured I'd chime in.  This is what I do in some scripts on an Ubuntu (or debian server)</p>
+
+<pre><code>#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+#I've gotten into the habit of setting this on all my scripts, prevents weird path issues if the script is not being run by root
+$ENV{'PATH'} = '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin';
+
+#Fill this with the perl modules required for your project
+my @perl = qw(LWP::Simple XML::LibXML MIME::Lite DBI DateTime Config::Tiny Proc::ProcessTable);
+
+chomp(my $curl = `which curl`);
+
+if(!$curl){ system('apt-get install curl -y &gt; /dev/null'); }
+
+chomp(my $cpanm = system('/bin/bash', '-c', 'which cpanm &amp;&gt;/dev/null'));
+
+#installs cpanm if missing
+if($cpanm){ system('curl -s -L http://cpanmin.us | perl - --sudo App::cpanminus'); }
+
+#loops through required modules and installs them if missing
+foreach my $x (@perl){
+    eval "use $x";
+    if($@){
+        system("cpanm $x");
+        eval "use $x";
+    }
+}
+</code></pre>
+
+<p>This works well for me, maybe there is something here you can use.</p>
+------------------------------------------------------------------ <br><h3> Answer 65945 PW.: </h3><p>On Windows with the ActiveState distribution of Perl, use the <a href="http://docs.activestate.com/activeperl/5.10/faq/ActivePerl-faq2.html#pkg_operations" rel="nofollow noreferrer">ppm</a> command.</p>
+<h4> Comment 133375446 brian d foy: </h4>Activestate Perl as of 2021 uses its <code>state</code> tool. The PPM stuff is gone: <a href="https://www.activestate.com/products/perl/ppm-perl-modules/" rel="nofollow noreferrer">activestate.com/products/perl/ppm-perl-modules</a><br>

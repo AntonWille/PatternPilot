@@ -1,0 +1,72 @@
+ <h2> Title: What is the proper way to check if a string is empty in Perl? </h2> <h3> Nick Bolton, question_id: 2045644 </h3>Score: 114, Tags: {perl,string,comparison} <br><p>I have been using this code to check if a string is empty:</p>
+<pre><code>if ($str == &quot;&quot;)
+{
+  // ...
+}
+</code></pre>
+<p>And also the opposite with the not equals operator...</p>
+<pre><code>if ($str != &quot;&quot;)
+{
+  // ...
+}
+</code></pre>
+<p>This seems to work (I think), but I'm not sure it's the correct way, or if there are any unforeseen drawbacks. Something just doesn't feel right about it.</p>
+------------------------------------------------------------------ <br><h3> Answer 2045667 whatsisname: </h3><p>The very concept of a "proper" way to do anything, apart from using CPAN, is non existent in Perl. </p>
+
+<p>Anyways those are numeric operators, you should use </p>
+
+<pre><code>if($foo eq "")
+</code></pre>
+
+<p>or</p>
+
+<pre><code>if(length($foo) == 0)
+</code></pre>
+<h4> Comment 1972936 Telemachus: </h4>It&#39;s true that Perl doesn&#39;t tend to advocate the &quot;one true way&quot; towards problem solving, but that doesn&#39;t mean that there aren&#39;t strongly preferred idioms and styles and approaches. Also, as one of the Perl regulars likes to say a lot, even if there is more than one way to do things, <i>some</i> ways to do things are really, really bad (stupid, ill-advised, hard-to-maintain, etc.)<br><h4> Comment 1975111 Dave Sherohman: </h4>Just because there are many ways to do it does not mean that all ways are equal.  Testing for empty strings using <code>if ($foo == &quot;&quot;)</code>, for example, is <i>definitively wrong</i> unless you actually mean to be testing for whether <code>$foo</code>, evaluated in numeric context, has a value of 0 (in which case it would <i>still</i> be better written as <code>if ($foo == 0)</code>, as that more clearly expresses your intent).<br>------------------------------------------------------------------ <br><h3> Answer 2045663 Greg Hewgill: </h3><p>For string comparisons in Perl, use <code>eq</code> or <code>ne</code>:</p>
+
+<pre><code>if ($str eq "")
+{
+  // ...
+}
+</code></pre>
+
+<p>The <code>==</code> and <code>!=</code> operators are <em>numeric</em> comparison operators. They will attempt to convert both operands to integers before comparing them.</p>
+
+<p>See the <a href="http://perldoc.perl.org/perlop.html" rel="noreferrer">perlop</a> man page for more information.</p>
+<h4> Comment 1972304 Evan Carroll: </h4>Yea, using this though you need to be cautious that if it is undef, and if you&#39;re using warnings you&#39;ll get a runtime warning. Many ways to get around the warning though.<br>------------------------------------------------------------------ <br><h3> Answer 2045818 hobbs: </h3><ol>
+<li><p>Due to the way that strings are stored in Perl, getting the length of a string is optimized.<br>
+<code>if (length $str)</code> is a good way of checking that a string is non-empty.</p></li>
+<li><p>If you're in a situation where you haven't already guarded against <code>undef</code>, then the catch-all for "non-empty" that won't warn is <code>if (defined $str and length $str)</code>.</p></li>
+</ol>
+<h4> Comment 1975383 brian d foy: </h4>I think that length is the closest test that we have to the expression of the idea that there is nothing in the string.<br><h4> Comment 48738385 basic6: </h4>Upvoted because <code>if (length($str))</code> is a nice approach and doesn&#39;t fail if the variable is not defined.<br>------------------------------------------------------------------ <br><h3> Answer 2045680 DmitryK: </h3><p>You probably want to use "eq" instead of "==". 
+If you worry about some edge cases you may also want to check for undefined:</p>
+
+<pre><code>if (not defined $str) {
+
+# this variable is undefined
+
+}
+</code></pre>
+<h4> Comment 9947822 Dacav: </h4>Very useful when you obtained the string by shifting of an array which may have 0 elements.<br>------------------------------------------------------------------ <br><h3> Answer 2045704 Matthew Slattery: </h3><p>As already mentioned by several people, <code>eq</code> is the right operator here.</p>
+
+<p>If you <code>use warnings;</code> in your script, you'll get warnings about this (and many other useful things); I'd recommend <code>use strict;</code> as well.</p>
+<h4> Comment 1972325 Nick Bolton: </h4>+1 Cool, yeah I normally use <code>use strict</code> but I&#39;m updating some old code, so when I add this I get hundreds of errors. I&#39;ll probably fix them some day.<br>------------------------------------------------------------------ <br><h3> Answer 47129681 Roland Ayala: </h3><p>To check for an empty string you could also do something as follows</p>
+
+<pre><code>if (!defined $val || $val eq '')
+{
+    # empty
+}
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 74748309 Alberto Salvia Novella: </h3><p>The rest of answers are complicating things. It's just the following.</p>
+<hr />
+<p>If <strong>filled</strong>:</p>
+<pre><code>if ($var) {
+
+}
+</code></pre>
+<p>If <strong>not filled</strong>:</p>
+<pre><code>if (! $var) {
+
+}
+</code></pre>
+<h4> Comment 131951770 brian d foy: </h4>So, show us how that works with the string <code>0</code>. It&#39;s not that most answers are complicating things; it&#39;s that you never actually tried what you suggested to see all the ways it fails.<br>

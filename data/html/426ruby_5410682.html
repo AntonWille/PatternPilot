@@ -1,0 +1,111 @@
+ <h2> Title: Parsing a JSON string in Ruby </h2> <h3> Rod, question_id: 5410682 </h3>Score: 426, Tags: {ruby,json} <br><p>I have a string that I want to parse in Ruby:</p>
+
+<pre><code>string = '{"desc":{"someKey":"someValue","anotherKey":"value"},"main_item":{"stats":{"a":8,"b":12,"c":10}}}'
+</code></pre>
+
+<p>Is there an easy way to extract the data?</p>
+<h4> Comment 55004101 the Tin Man: </h4><i>JSON is directly supported in Ruby, and has been since at least Ruby v1.9.3, so there is no need to install a gem unless you&#39;re using something older. Simply use <code>require &#39;json&#39;</code> in your code.</i><br>------------------------------------------------------------------ <br><h3> Answer 5410713 Greg: </h3><p>This looks like <a href="http://www.json.org" rel="noreferrer">JavaScript Object Notation (JSON)</a>. You can parse JSON that resides in some variable, e.g. <code>json_string</code>, like so:</p>
+
+<pre><code>require 'json'
+JSON.parse(json_string)
+</code></pre>
+
+<p>If you’re using an older Ruby, you may need to install the <a href="https://rubygems.org/gems/json" rel="noreferrer">json gem</a>.</p>
+
+<hr>
+
+<p>There are also other implementations of JSON for Ruby that may fit some use-cases better:</p>
+
+<ul>
+<li><a href="https://rubygems.org/gems/yajl-ruby" rel="noreferrer">YAJL C Bindings for Ruby</a></li>
+<li><a href="https://rubygems.org/gems/json-stream" rel="noreferrer">JSON::Stream</a></li>
+</ul>
+<h4> Comment 34766758 Nando: </h4>Also you can sets the option symbolize_names to true, in order to get keys as symbols. Exemple: <code>JSON.parse(string, symbolize_names: true) #=&gt; {key: :value}</code><br><h4> Comment 55004218 the Tin Man: </h4><i>JSON is directly supported in Ruby, and has been since at least Ruby v1.9.3, so there is no need to install a gem unless you&#39;re using something older. Simply use <code>require &#39;json&#39;</code> in your code.</i><br>------------------------------------------------------------------ <br><h3> Answer 13625633 nevan king: </h3><p>Just to extend the answers a bit with what to do with the parsed object:</p>
+
+<pre><code># JSON Parsing example
+require "rubygems" # don't need this if you're Ruby v1.9.3 or higher
+require "json"
+
+string = '{"desc":{"someKey":"someValue","anotherKey":"value"},"main_item":{"stats":{"a":8,"b":12,"c":10}}}'
+parsed = JSON.parse(string) # returns a hash
+
+p parsed["desc"]["someKey"]
+p parsed["main_item"]["stats"]["a"]
+
+# Read JSON from a file, iterate over objects
+file = open("shops.json")
+json = file.read
+
+parsed = JSON.parse(json)
+
+parsed["shop"].each do |shop|
+  p shop["id"]
+end
+</code></pre>
+<h4> Comment 31805353 Ziggy: </h4>Important note: <code>&#39;{ &quot;a&quot;: &quot;bob&quot; }&#39;</code> is valid. <code>&quot;{ &#39;a&#39;: &#39;bob&#39; }&quot;</code> is not.<br><h4> Comment 35156699 endorama: </h4>@LinusAn because JSON requires double quotes around strings. See string in the JSON definition ( <a href="http://www.json.org/" rel="nofollow noreferrer">json.org</a> ): &quot;A string is a sequence of zero or more Unicode characters, wrapped in double quotes, using backslash escapes.&quot;<br><h4> Comment 37246948 johnml: </h4>In many cases you want to wrap <code>JSON.parse</code> within a rescue block for <code>JSON::ParserError</code>.<br><h4> Comment 99388001 barlop: </h4>Can you make your answer complete by including a sample example data from shops.json?<br><h4> Comment 59736251 Rivenfall: </h4><code>JSON.parse(&quot;[#{value}]&quot;)[0]</code> to avoid the error <code>A JSON text must at least contain two octets!</code><br>------------------------------------------------------------------ <br><h3> Answer 34295262 dav_i: </h3><p>As of Ruby v1.9.3 you don't need to install any Gems in order to parse JSON, simply use <code>require 'json'</code>:</p>
+
+<pre><code>require 'json'
+
+json = JSON.parse '{"foo":"bar", "ping":"pong"}'
+puts json['foo'] # prints "bar"
+</code></pre>
+
+<p>See <a href="http://ruby-doc.org/stdlib-2.0.0/libdoc/json/rdoc/JSON.html" rel="noreferrer">JSON</a> at Ruby-Doc.</p>
+------------------------------------------------------------------ <br><h3> Answer 5410710 keymone: </h3><p>It looks like a JSON string.  You can use one of many JSON libraries and it's as simple as doing:</p>
+
+<pre><code>JSON.parse(string)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 64065140 Adverbly: </h3><p>Don't see any answers here that mention parsing directly to an object other than a Hash, but it is possible using the poorly-documented object_class option(see <a href="https://ruby-doc.org/stdlib-2.7.1/libdoc/json/rdoc/JSON.html" rel="noreferrer">https://ruby-doc.org/stdlib-2.7.1/libdoc/json/rdoc/JSON.html</a>):</p>
+<pre><code>JSON.parse('{&quot;foo&quot;:{&quot;bar&quot;: 2}}', object_class: OpenStruct).foo.bar
+=&gt; 2
+</code></pre>
+<p>The better way to read that option is &quot;The ruby class that a json object turns into&quot;, which explains why it defaults to Hash. Likewise, there is an array_class option for json arrays.</p>
+------------------------------------------------------------------ <br><h3> Answer 26493639 guy mograbi: </h3><p>This is a bit late but I ran into something interesting that seems important to contribute. </p>
+
+<p>I accidentally wrote this code, and it seems to work:</p>
+
+<pre><code>require 'yaml'
+CONFIG_FILE = ENV['CONFIG_FILE'] # path to a JSON config file 
+configs = YAML.load_file("#{CONFIG_FILE}")
+puts configs['desc']['someKey']
+</code></pre>
+
+<p>I was surprised to see it works since I am using the YAML library, but it works. </p>
+
+<p>The reason why it is important is that <code>yaml</code> comes built-in with Ruby so there's no gem install.</p>
+
+<p>I am using versions 1.8.x and 1.9.x - so the <code>json</code> library is not built in, but it is in version 2.x. </p>
+
+<p>So technically - this is the easiest way to extract the data in version lower than 2.0. </p>
+<h4> Comment 64299880 Justin Ohms: </h4>The reason this works is that semantically (most) JSON is valid YAML (particularly YAML 1.2)<br><h4> Comment 132044018 Nakilon: </h4>I get &quot;undefined method `load_file&#39; for JSON:Module&quot; on ruby 2.3.8<br><h4> Comment 55004141 the Tin Man: </h4>Yes, JSON is actually parsed by the Psych code, which also parses YAML in Ruby. And JSON parsing was introduced in <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/json/rdoc/index.html" rel="nofollow noreferrer">Ruby v1.9.3</a>.<br>------------------------------------------------------------------ <br><h3> Answer 25850734 damianmr: </h3><p>I suggest Oj as it is waaaaaay faster than the standard JSON library.</p>
+
+<p><a href="https://github.com/ohler55/oj" rel="nofollow">https://github.com/ohler55/oj</a></p>
+
+<p>(<a href="https://github.com/ohler55/oj#performance-comparisons" rel="nofollow">see performance comparisons here</a>)</p>
+------------------------------------------------------------------ <br><h3> Answer 69773628 Erik Madsen: </h3><p>If you want to deserialise to your own class instead of OpenStruct it doesn't take a lot of work to make the following possible:</p>
+<pre class="lang-rb prettyprint-override"><code>require 'json'
+# result is an instance of MyClass
+result = JSON.parse(some_json_string, object_class: MyClass)
+</code></pre>
+<p>All you have to do is to provide a zero-argument constructor and implement the <code>#[]=</code> method which <code>JSON.parse</code> will call. If you don't want to expose it, it's sufficient to let it be private:</p>
+<pre class="lang-rb prettyprint-override"><code>class MyClass
+  attr_reader :a, :b
+
+  private
+
+  def []=(key, value)
+    case key
+    when 'a' then @a = value
+    when 'b' then @b = value
+    end
+  end
+end
+</code></pre>
+<p>Trying it out in irb:</p>
+<pre><code>&gt; JSON.parse('{&quot;a&quot;:1, &quot;b&quot;:2}', object_class: MyClass)
+=&gt; #&lt;MyClass:0x00007fe00913ae98 @a=1, @b=2&gt;
+</code></pre>
+<p>A caveat with this approach is that it only works for flat structures, because the <code>object_class</code> argument really tells the parser what class it should use to deserialise JSON objects in the string instead of <code>Hash</code> (see the similar argument <code>array_class</code> for the analogous operation for JSON arrays). For nested structures this will mean you will use the same class to represent all layers:</p>
+<pre><code>&gt; JSON.parse('{&quot;a&quot;:1, &quot;b&quot;:{ &quot;a&quot;: 32 }}', object_class: MyClass)
+=&gt; #&lt;MyClass:0x00007fb5110b2b38 @a=1, @b=#&lt;MyClass:0x00007fb5110b2908 @a=32&gt;&gt;
+</code></pre>

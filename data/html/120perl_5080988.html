@@ -1,0 +1,160 @@
+ <h2> Title: How to extract string following a pattern with grep, regex or perl </h2> <h3> wrangler, question_id: 5080988 </h3>Score: 120, Tags: {regex,perl,sed,html-parsing,text-extraction} <br><p>I have a file that looks something like this:</p>
+
+<pre class="lang-xml prettyprint-override"><code>    &lt;table name="content_analyzer" primary-key="id"&gt;
+      &lt;type="global" /&gt;
+    &lt;/table&gt;
+    &lt;table name="content_analyzer2" primary-key="id"&gt;
+      &lt;type="global" /&gt;
+    &lt;/table&gt;
+    &lt;table name="content_analyzer_items" primary-key="id"&gt;
+      &lt;type="global" /&gt;
+    &lt;/table&gt;
+</code></pre>
+
+<p>I need to extract anything within the quotes that follow <code>name=</code>, i.e., <code>content_analyzer</code>, <code>content_analyzer2</code> and <code>content_analyzer_items</code>.</p>
+
+<p>I am doing this on a Linux box, so a solution using sed, perl, grep or bash is fine.</p>
+<h4> Comment 5692161 Christoffer Hammarstr&#246;m: </h4>I feel that it would be wrong not to link to <a href="http://stackoverflow.com/questions/1732348/regex-match-open-tags-except-xhtml-self-contained-tags/1732454#1732454" title="regex match open tags except xhtml self contained tags">stackoverflow.com/questions/1732348/&hellip;</a><br><h4> Comment 5692159 Benoit: </h4>no need to be shy, welcome here!<br><h4> Comment 5724715 wrangler: </h4>Thanks everyone for the useful comments. I apologize for the XML not being properly formatted. I deleted some tags for simplification.<br>------------------------------------------------------------------ <br><h3> Answer 5081519 sidyll: </h3><p>Since you need to match content without including it in the result (must
+match <code>name="</code>  but it's not  part of the  desired result) some  form of
+zero-width matching  or group  capturing is required.  This can  be done
+easily with the following tools:</p>
+
+<h3>Perl</h3>
+
+<p>With Perl you  could use the <code>n</code>  option to loop line by  line and print
+the content of a capturing group if it matches:</p>
+
+<pre><code>perl -ne 'print "$1\n" if /name="(.*?)"/' filename
+</code></pre>
+
+<h3>GNU grep</h3>
+
+<p>If you have an improved version of  grep, such as GNU grep, you may have
+the  <code>-P</code> option  available. This  option will  enable Perl-like  regex,
+allowing you to use <code>\K</code> which  is a shorthand lookbehind. It will reset
+the match position, so anything before it is zero-width.</p>
+
+<pre><code>grep -Po 'name="\K.*?(?=")' filename
+</code></pre>
+
+<p>The <code>o</code>  option makes grep print  only the matched text,  instead of the
+whole line.</p>
+
+<h3>Vim - Text Editor</h3>
+
+<p>Another way  is to  use a  text editor  directly. With  Vim, one  of the
+various  ways of  accomplishing this  would be  to delete  lines without
+<code>name=</code> and then extract the content from the resulting lines:</p>
+
+<pre><code>:v/.*name="\v([^"]+).*/d|%s//\1
+</code></pre>
+
+<hr>
+
+<h3>Standard grep</h3>
+
+<p>If you  don't have  access to  these tools,  for some  reason, something
+similar could be achieved with  standard grep. However, without the look
+around it will require some cleanup later:</p>
+
+<pre><code>grep -o 'name="[^"]*"' filename
+</code></pre>
+
+<hr>
+
+<h3>A note about saving results</h3>
+
+<p>In all of the commands above the  results will be sent to <code>stdout</code>. It's
+important to remember  that you can always  save them by piping  it to a
+file by appending:</p>
+
+<pre><code>&gt; result
+</code></pre>
+
+<p>to the end of the command.</p>
+<h4> Comment 5695067 Dennis Williamson: </h4>Lookarounds (in GNU <code>grep</code>): <code>grep -Po &#39;.*name=&quot;\K.*?(?=&quot;.*)&#39;</code><br><h4> Comment 5698537 Dennis Williamson: </h4>Why would I be angry? Without the <code>.*</code>, you can do <code>grep -Po &#39;(?&lt;=name=&quot;).*?(?=&quot;)&#39;</code>. The <code>\K</code> can be used for shorthand, but it&#39;s really only needed if the match to its left is variable length. In cases like this, the reason for using lookarounds is fairly obvious. Ungreedy operations look a little neater (<code>[^&quot;]*</code> versus <code>.*?</code> and you don&#39;t have to repeat the anchor character. I don&#39;t know about speed. That depends a lot on the context, I think. I hope that&#39;s helpful.<br><h4> Comment 5698795 sidyll: </h4>@Dennis Williamson: certainly sir, a lot of helpful information here. I think the reason I kept the <code>\K</code> (after researching on it) and removed the <code>.*</code> was the same: make it look pretty (simpler). And I&#39;ve never thought in using <code>.*?</code> instead of the &quot;traditional way&quot; I learned from somewhere. But un-greedy here really makes sense. Thanks Dennis, best wishes.<br><h4> Comment 5697905 sidyll: </h4>@Dennis Williamson, great. I updated the answer accordingly, but left both <code>.*</code> aside, I hope you don&#39;t get angry with me. I&#39;d like to ask, do you see any benefits from un-greedy match over &quot;anything except <code>&quot;</code>&quot;? Don&#39;t take this as a fight, I&#39;m just curious and I&#39;m not a regex expert. Also, the <code>\K</code> tip, really nice. Thanks Dennis.<br><h4> Comment 70701624 Andrew: </h4><code>grep -Po &#39;look-ahead \K capture&#39;</code> made my day. Slick.<br><h4> Comment 44276957 Per Quested Aronsson: </h4>The -P flag does not seem to be supported on OS X: grep [-abcDEFGHhIiJLlmnOoqRSsUVvwxZ] [-A num] [-B num] [-C[num]] 	[-e pattern] [-f file] [--binary-files=value] [--color=when] 	[--context[=num]] [--directories=action] [--label] [--line-buffered] 	[--null] [pattern] [file ...]<br><h4> Comment 44303199 sidyll: </h4>@PerQuestedAronsson its is cited in the manual as extension. Not sure how documented it is, but well, I&#39;m on OS X as well and works here.<br><h4> Comment 44310863 Per Quested Aronsson: </h4>@sidyll: I found this article: &quot;Perl Regex Removed From Grep in Mountain Lion&quot; (<a href="http://www.dirtdon.com/?p=1452" rel="nofollow noreferrer">dirtdon.com/?p=1452</a> ). I&#39;m on Yosemite myself, but the article seems to be valid for that as well.<br><h4> Comment 33659865 lreeder: </h4>+1 for describing the command.  Would appreciate it if you could update your answer to explain the &quot;[...]&quot; part of the regex.<br><h4> Comment 33798361 sidyll: </h4>@lreeder Thank you. That is a character class, when it begins with <code>^</code> that means it matches anything except its contents. So <code>[^&quot;]</code> means every character that&#39;s not a quote. I didn&#39;t use it in the latter answer in favor of the unready version, <code>.*?</code>. The previous was greedy, so I used that class to match everything not a quote with the intention of stopping on the first quote, which is the same as matching anything &quot;ungreedly&quot; up to a quote. Hope this helps understanding it, let me know if I can clarify better some part.<br><h4> Comment 49154534 Sebasti&#225;n Barschkis: </h4>On OS X, simply install <code>grep</code> via homebrew and use that instead of the default one. It should work.<br>------------------------------------------------------------------ <br><h3> Answer 5081046 Benoit: </h3><p>this could do it:</p>
+
+<pre><code>perl -ne 'if(m/name="(.*?)"/){ print $1 . "\n"; }'
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 5081093 shawnhcorey: </h3><p>If you're using Perl, download a module to parse the XML: <a href="http://search.cpan.org/~grantm/XML-Simple-2.18/lib/XML/Simple.pm" rel="noreferrer">XML::Simple</a>, <a href="http://search.cpan.org/~mirod/XML-Twig-3.37/Twig_pm.slow" rel="noreferrer">XML::Twig</a>, or <a href="http://search.cpan.org/~pajas/XML-LibXML-1.70/LibXML.pod" rel="noreferrer">XML::LibXML</a>.  Don't re-invent the wheel.</p>
+<h4> Comment 5692774 bvr: </h4>Note that example OP gave is not well-formed (<code>&lt;type=&quot;global&quot;</code> for instance), so most of XML parsers just complain and die.<br>------------------------------------------------------------------ <br><h3> Answer 5081049 Matt Shaver: </h3><p>The regular expression would be:</p>
+
+<pre><code>.+name="([^"]+)"
+</code></pre>
+
+<p>Then the grouping would be in the \1 </p>
+------------------------------------------------------------------ <br><h3> Answer 5081425 Alan Haggai Alavi: </h3><p>An HTML parser should be used for this purpose rather than regular expressions. A Perl program that makes use of <a href="http://search.cpan.org/perldoc?HTML%3a%3aTreeBuilder" rel="noreferrer"><code>HTML::TreeBuilder</code></a>:</p>
+
+<h2>Program</h2>
+
+<pre><code>#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use HTML::TreeBuilder;
+
+my $tree = HTML::TreeBuilder-&gt;new_from_file( \*DATA );
+my @elements = $tree-&gt;look_down(
+    sub { defined $_[0]-&gt;attr('name') }
+);
+
+for (@elements) {
+    print $_-&gt;attr('name'), "\n";
+}
+
+__DATA__
+&lt;table name="content_analyzer" primary-key="id"&gt;
+  &lt;type="global" /&gt;
+&lt;/table&gt;
+&lt;table name="content_analyzer2" primary-key="id"&gt;
+  &lt;type="global" /&gt;
+&lt;/table&gt;
+&lt;table name="content_analyzer_items" primary-key="id"&gt;
+  &lt;type="global" /&gt;
+&lt;/table&gt;
+</code></pre>
+
+<h2>Output</h2>
+
+<pre><code>content_analyzer
+content_analyzer2
+content_analyzer_items
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 5329508 mitma: </h3><p>Here's a solution using HTML tidy &amp; xmlstarlet:</p>
+
+<pre><code>htmlstr='
+&lt;table name="content_analyzer" primary-key="id"&gt;
+&lt;type="global" /&gt;
+&lt;/table&gt;
+&lt;table name="content_analyzer2" primary-key="id"&gt;
+&lt;type="global" /&gt;
+&lt;/table&gt;
+&lt;table name="content_analyzer_items" primary-key="id"&gt;
+&lt;type="global" /&gt;
+&lt;/table&gt;
+'
+
+echo "$htmlstr" | tidy -q -c -wrap 0 -numeric -asxml -utf8 --merge-divs yes --merge-spans yes 2&gt;/dev/null |
+sed '/type="global"/d' |
+xmlstarlet sel -N x="http://www.w3.org/1999/xhtml" -T -t -m "//x:table" -v '@name' -n
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 5329633 mitma: </h3><p>Oops, the sed command has to precede the tidy command of course:</p>
+
+<pre><code>echo "$htmlstr" | 
+sed '/type="global"/d' |
+tidy -q -c -wrap 0 -numeric -asxml -utf8 --merge-divs yes --merge-spans yes 2&gt;/dev/null |
+xmlstarlet sel -N x="http://www.w3.org/1999/xhtml" -T -t -m "//x:table" -v '@name' -n
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 47602650 Carlos Lindado: </h3><p>If the structure of your xml (or text in general) is fixed, the easiest way is using <code>cut</code>. For your specific case:</p>
+
+<pre><code>echo '&lt;table name="content_analyzer" primary-key="id"&gt;
+  &lt;type="global" /&gt;
+&lt;/table&gt;
+&lt;table name="content_analyzer2" primary-key="id"&gt;
+  &lt;type="global" /&gt;
+&lt;/table&gt;
+&lt;table name="content_analyzer_items" primary-key="id"&gt;
+  &lt;type="global" /&gt;
+&lt;/table&gt;' | grep name= | cut -f2 -d '"'
+</code></pre>

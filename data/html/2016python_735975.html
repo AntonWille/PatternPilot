@@ -1,0 +1,525 @@
+ <h2> Title: Static methods in Python? </h2> <h3> Joan Venge, question_id: 735975 </h3>Score: 2016, Tags: {python,static-methods} <br><p>Can I define a <a href="https://en.wikipedia.org/wiki/Method_(computer_programming)#Static_methods" rel="noreferrer">static method</a> which I can call directly on the class instance? e.g.,</p>
+<pre><code>MyClass.the_static_method()
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 735978 dbr: </h3><p>Yep, using the <a href="https://docs.python.org/3/library/functions.html#staticmethod" rel="noreferrer" title="staticmethod"><code>staticmethod</code></a> decorator:</p>
+<pre><code>class MyClass(object):
+    @staticmethod
+    def the_static_method(x):
+        print(x)
+
+MyClass.the_static_method(2)  # outputs 2
+</code></pre>
+<p>Note that some code might use the old method of defining a static method, using <code>staticmethod</code> as a function rather than a decorator. This should only be used if you have to support ancient versions of Python (2.2 and 2.3):</p>
+<pre><code>class MyClass(object):
+    def the_static_method(x):
+        print(x)
+    the_static_method = staticmethod(the_static_method)
+
+MyClass.the_static_method(2)  # outputs 2
+</code></pre>
+<p>This is entirely identical to the first example (using <code>@staticmethod</code>), just not using the nice decorator syntax.</p>
+<p>Finally, use <a href="https://docs.python.org/3/library/functions.html#staticmethod" rel="noreferrer" title="staticmethod"><code>staticmethod</code></a> sparingly! There are very few situations where static-methods are necessary in Python, and I've seen them used many times where a separate &quot;top-level&quot; function would have been clearer.</p>
+<hr />
+<p><a href="https://docs.python.org/3/library/functions.html#staticmethod" rel="noreferrer" title="staticmethod">The following is verbatim from the documentation:</a>:</p>
+<blockquote>
+<p>A static method does not receive an implicit first argument. To declare a static method, use this idiom:</p>
+<pre><code>class C:
+    @staticmethod
+    def f(arg1, arg2, ...): ...
+</code></pre>
+<p>The @staticmethod form is a function <a href="https://docs.python.org/3/glossary.html#term-decorator" rel="noreferrer" title="term-decorator"><em>decorator</em></a> – see the description of function definitions in <a href="https://docs.python.org/3/reference/compound_stmts.html#function" rel="noreferrer" title="Function definitions"><em>Function definitions</em></a> for details.</p>
+<p>It can be called either on the class (such as <code>C.f()</code>) or on an instance (such as <code>C().f()</code>). The instance is ignored except for its class.</p>
+<p>Static methods in Python are similar to those found in Java or C++. For a more advanced concept, see <a href="https://docs.python.org/3/library/functions.html#classmethod" rel="noreferrer" title="classmethod"><code>classmethod()</code></a>.</p>
+<p>For more information on static methods, consult the documentation on the standard type hierarchy in <a href="https://docs.python.org/3/reference/datamodel.html#types" rel="noreferrer" title="types"><em>The standard type hierarchy</em></a>.</p>
+<p>New in version 2.2.</p>
+<p>Changed in version 2.4: Function decorator syntax added.</p>
+</blockquote>
+<h4> Comment 75253202 SomethingSomething: </h4>Why adding <code>@staticmethod</code> decoration or using a function pointer, when you can simply avoid the first <code>self</code> parameter? Well, for an object <code>a</code>, you won&#39;t be able to call <code>a.your_static_method()</code>, which is allowed in other languages, but it is anyway considered a bad practice and the compiler always warns about it<br><h4> Comment 91097004 George Moutsopoulos: </h4>@SomethingSomething, if you don&#39;t use the variable name &quot;self&quot;, but do not add the decorator, the first argument eg arg1 will still be the reference to the self instance. The name self is only a convention.<br><h4> Comment 111104054 IceFire: </h4>@SomethingSomething so many SO answers, blog posts, and references and NO ONE seems to answer this question. I completely agree with everything you said. One should neither write <code>self.staticMethod()</code> nor <code>instance.staticMethod()</code>. The only exception I found is when you use inheritance and want the staticMethod to be overridden, which seems to work in Python. Now calling <code>self.staticMethod()</code> acknowledges the class type of <code>self</code>... This might be interesting with factory methods or clones when needed within the class but is probably still rare<br><h4> Comment 91100082 SomethingSomething: </h4>@GeorgeMoutsopoulos - agreed generally. But - you will anyway be able to call the method as <code>ClassName.methodName()</code>, as if it was a static one, and then no <code>self</code>will be provided to the method. As you said, it will still be possible to also call this method as <code>ClassInstance.methodName()</code>, and <code>self</code> will be provided as the first parameter, regardless of its name.<br><h4> Comment 77488911 Supratim Samantray: </h4>I am using python 2.7.12, with @staticmethod decorator I am unable to call first static method defined. Its givin error : <b>TypeError: &#39;staticmethod&#39; object is not callable</b><br><h4> Comment 83731600 realslimshanky: </h4>Supratim Samantray, are you sure? because <a href="https://docs.python.org/2/library/functions.html#staticmethod" rel="nofollow noreferrer">here</a> it&#39;s clearly stated that it can be used after 2.4.<br>------------------------------------------------------------------ <br><h3> Answer 10206355 Richard Ambler: </h3><p>I think that <a href="https://stackoverflow.com/a/738102/3798217">Steven is actually right</a>. To answer the original question, then, in order to set up a class method, simply assume that the first argument is not going to be a calling instance, and then make sure that you only call the method from the class.</p>
+
+<p>(Note that this answer refers to Python 3.x. In Python 2.x you'll get a <code>TypeError</code> for calling the method on the class itself.)</p>
+
+<p>For example:</p>
+
+<pre><code>class Dog:
+    count = 0 # this is a class variable
+    dogs = [] # this is a class variable
+
+    def __init__(self, name):
+        self.name = name #self.name is an instance variable
+        Dog.count += 1
+        Dog.dogs.append(name)
+
+    def bark(self, n): # this is an instance method
+        print("{} says: {}".format(self.name, "woof! " * n))
+
+    def rollCall(n): #this is implicitly a class method (see comments below)
+        print("There are {} dogs.".format(Dog.count))
+        if n &gt;= len(Dog.dogs) or n &lt; 0:
+            print("They are:")
+            for dog in Dog.dogs:
+                print("  {}".format(dog))
+        else:
+            print("The dog indexed at {} is {}.".format(n, Dog.dogs[n]))
+
+fido = Dog("Fido")
+fido.bark(3)
+Dog.rollCall(-1)
+rex = Dog("Rex")
+Dog.rollCall(0)
+</code></pre>
+
+<p>In this code, the "rollCall" method assumes that the first argument is not an instance (as it would be if it were called by an instance instead of a class). As long as "rollCall" is called from the class rather than an instance, the code will work fine. If we try to call "rollCall" from an instance, e.g.:</p>
+
+<pre><code>rex.rollCall(-1)
+</code></pre>
+
+<p>however, it would cause an exception to be raised because it would send two arguments: itself and -1, and "rollCall" is only defined to accept one argument.</p>
+
+<p>Incidentally, rex.rollCall() would send the correct number of arguments, but would also cause an exception to be raised because now n would be representing a Dog instance (i.e., rex) when the function expects n to be numerical.</p>
+
+<p>This is where the decoration comes in:
+If we precede the "rollCall" method with</p>
+
+<pre><code>@staticmethod
+</code></pre>
+
+<p>then, by explicitly stating that the method is static, we can even call it from an instance. Now, </p>
+
+<pre><code>rex.rollCall(-1)
+</code></pre>
+
+<p>would work. The insertion of @staticmethod before a method definition, then, stops an instance from sending itself as an argument.</p>
+
+<p>You can verify this by trying the following code with and without the @staticmethod line commented out.</p>
+
+<pre><code>class Dog:
+    count = 0 # this is a class variable
+    dogs = [] # this is a class variable
+
+    def __init__(self, name):
+        self.name = name #self.name is an instance variable
+        Dog.count += 1
+        Dog.dogs.append(name)
+
+    def bark(self, n): # this is an instance method
+        print("{} says: {}".format(self.name, "woof! " * n))
+
+    @staticmethod
+    def rollCall(n):
+        print("There are {} dogs.".format(Dog.count))
+        if n &gt;= len(Dog.dogs) or n &lt; 0:
+            print("They are:")
+            for dog in Dog.dogs:
+                print("  {}".format(dog))
+        else:
+            print("The dog indexed at {} is {}.".format(n, Dog.dogs[n]))
+
+
+fido = Dog("Fido")
+fido.bark(3)
+Dog.rollCall(-1)
+rex = Dog("Rex")
+Dog.rollCall(0)
+rex.rollCall(-1)
+</code></pre>
+<h4> Comment 21092047 tba: </h4>The first example (calling by class without @staticmethod) doesn&#39;t work for me on Python 2.7. I get &quot;TypeError: unbound method rollCall() must be called with Dog instance as first argument (got int instance instead)&quot;<br><h4> Comment 42426530 Asad Saeeduddin: </h4>@MestreLion I think this is not a huge benefit, since all it does is muddle up static and instance methods and make one look like the other. If you know a method is static, you should access it as a static method. The fact that the method does not need or use your instance should be self-evident wherever you use the method. I always use <code>T.my_static_method()</code> or <code>type(my_t_instance).my_static_method()</code>, since this is clearer and makes it immediately obvious that I&#39;m calling a static method.<br><h4> Comment 28689958 Mittenchops: </h4>This does not work.  Both Dog.rollCall(-1) and rex.rollCall(-1) return the same <code>TypeError: unbound method rollCall() must be called with Dog instance as first argument (got int instance instead)</code><br>------------------------------------------------------------------ <br><h3> Answer 735976 Paolo Bergantino: </h3><p>Yes, check out the <a href="http://docs.python.org/library/functions.html#staticmethod" rel="noreferrer">staticmethod</a> decorator:</p>
+
+<pre><code>&gt;&gt;&gt; class C:
+...     @staticmethod
+...     def hello():
+...             print "Hello World"
+...
+&gt;&gt;&gt; C.hello()
+Hello World
+</code></pre>
+<h4> Comment 115321340 Gigino: </h4>Many answer above were downvoted because they provide just an example. Why this is different?<br>------------------------------------------------------------------ <br><h3> Answer 738102 Steven: </h3><p>You don't really need to use the <code>@staticmethod</code> decorator. Just declaring a method (that doesn't expect the self parameter) and call it from the class. The decorator is only there in case you want to be able to call it from an instance as well (which was not what you wanted to do)</p>
+
+<p>Mostly, you just use functions though...</p>
+<h4> Comment 111208776 IceFire: </h4>@EthanFurman You stopped there where I started my question: Why would you call the static method from an instance object? Normally, you would not do this in most programming languages<br><h4> Comment 35601675 spinkus: </h4>Actually this is wrong in 2.7 and legal as of 3.X (tested fine in 3.2). That is you <i>can&#39;t</i> call a method from context of a class without the @staticmethod decorator in 2.7 and below. In 3.2 it works and will insert a <code>self</code> ref appropriately depending on how its called. Test case: <a href="http://pastebin.com/12DDV7DB" rel="nofollow noreferrer">pastebin.com/12DDV7DB</a>.<br><h4> Comment 20710784 Navin: </h4>This does not work inside a class. Python will pass <code>self</code> as the first argument unless you tell it not to. (see: decorator)<br><h4> Comment 111151652 Ethan Furman: </h4>@IceFire: a <code>staticmethod</code> is one which does not require any class nor instance data to do its function -- so the only reason to have it in a class at all is for convenience/packaging, and it would be very convenient for an instance to call such a utility method on itself.<br><h4> Comment 72046430 Ethan Furman: </h4>Technically accurate, but a terrible solution.  The <code>staticmethod</code> decorator allows one to call the function on both the class and an instance (this solution fails when calling the function on an instance).<br><h4> Comment 111552859 Ethan Furman: </h4>Let&#39;s say a class you are subclassing (<code>Main</code>) is in some library, and it has dependencies on other libraries (<code>utils.do_something</code>); the module with your subclass can either <code>import utils</code> to make sure your subclass has access to it (one more thing to keep track of) or <code>Main</code> can make that function a static method (<code>do_something = staticmethod(utils.do_something)</code> and then your subclass can easily access it with <code>self.do_something(...)</code> and life just got a little bit better.  :-)<br><h4> Comment 80753026 pouya: </h4>a method can be called like any other attribute of an object using dot notation.<code>class C: def callme(): print(&#39;called&#39;); C.callme()</code><br><h4> Comment 91097095 George Moutsopoulos: </h4>Please read Navin&#39;s comment. Self is only a convention and the first arg1 will be used as self.<br><h4> Comment 111104096 IceFire: </h4>@EthanFurman but WHY would you call a static method ON an instance object? This is bad style unless you have a very specific intention in mind<br><h4> Comment 15917202 mahoriR: </h4>This would not work for python 2.5.2                           <code>class Dummy: 		def static1(): 			print &quot;hello from static1&quot; 		@staticmethod 		def static2(): 			print &quot;hello from static2&quot;  Dummy.static2() Dummy.static1()</code>                                                                           Output: hello from static2 Traceback&lt;most recent call last&gt;:               File &quot;ll.py&quot;, line 46, in &lt;module&gt;                       Dummy.static1()                                             TypeError: unbound method static1() must be called with Dummy instance as first argument (got nothing instead)<br>------------------------------------------------------------------ <br><h3> Answer 28122324 Russia Must Remove Putin: </h3><blockquote>
+  <p><strong>Static methods in Python?</strong></p>
+  
+  <p>Is it possible to have static methods in Python so I can call them
+  without initializing a class, like:</p>
+
+<pre><code>ClassName.StaticMethod()
+</code></pre>
+</blockquote>
+
+<p>Yes, static methods can be created like this (although it's a bit more <a href="https://www.python.org/dev/peps/pep-0008/" rel="noreferrer">Pythonic</a> to use underscores instead of CamelCase for methods):</p>
+
+<pre><code>class ClassName(object):
+
+    @staticmethod
+    def static_method(kwarg1=None):
+        '''return a value that is a function of kwarg1'''
+</code></pre>
+
+<p>The above uses the decorator syntax. This syntax is equivalent to </p>
+
+<pre><code>class ClassName(object):
+
+    def static_method(kwarg1=None):
+        '''return a value that is a function of kwarg1'''
+
+    static_method = staticmethod(static_method)
+</code></pre>
+
+<p>This can be used just as you described:</p>
+
+<pre><code>ClassName.static_method()
+</code></pre>
+
+<p>A builtin example of a static method is <code>str.maketrans()</code> in Python 3, which was a function in the <code>string</code> module in Python 2.</p>
+
+<hr>
+
+<p>Another option that can be used as you describe is the <code>classmethod</code>, the difference is that the classmethod gets the class as an implicit first argument, and if subclassed, then it gets the subclass as the implicit first argument.</p>
+
+<pre><code>class ClassName(object):
+
+    @classmethod
+    def class_method(cls, kwarg1=None):
+        '''return a value that is a function of the class and kwarg1'''
+</code></pre>
+
+<p>Note that <code>cls</code> is not a required name for the first argument, but most experienced Python coders will consider it badly done if you use anything else.</p>
+
+<p>These are typically used as alternative constructors. </p>
+
+<pre><code>new_instance = ClassName.class_method()
+</code></pre>
+
+<p>A builtin example is <code>dict.fromkeys()</code>:</p>
+
+<pre><code>new_dict = dict.fromkeys(['key1', 'key2'])
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 25041766 Matt Woelk: </h3><p>Perhaps the simplest option is just to put those functions outside of the class:</p>
+
+<pre><code>class Dog(object):
+    def __init__(self, name):
+        self.name = name
+
+    def bark(self):
+        if self.name == "Doggy":
+            return barking_sound()
+        else:
+            return "yip yip"
+
+def barking_sound():
+    return "woof woof"
+</code></pre>
+
+<p>Using this method, functions which modify or use internal object state (have side effects) can be kept in the class, and the reusable utility functions can be moved outside.</p>
+
+<p>Let's say this file is called <code>dogs.py</code>. To use these, you'd call <code>dogs.barking_sound()</code> instead of <code>dogs.Dog.barking_sound</code>.</p>
+
+<p>If you really need a static method to be part of the class, you can use the <a href="http://docs.python.org/library/functions.html#staticmethod" rel="noreferrer">staticmethod</a> decorator.</p>
+<h4> Comment 132195283 Alex: </h4>@help-ukraine-now It is perfectly fine to place functions outside the class, because Python has the concept of Modules to organize code. It can be even a bit faster, because it requires 1 less lookup. There isn&#39;t really a use-case for staticmethod in Python.<br><h4> Comment 127177855 help-ukraine-now: </h4>what&#39;s considered to be the best practice? because I prefer keeping functions outside of the class, but it might be more maintainable when you define static methods within classes?<br><h4> Comment 130716346 Zak: </h4>If the method has a valid generic use case where the class is not involved, I prefer it outside of the class, as just simple function. But I often have several methods which do similar things, but in different ways, according to what a certain class requires -- and then it makes a lot of sense to define them as static, inside their respective class, to avoid both name collisions and misunderstandings what a given method does. So I can have <code>class1.dothething()</code> and <code>class2.dothething()</code> provide similar functionality (e.g. preprocessing input), specific to what their class requires.<br>------------------------------------------------------------------ <br><h3> Answer 14085311 Filip Dupanović: </h3><p>Aside from the particularities of how <a href="http://docs.python.org/2/reference/datamodel.html#types" rel="noreferrer">static method objects</a> behave, there is a certain kind of beauty you can strike with them when it comes to organizing your module-level code.</p>
+
+<pre><code># garden.py
+def trim(a):
+    pass
+
+def strip(a):
+    pass
+
+def bunch(a, b):
+    pass
+
+def _foo(foo):
+    pass
+
+class powertools(object):
+    """
+    Provides much regarded gardening power tools.
+    """
+    @staticmethod
+    def answer_to_the_ultimate_question_of_life_the_universe_and_everything():
+        return 42
+
+    @staticmethod
+    def random():
+        return 13
+
+    @staticmethod
+    def promise():
+        return True
+
+def _bar(baz, quux):
+    pass
+
+class _Dice(object):
+    pass
+
+class _6d(_Dice):
+    pass
+
+class _12d(_Dice):
+    pass
+
+class _Smarter:
+    pass
+
+class _MagicalPonies:
+    pass
+
+class _Samurai:
+    pass
+
+class Foo(_6d, _Samurai):
+    pass
+
+class Bar(_12d, _Smarter, _MagicalPonies):
+    pass
+</code></pre>
+
+<p>...</p>
+
+<pre><code># tests.py
+import unittest
+import garden
+
+class GardenTests(unittest.TestCase):
+    pass
+
+class PowertoolsTests(unittest.TestCase):
+    pass
+
+class FooTests(unittest.TestCase):
+    pass
+
+class BarTests(unittest.TestCase):
+    pass
+</code></pre>
+
+<p>...</p>
+
+<pre><code># interactive.py
+from garden import trim, bunch, Foo
+
+f = trim(Foo())
+bunch(f, Foo())
+</code></pre>
+
+<p>...</p>
+
+<pre><code># my_garden.py
+import garden
+from garden import powertools
+
+class _Cowboy(garden._Samurai):
+    def hit():
+        return powertools.promise() and powertools.random() or 0
+
+class Foo(_Cowboy, garden.Foo):
+    pass
+</code></pre>
+
+<p>It now becomes a bit more intuitive and self-documenting in which context certain components are meant to be used and it pans out ideally for naming distinct test cases as well as having a straightforward approach to how test modules map to actual modules under tests for purists.</p>
+
+<p>I frequently find it viable to apply this approach to organizing a project's utility code. Quite often, people immediately rush and create a <code>utils</code> package and end up with 9 modules of which one has 120 LOC and the rest are two dozen LOC at best. I prefer to start with this and convert it to a package and create modules only for the beasts that truly deserve them:</p>
+
+<pre><code># utils.py
+class socket(object):
+    @staticmethod
+    def check_if_port_available(port):
+        pass
+
+    @staticmethod
+    def get_free_port(port)
+        pass
+
+class image(object):
+    @staticmethod
+    def to_rgb(image):
+        pass
+
+    @staticmethod
+    def to_cmyk(image):
+        pass
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 56444932 Aman Raheja: </h3><p>So, static methods are the methods which can be called without creating the object of a class.
+For Example :-</p>
+
+<pre><code>    @staticmethod
+    def add(a, b):
+        return a + b
+
+b = A.add(12,12)
+print b
+</code></pre>
+
+<p>In the above example method <code>add</code> is called by the class name <code>A</code> not the object name.</p>
+------------------------------------------------------------------ <br><h3> Answer 69727307 HIMANSHU PANDEY: </h3><p>Summarizing others' answers and adding, there are many ways to declare Static Methods or Variables in <strong>python</strong>.<br></p>
+<ol>
+<li>Using <a href="https://docs.python.org/3/library/functions.html#staticmethod" rel="noreferrer">staticmethod()</a> as a decorator:
+One can simply put a decorator above a method(function) declared to make it a static method. For eg.<br></li>
+</ol>
+<pre><code>class Calculator:
+    @staticmethod
+    def multiply(n1, n2, *args):
+        Res = 1
+        for num in args: Res *= num
+        return n1 * n2 * Res
+
+print(Calculator.multiply(1, 2, 3, 4))              # 24
+</code></pre>
+<ol start="2">
+<li>Using <a href="https://docs.python.org/3/library/functions.html#staticmethod" rel="noreferrer">staticmethod()</a> as a parameter function:
+This method can receive an argument which is of function type, and it returns a static version of the function passed. For eg.<br></li>
+</ol>
+<pre><code>class Calculator:
+    def add(n1, n2, *args):
+        return n1 + n2 + sum(args)
+
+Calculator.add = staticmethod(Calculator.add)
+print(Calculator.add(1, 2, 3, 4))                   # 10
+</code></pre>
+<ol start="3">
+<li>Using <a href="https://docs.python.org/3/library/functions.html#classmethod" rel="noreferrer">classmethod()</a> as a decorator:
+@classmethod has similar effect on a function as @staticmethod has, but
+this time, an additional argument is needed to be accepted in the function (similar to self parameter for instance variables). For eg.<br></li>
+</ol>
+<pre><code>class Calculator:
+    num = 0
+    def __init__(self, digits) -&gt; None:
+        Calculator.num = int(''.join(digits))
+
+    @classmethod
+    def get_digits(cls, num):
+        digits = list(str(num))
+        calc = cls(digits)
+        return calc.num
+
+print(Calculator.get_digits(314159))                # 314159
+</code></pre>
+<ol start="4">
+<li>Using <a href="https://docs.python.org/3/library/functions.html#classmethod" rel="noreferrer">classmethod()</a> as a parameter function:
+@classmethod can also be used as a parameter function, in case one doesn't want to modify class definition. For eg.<br></li>
+</ol>
+<pre><code>class Calculator:
+    def divide(cls, n1, n2, *args):
+        Res = 1
+        for num in args: Res *= num
+        return n1 / n2 / Res
+
+Calculator.divide = classmethod(Calculator.divide)
+
+print(Calculator.divide(15, 3, 5))                  # 1.0
+</code></pre>
+<ol start="5">
+<li>Direct declaration
+A method/variable declared outside all other methods, but inside a class is automatically static.<br></li>
+</ol>
+<pre><code>class Calculator:   
+    def subtract(n1, n2, *args):
+        return n1 - n2 - sum(args)
+
+print(Calculator.subtract(10, 2, 3, 4))             # 1
+</code></pre>
+<p>The whole program<br></p>
+<pre><code>class Calculator:
+    num = 0
+    def __init__(self, digits) -&gt; None:
+        Calculator.num = int(''.join(digits))
+    
+    
+    @staticmethod
+    def multiply(n1, n2, *args):
+        Res = 1
+        for num in args: Res *= num
+        return n1 * n2 * Res
+
+
+    def add(n1, n2, *args):
+        return n1 + n2 + sum(args)
+    
+
+    @classmethod
+    def get_digits(cls, num):
+        digits = list(str(num))
+        calc = cls(digits)
+        return calc.num
+
+
+    def divide(cls, n1, n2, *args):
+        Res = 1
+        for num in args: Res *= num
+        return n1 / n2 / Res
+
+
+    def subtract(n1, n2, *args):
+        return n1 - n2 - sum(args)
+    
+
+
+
+Calculator.add = staticmethod(Calculator.add)
+Calculator.divide = classmethod(Calculator.divide)
+
+print(Calculator.multiply(1, 2, 3, 4))              # 24
+print(Calculator.add(1, 2, 3, 4))                   # 10
+print(Calculator.get_digits(314159))                # 314159
+print(Calculator.divide(15, 3, 5))                  # 1.0
+print(Calculator.subtract(10, 2, 3, 4))             # 1
+</code></pre>
+<p>Refer to <a href="https://www.python.org/doc/versions/" rel="noreferrer">Python Documentation</a> for mastering OOP in python.</p>
+------------------------------------------------------------------ <br><h3> Answer 53865415 Codemaker2015: </h3><p>Python Static methods can be created in two ways. </p>
+
+<ol>
+<li><p><strong>Using staticmethod()</strong></p>
+
+<pre><code>class Arithmetic:
+    def add(x, y):
+        return x + y
+# create add static method
+Arithmetic.add = staticmethod(Arithmetic.add)
+
+print('Result:', Arithmetic.add(15, 10))
+</code></pre></li>
+</ol>
+
+<p><strong>Output:</strong></p>
+
+<p>Result: 25</p>
+
+<ol start="2">
+<li><p><strong>Using @staticmethod</strong></p>
+
+<pre><code>class Arithmetic:
+
+# create add static method
+@staticmethod
+def add(x, y):
+    return x + y
+
+print('Result:', Arithmetic.add(15, 10))
+</code></pre></li>
+</ol>
+
+<p><strong>Output:</strong></p>
+
+<p>Result: 25</p>
+<h4> Comment 102182722 new Q Open Wid: </h4>You just provided examples and shared the ways of <i>how</i> you can do it. You didn&#39;t explain what the methods mean.<br>------------------------------------------------------------------ <br><h3> Answer 74470713 Super Kai - Kazuya Ito: </h3><p>You can use <strong><a href="https://docs.python.org/3/library/functions.html#staticmethod" rel="nofollow noreferrer">@staticmethod</a> decorator</strong> to define a static method as shown below. In detail, I explain about <strong><a href="https://docs.python.org/3/library/functions.html#staticmethod" rel="nofollow noreferrer">@staticmethod</a> decorator</strong> and <strong><a href="https://docs.python.org/3/library/functions.html#classmethod" rel="nofollow noreferrer">@classmethod</a> decorator</strong> in <a href="https://stackoverflow.com/questions/136097/classmethod-vs-staticmethod-in-python/74470227#74470227"><strong>my answer</strong></a> for <a href="https://stackoverflow.com/questions/136097/classmethod-vs-staticmethod-in-python"><strong>@classmethod vs @staticmethod in Python</strong></a> and also explain about <strong>instance method</strong> in <a href="https://stackoverflow.com/questions/46230482/what-is-an-instance-method-in-python/74482579#74482579"><strong>my answer</strong></a> for <a href="https://stackoverflow.com/questions/46230482/what-is-an-instance-method-in-python"><strong>What is an &quot;instance method&quot; in Python?</strong></a>:</p>
+<pre class="lang-py prettyprint-override"><code>class Person:
+    @staticmethod # Here
+    def test():
+        print(&quot;Test&quot;)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 48145535 Jeff Silverman: </h3><p>I encounter this question from time to time.  The use case and example that I am fond of is:</p>
+
+<pre><code>jeffs@jeffs-desktop:/home/jeffs  $ python36
+Python 3.6.1 (default, Sep  7 2017, 16:36:03) 
+[GCC 6.3.0 20170406] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+&gt;&gt;&gt; import cmath
+&gt;&gt;&gt; print(cmath.sqrt(-4))
+2j
+&gt;&gt;&gt;
+&gt;&gt;&gt; dir(cmath)
+['__doc__', '__file__', '__loader__', '__name__', '__package__', '__spec__', 'acos', 'acosh', 'asin', 'asinh', 'atan', 'atanh', 'cos', 'cosh', 'e', 'exp', 'inf', 'infj', 'isclose', 'isfinite', 'isinf', 'isnan', 'log', 'log10', 'nan', 'nanj', 'phase', 'pi', 'polar', 'rect', 'sin', 'sinh', 'sqrt', 'tan', 'tanh', 'tau']
+&gt;&gt;&gt; 
+</code></pre>
+
+<p>It does not make sense to create an object of class cmath, because there is no state in a cmath object. However, cmath is a collection of methods that are all related in some way.  In my example above, all of the functions in cmath act on complex numbers in some way.</p>
+<h4> Comment 102182697 new Q Open Wid: </h4>You didn&#39;t answer the question but you provided a example instead.<br>

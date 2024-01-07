@@ -1,0 +1,604 @@
+ <h2> Title: What is attr_accessor in Ruby? </h2> <h3> dennismonsewicz, question_id: 4370960 </h3>Score: 1149, Tags: {ruby} <br><p>I am having a hard time understanding <code>attr_accessor</code> in <strong>Ruby</strong>.<br>
+Can someone explain this to me?</p>
+<h4> Comment 12450881 Andrew Marshall: </h4>Please see also <a href="http://stackoverflow.com/questions/5046831/why-use-rubys-attr-accessor-attr-reader-and-attr-writer">Why use Ruby&#39;s attr_accessor, attr_reader and attr_writer?</a>.<br><h4> Comment 60849458 Uzbekjon: </h4>@Angelfirenze, <code>git</code> has nothing to do with <code>attr_accessor</code>. Git is a version control software, whereas <code>attr_accessor</code> is a <a href="http://ruby-doc.org/core-2.3.0/Module.html#method-i-attr_accessor" rel="nofollow noreferrer">method in Ruby</a>.<br><h4> Comment 42955200 Angelfirenze: </h4>Does attr_accessor work this same way in Git?  I&#39;m finding that some tutorials don&#39;t explain enough and others assume prior knowledge.<br>------------------------------------------------------------------ <br><h3> Answer 4371458 Max Chernyak: </h3><p>Let's say you have a class <code>Person</code>.</p>
+
+<pre><code>class Person
+end
+
+person = Person.new
+person.name # =&gt; no method error
+</code></pre>
+
+<p>Obviously we never defined method <code>name</code>. Let's do that.</p>
+
+<pre><code>class Person
+  def name
+    @name # simply returning an instance variable @name
+  end
+end
+
+person = Person.new
+person.name # =&gt; nil
+person.name = "Dennis" # =&gt; no method error
+</code></pre>
+
+<p>Aha, we can read the name, but that doesn't mean we can assign the name. Those are two different methods. The former is called <em>reader</em> and latter is called <em>writer</em>. We didn't create the writer yet so let's do that.</p>
+
+<pre><code>class Person
+  def name
+    @name
+  end
+
+  def name=(str)
+    @name = str
+  end
+end
+
+person = Person.new
+person.name = 'Dennis'
+person.name # =&gt; "Dennis"
+</code></pre>
+
+<p>Awesome. Now we can write and read instance variable <code>@name</code> using reader and writer methods. Except, this is done so frequently, why waste time writing these methods every time? We can do it easier.</p>
+
+<pre><code>class Person
+  attr_reader :name
+  attr_writer :name
+end
+</code></pre>
+
+<p>Even this can get repetitive. When you want both reader and writer just use accessor!</p>
+
+<pre><code>class Person
+  attr_accessor :name
+end
+
+person = Person.new
+person.name = "Dennis"
+person.name # =&gt; "Dennis"
+</code></pre>
+
+<p>Works the same way! And guess what: the instance variable <code>@name</code> in our person object will be set just like when we did it manually, so you can use it in other methods.</p>
+
+<pre><code>class Person
+  attr_accessor :name
+
+  def greeting
+    "Hello #{@name}"
+  end
+end
+
+person = Person.new
+person.name = "Dennis"
+person.greeting # =&gt; "Hello Dennis"
+</code></pre>
+
+<p>That's it. In order to understand how <code>attr_reader</code>, <code>attr_writer</code>, and <code>attr_accessor</code> methods actually generate methods for you, read other answers, books, ruby docs. </p>
+<h4> Comment 13960511 Max Chernyak: </h4>@WilliamSmith To answer your question you need to understand that <code>attr_accessor</code> is a method called on the current class, and <code>:name</code> is a parameter you pass to that method. It&#39;s not a special syntax, it&#39;s a simple method call. If you were to give it <code>@name</code> variable, it wouldn&#39;t make sense, because @name would contain <code>nil</code>. So it would be like writing <code>attr_accessor nil</code>. You are not passing it a variable that it needs to create, you are passing the name that you want the variable to be called.<br><h4> Comment 13959281 Will: </h4>@hakunin - thank you for that clear answer. What is missing for me is why the Ruby syntax suggests a colon &#39;:&#39; for the instance variables in the attr_* statement? It seems that it would be more straight forward to use the same &#39;@&#39; syntax that is used elsewhere in the class to refer to the variable.<br><h4> Comment 13965510 Will: </h4>@hakunin - That makes total sense. I&#39;ve just today been learning that ruby is actually &#39;running&#39; as it parses through a file and that every statement and expression is actually a method call on some object. Including attr_accessor. Very helpful.<br><h4> Comment 27959025 Max Chernyak: </h4>@Buminda yes, but method <code>name</code> and variable <code>@name</code> are not the same thing. Don&#39;t confuse them. You have instance variable <code>@name</code> in your class, and you define <code>attr_reader :name</code> to be able to read it from the outside. Without <code>attr_reader</code> there is no simple way you can access <code>@name</code> outside of your class.<br><h4> Comment 18368822 Richard77: </h4>I see now. So that&#39;s the equivalent of automatic properties in C#. Awesome!<br><h4> Comment 131045550 Max Chernyak: </h4>@ajay_speed Your use case is a bit unclear. Feel free to ask a new question on SO, and link it to me here. I&#39;ll go take a look.<br><h4> Comment 45490936 Max Chernyak: </h4>@JonCrowell there is (almost) no such thing as &quot;getting/setting variables directly&quot; from outside of the object. You can only do that inside the object. You can&#39;t do <code>person.@name</code> &lt;- this doesn&#39;t exist. Ruby has special methods: <code>person.instance_variable_get(&#39;@name&#39;)</code> or <code>person.instance_variable_set(&#39;@name&#39;)</code> but you probably don&#39;t want to typically use them.<br><h4> Comment 60998674 engineerDave: </h4>@MuhammadUmer I know this is dated but I figured I&#39;d leave this for a future person wondering the same thing. its a colon because its a Symbol and this is is what <a href="http://ruby-doc.org/core-2.3.0/Object.html#method-i-send" rel="nofollow noreferrer">Object#send</a> expects to receive. While the call can take a String, it will have to convert said String to a Symbol. So by passing a Symbol you save a step.<br><h4> Comment 87698844 Max Chernyak: </h4>@codemilan Your classes can define constructors (e.g. <code>def initialize</code>) which take parameters, and assign those parameters to internal instance variables. E.g. <code>person = Person.new(&#39;Codemilan&#39;)</code> and then <code>person.name # =&gt; &quot;Codemilan&quot;</code>. In this scenario you aren&#39;t actually using the name writer method.<br><h4> Comment 27952023 Buminda: </h4>what if we use attr_reader , I guess still we can write to that attribute inside inilialize , for example  attr_reader :name  def initialize()  @name = &#39;DDD&#39; end<br><h4> Comment 45481099 tadasajon: </h4>Why not just give the object an instance variable and get and set it directly instead of using getter and setter methods?  I don&#39;t see how this saves any  time or work over accessing the variables directly.<br><h4> Comment 51770676 Muhammad Umer: </h4>i still dont get why there is colon, what does colon do here.  i get it&#39;s being passed as a parameter but is it a symbol<br><h4> Comment 91813154 Dennis: </h4>Given my name is Dennis and this answer is the first time i ever understood this topic I feel that somehow you actually wrote this one for me!<br><h4> Comment 95102308 BobRodes: </h4>Very well explained. I&#39;m new to Ruby, and, I must say that it seems to me that the language shamelessly mangles established semantics. This is a case in point: &quot;accessor&quot; and &quot;mutator&quot; methods are methods that read and write attributes, respectively. At least they have been until now: now an accessor both accesses <i>and</i> mutates an attribute! Why not simply use <code>attr_readwriter</code> or some such, I wonder, instead of this malapropism. Not whimsical enough, I suppose. :)<br><h4> Comment 95107934 Max Chernyak: </h4>@BobRodes Correct me if I&#39;m wrong, but when you say &quot;until now&quot;, you are implicitly referring to another language, where this word was used to indicate reading. There is nothing in the word &quot;access&quot; that inherently makes it about reading. Could it be that the other language chose a poor word? Shouldn&#39;t we be fixing historical mistakes as we advance? However, keep in mind that ruby was started in 1995, and is currently 24 yo. It has just as much right to establish terminology as any other language.<br><h4> Comment 95108641 BobRodes: </h4>Reading any definition of the word &quot;access&quot; suggests that it is indeed synonymous with the idea of reading, e.g. &quot;to open or load (a computer file, an internet site, etc.).&quot; To access something is NOT to change it. Changing is mutating. Therefore, in most languages, accessor methods are methods which access (read) an attribute, and mutator methods are methods which change (write) an attribute. This terminology is common to most languages, including C/C++, C#, Java and several others. However, I find that Smalltalk uses the term &quot;accessor methods&quot; to mean getters and setters. (...)<br><h4> Comment 95108795 BobRodes: </h4>So, perhaps Ruby, which, as I understand it, has its roots in Smalltalk, eschews the fixing of Smalltalk&#39;s &quot;historical mistake&quot; that pretty much every other OO language since then has fixed, due to Smalltalk&#39;s use of the term being semantically inconsistent with the English language. Anyway, that&#39;s the other side of your argument. The larger concern that I have is the lack of semantic consistency in Ruby; while I understand that the numerous ways to do the same thing are intended to make the language friendly to people already familiar with a wide variety of languages, (...)<br><h4> Comment 95108804 BobRodes: </h4>I have to say that the result appears to be that it is possible thereby for Ruby programmers to write code that is unintelligible to other Ruby programmers who use different ways to accomplish the same things. The fact that there is a &quot;style guide&quot; to address this issue suggests that this unintelligibility is a genuine problem, and must be addressed through agreeing to conventions, rather than adopting semantics that are inherent in the language itself. I therefore have trouble seeing the point of having several different ways to do the same thing: (...)<br><h4> Comment 95108849 BobRodes: </h4>If that means that nobody can understand anyone else&#39;s code unless they all agree to stick to the same ways of doing things, what&#39;s the point of having different ways to do them in the first place?<br><h4> Comment 96547506 Max Chernyak: </h4>@BobRodes It&#39;s hard to make an objective argument about the term &quot;accessor&quot; being wrong. You can access something in order to read it or change it. As far as consistency, if you understand ruby fundamentals, you can understand any kind of  ruby code. The consistency just comes at a lower level, enabling you to implement what looks like language features in the language itself, all thanks to executable class bodies.<br><h4> Comment 96597837 BobRodes: </h4>@MaxChernyak I picked up Ruby on Jan. 7, so when I wrote this my dive into Ruby was four days old. Since then, I have developed a much better understanding of Ruby fundamentals, and see exactly (and also agree with) what you are saying. Ruby is internally very consistently organized, and if you understand the underlying architecture, the &quot;syntax sugar&quot; is actually impressive with respect to how quickly you can put something complex together. As for &quot;accessor&quot; methods, it&#39;s hard to make an objective argument about any matter of semantics, since the idea of relating a word to a meaning is (...)<br><h4> Comment 96597945 BobRodes: </h4>inherently a subjective one. However, one can make arguments about common usage. It is true that you have to access something in order to change it, but it is also true that access does not in any way imply change. So what I&#39;m seeing now is that Ruby doesn&#39;t really make a distinction about whether a method is a mutating method at the level of the method signature. Methods either mutate their caller or they don&#39;t, but there isn&#39;t anything inherent in the method signature or the way arguments are passed that defines that. (Ending a name with <code>!</code> is a convention rather than a language structure.)<br><h4> Comment 87661441 Erica: </h4>After reading a bunch of confusing explanations, this one made me <i>actually</i> understand wtf these methods mean. Thank you!<br><h4> Comment 87698805 Max Chernyak: </h4>@OK999 When you are using <code>@name</code> you are referring to your object&#39;s internal instance variable directly. When you are using <code>name</code>, you are calling a method by that name. This method can do any number of things, and it doesn&#39;t have to specifically return the variable <code>@name</code>.<br><h4> Comment 58681669 whitehat: </h4>@hakunin Very neat explanation in simple language. I rarely find one these days.. thanks<br><h4> Comment 70400667 MissingHandle: </h4>One note missing from all comments so far is that since <code>attr_reader</code>, <code>attr_writer</code> and <code>attr_accessor</code> are all implemented in C, they are actually faster at run-time than writing the equivalent getters and setters manually in ruby.<br><h4> Comment 82971675 OK999: </h4>@MaxChernyakakahakunin - why is it neccessary to use the <code>@</code> infront of <code>name</code> in your example above. The same without the <code>@</code> works too in this case. but i notice some inconsistencies if i drop off the <code>@</code> from the instance variable with an <code>attr_accessor</code> being set. thanks<br><h4> Comment 84654281 codemilan: </h4>What if var as &#39;attr_reader&#39; only, in this case when is the value needed to be set initially, since we can&#39;t do var = &quot;&quot;, which throws exceptions it&#39;s readonly, conclusion, if i need var for read only means where to set it for the first time doesn&#39;t it give exception if we do &#39;var=&#39;  method, what do need to do in that case ? and say I would like to make var &#39;x&#39; as attr_accessor and later lock it to readonly mode after first assign(where it is done) for no further changes Thank you all.<br><h4> Comment 131033896 ajay_speed: </h4>hey @MaxChernyak , when we have a class with many functions(methods) inside and it&#39;s very hard to call all the functions one by one using the object created for the respective class. Is there any efficient way available to call and excecute all the functions inside the class with a single command?  thank you!<br>------------------------------------------------------------------ <br><h3> Answer 4371087 user166390: </h3><p><a href="http://www.ruby-doc.org/core-2.0.0/Module.html#method-i-attr_accessor" rel="nofollow noreferrer">attr_accessor</a> is <em>just a method</em>. (The link should provide more insight with how it works - look at the pairs of methods generated, and a tutorial should show you how to use it.)</p>
+<p>The trick is that <code>class</code> is <em>not a definition</em> in Ruby (it is &quot;just a definition&quot; in languages like C++ and Java), but it is an <em>expression that evaluates</em>. It is during this evaluation when the <code>attr_accessor</code> method is invoked which in turn modifies the current class - remember the implicit receiver: <code>self.attr_accessor</code>, where <code>self</code> is the &quot;open&quot; class object at this point.</p>
+<p>The need for <code>attr_accessor</code> and friends, is, well:</p>
+<ol>
+<li><p>Ruby, like Smalltalk, does not allow instance variables to be accessed outside of methods<sup>1</sup> for that object. That is, instance variables cannot be accessed in the <code>x.y</code> form as is common in say, Java or even Python. In Ruby <code>y</code> is always taken as a message to send (or &quot;method to call&quot;). Thus the <code>attr_*</code> methods create wrappers which proxy the instance <code>@variable</code> access through dynamically created methods.</p>
+</li>
+<li><p>Boilerplate sucks</p>
+</li>
+</ol>
+<hr />
+<p><sup>1</sup> This isn't strictly true and there are <a href="https://stackoverflow.com/questions/1074729/get-the-value-of-an-instance-variable-given-its-name">some &quot;techniques&quot; around this</a>, but there is no syntax support for &quot;public instance variable&quot; access.</p>
+<h4> Comment 125775954 Jim Grisham: </h4>It appears to be called automatically whenever you access an instance variable using &#39;@&#39; or &#39;.&#39; notation.<br><h4> Comment 45015779 B T: </h4>When you say attr_accessor is &quot;just a method&quot; i get it. But what is the syntax used to <i>call</i> that method called? I&#39;m  having trouble finding the section in the ruby documentation that talks about syntax like some_method :name =&gt; &quot;whatever&quot;, :notherName, :etc<br>------------------------------------------------------------------ <br><h3> Answer 4371143 Phrogz: </h3><p><code>attr_accessor</code> is (as @pst stated) just a method. What it does is create more methods for you.</p>
+
+<p>So this code here:</p>
+
+<pre><code>class Foo
+  attr_accessor :bar
+end
+</code></pre>
+
+<p>is equivalent to this code:</p>
+
+<pre><code>class Foo
+  def bar
+    @bar
+  end
+  def bar=( new_value )
+    @bar = new_value
+  end
+end
+</code></pre>
+
+<p>You can write this sort of method yourself in Ruby:</p>
+
+<pre><code>class Module
+  def var( method_name )
+    inst_variable_name = "@#{method_name}".to_sym
+    define_method method_name do
+      instance_variable_get inst_variable_name
+    end
+    define_method "#{method_name}=" do |new_value|
+      instance_variable_set inst_variable_name, new_value
+    end
+  end
+end
+
+class Foo
+  var :bar
+end
+
+f = Foo.new
+p f.bar     #=&gt; nil
+f.bar = 42
+p f.bar     #=&gt; 42
+</code></pre>
+<h4> Comment 33405131 John Simon: </h4>This is a great example of where metaprogramming is used in even the most beginner-level scenarios. Very nice.<br><h4> Comment 61876116 Wasif Hossain: </h4>I was looking for an implementation sketch of <code>attr_accessor</code> and found here at last ! Though it solved my problem, but I am curious to know where(book/official doc) can I find an implementation example like this?<br>------------------------------------------------------------------ <br><h3> Answer 4371136 efalcao: </h3><p><code>attr_accessor</code> is very simple:</p>
+
+<pre><code>attr_accessor :foo
+</code></pre>
+
+<p>is a shortcut for:</p>
+
+<pre><code>def foo=(val)
+  @foo = val
+end
+
+def foo
+  @foo
+end
+</code></pre>
+
+<p>it is nothing more than a getter/setter for an object</p>
+<h4> Comment 4760006 bowsersenior: </h4>your answer is fine. &#39;Shortcut&#39; means &quot;a shorter alternative route&quot; according to my dictionary, not &quot;syntax sugar&quot; or &quot;macro interpreted by the interpreter&quot;.<br>------------------------------------------------------------------ <br><h3> Answer 4370996 Tyler Eaves: </h3><p>Basically they fake publicly accessible data attributes, which Ruby doesn't have.</p>
+<h4> Comment 28443465 Eric Dand: </h4>Though this comment isn&#39;t entirely useful, it is true. Highlights the fact that public data attributes don&#39;t exist outside of &quot;get&quot; methods in Ruby, which is really useful info for someone trying to learn the language.<br><h4> Comment 30985764 Brad: </h4>This really shouldn&#39;t be downvoted.  As a non-Ruby guy trying to figure this stuff out, this answer is very helpful!<br><h4> Comment 31086633 David Miler: </h4>Agreed, seems very simmilar to C#&#39;s  name {get; set;}<br>------------------------------------------------------------------ <br><h3> Answer 4371142 Chuck: </h3><p>It is just a method that defines getter and setter methods for instance variables. An example implementation would be:</p>
+
+<pre><code>def self.attr_accessor(*names)
+  names.each do |name|
+    define_method(name) {instance_variable_get("@#{name}")} # This is the getter
+    define_method("#{name}=") {|arg| instance_variable_set("@#{name}", arg)} # This is the setter
+  end
+end
+</code></pre>
+<h4> Comment 61876183 Wasif Hossain: </h4>handling multiple attributes in this way is great !<br><h4> Comment 107815709 alexventuraio: </h4>This was a really helpful code snippet to solve another question that I had related to metaprogramming.<br>------------------------------------------------------------------ <br><h3> Answer 28391606 Ahmed Eshaan: </h3><p>If you are familiar with OOP concept, You must familiar with getter and setter method.
+attr_accessor does the same in Ruby.</p>
+
+<p><strong>Getter and Setter in General Way</strong></p>
+
+<pre><code>class Person
+  def name
+    @name
+  end
+
+  def name=(str)
+    @name = str
+  end
+end
+
+person = Person.new
+person.name = 'Eshaan'
+person.name # =&gt; "Eshaan"
+</code></pre>
+
+<p><strong>Setter Method</strong></p>
+
+<pre><code>def name=(val)
+  @name = val
+end
+</code></pre>
+
+<p><strong>Getter method</strong> </p>
+
+<pre><code>def name
+  @name
+end
+</code></pre>
+
+<p><strong>Getter and Setter method in Ruby</strong></p>
+
+<pre><code>class Person
+  attr_accessor :name
+end
+
+person = Person.new
+person.name = "Eshaan"
+person.name # =&gt; "Eshaan"
+</code></pre>
+<h4> Comment 45120425 Rubyrider: </h4>perfect explanation! It is a very handy behavior and can be overridden too very easily.<br>------------------------------------------------------------------ <br><h3> Answer 32598087 Jbur43: </h3><p>I faced this problem as well and wrote a somewhat lengthy answer to this question. There are some great answers on this already, but anyone looking for more clarification, I hope my answer can help</p>
+
+<p>Initialize Method</p>
+
+<p>Initialize allows you to set data to an instance of an object upon creation of the instance rather than having to set them on a separate line in your code each time you create a new instance of the class. </p>
+
+<pre><code>class Person
+
+  def initialize(name)
+    @name = name
+  end
+
+
+  def greeting
+    "Hello #{@name}"
+  end
+end
+
+person = Person.new("Denis")
+puts person.greeting
+</code></pre>
+
+<p>In the code above we are setting the name “Denis” using the initialize method by passing Dennis through the parameter in Initialize. If we wanted to set the name without the initialize method we could do so like this:</p>
+
+<pre><code>class Person
+  attr_accessor :name
+
+  # def initialize(name)
+  #     @name = name
+  # end
+
+  def greeting
+    "Hello #{name}"
+  end
+end
+
+person = Person.new
+person.name = "Dennis"
+puts person.greeting
+</code></pre>
+
+<p>In the code above, we set the name by calling on the attr_accessor setter method using person.name, rather than setting the values upon initialization of the object. </p>
+
+<p>Both “methods” of doing this work, but initialize saves us time and lines of code.</p>
+
+<p>This is the only job of initialize. You cannot call on initialize as a method. To actually get the values of an instance object you need to use getters and setters (attr_reader (get), attr_writer(set), and attr_accessor(both)).  See below for more detail on those.</p>
+
+<p>Getters, Setters (attr_reader, attr_writer, attr_accessor)</p>
+
+<p>Getters, attr_reader: The entire purpose of a getter is to return the value of a particular instance variable.  Visit the sample code below for a breakdown on this.  </p>
+
+<pre><code>class Item
+
+  def initialize(item_name, quantity)
+    @item_name = item_name
+    @quantity = quantity
+  end
+
+  def item_name
+    @item_name
+  end
+
+  def quantity
+     @quantity
+  end
+end
+
+example = Item.new("TV",2)
+puts example.item_name
+puts example.quantity
+</code></pre>
+
+<p>In the code above you are calling the methods “item_name” and “quantity” on the instance of Item “example”. The “puts example.item_name” and “example.quantity” will return (or “get”) the value for the parameters that were passed into the “example” and display them to the screen.</p>
+
+<p>Luckily in Ruby there is an inherent method that allows us to write this code more succinctly; the attr_reader method.  See the code below;</p>
+
+<pre><code>class Item
+
+attr_reader :item_name, :quantity
+
+  def initialize(item_name, quantity)
+    @item_name = item_name
+    @quantity = quantity
+  end
+
+end
+
+item = Item.new("TV",2)
+puts item.item_name
+puts item.quantity
+</code></pre>
+
+<p>This syntax works exactly the same way, only it saves us six lines of code. Imagine if you had 5 more state attributable to the Item class? The code would get long quickly.</p>
+
+<p>Setters, attr_writer: What crossed me up at first with setter methods is that in my eyes it seemed to perform an identical function to the initialize method. Below I explain the difference based on my understanding; </p>
+
+<p>As stated before, the initialize method allows you to set the values for an instance of an object upon object creation. </p>
+
+<p>But what if you wanted to set the values later, after the instance was created, or change them after they have been initialized?  This would be a scenario where you would use a setter method.  THAT IS THE DIFFERENCE. You don’t have to “set” a particular state when you are using the attr_writer method initially. </p>
+
+<p>The code below is an example of using a setter method to declare the value item_name for this instance of the Item class. Notice that we continue to use the getter method attr_reader so that we can get the values and print them to the screen, just in case you want to test the code on your own. </p>
+
+<pre><code>class Item
+
+attr_reader :item_name
+
+  def item_name=(str)
+    @item_name = (str)
+  end
+
+end
+</code></pre>
+
+<p>The code below is an example of using attr_writer to once again shorten our code and save us time.</p>
+
+<pre><code>class Item
+
+attr_reader :item_name
+attr_writer :item_name
+
+end
+
+item = Item.new
+puts item.item_name = "TV"
+</code></pre>
+
+<p>The code below is a reiteration of the initialize example above of where we are using initialize to set the objects value of item_name upon creation.</p>
+
+<pre><code>class Item
+
+attr_reader :item_name
+
+  def initialize(item_name)
+    @item_name = item_name
+  end
+
+end
+
+item = Item.new("TV")
+puts item.item_name
+</code></pre>
+
+<p>attr_accessor: Performs the functions of both attr_reader and attr_writer, saving you one more line of code.</p>
+------------------------------------------------------------------ <br><h3> Answer 36975222 BenKoshy: </h3><h3>Simple Explanation Without Any Code</h3>
+
+<p>Most of the above answers use code. This explanation attempts to answer it without using any, via an analogy/story:</p>
+
+<p><strong>Outside parties cannot access internal CIA secrets</strong></p>
+
+<ul>
+<li><p>Let's imagine a really secret place: the CIA. Nobody knows what's happening in the CIA apart from the people inside the CIA. In other words, external people cannot access any information in the CIA. But because it's no good having an organisation that is completely secret, certain information is made available to the outside world - only things that the CIA wants everyone to know about of course: e.g. the Director of the CIA, how environmentally friendly this department is compared to all other government departments etc. Other information: e.g. who are its covert operatives in Iraq or Afghanistan - these types of things will probably remain a secret for the next 150 years.</p></li>
+<li><p>If you're outside the CIA you can only access the information that it has made available to the public. Or to use CIA parlance you can only access information that is "cleared".</p></li>
+<li><p>The information that the CIA wants to make available to the general public outside the CIA are called: <strong>attributes.</strong> </p></li>
+</ul>
+
+<p><strong>The meaning of read and write attributes:</strong></p>
+
+<ul>
+<li><p>In the case of the CIA, most attributes are "read only". This means if you are a party <em>external</em> to the CIA, you can <strong>ask:</strong> "who is the director of the CIA?" and you will get a straight answer. But what you <strong>cannot</strong> do with "read only" attributes is to make changes changes in the CIA. e.g. you cannot make a phone call and suddenly <strong>decide</strong> that you want Kim Kardashian to be the Director, or that you want Paris Hilton to be the Commander in Chief. </p></li>
+<li><p>If the attributes gave you "write" access, then you could make changes if you want to, even if you were outside. Otherwise, the only thing you can do is read.</p>
+
+<p>In other words accessors allow you to make inquiries, or to make changes, to organisations that otherwise do not let external people in, depending on whether the accessors are read or write accessors.</p></li>
+</ul>
+
+<p><strong>Objects inside a class can easily access each other</strong></p>
+
+<ul>
+<li>On the other hand, if you were already <em>inside</em> the CIA, then you could easily call up your CIA operative in Kabul because this information is easily accessible given you are already inside. But if you're <em>outside</em> the CIA, you simply will not be given access:  you will not be able to know who they are (read access), and you will not be able to change their mission (write access).</li>
+</ul>
+
+<p>Exact same thing with classes and your ability to access variables, properties and methods within them. HTH! Any questions, please ask and I hope i can clarify.</p>
+<h4> Comment 69377122 kouty: </h4>Your explanation makes sense! +1 Sorry, are you sure that the expression &quot;information which is cleared by the CIA is right?<br><h4> Comment 69388420 BenKoshy: </h4>there are various &quot;clearance&quot; levels in the CIA: e.g. Top Secret (nobody but the Prez),or public trust (everyone can read that info). The CIA actually provides a lot of very cool facts!<br><h4> Comment 97373352 rmcsharry: </h4>You deserve the upvote just for the Kardashian, Paris Hilton examples :) I thought it was bad enough with Trump for President, imagine those two in charge omg!<br><h4> Comment 98037938 Marvin: </h4>Yes!  That&#39;s what we need, StackOverflow without code!  :-)<br>------------------------------------------------------------------ <br><h3> Answer 24680599 Ben: </h3><p>I think part of what confuses new Rubyists/programmers (like myself) is:</p>
+
+<p>"Why can't I just tell the instance it has any given attribute (e.g., name) and give that attribute a value all in one swoop?"</p>
+
+<p>A little more generalized, but this is how it clicked for me:</p>
+
+<p>Given:</p>
+
+<pre><code>class Person
+end
+</code></pre>
+
+<p>We haven't defined Person <em>as something that can have a name</em> or any other attributes for that matter. </p>
+
+<p>So if we then:</p>
+
+<pre><code>baby = Person.new
+</code></pre>
+
+<p>...and try to give them a name...</p>
+
+<pre><code>baby.name = "Ruth"
+</code></pre>
+
+<p>We get an <strong>error</strong> because, in Rubyland, a Person class of object is not something that is associated with or capable of having a "name" ... yet!</p>
+
+<p>BUT we can use any of the given methods (see previous answers) as a way to say, "An instance of a Person class (<code>baby</code>) <em>can now</em> have an attribute called 'name', therefore we not only have a syntactical way of getting and setting that name, but it makes sense for us to do so."</p>
+
+<p>Again, hitting this question from a slightly different and more general angle, but I hope this helps the next instance of class Person who finds their way to this thread.</p>
+------------------------------------------------------------------ <br><h3> Answer 25259556 Marcus Thornton: </h3><p>Simply put it will define a setter and getter for the class.</p>
+
+<p>Note that </p>
+
+<pre><code>attr_reader :v is equivalant to 
+def v
+  @v
+end
+
+attr_writer :v is equivalant to
+def v=(value)
+  @v=value
+end
+</code></pre>
+
+<p>So </p>
+
+<pre><code>attr_accessor :v which means 
+attr_reader :v; attr_writer :v 
+</code></pre>
+
+<p>are equivalant to define a setter and getter for the class.</p>
+------------------------------------------------------------------ <br><h3> Answer 22452695 Veeru: </h3><p>Simply <code>attr-accessor</code> creates the <code>getter</code> and <code>setter</code> methods for the specified attributes</p>
+------------------------------------------------------------------ <br><h3> Answer 39476729 Iggy: </h3><p>Another way to understand it is to figure out what error code it eliminates by having <code>attr_accessor</code>. </p>
+
+<p>Example:</p>
+
+<pre><code>class BankAccount    
+  def initialize( account_owner )
+    @owner = account_owner
+    @balance = 0
+  end
+
+  def deposit( amount )
+    @balance = @balance + amount
+  end
+
+  def withdraw( amount )
+    @balance = @balance - amount
+  end
+end
+</code></pre>
+
+<p>The following methods are available:</p>
+
+<pre><code>$ bankie = BankAccout.new("Iggy")
+$ bankie 
+$ bankie.deposit(100)
+$ bankie.withdraw(5)
+</code></pre>
+
+<p>The following methods throws error:</p>
+
+<pre><code>$ bankie.owner     #undefined method `owner'... 
+$ bankie.balance   #undefined method `balance'...
+</code></pre>
+
+<p><code>owner</code> and <code>balance</code> are not, technically, <em>a method</em>, but an attribute. BankAccount class does not have <code>def owner</code> and <code>def balance</code>. If it does, then you can use the two commands below. But those two methods aren't there. However, you can <em>access</em> attributes as if you'd <em>access</em> a method via <code>attr_accessor</code>!! <em>Hence the word <code>attr_accessor</code></em>. Attribute. Accessor. It accesses attributes like you would access a method. </p>
+
+<p>Adding <code>attr_accessor :balance, :owner</code> allows you to read and write <code>balance</code> and <code>owner</code> "method". Now you can use the last 2 methods.</p>
+
+<pre><code>$ bankie.balance
+$ bankie.owner
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 66538036 matt: </h3><p>Despite the large number of existing answers, none of them seems to me to explain the actual mechanism involved here. It's metaprogramming; it takes advantage of the following two facts:</p>
+<ul>
+<li><p>You can modify a module / class on the fly</p>
+</li>
+<li><p>A module / class declaration is itself executable code</p>
+</li>
+</ul>
+<p>Okay, so imagine the following:</p>
+<pre><code>class Nameable
+  def self.named(whatvalue)
+    define_method :name do whatvalue end
+  end
+end
+</code></pre>
+<p>We are declaring a <em>class method</em> <code>named</code> which, when called with a value, <em>creates an instance method</em> called <code>name</code> which returns that value. That is the metaprogramming part.</p>
+<p>Now we'll subclass that class:</p>
+<pre><code>class Dog &lt; Nameable
+  named &quot;Fido&quot;
+end
+</code></pre>
+<p>What on earth did we just do? Well, in the class declaration, executable code executes with reference to the class. So the bare word <code>named</code> is actually a call to the class method <code>named</code>, which we inherited from Nameable; and we are passing the string <code>&quot;Fido&quot;</code> as the argument.</p>
+<p>And what does the class method <code>named</code> do? It creates an instance method called <code>name</code>, which returns that value. So now, behind the scenes, Dog has a method that looks like this:</p>
+<pre><code>def name
+   &quot;Fido&quot;
+end
+</code></pre>
+<p>Don't believe me? Then watch <em>this</em> little move:</p>
+<pre><code>puts Dog.new.name #=&gt; Fido
+</code></pre>
+<p>Why did I tell you all that? Because what I just did with <code>named</code> for Nameable is almost exactly what <code>attr_accessor</code> does for Module. When you say <code>attr_accessor</code> you are calling a class method (inherited from Module) that creates instance methods. In particular, it creates a getter and setter method for the instance property whose name you provide as argument, so that you don't have to write those getter and setter methods yourself.</p>
+------------------------------------------------------------------ <br><h3> Answer 31946865 Praveen_Shukla: </h3><p>Defines a named attribute for this module, where the name is symbol.id2name, creating an instance variable (@name) and a corresponding access method to read it. Also creates a method called name= to set the attribute.</p>
+
+<pre><code>module Mod
+  attr_accessor(:one, :two)
+end
+Mod.instance_methods.sort   #=&gt; [:one, :one=, :two, :two=]
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 40581683 Douglas G. Allen: </h3><p>To summarize an attribute accessor aka attr_accessor gives you two free methods.</p>
+
+<p>Like in Java they get called getters and setters.</p>
+
+<p>Many answers have shown good examples so I'm just going to be brief.</p>
+
+<p>#the_attribute</p>
+
+<p>and</p>
+
+<p>#the_attribute=</p>
+
+<p>In the old ruby docs a hash tag # means a method.
+It could also include a class name prefix...
+MyClass#my_method</p>
+------------------------------------------------------------------ <br><h3> Answer 54330029 Adverbly: </h3><p>I am new to ruby and had to just deal with understanding the following weirdness. Might help out someone else in the future. In the end it is as was mentioned above, where 2 functions (def myvar, def myvar=) both get implicitly for accessing @myvar, but these methods can be overridden by local declarations.</p>
+
+<pre><code>class Foo
+  attr_accessor 'myvar'
+  def initialize
+    @myvar = "A"
+    myvar = "B"
+    puts @myvar # A
+    puts myvar # B - myvar declared above overrides myvar method
+  end
+
+  def test
+    puts @myvar # A
+    puts myvar # A - coming from myvar accessor
+
+    myvar = "C" # local myvar overrides accessor
+    puts @myvar # A
+    puts myvar # C
+
+    send "myvar=", "E" # not running "myvar =", but instead calls setter for @myvar
+    puts @myvar # E
+    puts myvar # C
+  end
+end
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 38202562 BrunoF: </h3><h3>Attributes and accessor methods</h3>
+
+<p>Attributes are class components that can be accessed from outside the object. They are known as properties in many other programming languages. Their values are accessible by using the "dot notation", as in object_name.attribute_name. Unlike Python and a few other languages, Ruby does not allow instance variables to be accessed directly from outside the object.</p>
+
+<pre><code>class Car
+  def initialize
+    @wheels = 4  # This is an instance variable
+  end
+end
+
+c = Car.new
+c.wheels     # Output: NoMethodError: undefined method `wheels' for #&lt;Car:0x00000000d43500&gt;
+</code></pre>
+
+<p>In the above example, c is an instance (object) of the Car class. We tried unsuccessfully to read the value of the wheels instance variable from outside the object. What happened is that Ruby attempted to call a method named wheels within the c object, but no such method was defined. In short, object_name.attribute_name tries to call a method named attribute_name within the object. To access the value of the wheels variable from the outside, we need to implement an instance method by that name, which will return the value of that variable when called. That's called an accessor method. In the general programming context, the usual way to access an instance variable from outside the object is to implement accessor methods, also known as getter and setter methods. A getter allows the value of a variable defined within a class to be read from the outside and a setter allows it to be written from the outside.</p>
+
+<p>In the following example, we have added getter and setter methods to the Car class to access the wheels variable from outside the object. This is not the "Ruby way" of defining getters and setters; it serves only to illustrate what getter and setter methods do.</p>
+
+<pre><code>class Car
+  def wheels  # getter method
+    @wheels
+  end
+
+  def wheels=(val)  # setter method
+    @wheels = val
+  end
+end
+
+f = Car.new
+f.wheels = 4  # The setter method was invoked
+f.wheels  # The getter method was invoked
+# Output: =&gt; 4
+</code></pre>
+
+<p>The above example works and similar code is commonly used to create getter and setter methods in other languages. However, Ruby provides a simpler way to do this: three built-in methods called attr_reader, attr_writer and attr_acessor. The attr_reader method makes an instance variable readable from the outside, attr_writer makes it writeable, and attr_acessor makes it readable and writeable. </p>
+
+<p>The above example can be rewritten like this.</p>
+
+<pre><code>class Car
+  attr_accessor :wheels
+end
+
+f = Car.new
+f.wheels = 4
+f.wheels  # Output: =&gt; 4
+</code></pre>
+
+<p>In the above example, the wheels attribute will be readable and writable from outside the object. If instead of attr_accessor, we used attr_reader, it would be read-only. If we used attr_writer, it would be write-only. Those three methods are not getters and setters in themselves but, when called, they create getter and setter methods for us. They are methods that dynamically (programmatically) generate other methods; that's called metaprogramming.</p>
+
+<p>The first (longer) example, which does not employ Ruby's built-in methods, should only be used when additional code is required in the getter and setter methods. For instance, a setter method may need to validate data or do some calculation before assigning a value to an instance variable. </p>
+
+<p>It is possible to access (read and write) instance variables from outside the object, by using the instance_variable_get and instance_variable_set built-in methods. However, this is rarely justifiable and usually a bad idea, as bypassing encapsulation tends to wreak all sorts of havoc.</p>
+------------------------------------------------------------------ <br><h3> Answer 45507314 Abibullah Rahamathulah: </h3><p>Hmmm. Lots of good answers. Here is my few cents on it. </p>
+
+<ul>
+<li><p><code>attr_accessor</code> is a simple method that helps us in cleaning(<strong>DRY-ing</strong>) up the <strong>repeating <code>getter and setter</code></strong> methods. </p></li>
+<li><p>So that we can focus more on writing business logic and not worry about the setters and getters.</p></li>
+</ul>
+------------------------------------------------------------------ <br><h3> Answer 37885505 creativegeek: </h3><p>The main functionality of <strong>attr_accessor</strong> over the other ones is the capability of accessing data from other files.<br />
+So you usually would have attr_reader or attr_writer but the good news is that Ruby lets you combine these two together with attr_accessor. I think of it as <em><strong>my to go method</strong></em> because it is more well rounded or versatile.
+Also, peep in mind that in Rails, this is eliminated because it does it for you in the back end. So in other words: you are better off using attr_acessor over the other two because you don't have to worry about being to specific, the accessor covers it all.</p>

@@ -1,0 +1,127 @@
+ <h2> Title: Difference between map and collect in Ruby? </h2> <h3> sscirrus, question_id: 5254732 </h3>Score: 461, Tags: {ruby,arrays,dictionary,collect} <br><p>I have Googled this and got patchy / contradictory opinions - is there actually any difference between doing a <code>map</code> and doing a <code>collect</code> on an array in Ruby/Rails? </p>
+
+<p>The <a href="http://www.ruby-doc.org/core/classes/Array.html#M000248" rel="noreferrer">docs</a> don't seem to suggest any, but are there perhaps differences in method or performance?</p>
+<h4> Comment 58600853 Cary Swoveland: </h4><code>map</code> is preferred at <a href="http://codegolf.stackexchange.com/questions">Code Golf</a>.<br><h4> Comment 92196442 sscirrus: </h4>Just to play devil&#39;s advocate, I personally find <code>collect</code> more readable and natural - the idea of &#39;collecting&#39; records and doing X to them makes more natural sense to me than &#39;mapping&#39; records and doing X to them.<br><h4> Comment 67209321 Jochem Schulenklopper: </h4>As an explanation to why <code>map</code> is preferred at CodeGolf, which might not be obvious for all: it is only because <code>collect</code> is four characters longer than <code>map</code>, but the same in functionality.<br>------------------------------------------------------------------ <br><h3> Answer 5254764 Jakub Hampl: </h3><p>There's no difference, in fact <code>map</code> is implemented in C as <code>rb_ary_collect</code> and <code>enum_collect</code> (eg. there is a difference between <code>map</code> on an array and on any other enum, but no difference between <code>map</code> and <code>collect</code>).</p>
+
+<hr>
+
+<p><strong>Why do both <code>map</code> and <code>collect</code> exist in Ruby?</strong> The <code>map</code> function has many naming conventions in different languages. <a href="http://en.wikipedia.org/wiki/Map_(higher-order_function)" rel="noreferrer">Wikipedia provides an overview</a>:</p>
+
+<blockquote>
+  <p>The map function originated in functional programming languages but is today supported (or may be defined) in many procedural, object oriented, and multi-paradigm languages as well: In C++'s Standard Template Library, it is called <code>transform</code>, in C# (3.0)'s LINQ library, it is provided as an extension method called <code>Select</code>. Map is also a frequently used operation in high level languages such as Perl, Python and Ruby; the operation is called <code>map</code> in all three of these languages. <em>A <code>collect</code> alias for map is also provided in Ruby (from Smalltalk)</em> [emphasis mine]. Common Lisp provides a family of map-like functions; the one corresponding to the behavior described here is called <code>mapcar</code> (-car indicating access using the CAR operation). </p>
+</blockquote>
+
+<p>Ruby provides an alias for programmers from the Smalltalk world to feel more at home.</p>
+
+<hr>
+
+<p><strong>Why is there a different implementation for arrays and enums?</strong> An enum is a generalized iteration structure, which means that there is no way in which Ruby can predict what the next element can be (you can define infinite enums, see <a href="http://apidock.com/ruby/Prime" rel="noreferrer">Prime</a> for an example). Therefore it must call a function to get each successive element (typically this will be the <code>each</code> method). </p>
+
+<p>Arrays are the most common collection so it is reasonable to optimize their performance. Since Ruby knows a lot about how arrays work it doesn't have to call <code>each</code> but can only use simple <a href="http://www.eskimo.com/~scs/cclass/notes/sx10b.html" rel="noreferrer">pointer manipulation</a> which is significantly faster.</p>
+
+<p>Similar optimizations exist for a number of Array methods like <code>zip</code> or <code>count</code>.</p>
+<h4> Comment 27017558 SasQ: </h4>@Mark Reed but then, programmers not coming from SmallTalk would be confuset by having two different functions wchich turn out to be just aliases. It causes questions like the OP one above.<br><h4> Comment 27040596 Mark Reed: </h4>@SasQ I don&#39;t disagree - I think it would be better overall if there were only one name.  But there are plenty of other aliases in Ruby, and one feature of the aliasing is that there&#39;s a nice naming parallel among the operations <i>collect</i>, <i>detect</i>, <i>inject</i>, <i>reject</i>, and <i>select</i> (otherwise known as <i>map</i>, <i>find</i>, <i>reduce</i>, <i>reject</i> (no alias), and <i>find_all</i>).<br><h4> Comment 67209589 Jochem Schulenklopper: </h4>Indeed. Apparently, Ruby is using aliases / synonyms at more occasions. For example, the number of elements in an array can be retrieved with <code>count</code>, <code>length</code>, or <code>size</code>. Different words for the same attribute of an array, but by this, Ruby enables you to pick the most appropriate word for your code: do you want the <i>number</i> of items you&#39;re collecting, the <i>length</i> of an array, or the current <i>size</i> of the structure. Essentially, they&#39;re all the same, but picking the right word might make your code easier to read, which is a nice property of the language.<br>------------------------------------------------------------------ <br><h3> Answer 5254757 OscarRyz: </h3><p><strike>I've been told</strike> they are the same. </p>
+
+<p>Actually they are documented in the same place under ruby-doc.org:</p>
+
+<p><a href="http://www.ruby-doc.org/core/classes/Array.html#M000249" rel="noreferrer">http://www.ruby-doc.org/core/classes/Array.html#M000249</a></p>
+
+<blockquote>
+  <ul>
+  <li>ary.collect {|item| block } → new_ary</li>
+  <li>ary.map {|item| block } → new_ary</li>
+  <li>ary.collect → an_enumerator</li>
+  <li>ary.map → an_enumerator</li>
+  </ul>
+  
+  <p>Invokes block once for each element of self. 
+  Creates a new array containing the values returned by the block. 
+  See also Enumerable#collect.<br>
+  If no block is given, an enumerator is returned instead.</p>
+
+<pre><code>a = [ "a", "b", "c", "d" ]
+a.collect {|x| x + "!" }   #=&gt; ["a!", "b!", "c!", "d!"]
+a                          #=&gt; ["a", "b", "c", "d"]
+</code></pre>
+</blockquote>
+<h4> Comment 35611768 Andre Helberg: </h4>Just to be thorough: <a href="http://www.ruby-doc.org/core/classes/Enumerable.html#method-i-map" rel="nofollow noreferrer">http://www.ruby-doc.org/core/classes/Enumerable.html#method-&zwnj;&#8203;i-map</a><br>------------------------------------------------------------------ <br><h3> Answer 52598143 BrunoF: </h3><p>The <code>collect</code> and <code>collect!</code> methods are aliases to <code>map</code> and <code>map!</code>, so they can be used interchangeably. Here is an easy way to confirm that:</p>
+
+<pre><code>Array.instance_method(:map) == Array.instance_method(:collect)
+ =&gt; true
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 34552779 ktec: </h3><p>I did a benchmark test to try and answer this question, then found this post so here are my findings (which differ slightly from the other answers)</p>
+
+<p>Here is the benchmark code:</p>
+
+<pre><code>require 'benchmark'
+
+h = { abc: 'hello', 'another_key' =&gt; 123, 4567 =&gt; 'third' }
+a = 1..10
+many = 500_000
+
+Benchmark.bm do |b|
+  GC.start
+
+  b.report("hash keys collect") do
+    many.times do
+      h.keys.collect(&amp;:to_s)
+    end
+  end
+
+  GC.start
+
+  b.report("hash keys map") do
+    many.times do
+      h.keys.map(&amp;:to_s)
+    end
+  end
+
+  GC.start
+
+  b.report("array collect") do
+    many.times do
+      a.collect(&amp;:to_s)
+    end
+  end
+
+  GC.start
+
+  b.report("array map") do
+    many.times do
+      a.map(&amp;:to_s)
+    end
+  end
+end
+</code></pre>
+
+<p>And the results I got were:</p>
+
+<pre><code>                   user     system      total        real
+hash keys collect  0.540000   0.000000   0.540000 (  0.570994)
+hash keys map      0.500000   0.010000   0.510000 (  0.517126)
+array collect      1.670000   0.020000   1.690000 (  1.731233)
+array map          1.680000   0.020000   1.700000 (  1.744398) 
+</code></pre>
+
+<p>Perhaps an alias isn't free?</p>
+<h4> Comment 97835014 murb: </h4>I&#39;m not sure whether these differences are significant. On a rerun I get different results in speed (even while your hash collect seems slower, your array collect seems faster)<br>------------------------------------------------------------------ <br><h3> Answer 28756486 jeton: </h3><p>Ruby aliases the method Array#map to Array#collect; they can be used interchangeably. (Ruby Monk)</p>
+
+<p>In other words, same source code :</p>
+
+<pre><code>               static VALUE
+rb_ary_collect(VALUE ary)
+{
+long i;
+VALUE collect;
+
+RETURN_SIZED_ENUMERATOR(ary, 0, 0, ary_enum_length);
+collect = rb_ary_new2(RARRAY_LEN(ary));
+for (i = 0; i &lt; RARRAY_LEN(ary); i++) {
+    rb_ary_push(collect, rb_yield(RARRAY_AREF(ary, i)));
+}
+return collect;
+}
+</code></pre>
+
+<p><a href="http://ruby-doc.org/core-2.2.0/Array.html#method-i-map">http://ruby-doc.org/core-2.2.0/Array.html#method-i-map</a></p>
+<h4> Comment 48015090 Chris Bloom: </h4>I wish the documentation stated explicitly that they are aliases. At the moment they simply reference each other, and both have slightly different descriptions.<br>------------------------------------------------------------------ <br><h3> Answer 64582637 Junaid Abbasi: </h3><p><code>#collect</code> is actually an alias for <code>#map</code>. That means the two methods can be used interchangeably, and effect the same behavior.</p>

@@ -1,0 +1,59 @@
+ <h2> Title: How to replace a string in an existing file in Perl </h2> <h3> user831579, question_id: 6994947 </h3>Score: 91, Tags: {regex,perl} <br><p>I want to replace the word &quot;blue&quot; with &quot;red&quot; in all text files named as 1_classification.dat, 2_classification.dat and so on. I want to edit the same file so I tried the following code, but it does not work. Where am I going wrong?</p>
+<pre><code>@files = glob(&quot;*_classification.dat&quot;);
+foreach my $file (@files)
+{
+    open(IN,$file) or die $!;
+    &lt;IN&gt;;
+    while(&lt;IN&gt;)
+    {
+        $_ = '~s/blue/red/g';
+        print IN $file;
+    }
+    close(IN)
+}
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 6995010 Zaid: </h3><p>Use a one-liner:</p>
+<pre><code>$ perl -pi.bak -e 's/blue/red/g' *_classification.dat
+</code></pre>
+<hr />
+<p><strong>Explanation</strong></p>
+<ul>
+<li><code>-p</code> processes, then prints <code>&lt;&gt;</code> line by line</li>
+<li><code>-i</code> activates in-place editing. Files are backed up using the <code>.bak</code> extension</li>
+<li>The regex substitution acts on the implicit variable, which are the contents of the file, line-by-line</li>
+</ul>
+<h4> Comment 8350016 TLP: </h4>Using the <code>*</code> globbing in arguments does not seem to work in windows.<br><h4> Comment 60867605 Tan Rezaei: </h4>I notied that on windows I had to used double quotes around the regex<br><h4> Comment 8348824 bart: </h4>Yeah, or no quotes at all, if the code doesn&#39;t contain spaces.<br><h4> Comment 104173463 Zaid: </h4><code>glob</code> hack to support wildcard command line arguments (<code>*.dat</code>) for Windows users: <code>BEGIN { @ARGV = map +glob, @ARGV }</code><br><h4> Comment 105550696 devdoe: </h4>What if search and replacement strings are in variables? <code>perl -pi -e &#39;s&#47;$oldKey&#47;$trimmedNewKey&#47;g&#39; AppConstants.txt</code>, did not work for me<br><h4> Comment 108887578 Royi: </h4>@nr5, Look at my answer below. I had a case it didn&#39;t work for me either and the issue was the Regular Expression processing,<br><h4> Comment 115253597 geekley: </h4>How do I do substitution atomically (per-file, not per-line) without any backup files? Should i use -i or not? I don&#39;t understand what &quot;in-place editing&quot; means. I want to do substitution in files that I&#39;m watching for changes, so it needs to be atomic.<br><h4> Comment 128060587 drevicko: </h4>@nr5 The problem is that bash variables don&#39;t expand within single quoted strings. Use double quotes.<br>------------------------------------------------------------------ <br><h3> Answer 47664214 cmbryan: </h3><p>None of the existing answers here have provided a complete example of how to do this from within a script (not a one-liner). Here is what I did:</p>
+<pre><code>rename($file, $file . '.bak');
+open(IN, '&lt;' . $file . '.bak') or die $!;
+open(OUT, '&gt;' . $file) or die $!;
+while(&lt;IN&gt;)
+{
+    $_ =~ s/blue/red/g;
+    print OUT $_;
+}
+close(IN);
+close(OUT);
+</code></pre>
+<h4> Comment 99033308 iDoc: </h4>ugly misuse of $_<br>------------------------------------------------------------------ <br><h3> Answer 6995074 bart: </h3><blockquote>
+  <p><code>$_='~s/blue/red/g';</code></p>
+</blockquote>
+
+<p>Uh, what??</p>
+
+<p>Just </p>
+
+<pre><code>s/blue/red/g;
+</code></pre>
+
+<p>or, if you insist on using a variable (which is not necessary when using $_, but I just want to show the right syntax):</p>
+
+<pre><code>$_ =~ s/blue/red/g;
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 61556882 Royi: </h3><p>It can be done using a single line:</p>
+
+<pre class="lang-perl prettyprint-override"><code>perl -pi.back -e 's/oldString/newString/g;' inputFileName
+</code></pre>
+
+<p>Pay attention that <code>oldString</code> is processed as a <a href="https://en.wikipedia.org/wiki/Regular_expression" rel="nofollow noreferrer">Regular Expression</a>.<br>
+In case the string contains any of <code>{}[]()^$.|*+?</code> (<a href="https://en.wikipedia.org/wiki/Regular_expression#Syntax" rel="nofollow noreferrer">The special characters for Regular Expression syntax</a>) make sure to escape them unless you want it to be processed as a regular expression.<br>
+Escaping it is done by <code>\</code>, so <code>\[</code>.</p>

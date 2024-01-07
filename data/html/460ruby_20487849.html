@@ -1,0 +1,74 @@
+ <h2> Title: How to downgrade or install an older version of Cocoapods </h2> <h3> a fair player, question_id: 20487849 </h3>Score: 460, Tags: {ios,ruby,rubygems,cocoapods} <br><p>How can I downgrade Cocoapods to an older version, or how can I install an older version of Cocoapods?</p>
+------------------------------------------------------------------ <br><h3> Answer 20489489 NSMutableString: </h3><p>to remove your current version you could just run:</p>
+
+<pre><code>sudo gem uninstall cocoapods
+</code></pre>
+
+<p>you can install a specific version of cocoa pods via the following command:</p>
+
+<pre><code>sudo gem install cocoapods -v 0.25.0
+</code></pre>
+
+<p>You can use older installed versions with following command:</p>
+
+<pre><code>pod _0.25.0_ setup
+</code></pre>
+<h4> Comment 48071919 SwiftArchitect: </h4>To see which version you currently have, run <code>sudo gem list cocoapods</code><br><h4> Comment 51020027 Erik van der Neut: </h4>This is brilliant! I had upgraded to 0.38, and with that version I was getting errors. All I had to do to revert to 0.37 was run your comment <code>sudo gem uninstall cocoapods</code> and then pick 0.38 from the automatically presented list. Within seconds I was back on 0.37, and my pod install worked again! Thanks so much!<br><h4> Comment 53568075 ingh.am: </h4>Update... if you call <code>gem uninstall cocoapods</code> it will now ask you which version you want to uninstall. Much quicker! :o)<br><h4> Comment 52382195 AkademiksQc: </h4>Great thx! Just one comment, if you are using rvm, omit the sudo since its going to uninstall/install in the usr/bin instead of your rvm installation directory<br><h4> Comment 62301268 fullofsquirrels: </h4>Cocoapods 1.0.0 Update:  note that if you have 1.0.0 installed, attempting to reinstall an older version on top will leave 1.0.0 as the default version, so you have to <code>sudo gem uninstall cocoapods</code> first, then select 1.0.0 as the version to remove.  Not sure if this has always been the behavior, but <code>sudo gem install cocoapods -v 0.39.0</code> alone didn&#39;t do the trick for me once I had 1.0.0.<br><h4> Comment 87057470 allenlinli: </h4>If you see the error message &quot;You don&#39;t have write permissions for the /usr/bin directory.&quot; on macOS High Sierra, use: <code>sudo gem install cocoapods -v 1.3.1 -n &#47;usr&#47;local&#47;bin</code>  referenced from <a href="https://stackoverflow.com/questions/2893889/how-do-i-fix-the-you-dont-have-write-permissions-into-the-usr-bin-directory?utm_medium=organic&amp;utm_source=google_rich_qa&amp;utm_campaign=google_rich_qa" title="how do i fix the you dont have write permissions into the usr bin directory">stackoverflow.com/questions/2893889/&hellip;</a><br><h4> Comment 101465953 nomann: </h4>You can also remove a specific version of cocoapods like: <code>sudo gem uninstall cocoapods -v 1.7.5 </code>.  This is specially useful if you want to revert to an older version as removing the current/latest version reverts it back to last installed version. If there is no other version installed you can installed the one you want like: <code>sudo gem install cocoapods -v 1.6.0</code><br>------------------------------------------------------------------ <br><h3> Answer 31772875 Augard: </h3><p>Actually, you don't need to downgrade – if you need to use older version in some projects, just specify the version that you need to use after <code>pod</code> command.</p>
+
+<pre><code>pod _0.37.2_ setup
+</code></pre>
+<h4> Comment 92730410 Mauricio: </h4>This doesn&#39;t work for me, neither <code>pod _0.39.0_ install</code>. If I run that and then run <code>pod --version</code> it still shows the latest version.<br><h4> Comment 55693263 Jeff Ames: </h4>I think this is a much better solution. There are unfortunate situations where you need different versions of cocoa pods for different projects and it&#39;s convenient to not have to uninstall and reinstall cocoa pods each time<br><h4> Comment 97994593 Alberto M: </h4>you have to first install it with <code>sudo gem install cocoapods -v 0.39.0</code> , it will work after that<br><h4> Comment 102566812 Anthony Oliveri: </h4>I can confirm that this doesn&#39;t work. Even with the required version installed, Cocoapods ignores the version specified and uses the latest installed version.<br><h4> Comment 102567503 Anthony Oliveri: </h4>Just got it to work. I completely uninstalled all traces of cocoapods (using <code>gem list --local</code> as a guide), then installed cocoapods with <code>sudo gem install cocoapods -n &#47;usr&#47;local&#47;bin</code>. Now, doing <code>pod _1.5.3_ install</code> uses 1.5.3 instead of the latest 1.8.0, even with both installed.<br><h4> Comment 52654582 Mari&#225;n Čern&#253;: </h4>Thanks, it kind of worked, but I had some ruby cocoapods-rome warnings so I ended up uninstalling cocoapods completely and installing only the older version.<br>------------------------------------------------------------------ <br><h3> Answer 57843280 mfaani: </h3><p>Several notes:</p>
+<p>Make sure you first get a list of all installed versions. I actually had the version I wanted to downgrade to already installed, but ended up uninstalling that as well. To see the list of all your versions do:</p>
+<pre><code>sudo gem list cocoapods
+</code></pre>
+<p>Then when you want to delete a version, specify that version.</p>
+<pre><code>sudo gem uninstall cocoapods -v 1.6.2
+</code></pre>
+<p>You could remove the version specifier <code>-v 1.6.2</code> and that would delete all versions:</p>
+<p>You may try all this and still see that the Cocoapods you expected is still installed. If that's the case then it might be because Cocoaposa is stored in a <strong>different directory</strong>.</p>
+<pre><code>sudo gem uninstall -n /usr/local/bin cocoapods -v 1.6.2
+</code></pre>
+<p>Then you will have to also install it in a different directory, otherwise you may get an error saying <strong>You don't have write permissions for the /usr/bin directory</strong></p>
+<pre><code>sudo gem install -n /usr/local/bin cocoapods -v 1.6.1
+</code></pre>
+<p>To check which version is your default do:</p>
+<pre><code>pod --version
+</code></pre>
+<p>For more on the directory problem see <a href="https://stackoverflow.com/q/49213136/5175709">here</a></p>
+<h4> Comment 110867696 Benjohn: </h4>Great extra detail about the alternative install folders – I needed that, thank you.<br>------------------------------------------------------------------ <br><h3> Answer 35700483 Ori: </h3><p>If you need to install an older version (for example 0.25):</p>
+
+<pre><code>pod _0.25.0_ install
+</code></pre>
+<h4> Comment 97067415 AnthoPak: </h4>In my case using <code>pod _1.5.3_ install</code> has the behavior of the new 1.7.x versions, so I&#39;m really questioning about the reliability of this syntax…<br><h4> Comment 106799557 CodeReaper: </h4>This DOES work. I was able to use 1.7.5 while my latest version was 1.8.4.<br><h4> Comment 92730369 Mauricio: </h4>This doesn&#39;t work for me. If I run this and the run <code>pod --version</code> it still shows the latest version.<br><h4> Comment 92761057 Ori: </h4><code>pod --version</code> will always show the newest version. Use the example above to install an older version (in the example above the older version is 0.25.0)<br>------------------------------------------------------------------ <br><h3> Answer 37365145 neoneye: </h3><pre><code>PROMPT&gt; gem uninstall cocoapods
+
+Select gem to uninstall:
+ 1. cocoapods-0.32.1
+ 2. cocoapods-0.33.1
+ 3. cocoapods-0.36.0.beta.2
+ 4. cocoapods-0.38.2
+ 5. cocoapods-0.39.0
+ 6. cocoapods-1.0.0
+ 7. All versions
+&gt; 6
+Successfully uninstalled cocoapods-1.0.0
+PROMPT&gt; gem install cocoapods -v 0.39.0
+Successfully installed cocoapods-0.39.0
+Parsing documentation for cocoapods-0.39.0
+Done installing documentation for cocoapods after 1 seconds
+1 gem installed
+PROMPT&gt; pod --version
+0.39.0
+PROMPT&gt;
+</code></pre>
+<h4> Comment 118715153 Glenn Posadas: </h4>This works. Fastlane detects the older version of the cocoapods. which leads to error.<br>------------------------------------------------------------------ <br><h3> Answer 70177240 Murilo Medeiros: </h3><p>In my case I had to uninstall from homebrew</p>
+<pre><code>brew uninstall cocoapods
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 30747708 Vlad: </h3><p>Note that your pod specs will remain, and are located at ~/.cocoapods/ .
+This directory may also need to be removed if you want a completely fresh install. </p>
+
+<p>They can be removed using <code>pod spec remove SPEC_NAME</code> then <code>pod setup</code></p>
+
+<p>It may help to do <code>pod spec remove master</code> then <code>pod setup</code></p>
+------------------------------------------------------------------ <br><h3> Answer 67087500 Lukas Mohs: </h3><p>In some cases, one needs to remove some hidden artefacts in the home directory so that the up- or downgrade takes effect:</p>
+<pre><code>rm -rf ~/.cocoapods
+</code></pre>

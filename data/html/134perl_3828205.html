@@ -1,0 +1,75 @@
+ <h2> Title: How do I enter a multi-line comment in Perl? </h2> <h3> vrbilgi, question_id: 3828205 </h3>Score: 134, Tags: {perl,comments,multiline,perl-data-structures} <br><blockquote>
+  <p><strong>Possible Duplicate:</strong><br>
+  <a href="https://stackoverflow.com/questions/3608957">What are the common workarounds for multi-line comments in Perl?</a>  </p>
+</blockquote>
+
+
+
+<p>How do I add a multi-line comment to Perl source code?</p>
+<h4> Comment 18921193 TheBlackCorsair: </h4>simply do       =head     ##your code to comment     =cut<br>------------------------------------------------------------------ <br><h3> Answer 3828297 Nikhil Jain: </h3><p>POD is the official way to do multi line comments in Perl. See:</p>
+<ul>
+<li><strong><a href="http://www.perlmonks.org/?node_id=560985" rel="nofollow noreferrer">Multi-line comments in perl
+code</a></strong> and</li>
+<li><strong><a href="http://www.perlmonks.org/?node_id=100344" rel="nofollow noreferrer">Better ways to make multi-line comments in Perl</a></strong> for more
+detail.</li>
+<li><a href="https://perldoc.perl.org/perlfaq7#How-can-I-comment-out-a-large-block-of-Perl-code?" rel="nofollow noreferrer">How can I comment out a large block of Perl code?</a></li>
+</ul>
+<blockquote>
+<p>The quick-and-dirty way to comment out more than one line of Perl is
+to surround those lines with Pod directives. You have to put these
+directives at the beginning of the line and somewhere where Perl
+expects a new statement (so not in the middle of statements like the #
+comments). You end the comment with <code>=cut</code>, ending the Pod section:</p>
+</blockquote>
+<pre><code>=pod
+
+my $object = NotGonnaHappen-&gt;new();
+
+ignored_sub();
+
+$wont_be_assigned = 37;
+
+=cut
+</code></pre>
+<blockquote>
+<p>The quick-and-dirty method only works well when you don't plan to
+leave the commented code in the source. If a Pod parser comes along,
+your multiline comment is going to show up in the Pod translation. A
+better way hides it from Pod parsers as well.</p>
+<p>The <code>=begin</code> directive can mark a section for a particular purpose. If
+the Pod parser doesn't want to handle it, it just ignores it. Label
+the comments with <code>comment</code>. End the comment using <code>=end</code> with the
+same label. You still need the <code>=cut</code> to go back to Perl code from the
+Pod comment:</p>
+</blockquote>
+<pre><code>=begin comment
+
+my $object = NotGonnaHappen-&gt;new();
+
+ignored_sub();
+
+$wont_be_assigned = 37;
+
+=end comment
+
+=cut
+</code></pre>
+<h4> Comment 37357802 Bharat Pahalwani: </h4>It isn&#39;t necessary to start the comment with =POD, you can use any thing to start Multi-line comment ( say =xyz etc ) But yes end must always be with =cut not even =CUT<br>------------------------------------------------------------------ <br><h3> Answer 3828292 vrbilgi: </h3><p>I found it. Perl has multi-line comments:</p>
+
+<pre><code>#!/usr/bin/perl
+
+use strict;
+
+use warnings;
+
+=for comment
+
+Example of multiline comment.
+
+Example of multiline comment.
+
+=cut
+
+print "Multi Line Comment Example \n";
+</code></pre>
+<h4> Comment 17453890 Andrew_1510: </h4>Between <code>=for comment</code> and <code>=cut</code>, from the second paragraph, it will be shown in <i>perldoc</i>.  So only the first paragraph would be fully commented from both codes and <i>perldoc</i>.  If this should be avoided, use <code>=begin comment</code> ...multi-lines/paragraph comments... <code>=end comment (*new-line*) =cut</code>.<br>

@@ -1,0 +1,637 @@
+ <h2> Title: How do I split the definition of a long string over multiple lines? </h2> <h3> Pablo Mescher, question_id: 10660435 </h3>Score: 1963, Tags: {python,string,multiline,multilinestring} <br><p>I have a very long query. I would like to split it in several lines in Python. A way to do it in JavaScript would be using several sentences and joining them with a <code>+</code> operator (I know, maybe it's not the most efficient way to do it, but I'm not really concerned about performance in this stage, just code readability). Example:</p>
+<pre class="lang-js prettyprint-override"><code>var long_string = 'some text not important. just garbage to' +
+                      'illustrate my example';
+</code></pre>
+<p>I tried doing something similar in Python, but it didn't work, so I used <code>\</code> to split the long string. However, I'm not sure if this is the only/best/pythonicest way of doing it. It looks awkward.
+Actual code:</p>
+<pre class="lang-py prettyprint-override"><code>query = 'SELECT action.descr as &quot;action&quot;, '\
+    'role.id as role_id,'\
+    'role.descr as role'\
+    'FROM '\
+    'public.role_action_def,'\
+    'public.role,'\
+    'public.record_def, '\
+    'public.action'\
+    'WHERE role.id = role_action_def.role_id AND'\
+    'record_def.id = role_action_def.def_id AND'\
+    'action.id = role_action_def.action_id AND'\
+    'role_action_def.account_id = ' + account_id + ' AND'\
+    'record_def.account_id=' + account_id + ' AND'\
+    'def_id=' + def_id
+</code></pre>
+<h4> Comment 13826994 John Gaines Jr.: </h4>Since your example looks like a SQL block just waiting for an injection attack, another suggestion is to look into a higher level SQL library like SQLAlchemy or something to steer clear of hacking together raw SQL like this.  (Perhaps off-topic, but you did ask for &quot;Any suggestions&quot;. ;)<br><h4> Comment 44804398 Bob Stein: </h4>This is &quot;Pythonic way to create <b>multi-line code</b> for a long string&quot;  To create a string <b>containing newlines</b> see <a href="http://stackoverflow.com/a/2504454/673991">textwrap.dedent</a>.<br><h4> Comment 105924758 Shay: </h4>I wrote a small package for this. Example here: <a href="https://stackoverflow.com/a/56940938/1842491">stackoverflow.com/a/56940938/1842491</a><br><h4> Comment 135586671 Steve Hibbert: </h4>@JohnGainesJr. Would the SQL chunk above be resistant to SQL injection attacks if the account_id and def_id were sanitised?  I am using Pydantic via FastAPI to ensure user input passes a regex pattern, but if this is not safe it would be good to know.  I am not anti-SQLAlchemy, just exploring the space.<br><h4> Comment 125954052 Stevoisiak: </h4>Related: <a href="https://stackoverflow.com/a/1874679/3357935">How to write very long string that conforms with PEP8 and prevent E501</a><br>------------------------------------------------------------------ <br><h3> Answer 10660443 Levon: </h3><p>Are you talking about multi-line strings? Easy, use triple quotes to start and end them.</p>
+
+<pre><code>s = """ this is a very
+        long string if I had the
+        energy to type more and more ..."""
+</code></pre>
+
+<p>You can use single quotes too (3 of them of course at start and end) and treat the resulting string <code>s</code> just like any other string.</p>
+
+<p><strong>NOTE</strong>: Just as with any string, anything between the starting and ending quotes becomes part of the string, so this example has a leading blank (as pointed out by @root45). This string will also contain both blanks and newlines.</p>
+
+<p>I.e.,:</p>
+
+<pre><code>' this is a very\n        long string if I had the\n        energy to type more and more ...'
+</code></pre>
+
+<p>Finally, one can also construct long lines in Python like this:</p>
+
+<pre><code> s = ("this is a very"
+      "long string too"
+      "for sure ..."
+     )
+</code></pre>
+
+<p>which will <strong>not</strong> include any extra blanks or newlines (this is a deliberate example showing what the effect of skipping blanks will result in):</p>
+
+<pre><code>'this is a verylong string toofor sure ...'
+</code></pre>
+
+<p>No commas required, simply place the strings to be joined together into a pair of parenthesis and be sure to account for any needed blanks and newlines.</p>
+<h4> Comment 81985158 Corey Goldberg: </h4>you can use <code>textwrap.dedent</code> to remove unwanted leading whitespace. <a href="https://docs.python.org/3/library/textwrap.html#textwrap.dedent" rel="nofollow noreferrer">docs.python.org/3/library/textwrap.html#textwrap.dedent</a><br><h4> Comment 42760036 Joshua Taylor: </h4>@LucasMalor The adjacent strings are a compile-time concatenation.  Doesn&#39;t using the <code>+</code> operator make the concatenation happen at runtime?<br><h4> Comment 65265483 neverendingqs: </h4>For reference, here are the official docs to this phenomenon: <a href="https://docs.python.org/2/reference/lexical_analysis.html#string-literal-concatenation" rel="nofollow noreferrer">docs.python.org/2/reference/&hellip;</a> (python 2) and <a href="https://docs.python.org/3/reference/lexical_analysis.html#string-literal-concatenation" rel="nofollow noreferrer">docs.python.org/3/reference/&hellip;</a> (python 3)<br><h4> Comment 39442929 Marco Sulla: </h4>I prefer to use explicitly the &quot;+&quot; operator for the second method. Not much an hassle and improves readability.<br><h4> Comment 67152413 Scott Prive: </h4>Your example is good, but I wish it had included demonstrating how to safely and securely embed variable data into the query.   Both the OP and @jessee example code show how NOT to do it correctly (they&#39;re invitations to SQL attacks).  See also: <a href="https://dev.mysql.com/doc/connector-python/en/connector-python-api-mysqlcursor-execute.html" rel="nofollow noreferrer">dev.mysql.com/doc/connector-python/en/&hellip;</a><br><h4> Comment 66233617 user5306470: </h4>How about + stuff? To mix variables and strings. How do you indent that?<br><h4> Comment 115490414 Blisterpeanuts: </h4>Excellent answer. This solved my problem as well -- I have double quotes inside a multi-line string and they are automatically handled correctly.<br><h4> Comment 116331449 Lou: </h4>Don&#39;t you need commas or + in the example with parentheses?<br><h4> Comment 118982457 echefede: </h4>The + operator will give you problems when using string methods.<br><h4> Comment 120559997 ss7: </h4>Note: The second method only works when the string is enclosed  in <code>( )</code>.  Otherwise  a backslash is needed at the end of each line.<br><h4> Comment 77244845 Ayush Sharma: </h4>What about string interpolation? If I want to use variables within this string, how would that work?<br><h4> Comment 82024085 Chris L: </h4>@JoshuaTaylor Whether you use implicit (adjacent) concatenation or use explicit concatenation with the <code>+</code> operator, either results in a compile-time concatenated string literal constant. It doesn&#39;t make any difference.  In fact, you also get a compile-time string literal when you use the <code>*</code> operator with a string literal and an integer literal.<br><h4> Comment 90865409 aaa90210: </h4>He didn&#39;t ask for newlines in the string, bad answer.<br>------------------------------------------------------------------ <br><h3> Answer 24331604 amphibient: </h3><p>Breaking lines by <code>\</code> works for me.  Here is an example:</p>
+
+<pre><code>longStr = "This is a very long string " \
+        "that I wrote to help somebody " \
+        "who had a question about " \
+        "writing long strings in Python"
+</code></pre>
+<h4> Comment 82784124 Alfe: </h4>I strongly advise to put the spaces at the beginning of the following lines instead of at the ending of the followed lines.  This way an accidentally missing one is way more obvious (and thus is less likely to happen).<br><h4> Comment 56894795 Khanh Hua: </h4>I would prefer either the triple quote notation or wrapping inside () to the \  character<br><h4> Comment 111488180 Arthur Tarasov: </h4>@Alfe No need to worry about missing \&#39;s anymore. VScode will have a heart attack if I miss one<br><h4> Comment 131424396 Stevoisiak: </h4>Both <a href="https://peps.python.org/pep-0008/#maximum-line-length" rel="nofollow noreferrer">PEP 8</a> and <a href="https://black.readthedocs.io/en/stable/contributing/reference/reference_functions.html#black.linegen.normalize_prefix" rel="nofollow noreferrer">Black</a> discourage using backslashes for line continuation.<br><h4> Comment 104626802 frmbelz: </h4>Also works with variables at the end of lines <code>longStr = &quot;account: &quot; + account_id + \ ... </code><br><h4> Comment 109673355 alper: </h4>I am getting following error: <code>the backslash is redundant between brackets</code> when I wrote in inside <code>print()</code><br><h4> Comment 122896937 Chris Collett: </h4>Avoid using backslashes to break up long lines of code. It reduces clarity, makes refactoring more painful, and avoids the root of the problem (you don&#39;t know of a better way making your code fit within 79 characters).<br><h4> Comment 117184942 Peter Mortensen: </h4>VScode = <a href="https://en.wikipedia.org/wiki/Visual_Studio_Code" rel="nofollow noreferrer">Visual Studio Code</a><br><h4> Comment 111518923 Alfe: </h4>@ArthurTarasov I didn&#39;t worry about the backslashes.  My comment what about the spaces <i>within</i> the string.  In the answer they are at the end of the first, second, and third line, every time at a different column, hence a missing one can easily be overlooked.  I recommend to put them instead at the beginning of the second, third, and fourth line, every time at column 1 of the string, hence neatly above each other so that a missing one is quite obvious and thus unlikely to happen.<br>------------------------------------------------------------------ <br><h3> Answer 10660477 Jesse: </h3><p>If you don't want a multiline string, but just have a long single line string, you can use parentheses. Just make sure you don't include commas between the string segments (then it will be a tuple).</p>
+<pre><code>query = ('SELECT   action.descr as &quot;action&quot;, '
+         'role.id as role_id,'
+         'role.descr as role'
+         ' FROM '
+         'public.role_action_def,'
+         'public.role,'
+         'public.record_def, '
+         'public.action'
+         ' WHERE role.id = role_action_def.role_id AND'
+         ' record_def.id = role_action_def.def_id AND'
+         ' action.id = role_action_def.action_id AND'
+         ' role_action_def.account_id = '+account_id+' AND'
+         ' record_def.account_id='+account_id+' AND'
+         ' def_id='+def_id)
+</code></pre>
+<p>In a SQL statement like what you're constructing, multiline strings would also be fine. But if the extra white space a multiline string would contain would be a problem, then this would be a good way to achieve what you want.</p>
+<p>As noted in the comments, <strong>concatenating SQL queries in this way is a SQL injection security risk waiting to happen</strong>, so use your database's parameterized queries feature to prevent this. However, I'm leaving the answer as-is otherwise as it directly answers the question asked.</p>
+<h4> Comment 67152438 Scott Prive: </h4>This example is an open door to SQL injection attacks. Please, no one use this on any public-facing application. See the MySQL docs for how to use &#39;placeholders&#39;: <a href="https://dev.mysql.com/doc/connector-python/en/connector-python-api-mysqlcursor-execute.html" rel="nofollow noreferrer">dev.mysql.com/doc/connector-python/en/&hellip;</a><br><h4> Comment 50563246 yoyo: </h4>Note that each line must end with a string constant, so <code>&#39; foo &#39;+variable</code> won&#39;t work, but <code>&#39; foo &#39;+variable+&#39;&#39;</code> will.<br><h4> Comment 37413606 kon psych: </h4>Another way to format this string would be to add <code>.format(...)</code> after the closing parenthesis. <code>%</code> formating notation must work too but I haven&#39;t tried it<br><h4> Comment 37413590 kon psych: </h4>@200OK you mean after <code>&#39;</code>?<br><h4> Comment 13827255 Ashwini Chaudhary: </h4>@Pablo you can even add comments after the <code>,</code><br><h4> Comment 103661887 cezar: </h4>This best answers the title of the question - it is indeed the most Pythonic way to create a multi-line string. There is still an issue with SQL injection, but that wasn&#39;t a core part of the question.<br><h4> Comment 91627527 jpmc26: </h4>@Crossfit_and_Beer They&#39;re called query parameters, and the queries that have them are called paramterized queries. And every major relational DBMS supports them.<br><h4> Comment 136660312 adamkonrad: </h4>It&#39;s good you pointed out the security risks.<br>------------------------------------------------------------------ <br><h3> Answer 24300699 darkfeline: </h3><p>I find that when building long strings, you are usually doing something like building an SQL query, in which case this is best:</p>
+<pre><code>query = ' '.join((  # Note double parentheses. join() takes an iterable
+    &quot;SELECT foo&quot;,
+    &quot;FROM bar&quot;,
+    &quot;WHERE baz&quot;,
+))
+</code></pre>
+<p>What <a href="https://stackoverflow.com/questions/10660435/pythonic-way-to-create-a-long-multi-line-string/10660443#10660443">Levon suggested</a> is good, but it might be vulnerable to mistakes:</p>
+<pre><code>query = (
+    &quot;SELECT foo&quot;
+    &quot;FROM bar&quot;
+    &quot;WHERE baz&quot;
+)
+
+query == &quot;SELECT fooFROM barWHERE baz&quot;  # Probably not what you want
+</code></pre>
+<h4> Comment 44840238 Bob Stein: </h4>+1 Relieves code-reviewer from having to assiduously check the right end of every line for <b>inadequate whitespace</b>.  The OP committed this mistake several times, as noted by @KarolyHorvath.<br><h4> Comment 67459130 Charles: </h4>@BobStein-VisiBone Code reviews should not be about syntax errors or small bugs like this, they should be about substance. If somebody is putting code up for review that has syntax errors (and thus won&#39;t run either at all or in certain situations) then something is seriously wrong. It&#39;s not hard to run lint before you commit. If the person hasn&#39;t noticed their program doesn&#39;t run correctly because they made such an obvious mistake, they shouldn&#39;t be committing.<br><h4> Comment 66544178 Umbrella: </h4>When reviewing multiline strings coded in similar fashion, I require adequate whitespace on the <i>left</i> end of every line for easy confirmation.<br><h4> Comment 67459378 Bob Stein: </h4>Agreed @CharlesAddis, code reviews should come after automated methods, e.g. lint, syntax highlighting, etc. However some white-space-missing bugs may not be caught that way. Avail yourself of all reasonable advantages in guarding against bugs, I suggest.<br><h4> Comment 125918350 Ideogram: </h4>Added benefit is that you can quickly out-comment lines.<br>------------------------------------------------------------------ <br><h3> Answer 14155520 Eero Aaltonen: </h3><p>I found myself happy with this one:</p>
+
+<pre><code>string = """This is a
+very long string,
+containing commas,
+that I split up
+for readability""".replace('\n',' ')
+</code></pre>
+<h4> Comment 73900361 xjcl: </h4>Disagree. What if the first line (&quot;string = ...&quot;) is heavily indented? One would have to de-dent the following lines to zero indentation, which looks ugly in the middle of an otherwise indented block.<br><h4> Comment 113876923 Keto: </h4>If you care about code-folding, this would break it in most editors.<br><h4> Comment 73987779 Eero Aaltonen: </h4>Well, the majority of my lengthy strings occur at the module level, where this fits nicely. In your case though this would obviously not be the best solution.<br><h4> Comment 75620770 Eduardo Lucio: </h4>I like this approach because it privileges reading. In cases where we have long strings there is no way... Depending on the level of indentation you are in and still limited to 80 characters per line... Well... No need to say anything else. In my view the python style guides are still very vague. Thanks!<br><h4> Comment 109673461 alper: </h4>This would be so ugly if it is used under a module, I have to as also <code>.replace(&#39;\t&#39;,&#39;&#39;)</code><br>------------------------------------------------------------------ <br><h3> Answer 50746619 Christopher Bruns: </h3><p>This approach uses:</p>
+<ul>
+<li>almost no internal punctuation by using a triple quoted string</li>
+<li>strips away local indentation using the <code>inspect</code> module</li>
+<li>uses Python 3.6 formatted string interpolation ('f') for the <code>account_id</code> and <code>def_id</code> variables.</li>
+</ul>
+<p>This way looks the most Pythonic to me.</p>
+<pre><code>import inspect
+
+query = inspect.cleandoc(f'''
+    SELECT action.descr as &quot;action&quot;,
+    role.id as role_id,
+    role.descr as role
+    FROM
+    public.role_action_def,
+    public.role,
+    public.record_def,
+    public.action
+    WHERE role.id = role_action_def.role_id AND
+    record_def.id = role_action_def.def_id AND
+    action.id = role_action_def.action_id AND
+    role_action_def.account_id = {account_id} AND
+    record_def.account_id={account_id} AND
+    def_id={def_id}'''
+)
+</code></pre>
+<h4> Comment 95669551 ShadowRanger: </h4>Note: <a href="https://docs.python.org/3/library/inspect.html#inspect.cleandoc" rel="nofollow noreferrer"><code>inspect.cleandoc</code> is slightly nicer</a> than <code>textwrap.dedent</code>, as it doesn&#39;t require the first line to be empty with a line continuation character at the end.<br><h4> Comment 117234511 jackblk: </h4>Although it looks really nice, I think this approach will be vulnerable to SQL injection. Sadly f-string is not good with SQL queries. From other comments, it is better to use <code>cursor.execute</code> instead <a href="https://dev.mysql.com/doc/connector-python/en/connector-python-api-mysqlcursor-execute.html" rel="nofollow noreferrer">dev.mysql.com/doc/connector-python/en/&hellip;</a><br><h4> Comment 95670424 Christopher Bruns: </h4>@ShadowRanger Wow I never used cleandoc before. I updated my answer and will in future use <code>inspect.cleandoc</code> for this.<br><h4> Comment 113335217 Joseph Astrahan: </h4>This worked great for me! Gets rid of the spaces that are added from the editor during the &#39;&#39;&#39; quote process!<br>------------------------------------------------------------------ <br><h3> Answer 32980897 gjgjgj: </h3><p>You can also include variables when using &quot;&quot;&quot; notation:</p>
+<pre><code>foo = '1234'
+
+long_string = &quot;&quot;&quot;fosdl a sdlfklaskdf as
+as df ajsdfj asdfa sld
+a sdf alsdfl alsdfl &quot;&quot;&quot; +  foo + &quot;&quot;&quot; aks
+asdkfkasdk fak&quot;&quot;&quot;
+</code></pre>
+<p>A better way is, with named parameters and .format():</p>
+<pre><code>body = &quot;&quot;&quot;
+&lt;html&gt;
+&lt;head&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;p&gt;Lorem ipsum.&lt;/p&gt;
+    &lt;dl&gt;
+        &lt;dt&gt;Asdf:&lt;/dt&gt;     &lt;dd&gt;&lt;a href=&quot;{link}&quot;&gt;{name}&lt;/a&gt;&lt;/dd&gt;
+    &lt;/dl&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+&quot;&quot;&quot;.format(
+    link='http://www.asdf.com',
+    name='Asdf',
+)
+
+print(body)
+</code></pre>
+<h4> Comment 117498283 Timo: </h4>Using <a href="https://stackoverflow.com/a/50746619/1705829">f strings</a> here seems more natural and easy.<br><h4> Comment 134083288 Yzmir Ramirez: </h4>If <code>{link}</code> or <code>{name}</code> was used more than once I&#39;d prefer <code>.format()</code>; however if the variable names are long I prefer <code>.format()</code> too<br>------------------------------------------------------------------ <br><h3> Answer 43618673 Vlad Bezden: </h3><p>In Python >= 3.6 you can use <a href="https://docs.python.org/3.6/reference/lexical_analysis.html#f-strings" rel="noreferrer">Formatted string literals (f string)</a></p>
+
+<pre><code>query= f'''SELECT   action.descr as "action"
+    role.id as role_id,
+    role.descr as role
+    FROM
+    public.role_action_def,
+    public.role,
+    public.record_def,
+    public.action
+    WHERE role.id = role_action_def.role_id AND
+    record_def.id = role_action_def.def_id AND
+    action.id = role_action_def.action_id AND
+    role_action_def.account_id = {account_id} AND
+    record_def.account_id = {account_id} AND
+    def_id = {def_id}'''
+</code></pre>
+<h4> Comment 93086398 Trenton: </h4>Still vulnerable to SQL injection<br><h4> Comment 80178329 kuanb: </h4>How would an f-string work if I wanted to log the result of a multi-line string and not have the left-side tabs/spaces shown?<br>------------------------------------------------------------------ <br><h3> Answer 74448671 Stevoisiak: </h3><p>The <a href="https://peps.python.org/pep-0008/#maximum-line-length" rel="noreferrer">PEP 8 Style Guide</a> recommends using parenthesis:</p>
+<blockquote>
+<p>The preferred way of wrapping long lines is by using Python's implied line continuation inside parentheses, brackets and braces. Long lines can be broken over multiple lines by wrapping expressions in parentheses. These should be used in preference to using a backslash for line continuation.</p>
+</blockquote>
+<p>Example:</p>
+<pre><code>long_string = (
+    &quot;This is a lengthy string that takes up a lot of space. I am going to &quot;
+    &quot;keep on typing words to fill up more and more space to show how you can &quot;
+    &quot;split the string across multiple lines.&quot;
+)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 51185039 fredrik: </h3><p>I find <a href="https://docs.python.org/2/library/textwrap.html" rel="noreferrer"><code>textwrap.dedent</code></a> the best for long strings as described <a href="https://amir.rachum.com/blog/2018/06/23/python-multiline-idioms/" rel="noreferrer">here</a>:</p>
+
+<pre><code>def create_snippet():
+    code_snippet = textwrap.dedent("""\
+        int main(int argc, char* argv[]) {
+            return 0;
+        }
+    """)
+    do_something(code_snippet)
+</code></pre>
+<h4> Comment 98412581 zyy: </h4>I like the black slash that prevents auto new line, thanks so much!<br><h4> Comment 115435667 Christopher Bruns: </h4>That back slash would be unnecessary if you used <code>inspect.cleandoc</code> instead of <code>textwrap.dedent</code>.<br><h4> Comment 125513170 chepner: </h4>This is criminally undervoted.<br><h4> Comment 128712567 Brent Pappas: </h4>IMO this is the one of if not the best solution on here, thank you for revealing yet another nice part of Python&#39;s standard library<br><h4> Comment 136258482 Nolan: </h4>That&#39;s the answer I was looking for<br>------------------------------------------------------------------ <br><h3> Answer 37186365 pangpang: </h3><p>For example:</p>
+<pre><code>sql = (&quot;select field1, field2, field3, field4 &quot;
+       &quot;from table &quot;
+       &quot;where condition1={} &quot;
+       &quot;and condition2={}&quot;).format(1, 2)
+
+Output: 'select field1, field2, field3, field4 from table
+         where condition1=1 and condition2=2'
+</code></pre>
+<p>If the value of the condition should be a string, you can do it like this:</p>
+<pre><code>sql = (&quot;select field1, field2, field3, field4 &quot;
+       &quot;from table &quot;
+       &quot;where condition1='{0}' &quot;
+       &quot;and condition2='{1}'&quot;).format('2016-10-12', '2017-10-12')
+
+Output: &quot;select field1, field2, field3, field4 from table where
+         condition1='2016-10-12' and condition2='2017-10-12'&quot;
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 56013473 ddrscott: </h3><p>Others have mentioned the parentheses method already, but I'd like to add that with parentheses, inline comments are allowed.</p>
+
+<h3>Comment on each fragment:</h3>
+
+<pre class="lang-py prettyprint-override"><code>nursery_rhyme = (
+    'Mary had a little lamb,'          # Comments are great!
+    'its fleece was white as snow.'
+    'And everywhere that Mary went,'
+    'her sheep would surely go.'       # What a pesky sheep.
+)
+</code></pre>
+
+<h3>Comment not allowed after continuation:</h3>
+
+<p>When using backslash line continuations (<code>\</code> ), comments are not allowed. You'll receive a <code>SyntaxError: unexpected character after line continuation character</code> error.</p>
+
+<pre><code>nursery_rhyme = 'Mary had a little lamb,' \  # These comments
+    'its fleece was white as snow.'       \  # are invalid!
+    'And everywhere that Mary went,'      \
+    'her sheep would surely go.'
+# =&gt; SyntaxError: unexpected character after line continuation character
+</code></pre>
+
+<h3>Better comments for Regex strings:</h3>
+
+<p>Based on the example from <a href="https://docs.python.org/3/library/re.html#re.VERBOSE" rel="noreferrer">https://docs.python.org/3/library/re.html#re.VERBOSE</a>, </p>
+
+<pre><code>a = re.compile(
+    r'\d+'  # the integral part
+    r'\.'   # the decimal point
+    r'\d*'  # some fractional digits
+)
+</code></pre>
+
+<pre><code># Using VERBOSE flag, IDE usually can't syntax highight the string comment.
+a = re.compile(r"""\d +  # the integral part
+                   \.    # the decimal point
+                   \d *  # some fractional digits""", re.X)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 61103412 Rasmus Groth: </h3><p>As a general approach to long strings in Python, you can use triple quotes, <code>split</code> and <code>join</code>:</p>
+<pre class="lang-py prettyprint-override"><code>_str = ' '.join('''Lorem ipsum dolor sit amet, consectetur adipiscing
+        elit, sed do eiusmod tempor incididunt ut labore et dolore
+        magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+        ullamco laboris nisi ut aliquip ex ea commodo.'''.split())
+</code></pre>
+<p>Output:</p>
+<pre><code>'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo.'
+</code></pre>
+<p>With regard to OP's question relating to a SQL query, the answer below disregards the correctness of this approach to building SQL queries and focuses only on building long strings in a readable and aesthetic way without additional imports. It also disregards the computational load this entails.</p>
+<p>Using triple quotes, we build a long and readable string which we then break up into a list using <code>split()</code> thereby stripping the white space and then join it back together with <code>' '.join()</code>. Finally we insert the variables using the <code>format()</code> command:</p>
+<pre class="lang-py prettyprint-override"><code>account_id = 123
+def_id = 321
+
+_str = '''
+    SELECT action.descr AS &quot;action&quot;, role.id AS role_id, role.descr AS role
+    FROM public.role_action_def, public.role, public.record_def, public.action
+    WHERE role.id = role_action_def.role_id
+    AND record_def.id = role_action_def.def_id
+    AND' action.id = role_action_def.action_id
+    AND role_action_def.account_id = {}
+    AND record_def.account_id = {}
+    AND def_id = {}
+    '''
+
+query = ' '.join(_str.split()).format(account_id, account_id, def_id)
+
+</code></pre>
+<p>Produces:</p>
+<pre class="lang-sql prettyprint-override"><code>SELECT action.descr AS &quot;action&quot;, role.id AS role_id, role.descr AS role FROM public.role_action_def, public.role, public.record_def, public.action WHERE role.id = role_action_def.role_id AND record_def.id = role_action_def.def_id AND action.id = role_action_def.action_id AND role_action_def.account_id = 123 AND record_def.account_id=123 AND def_id=321
+</code></pre>
+<p>This approach is not in line with <a href="https://pep8.org/" rel="noreferrer">PEP 8</a>, but I find it useful at times.</p>
+<p>Please note that the curly brackets in the original string are used by the format() function.</p>
+------------------------------------------------------------------ <br><h3> Answer 47293614 Faheel: </h3><p>I personally find the following to be the best (simple, safe and Pythonic) way to write raw SQL queries in Python, especially when using <a href="https://docs.python.org/3/library/sqlite3.html" rel="noreferrer">Python's sqlite3 module</a>:</p>
+
+<pre><code>query = '''
+    SELECT
+        action.descr as action,
+        role.id as role_id,
+        role.descr as role
+    FROM
+        public.role_action_def,
+        public.role,
+        public.record_def,
+        public.action
+    WHERE
+        role.id = role_action_def.role_id
+        AND record_def.id = role_action_def.def_id
+        AND action.id = role_action_def.action_id
+        AND role_action_def.account_id = ?
+        AND record_def.account_id = ?
+        AND def_id = ?
+'''
+vars = (account_id, account_id, def_id)   # a tuple of query variables
+cursor.execute(query, vars)   # using Python's sqlite3 module
+</code></pre>
+
+<h3>Pros</h3>
+
+<ul>
+<li>Neat and simple code (Pythonic!)</li>
+<li><strong>Safe from SQL injection</strong></li>
+<li>Compatible with both Python 2 and Python 3 (it's Pythonic after all)</li>
+<li>No string concatenation required</li>
+<li>No need to ensure that the right-most character of each line is a space</li>
+</ul>
+
+<h3>Cons</h3>
+
+<ul>
+<li>Since variables in the query are replaced by the <code>?</code> placeholder, it may become a little difficult to keep track of which <code>?</code> is to be substituted by which Python variable when there are lots of them in the query.</li>
+</ul>
+<h4> Comment 91162685 Patrick Mevzek: </h4>@Ben if you do <code>cursor.execute(query.format(vars))</code> you do not profit from prepared statements anymore so you are vulnerable to many kind of problems, starting with the fact that if the parameters are not just numbers you need to double quote them in the SQL query.<br><h4> Comment 86183120 Ben: </h4>Note, I haven&#39;t tested this, but you can probably avoid the question mark confusion by replacing them with &quot;{0} {1} {2}&quot; in the relevant places and then changing the last line to <code>cursor.execute(query.format(vars))</code>. That should take care of your only &quot;con&quot; (I hope).<br><h4> Comment 86222304 Faheel: </h4>Yes, using <code>format</code> would be nice but I&#39;m not sure whether the query string formatted that way would be safe from SQL injection.<br><h4> Comment 86290990 Ben: </h4>Yeah, that&#39;s a fair point and it could certainly get a bit tricky. Perhaps testing it on something entirely expendable would be wise ... no doubt a Comp. Sci. undergrad will wander past soon enough.  ;)<br>------------------------------------------------------------------ <br><h3> Answer 57464608 Flow: </h3><p><strong>tl;dr: Use <code>&quot;&quot;&quot;\</code> and <code>&quot;&quot;&quot;</code> to wrap the string</strong>, as in</p>
+<pre><code>string = &quot;&quot;&quot;\
+This is a long string
+spanning multiple lines.
+&quot;&quot;&quot;
+</code></pre>
+<p>From the <a href="https://docs.python.org/3.7/tutorial/introduction.html#strings" rel="noreferrer">official Python documentation</a>:</p>
+<blockquote>
+<p>String literals can span multiple lines. One way is using
+triple-quotes: &quot;&quot;&quot;...&quot;&quot;&quot; or '''...'''. End of lines are automatically
+included in the string, but it’s possible to prevent this by adding a
+\ at the end of the line. The following example:</p>
+</blockquote>
+<pre><code>print(&quot;&quot;&quot;\
+Usage: thingy [OPTIONS]
+     -h                        Display this usage message
+     -H hostname               Hostname to connect to
+&quot;&quot;&quot;)
+</code></pre>
+<blockquote>
+<p>produces the following output (note that the initial newline is not
+included):</p>
+</blockquote>
+<pre><code>Usage: thingy [OPTIONS]
+     -h                        Display this usage message
+     -H hostname               Hostname to connect to
+</code></pre>
+<h4> Comment 128712608 Brent Pappas: </h4>I never knew you could do that with multi-line string literals, thank you :)<br>------------------------------------------------------------------ <br><h3> Answer 69536797 user41855: </h3><p>Adding to @Levon's answer....</p>
+<p><strong>1. Create a multiline string like this:</strong></p>
+<pre><code>paragraph = &quot;&quot;&quot;this is a very
+        long string if I had the
+        energy to type more and more ...&quot;&quot;&quot;
+
+print(paragraph)
+</code></pre>
+<p>Output:</p>
+<pre><code>'this is a very\n        long string if I had the\n        energy to type more and more ...'
+</code></pre>
+<p>This string will have newlines and blank spaces. So remove them.</p>
+<p><strong>2. Remove extra spaces using regex</strong></p>
+<pre><code>paragraph = re.sub('\s+', ' ', paragraph)
+print(paragraph)
+</code></pre>
+<p>Ouput:</p>
+<pre><code>'this is a very long string if I had the energy to type more and more ...'
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 50974540 Israel Barth Rubio: </h3><p>I usually use something like this:</p>
+
+<pre><code>text = '''
+    This string was typed to be a demo
+    on how could we write a multi-line
+    text in Python.
+'''
+</code></pre>
+
+<p>If you want to remove annoying blank spaces in each line, you could do as follows:</p>
+
+<pre><code>text = '\n'.join(line.lstrip() for line in text.splitlines())
+</code></pre>
+<h4> Comment 88946256 emmeowzing: </h4>Look into Python&#39;s <a href="https://github.com/python/cpython/blob/master/Lib/textwrap.py#L414" rel="nofollow noreferrer"><code>textwrap.dedent</code></a> function, which is in the standard library, it has the functionality you need.<br><h4> Comment 106441691 ShadowRanger: </h4>@bjd2385: <a href="https://docs.python.org/3/library/inspect.html#inspect.cleandoc" rel="nofollow noreferrer"><code>inspect.cleandoc</code></a> is slightly nicer (less finicky about whether or not text appears on the same line as the open quotes, doesn&#39;t require explicit line continuation characters).<br>------------------------------------------------------------------ <br><h3> Answer 56674477 Kelvin Onkundi: </h3><p>Try something like this. Like in this format it will return you a continuous line like you have successfully enquired about this property:</p>
+<pre><code>&quot;message&quot;: f'You have successfully inquired about '
+           f'{enquiring_property.title} Property owned by '
+           f'{enquiring_property.client}'
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 70597406 Rick: </h3><p>Ummm.</p>
+<p>I know it's been a long time since this question got posted.
+But I just found the style I would like to use to assign long and multiline strings to variables in my projects.
+This takes a bit of extra runtime, but still preserves the beauty of the code, even if the variable I am assigning my string to is heavily indented.</p>
+<pre class="lang-py prettyprint-override"><code>    # Suppose the following code is heavily indented
+    line3header = &quot;Third&quot;
+
+    variable = fr&quot;&quot;&quot;
+
+First line.
+Second line.
+{line3header} line.
+{{}} line.
+...
+The last line.
+
+    &quot;&quot;&quot;.strip()
+    &quot;&quot;&quot;A variable whose name is Variable.
+
+    You can even add a docstring here.
+    &quot;&quot;&quot;
+
+    variable = variable.format(&quot;Fourth&quot;)
+    print(variable)
+    variable += &quot;\n&quot;
+    print(variable, end=&quot;&quot;)
+</code></pre>
+<p>There it goes.</p>
+------------------------------------------------------------------ <br><h3> Answer 10660465 Karoly Horvath: </h3><p>Your actual code shouldn't work; you are missing white spaces at the end of &quot;lines&quot; (for example, <code>role.descr as roleFROM...</code>).</p>
+<p>There are triple quotes for multiline strings:</p>
+<pre><code>string = &quot;&quot;&quot;line
+  line2
+  line3&quot;&quot;&quot;
+</code></pre>
+<p>It will contain the line breaks and extra spaces, but for SQL that's not a problem.</p>
+------------------------------------------------------------------ <br><h3> Answer 64886293 e.d.n.a: </h3><p><strong>Combining the ideas from:</strong></p>
+<p><a href="https://stackoverflow.com/a/10660443/14658777">Levon</a> or <a href="https://stackoverflow.com/a/10660477/14658777">Jesse</a>, <a href="https://stackoverflow.com/a/47293614/14658777">Faheel</a> and <a href="https://stackoverflow.com/a/56013473/14658777">ddrscott</a></p>
+<p>with my formatting suggestion, you could write your query as:</p>
+<pre><code>query = ('SELECT'
+             ' action.descr as &quot;action&quot;'
+             ',role.id as role_id'
+             ',role.descr as role'
+         ' FROM'
+             ' public.role_action_def'
+             ',public.role'
+             ',public.record_def'
+             ',public.action'
+         ' WHERE'
+             ' role.id = role_action_def.role_id'
+             ' AND'
+             ' record_def.id = role_action_def.def_id'
+             ' AND'
+             ' action.id = role_action_def.action_id'
+             ' AND'
+             ' role_action_def.account_id = ?' # account_id
+             ' AND'
+             ' record_def.account_id = ?'      # account_id
+             ' AND'
+             ' def_id = ?'                     # def_id
+         )
+
+ vars = (account_id, account_id, def_id)     # A tuple of the query variables
+ cursor.execute(query, vars)                 # Using Python's sqlite3 module
+</code></pre>
+<p>Or like:</p>
+<pre><code>vars = []
+query = ('SELECT'
+             ' action.descr as &quot;action&quot;'
+             ',role.id as role_id'
+             ',role.descr as role'
+         ' FROM'
+             ' public.role_action_def'
+             ',public.role'
+             ',public.record_def'
+             ',public.action'
+         ' WHERE'
+             ' role.id = role_action_def.role_id'
+             ' AND'
+             ' record_def.id = role_action_def.def_id'
+             ' AND'
+             ' action.id = role_action_def.action_id'
+             ' AND'
+             ' role_action_def.account_id = '
+                 vars.append(account_id) or '?'
+             ' AND'
+             ' record_def.account_id = '
+                 vars.append(account_id) or '?'
+             ' AND'
+             ' def_id = '
+                 vars.append(def_id) or '?'
+         )
+
+ cursor.execute(query, tuple(vars))  # Using Python's sqlite3 module
+</code></pre>
+<p>Which could be interesting together with 'IN' and 'vars.extend(options) or n_options(len(options))', where:</p>
+<pre><code>def n_options(count):
+    return '(' + ','.join(count*'?') + ')'
+</code></pre>
+<p>Or with the hint from <a href="https://stackoverflow.com/a/24300699/14658777">darkfeline</a>, that you might still make mistakes with those leading spaces and separators and also with named placeholders:</p>
+<pre><code>SPACE_SEP = ' '
+COMMA_SEP = ', '
+AND_SEP   = ' AND '
+
+query = SPACE_SEP.join((
+    'SELECT',
+        COMMA_SEP.join((
+        'action.descr as &quot;action&quot;',
+        'role.id as role_id',
+        'role.descr as role',
+        )),
+    'FROM',
+        COMMA_SEP.join((
+        'public.role_action_def',
+        'public.role',
+        'public.record_def',
+        'public.action',
+        )),
+    'WHERE',
+        AND_SEP.join((
+        'role.id = role_action_def.role_id',
+        'record_def.id = role_action_def.def_id',
+        'action.id = role_action_def.action_id',
+        'role_action_def.account_id = :account_id',
+        'record_def.account_id = :account_id',
+        'def_id = :def_id',
+        )),
+    ))
+
+vars = {'account_id':account_id,'def_id':def_id}  # A dictionary of the query variables
+cursor.execute(query, vars)                       # Using Python's sqlite3 module
+</code></pre>
+<p>See <a href="https://docs.python.org/3.7/library/sqlite3.html#sqlite3.Cursor.execute" rel="nofollow noreferrer">documentation of Cursor.execute-function</a>.</p>
+<p>&quot;This is the [most Pythonic] way!&quot; - ...</p>
+------------------------------------------------------------------ <br><h3> Answer 10693472 mrijken: </h3><p>You can also place the SQL statement in a separate file, <code>action.sql</code>, and load it in the .py file with:</p>
+<pre><code>with open('action.sql') as f:
+   query = f.read()
+</code></pre>
+<p>So the SQL statements will be separated from the Python code. If there are parameters in the SQL statement which needs to be filled from Python, you can use string formatting (like %s or {field}).</p>
+------------------------------------------------------------------ <br><h3> Answer 39574511 Eyal Levin: </h3><p>Another option that I think is more readable when the code (e.g., a variable) is indented and the output string should be a one-liner (no newlines):</p>
+<pre><code>def some_method():
+
+    long_string = &quot;&quot;&quot;
+A presumptuous long string
+which looks a bit nicer
+in a text editor when
+written over multiple lines
+&quot;&quot;&quot;.strip('\n').replace('\n', ' ')
+
+    return long_string
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 43359487 victe: </h3><p>&quot;À la&quot; <em>Scala</em> way (but I think is the most Pythonic way as the OP demands):</p>
+<pre><code>description = &quot;&quot;&quot;
+            | The intention of this module is to provide a method to
+            | pass meta information in markdown_ header files for
+            | using it in jinja_ templates.
+            |
+            | Also, to provide a method to use markdown files as jinja
+            | templates. Maybe you prefer to see the code than
+            | to install it.&quot;&quot;&quot;.replace('\n            | \n','\n').replace('            | ',' ')
+</code></pre>
+<p>If you want final str without jump lines, just put <code>\n</code> at the start of the first argument of the second replace:</p>
+<pre><code>.replace('\n            | ',' ')`.
+</code></pre>
+<p>Note: the white line between &quot;...templates.&quot; and &quot;Also, ...&quot; requires a white space after the <code>|</code>.</p>
+------------------------------------------------------------------ <br><h3> Answer 69568223 Богдан Божић: </h3><p>I know it's a rather old question, but Python has changed in the meantime and I don't see this answer, so here we go.</p>
+<p>Another way is to use \ to cut the current line and move to another:</p>
+<pre><code>print(&quot;This line will \
+get carried over to\
+ the new line.\
+Notice how this\
+word will be together because \
+of no space around it&quot;)
+</code></pre>
+<h4> Comment 126973978 liakoyras: </h4>Note that this does not work very well with indented code (aesthetically).<br>------------------------------------------------------------------ <br><h3> Answer 29527774 Sandeep: </h3><p>I use a recursive function to build complex SQL queries. This technique can generally be used to build large strings while maintaining code readability.</p>
+<pre><code># Utility function to recursively resolve SQL statements.
+# CAUTION: Use this function carefully, Pass correct SQL parameters {},
+# TODO: This should never happen but check for infinite loops
+def resolveSQL(sql_seed, sqlparams):
+    sql = sql_seed % (sqlparams)
+    if sql == sql_seed:
+        return ' '.join([x.strip() for x in sql.split()])
+    else:
+        return resolveSQL(sql, sqlparams)
+</code></pre>
+<p>P.S.: Have a look at the awesome <em><a href="http://sqlparse.readthedocs.org/en/latest/api/#sqlparse.format" rel="nofollow noreferrer">python-sqlparse</a></em> library to pretty print SQL queries if needed.</p>
+<h4> Comment 49499988 m3nda: </h4>&quot;recursive function&quot; is not that called lambda?<br>------------------------------------------------------------------ <br><h3> Answer 57464651 Flow: </h3><p>From the <a href="https://docs.python.org/3.7/tutorial/introduction.html#strings" rel="nofollow noreferrer">official Python documentation</a>:</p>
+<blockquote>
+<p>String literals can span multiple lines. One way is using
+triple-quotes: &quot;&quot;&quot;...&quot;&quot;&quot; or '''...'''. End of lines are automatically
+included in the string, but it’s possible to prevent this by adding a
+\ at the end of the line. The following example:</p>
+</blockquote>
+<pre><code>print(&quot;&quot;&quot;\
+Usage: thingy [OPTIONS]
+     -h                        Display this usage message
+     -H hostname               Hostname to connect to
+&quot;&quot;&quot;)
+</code></pre>
+<blockquote>
+<p>produces the following output (note that the initial newline is not
+included):</p>
+</blockquote>
+<h4> Comment 133304257 MisterMiyagi: </h4>This seems to be functionally identical to <a href="https://stackoverflow.com/a/57464608/5349916">your own answer</a>. Did you mean to edit the original?<br>------------------------------------------------------------------ <br><h3> Answer 59580532 flix: </h3><p>For defining a long string inside a dict,
+<strong>keeping the newlines but omitting the spaces</strong>, I ended up defining the string in a constant like this:</p>
+
+<pre><code>LONG_STRING = \
+"""
+This is a long sting
+that contains newlines.
+The newlines are important.
+"""
+
+my_dict = {
+   'foo': 'bar',
+   'string': LONG_STRING
+}
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 44308203 Eduardo Lucio: </h3><p>I like this approach because it privileges reading. In cases where we have long strings there is no way! Depending on the level of indentation you are in and still limited to 80 characters per line... Well... No need to say anything else</p>
+<p>In my view, the Python style guides are still very vague. I took the <a href="https://stackoverflow.com/questions/10660435/pythonic-way-to-create-a-long-multi-line-string/14155520#14155520">Eero Aaltonen approach</a>, because it privileges reading and common sense. I understand that style guides should help us and not make our lives a mess.</p>
+<pre><code>class ClassName():
+    def method_name():
+        if condition_0:
+            if condition_1:
+                if condition_2:
+                    some_variable_0 =\
+&quot;&quot;&quot;
+some_js_func_call(
+    undefined,
+    {
+        'some_attr_0': 'value_0',
+        'some_attr_1': 'value_1',
+        'some_attr_2': '&quot;&quot;&quot; + some_variable_1 + &quot;&quot;&quot;'
+    },
+    undefined,
+    undefined,
+    true
+)
+&quot;&quot;&quot;
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 52553846 paone: </h3><p>Generally, I use <code>list</code> and <code>join</code> for multi-line comments/string.</p>
+<pre><code>lines = list()
+lines.append('SELECT action.enter code here descr as &quot;action&quot;, ')
+lines.append('role.id as role_id,')
+lines.append('role.descr as role')
+lines.append('FROM ')
+lines.append('public.role_action_def,')
+lines.append('public.role,')
+lines.append('public.record_def, ')
+lines.append('public.action')
+query = &quot; &quot;.join(lines)
+</code></pre>
+<p>You can use any string to join all these list elements, like '<code>\n</code>'(newline) or '<code>,</code>'(comma) or '<code> </code>'(space).</p>
+<h4> Comment 92902235 Alexander: </h4>Why wouldn&#39;t you at least use an array literal?<br><h4> Comment 93398447 paone: </h4>Arrays are represented by class list. <a href="https://stackoverflow.com/questions/1514553/how-to-declare-an-array-in-python">check out another discussion regarding the array literals</a><br><h4> Comment 103494986 Petro: </h4>I suppose this works, but you should think about performance and readability...<br>

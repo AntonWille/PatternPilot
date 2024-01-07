@@ -1,0 +1,40 @@
+ <h2> Title: How do I update all my CPAN modules to their latest versions? </h2> <h3> David B, question_id: 3727795 </h3>Score: 148, Tags: {perl,cpan} <br><p>How do I update all my CPAN modules to their latest versions?</p>
+------------------------------------------------------------------ <br><h3> Answer 3728027 draegtun: </h3><p>An alternative method to using <code>upgrade</code> from the default CPAN shell is to use <a href="https://search.cpan.org/dist/App-cpanminus/lib/App/cpanminus.pm" rel="noreferrer"><code>cpanminus</code></a> and <a href="https://search.cpan.org/dist/App-cpanoutdated/bin/cpan-outdated" rel="noreferrer"><code>cpan-outdated</code></a>.</p>
+
+<p>These are so easy and nimble to use that I hardly ever go back to CPAN shell. To upgrade all of your modules in one go, the command is:</p>
+
+<pre><code>cpan-outdated -p | cpanm
+</code></pre>
+
+<p>I recommend you install <code>cpanminus</code> like the docs describe:</p>
+
+<pre><code>curl -L https://cpanmin.us | perl - App::cpanminus
+</code></pre>
+
+<p>And then install <code>cpan-outdated</code> along with all other CPAN modules using <code>cpanm</code>:</p>
+
+<pre><code>cpanm App::cpanoutdated
+</code></pre>
+
+<p>BTW: If you are using <code>perlbrew</code> then you will need to repeat this for every Perl you have installed under it.</p>
+
+<p>You can find out more about <code>cpanminus</code> and <code>cpan-outdated</code> at the Github repos here:</p>
+
+<ul>
+<li><a href="https://github.com/miyagawa/cpanminus" rel="noreferrer">https://github.com/miyagawa/cpanminus</a></li>
+<li><a href="https://github.com/tokuhirom/cpan-outdated" rel="noreferrer">https://github.com/tokuhirom/cpan-outdated</a></li>
+</ul>
+<h4> Comment 18112751 eav: </h4>why using such extra tools while there&#39;s a built-in solution (see second answer)?<br><h4> Comment 31190451 Noah Sussman: </h4>&quot;why using such extra tools&quot; While it&#39;s outside the scope of the OP&#39;s question, cpanimus DOES solve the problem of CPAN asking you to press Enter and/or type [y]es. Afaict you can not <i>reliably</i> suppress this behavior with vanilla CPAN. This becomes important as soon as any kind of cron or CI server is involved, and/or if you like to be able to start an upgrade with the confidence it won&#39;t hang while you&#39;re out getting coffee (which in my experience is often the case with vanilla CPAN) See also this answer <a href="http://stackoverflow.com/questions/898782/how-do-i-tell-cpan-to-install-all-dependencies" title="how do i tell cpan to install all dependencies">stackoverflow.com/questions/898782/&hellip;</a><br><h4> Comment 37153478 draegtun: </h4>Those are old (perl dates from 2006, LWP from 2005).  Ideally you need newer version of both.  If for some reason you can&#39;t do this then I would upgrade LWP version by version until you got cpanm|cpan-outdated working. NB. IMPORTANT - If you are using the CentOS installed Perl then don&#39;t use CPAN or CPANMINUS with these!  Never mix with OS packages!!  Instead use Perlbrew to brew your own perl (and then use cpanminus etc within this).<br><h4> Comment 83942425 Stephen Ostermiller: </h4>I like this solutions because you can easily run <code>cpan-outdated -p</code> first to see what it is going to do before actually running the upgrades.   It isn&#39;t clear how to do a dry run with <code>cpan upgrade</code><br><h4> Comment 37097423 shorif2000: </h4>[root@portal-test bugzilla-4.4.4]# cpan-outdated -p | cpanm Can&#39;t locate object method &quot;new&quot; via package &quot;LWP::UserAgent&quot; at /usr/bin/cpan-outdated line 170.<br><h4> Comment 37133932 draegtun: </h4>@eav Because it&#39;s more &quot;nimble&quot;!  The built-in solution (CPAN shell) does not work well in limited memory hence why Miyagawa originally developed cpanminus - <a href="https://metacpan.org/pod/App::cpanminus#Another-CPAN-installer" rel="nofollow noreferrer">metacpan.org/pod/App::cpanminus#Another-CPAN-installer</a><br><h4> Comment 37133968 draegtun: </h4>@sharif - Need more info... what versions of cpanminus, cpan-outdated, LWP and Perl are you using?<br><h4> Comment 37145462 shorif2000: </h4>perl v5.8.8. LWP 5.805. centos 5.10 final<br><h4> Comment 134161614 DustWolf: </h4>I tried using this to update packages for imapsync, only to find that <code>cpan-outdated -p</code> didn&#39;t actually list any of the modules used by imapsync. Manually updating them with <code>cpanm</code> worked.<br>------------------------------------------------------------------ <br><h3> Answer 8655803 Michael Armbruster: </h3><p>An easy way to upgrade all Perl packages (CPAN modules) is the following way:</p>
+
+<pre><code>cpan upgrade /(.*)/
+</code></pre>
+
+<p>cpan will recognize the regular expression like this and will update/upgrade all packages installed.</p>
+<h4> Comment 58532264 earthmeLon: </h4>For those having problems with this command;  Try running cpan shell via <code>cpan</code>, and then run the <code>upgrade &#47;(.*)&#47;</code> in the cpan shell.<br><h4> Comment 13296055 David W.: </h4>Okay, this isn&#39;t as <i>cool</i> as <code>cpanminus</code>, but at least you don&#39;t have to download anything to get this to work.<br>------------------------------------------------------------------ <br><h3> Answer 15663419 Denis Howe: </h3><p>For Strawberry Perl, try:</p>
+
+<pre><code>cpan -u
+</code></pre>
+<h4> Comment 60404609 Chloe: </h4>For regular Perl too. From the man page: <code>-u  Upgrade all installed modules. Blindly doing this can really break things, so keep a backup.</code><br><h4> Comment 118963401 Someone_1313: </h4>The option <code>cpan -u</code> how long does it take to update?<br>------------------------------------------------------------------ <br><h3> Answer 16796149 Matthias Munz: </h3><p>Try <code>perl -MCPAN -e "upgrade /(.\*)/"</code>. It works fine for me.</p>
+------------------------------------------------------------------ <br><h3> Answer 3727913 musiKk: </h3><p><a href="http://p3rl.org/CPAN#upgrade-Module-Regexp-..." rel="noreferrer"><code>upgrade</code></a></p>
+
+<p>BTW there is a <code>help</code> command.</p>

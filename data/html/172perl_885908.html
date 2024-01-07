@@ -1,0 +1,395 @@
+ <h2> Title: while (1) Vs. for (;;) Is there a speed difference? </h2> <h3> Copas, question_id: 885908 </h3>Score: 172, Tags: {c++,perl,optimization,performance} <br><p>Long version...</p>
+
+<p>A co-worker asserted today after seeing my use of <code>while (1)</code> in a Perl script that <code>for (;;)</code> is faster.  I argued that they should be the same hoping that the interpreter would optimize out any differences. I set up a script that would run 1,000,000,000 for loop iterations and the same number of while loops and record the time between. I could find no appreciable difference. My co-worker said that a professor had told him that the <code>while (1)</code> was doing a comparison <code>1 == 1</code> and the <code>for (;;)</code> was not.  We repeated the same test with the 100x the number of iterations with C++ and the difference was negligible. It was however a graphic example of how much faster compiled code can be vs. a scripting language.</p>
+
+<p>Short version...</p>
+
+<p>Is there any reason to prefer a <code>while (1)</code> over a <code>for (;;)</code> if you need an infinite loop to break out of?</p>
+
+<p><strong>Note:</strong> If it's not clear from the question.  This was purely a fun academic discussion between a couple of friends.  I am aware this is not a super important concept that all programmers should agonize over.  Thanks for all the great answers I (and I'm sure others) have learned a few things from this discussion.</p>
+
+<p><strong>Update:</strong> The aforementioned co-worker weighed in with a response below.</p>
+
+<p>Quoted here in case it gets buried.</p>
+
+<blockquote>
+  <p>It came from an AMD assembly programmer. He stated that C programmers
+  (the poeple) don't realize that their code has inefficiencies. He said
+  today though, gcc compilers are very good, and put people like him out
+  of business. He said for example, and told me about the <code>while 1</code> vs
+  <code>for(;;)</code>. I use it now out of habit but gcc and especially interpreters
+  will do the same operation (a processor jump) for both these days,
+  since they are optimized.</p>
+</blockquote>
+<h4> Comment 694177 Arjan Einbu: </h4>Which infinite loop is fastest? LOL... &quot;My new computer is so fast, it runs an infinite loop in just under an hour...&quot; ;-)<br><h4> Comment 719268 brian d foy: </h4>Was that a professor of sociology who told him that? In the modern era, the code you type isn&#39;t what the computer ends up seeing.<br><h4> Comment 4047394 Peter Recore: </h4>i expect the amount of time it took you to test this was far longer than the amount of time potentially saved by knowing which one is faster, if either.  even if you amortize it over both your lifetimes of programming.<br><h4> Comment 8673862 David Schwartz: </h4>Why would the compiler ever generate code to perform a test that it knows has no side effects and whose result the compiler already knows? That makes no sense.<br><h4> Comment 692885 Luc M: </h4>I&#39;m curious. Why do need an infinite loop in a perl script ? You&#39;re obviously not programming a driver or a system thing... Infinite is quiet long :-)<br><h4> Comment 692936 Copas: </h4>Its a script that is meant to run indefinitely on (for lack of a better/longer explanation) on a piece of embedded hardware and do something every 5 seconds.<br><h4> Comment 693079 Kent Fredric: </h4>sometimes its also easier to do flow control that way. while(1){ \n #this line will \n  last if $complexcondition;\n  # this line wont execute }<br><h4> Comment 1218751 Liran Orevi: </h4>for (;;) is faster, to write `).<br><h4> Comment 693138 Kent Fredric: </h4>without the while(1) you need an explicit redo at the end of the naked block: they don&#39;t auto-loop ;P<br><h4> Comment 40989344 mistahenry: </h4>PSA: for(;;) is the Zoidberg loop<br><h4> Comment 113100430 Olivier Dulac: </h4>if your default locale is some complex utf locale, or one with lots of accents, but you only deal with regular ascii filenames/text files : invoking your perl with : LC_ALL=C perl  ... (or LC_ALL=C ./script.pl )  can be a lot faster if you use regexes searches ;).  (this also should speed up grep, awk, sed, etc). Not the question you asked... but an interresting tidbit nonetheless?<br><h4> Comment 123218272 Kuba hasn&#39;t forgotten Monica: </h4>So is it a Perl question or a C question or a C++ question? Because the answers are different for all three.<br><h4> Comment 4047442 Michael Eakins: </h4>I once had a long debate with a colleague over this very topic.  We both concluded that either way is sufficient when speed is not a factor, but we had never concluded the best way to do it when speen and performance were critical.<br><h4> Comment 4093630 Copas: </h4>It appears that in some languages 100% equivalent. No one has been able to find where one is faster then another in the thread yet<br><h4> Comment 4408608 Isaac Clarke: </h4>A year after its origin, I just happened to stumble upon this very interesting thread while asking myself the exact same question. Thank you all =)<br><h4> Comment 1241436 Copas: </h4>@Liran Orevi a better explanation of that would be great.<br><h4> Comment 4014622 Ayush: </h4>He was just kidding. He meant writing for(;;) contains fewer characters so it would be faster<br><h4> Comment 4015124 Copas: </h4>@xbonez No he was sitting beside me when I wrote this post.  He wanted to know the answer also.<br><h4> Comment 840675 Brad Gilbert: </h4>{ say &#39;infinite loop&#39;; redo }<br><h4> Comment 693135 Chris Lutz: </h4>@Kent - you don&#39;t need a while(1) or a while(anything) for that. You can just make a naked block.<br>------------------------------------------------------------------ <br><h3> Answer 885951 bdonlan: </h3><p>In perl, they result in the same opcodes:</p>
+
+<pre><code>$ perl -MO=Concise -e 'for(;;) { print "foo\n" }'
+a  &lt;@&gt; leave[1 ref] vKP/REFC -&gt;(end)
+1     &lt;0&gt; enter -&gt;2
+2     &lt;;&gt; nextstate(main 2 -e:1) v -&gt;3
+9     &lt;2&gt; leaveloop vK/2 -&gt;a
+3        &lt;{&gt; enterloop(next-&gt;8 last-&gt;9 redo-&gt;4) v -&gt;4
+-        &lt;@&gt; lineseq vK -&gt;9
+4           &lt;;&gt; nextstate(main 1 -e:1) v -&gt;5
+7           &lt;@&gt; print vK -&gt;8
+5              &lt;0&gt; pushmark s -&gt;6
+6              &lt;$&gt; const[PV "foo\n"] s -&gt;7
+8           &lt;0&gt; unstack v -&gt;4
+-e syntax OK
+
+$ perl -MO=Concise -e 'while(1) { print "foo\n" }'
+a  &lt;@&gt; leave[1 ref] vKP/REFC -&gt;(end)
+1     &lt;0&gt; enter -&gt;2
+2     &lt;;&gt; nextstate(main 2 -e:1) v -&gt;3
+9     &lt;2&gt; leaveloop vK/2 -&gt;a
+3        &lt;{&gt; enterloop(next-&gt;8 last-&gt;9 redo-&gt;4) v -&gt;4
+-        &lt;@&gt; lineseq vK -&gt;9
+4           &lt;;&gt; nextstate(main 1 -e:1) v -&gt;5
+7           &lt;@&gt; print vK -&gt;8
+5              &lt;0&gt; pushmark s -&gt;6
+6              &lt;$&gt; const[PV "foo\n"] s -&gt;7
+8           &lt;0&gt; unstack v -&gt;4
+-e syntax OK
+</code></pre>
+
+<p>Likewise in GCC:</p>
+
+<pre><code>#include &lt;stdio.h&gt;
+
+void t_while() {
+    while(1)
+        printf("foo\n");
+}
+
+void t_for() {
+    for(;;)
+        printf("foo\n");
+}
+
+    .file   "test.c"
+    .section    .rodata
+.LC0:
+    .string "foo"
+    .text
+.globl t_while
+    .type   t_while, @function
+t_while:
+.LFB2:
+    pushq   %rbp
+.LCFI0:
+    movq    %rsp, %rbp
+.LCFI1:
+.L2:
+    movl    $.LC0, %edi
+    call    puts
+    jmp .L2
+.LFE2:
+    .size   t_while, .-t_while
+.globl t_for
+    .type   t_for, @function
+t_for:
+.LFB3:
+    pushq   %rbp
+.LCFI2:
+    movq    %rsp, %rbp
+.LCFI3:
+.L5:
+    movl    $.LC0, %edi
+    call    puts
+    jmp .L5
+.LFE3:
+    .size   t_for, .-t_for
+    .section    .eh_frame,"a",@progbits
+.Lframe1:
+    .long   .LECIE1-.LSCIE1
+.LSCIE1:
+    .long   0x0
+    .byte   0x1
+    .string "zR"
+    .uleb128 0x1
+    .sleb128 -8
+    .byte   0x10
+    .uleb128 0x1
+    .byte   0x3
+    .byte   0xc
+    .uleb128 0x7
+    .uleb128 0x8
+    .byte   0x90
+    .uleb128 0x1
+    .align 8
+.LECIE1:
+.LSFDE1:
+    .long   .LEFDE1-.LASFDE1
+.LASFDE1:
+    .long   .LASFDE1-.Lframe1
+    .long   .LFB2
+    .long   .LFE2-.LFB2
+    .uleb128 0x0
+    .byte   0x4
+    .long   .LCFI0-.LFB2
+    .byte   0xe
+    .uleb128 0x10
+    .byte   0x86
+    .uleb128 0x2
+    .byte   0x4
+    .long   .LCFI1-.LCFI0
+    .byte   0xd
+    .uleb128 0x6
+    .align 8
+.LEFDE1:
+.LSFDE3:
+    .long   .LEFDE3-.LASFDE3
+.LASFDE3:
+    .long   .LASFDE3-.Lframe1
+    .long   .LFB3
+    .long   .LFE3-.LFB3
+    .uleb128 0x0
+    .byte   0x4
+    .long   .LCFI2-.LFB3
+    .byte   0xe
+    .uleb128 0x10
+    .byte   0x86
+    .uleb128 0x2
+    .byte   0x4
+    .long   .LCFI3-.LCFI2
+    .byte   0xd
+    .uleb128 0x6
+    .align 8
+.LEFDE3:
+    .ident  "GCC: (Ubuntu 4.3.3-5ubuntu4) 4.3.3"
+    .section    .note.GNU-stack,"",@progbits
+</code></pre>
+
+<p>So I guess the answer is, they're the same in many compilers. Of course, for some other compilers this may not necessarily be the case, but chances are the code inside of the loop is going to be a few thousand times more expensive than the loop itself anyway, so who cares?</p>
+<h4> Comment 2678554 the Tin Man: </h4>&quot;In perl, they result in the same opcodes&quot;... yes, but which is faster? :-)<br><h4> Comment 697336 Kent Fredric: </h4>try with B::Deparse, deparsing an infinite for loop returns a while loop :P<br><h4> Comment 7124470 Lee D: </h4>I love that gcc substituted puts() for printf(), since there is only one argument and therefore nothing to format -- faster and more secure! (gcc also checks formatting tags against the variable argument list.)<br><h4> Comment 8799480 bdonlan: </h4>@snap, it&#39;s not &#39;completely&#39; incorrect, it&#39;s just focusing on the runtime costs. I can&#39;t imagine what kind of situation would result in the <i>parsing time of</i> infinite loops being the key deciding factor in how fast your program runs<br><h4> Comment 8801938 snap: </h4>@bdonian, true, I stand corrected. Only half incorrect then. Though personally I do not want to waste CPU cycles even if the loop is parsed only once. But I learned programming on the Z80 platform which is slightly slower than todays computers. Oh, this question was serious? I thought the whole thing was tongue-in-cheek... at least my answer obviously is :)<br><h4> Comment 8788170 BlackBear: </h4>@the Tin Man: they&#39;re equivalent, because the computer does the same exact operations :P<br><h4> Comment 8791717 snap: </h4>This answer is completely incorrect regarding perl. See <a href="http://stackoverflow.com/questions/885908/while-1-vs-for-is-there-a-speed-difference/7294866#7294866">my answer</a> for details.<br>------------------------------------------------------------------ <br><h3> Answer 885917 Bill the Lizard: </h3><p>There's not much reason to prefer one over the other.  I do think that <code>while(1)</code> and particularly <code>while(true)</code> are more readable than <code>for(;;)</code>, but that's just my preference.</p>
+<h4> Comment 692880 Tom: </h4>#define EVER ;; for(EVER)   I&#39;ve always find that kind of amusing.<br><h4> Comment 692899 Martin Cote: </h4>How about #define ever (;;) forever;<br><h4> Comment 692918 Bill the Lizard: </h4>Both seem more readable on the surface, but I try not to define new keywords for my maintenance programmer (usually me) to scratch his head over.<br><h4> Comment 3664410 lily: </h4>@Martin that will not work, because #define&#39;s do not replace within a token, and <code>forever</code> is it&#39;s own token.<br><h4> Comment 52108716 tchrist: </h4>&quot;I try not to define new keywords for my maintenance&quot; — if only more people took that attitude I wouldn’t be clutching at all these inane and magical sleight-of-hand shenanigans every time I turned around!<br><h4> Comment 4047540 Frank: </h4>+1 <code>while(true)</code> is more readable and therefore, all other things equal, better code than <code>for(;;)</code>.<br><h4> Comment 18655089 Gauthier: </h4>I think that PC-Lint warns for <code>while(true)</code>, and does not for <code>for(;;)</code>.<br><h4> Comment 712514 phihag: </h4>@Bill the Lizard You can still read it out aloud as for (ever) ;)<br><h4> Comment 99419004 dpi: </h4>K&amp;R (second edition) suggest <code>#define  forever  for (;;)</code>, although just as an example for macro replacement; it may not mean that we should always use this for infinite loops. The idiomatic form of an infinite loop (mentioned even in the first edition half a century ago) is <code>for (;;)</code>; this is the reason why the <code>for</code> statement allows omitting the second expression in the first place.<br>------------------------------------------------------------------ <br><h3> Answer 885939 Martin Cote: </h3><p>Using GCC, they both seem to compile to the same assembly language:</p>
+
+<pre><code>L2:
+        jmp     L2
+</code></pre>
+<h4> Comment 4051925 Martin Cote: </h4>Using GCC with the -S option (assemble, do not link)<br>------------------------------------------------------------------ <br><h3> Answer 887298 Richard Corden: </h3><p>There is no difference according to the standard.  6.5.3/1 has:</p>
+
+<blockquote>
+  <p>The for statement</p>
+</blockquote>
+
+<pre><code>for ( for-init-statement ; conditionopt ; expressionopt ) statement
+</code></pre>
+
+<blockquote>
+  <p>is equivalent to</p>
+</blockquote>
+
+<pre><code>{
+  for-init-statement
+  while ( condition ) {
+    statement
+    expression ;
+  }
+}
+</code></pre>
+
+<p>And 6.5.3/2 has:</p>
+
+<blockquote>
+  <p>Either or both of the condition and the expression can be omitted. A missing condition makes the implied while clause equivalent to while(true).</p>
+</blockquote>
+
+<p>So according to the C++ standard the code:</p>
+
+<pre><code>for (;;);
+</code></pre>
+
+<p>is exactly the same as:</p>
+
+<pre><code>{
+  while (true) {
+    ;
+    ;
+  }
+}
+</code></pre>
+<h4> Comment 1103970 Potatoswatter: </h4>That doesn&#39;t pertain to the generated code or performance at all. The standard only defines functionality.  Of course, performance will be the same.<br><h4> Comment 1218673 Steve Jessop: </h4>I don&#39;t believe it&#39;s true that a difference in performance violates the as-if rule. If it were, then compilers would not be permitted to speed up your code under the as-if rule, for example by re-ordering independent statements. Compilers in fact do exactly that. But my copy of the standard is way upstairs.<br><h4> Comment 133304351 Holger Waldmann: </h4>The difference between <code>for</code> and <code>while</code> is that the condition in <code>for</code> is optional while the condition in <code>while</code> is mandatory. Therefore <code>while()</code> will not compile while <code>for(;;)</code> does.<br>------------------------------------------------------------------ <br><h3> Answer 885934 Chris Bartow: </h3><p><code>for(;;)</code> is one less character to type if you want to go in that direction to optimize things.</p>
+<h4> Comment 2131850 Adam Bellaire: </h4>Good to know for golfing.  Otherwise a poor reason to choose a syntax.<br><h4> Comment 30208524 Vector Gorgoth: </h4>@AdamBellaire Terseness often increases readability, above a certain skill threshold.<br>------------------------------------------------------------------ <br><h3> Answer 886158 sean e: </h3><p>The Visual C++ compiler used to emit a warning for</p>
+
+<pre><code>while (1) 
+</code></pre>
+
+<p>(constant expression) but not for </p>
+
+<pre><code>for (;;)
+</code></pre>
+
+<p>I've continued the practice of preferring <code>for (;;)</code> for that reason, but I don't know if the compiler still does that these days.</p>
+<h4> Comment 693369 sean e: </h4>true is a constant.  while (true) is a constant expression. For anyone interested, warning C4127 is documented here: <a href="http://msdn.microsoft.com/en-us/library/6t66728h(VS.80).aspx" rel="nofollow noreferrer">msdn.microsoft.com/en-us/library/6t66728h(VS.80).aspx</a><br><h4> Comment 125979395 user904963: </h4>@ElvissStrazdins The documentation for Visual Studio now says C4127 doesn&#39;t emit a warning for <code>while(1)</code> or <code>while(true)</code>.<br><h4> Comment 64049140 Elviss Strazdins: </h4>Yes, the warning is still present for both 1 and true. That is the reason why I always use for (;;)<br><h4> Comment 693311 jrharshath: </h4>the warning is probably becuase you used while(1) instead of while(true)<br><h4> Comment 125982653 sean e: </h4>The docs now state: &quot;Because of their common idiomatic usage, beginning in Visual Studio 2015 update 3, trivial constants such as 1 or true do not trigger the warning, unless they are the result of an operation in an expression.&quot;<br>------------------------------------------------------------------ <br><h3> Answer 10276274 Lutz L.: </h3><p>Turbo C with this old compilers <code>for(;;)</code> results in faster code then <code>while(1)</code>.</p>
+
+<p>Today gcc, Visual C (I think almost all) compilers optimize well, and CPUs with 4.7 MHz are rarely used. </p>
+
+<p>In those days a <code>for( i=10; i; i-- )</code> was faster than <code>for( i=1; i &lt;=10; i++ )</code>, because compare <code>i</code> is 0, results in a CPU-Zero-Flag conditional Jump. And the Zero-Flag was modified with the last decrement operation <code>( i-- )</code>, no extra cmp-operation is needed.</p>
+
+<pre><code>    call    __printf_chk
+    decl    %ebx          %ebx=iterator i 
+    jnz     .L2
+    movl    -4(%ebp), %ebx
+    leave
+</code></pre>
+
+<p>and here with <code>for(i=1; i&lt;=10; i++)</code> with extra cmpl:</p>
+
+<pre><code>    call    __printf_chk
+    incl    %ebx
+    cmpl    $11, %ebx
+    jne     .L2
+    movl    -4(%ebp), %ebx
+    leave
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 886172 Kent Fredric: </h3><p>For all the people arguing you shouldn't use indefinte while loops, and suggesting daft stuff like using open <em>goto</em>'s ( seriously, ouch ) </p>
+
+<pre><code>while (1) {
+     last if( condition1 );
+     code();
+     more_code(); 
+     last if( condition2 ); 
+     even_more_code(); 
+}
+</code></pre>
+
+<p>Can't really be represented effectively any other way. Not without creating an exit variable and doing black magic to keep it synced. </p>
+
+<p>If you have a penchant for the more goto-esque syntax, use something sane that limits  scope. </p>
+
+<pre><code>flow: { 
+
+   if ( condition ){ 
+      redo flow;
+   }
+   if ( othercondition ){ 
+       redo flow;
+   }
+   if ( earlyexit ){ 
+       last flow;
+   }
+   something(); # doesn't execute when earlyexit is true 
+}
+</code></pre>
+
+<p><strong>Ultimately Speed is not that important</strong> </p>
+
+<p>Worring about how effective speed wise different looping constructs are is a massive waste of time. Premature optimization through and through. I can't think of any situation I've ever seen where profiling code found bottlenecks in my choice of looping construct.  </p>
+
+<p>Generally its the <em>how</em> of the loop and the <em>what</em> of the loop. </p>
+
+<p>You should "optimize" for readability and succinctness, and write whatever is best at explaining the problem to the next poor sucker who finds your code. </p>
+
+<p>If you use the "goto LABEL" trick somebody mentioned, and I have to use your code, be prepared to sleep with one eye open, especially if you do it more than once, because that sort of stuff creates <strong>horrifically</strong> spaghetti code. </p>
+
+<p>Just because you <strong>can</strong> create spaghetti code doesn't mean you <strong>should</strong></p>
+------------------------------------------------------------------ <br><h3> Answer 9861242 silverbullettt: </h3><p>If compiler doesn't do any optimization, <code>for(;;)</code> would always be faster than <code>while(true)</code>. This is because while-statement evaluates the condition everytime, but for-statement is an unconditional jump. But if compiler optimizes the control flow, it may generate some opcodes. You can read disassembly code very easily.</p>
+
+<p>P.S. you could write a infinite loop like this:</p>
+
+<pre><code>#define EVER ;;
+  //...
+  for (EVER) {
+    //...
+  }
+</code></pre>
+<h4> Comment 74550459 Bja: </h4>In the modern day and age shouldn&#39;t EVER be replaced with EVS (teenage speak)!  Seriously though I just simply use for(;;){}. I read online a long time ago about the differences between the two (when I was younger and didn&#39;t actually know they are the same) and just stuck with what I read.<br>------------------------------------------------------------------ <br><h3> Answer 2182797 Hans W: </h3><p>From Stroustrup, TC++PL (3rd edition), §6.1.1:</p>
+
+<blockquote>
+  <p>The curious notation <code>for (;;)</code> is the standard way to specify an infinite loop; you could pronounce it "forever". [...] <code>while (true)</code> is an alternative.</p>
+</blockquote>
+
+<p>I prefer <code>for (;;)</code>.</p>
+------------------------------------------------------------------ <br><h3> Answer 3814997 Jimmie Clark: </h3><p>I heard about this once.</p>
+
+<p>It came from an AMD assembly programmer. He stated that C programmers (the people) don't realize that their code has inefficiencies. He said today though, gcc compilers are very good, and put people like him out of business. He said for example, and told me about the <code>while 1</code> vs <code>for(;;)</code>. I use it now out of habit but gcc and especially interpreters will do the same operation (a processor jump) for both these days, since they are optimized.</p>
+------------------------------------------------------------------ <br><h3> Answer 885921 Charlie: </h3><p>In an optimized build of a compiled language, there should be no appreciable difference between the two. Neither should end up performing any comparisons at runtime, they will just execute the loop code until you manually exit the loop (e.g. with a <code>break</code>).</p>
+------------------------------------------------------------------ <br><h3> Answer 52201447 Nick Law: </h3><p>Just came across this thread (although quite a few years late).</p>
+
+<p>I think I found the actual reason why "for(;;)" is better than "while(1)".</p>
+
+<p>according to the "barr coding standard 2018"</p>
+
+<pre><code>Kernighan &amp; Ritchie long ago recommended for (;;) , which has the additional benefit
+of insuring against the visually-confusing defect of a while (l); referencing a variable ‘l’.
+</code></pre>
+
+<p>basically, this is not a speed issue but a readability issue. Depending on the font/print of code the number one(1) in a while may look like a lower case letter l.</p>
+
+<p>i.e 1 vs l. (in some fonts these look identical).</p>
+
+<p>So while(1) may look like some while loop dependent on the variable letter L.</p>
+
+<p>while(true) may also work but in some older C and embedded C cases true/false are not yet defined unless stdbool.h is included.   </p>
+<h4> Comment 91530724 mjuopperi: </h4>I would say the issue in your code would be that you have a variable named <code>l</code>, not that <code>1</code> and <code>l</code> can look similar.<br><h4> Comment 91536558 Nick Law: </h4>Agreed, I know the Barr coding standard also says elsewhere that variables must be at least 3 characters even in for loops. i.e no i++ etc. in a for loop. I tend to think that may be a bit much though. While typing I am also noticing it&#39;s not just the letter L that looks like a 1. The letter i which is commonly used as a variable may also cause issues.<br>------------------------------------------------------------------ <br><h3> Answer 3506032 Phil Miller: </h3><p>I'm surprised no one has offered the more direct form, corresponding to the desired assembly:</p>
+
+<pre><code>forever:
+     do stuff;
+     goto forever;
+</code></pre>
+<h4> Comment 49020671 Roy Tinker: </h4>One other shortcoming of that approach: it violates encapsulation by not enclosing the loop in a block -- thus any variables declared in the loop are available outside the loop. (Of course, you could <code>{ forever: do stuff; goto forever; }</code>)<br><h4> Comment 3688168 Copas: </h4>Dose that not end up with the same machine code as while 1 or for (;;) in say c?<br>------------------------------------------------------------------ <br><h3> Answer 7294866 snap: </h3><p>I am surprised that nobody properly tested <code>for (;;)</code> versus <code>while (1)</code> in perl!</p>
+
+<p>Because perl is interpreted language, the time to run a perl script does not only consist of the execution phase (which in this case is the same) but also of the interpretation phase before execution. Both of these phases have to be taken in account when making a speed comparison.</p>
+
+<p>Luckily perl has a convenient <a href="http://perldoc.perl.org/Benchmark.html" rel="nofollow">Benchmark module</a> which we can use to implement a benchmark such as follows:</p>
+
+<pre><code>#!/usr/bin/perl -w
+
+use Benchmark qw( cmpthese );
+
+sub t_for   { eval 'die; for (;;) { }'; }
+sub t_for2  { eval 'die; for (;;)  { }'; }
+sub t_while { eval 'die; while (1) { }'; }
+
+cmpthese(-60, { for =&gt; \&amp;t_for, for2 =&gt; \&amp;t_for2, while =&gt; \&amp;t_while });
+</code></pre>
+
+<p>Note that I am testing two different versions of the infinite for loop: one which is shorter than the while loop and another one which has an extra space to make it the same length as the while loop.</p>
+
+<p>On Ubuntu 11.04 x86_64 with perl 5.10.1 I get the following results:</p>
+
+<pre>
+          Rate   for  for2 while
+for   100588/s    --   -0%   -2%
+for2  100937/s    0%    --   -1%
+while 102147/s    2%    1%    --
+</pre>
+
+<p>The while loop is clearly the winner on this platform.</p>
+
+<p>On FreeBSD 8.2 x86_64 with perl 5.14.1:</p>
+
+<pre>
+         Rate   for  for2 while
+for   53453/s    --   -0%   -2%
+for2  53552/s    0%    --   -2%
+while 54564/s    2%    2%    --
+</pre>
+
+<p>While loop is the winner here too.</p>
+
+<p>On FreeBSD 8.2 i386 with perl 5.14.1:</p>
+
+<pre>
+         Rate while   for  for2
+while 24311/s    --   -1%   -1%
+for   24481/s    1%    --   -1%
+for2  24637/s    1%    1%    --
+</pre>
+
+<p>Surprisingly the for loop with an extra space is the fastest choice here!</p>
+
+<p><strong>My conclusion is that the while loop should be used on x86_64 platform if the programmer is optimizing for speed. Obviously a for loop should be used when optimizing for space. My results are unfortunately inconclusive regarding other platforms.</strong></p>
+<h4> Comment 10471256 Zaid: </h4>The conclusion is blatantly wrong. <code>Benchmark</code> has its limitations and cannot be used to distinguish fast from slow if the results are within 7% of each other. Moreover, you have not tested the difference between the <code>for</code> and <code>while</code> loops because each sub will <code>die</code> before reaching the loops themselves. And since when did the amount of whitespace matter to the Perl interpreter? Sorry, but the analysis is extremely flawed.<br><h4> Comment 10728956 Zaid: </h4>I don&#39;t need to post an answer because what I would say has already been mentioned by bdonlan. And even if you&#39;re comparing compile times, the numbers that <code>Benchmark</code> are inconclusive. Don&#39;t trust that 1% difference at all!<br><h4> Comment 10722318 snap: </h4>@Zaid, Thanks for your comments! Would you mind posting your own answer so that everyone can learn from that? :) The <code>die</code> is there in my code because my intention is to test <i>only the compilation time difference</i>. As others have already pointed out the resulting byte-code is identical, thus there is no point in testing that. Surprisingly the amount of white space seems to make a small difference in this case in my testing environments. It might have something to do with how the characters end up getting aligned in memory or something similar...<br><h4> Comment 17504957 Mooing Duck: </h4>Only 60 iterations?  Run tests for like 5 minutes so as to get more accurate relative times.<br><h4> Comment 17517903 snap: </h4><code>-60</code> runs the test for 60 seconds.<br>------------------------------------------------------------------ <br><h3> Answer 892742 J M D: </h3><p><code>while(1)</code> is an idiom for <code>for(;;)</code> which is recognized by most compilers.</p>
+
+<p>I was glad to see that perl recognizes <code>until(0)</code>, too.</p>
+<h4> Comment 742871 J M D: </h4>until() is the opposite of while() just as unless() is the opposite of if().  As suggested eslewhere in this thread, one might write:  do {    something... } while (! condition)  An alternative might be  until (condition) {    something }<br><h4> Comment 738162 Copas: </h4>In what situation would until(0) be helpful?<br>------------------------------------------------------------------ <br><h3> Answer 2653628 Nick T: </h3><p>In theory, a <em>completely</em> naive compiler could store the literal '1' in the binary (wasting space) and check to see if 1 == 0 every iteration (wasting time and more space).</p>
+
+<p>In reality, however, even with "no" optimizations, compilers will still reduce both to the same.  They may also emit warnings because it could indicate a logical error.  For instance, the argument of <code>while</code> could be defined somewhere else and you not realize it's constant.</p>
+------------------------------------------------------------------ <br><h3> Answer 37786949 redbandit: </h3><p>To summarize the <code>for (;;)</code> vs <code>while (1)</code> debate it is obvious that the former was faster in the days of older non-optimizing compilers, that is why you tend to see it in older code bases such as Lions Unix Source code commentary, however in the age of badass optimizing compilers those gains are optimized away coupling that with the fact that the latter is easier to understand than the former I believe that it would be more preferable. </p>
+<h4> Comment 125979272 user904963: </h4>The people speculating that a compiler didn&#39;t know how to create efficient assembly for <code>while(true)</code> didn&#39;t provide any evidence of that.<br>------------------------------------------------------------------ <br><h3> Answer 891469 bichonfrise74: </h3><p>I would think that both are the same in terms of performance. But I would prefer while(1) for readability but I question why you need an infinite loop.</p>
+<h4> Comment 125979504 user904963: </h4>I suggest you start writing some code more often if you can&#39;t think of a reason to have an infinite loop.<br>------------------------------------------------------------------ <br><h3> Answer 885918 Mark Ransom: </h3><p>They are the same. There are much more important questions to ponder.
+<hr>
+My point which was implied but not explicitly made above, is that a decent compiler would generate the exact same code for both loop forms. The bigger point is that the looping construct is a minor part of the run time of any algorithm, and you must first ensure that you have optimized the algorithm and everything else related to it. Optimizing your loop construct should absolutely be at the bottom of your priority list.</p>
+<h4> Comment 692868 cdmckay: </h4>No links or explanation.  Unhelpful, subjective and a little condescending.<br><h4> Comment 732126 Mark Ransom: </h4>I wasn&#39;t trying to be a jerk. I was trying to make a point. When I posted it I was trying for a kind of dark humor, and it is obvious that I failed; for that I apologize.<br><h4> Comment 693060 Mark Ransom: </h4>Yes, I admit it is condescending. But seriously, even without any proof it is obvious that they are going to be in the same ballpark speedwise; if the question was about style there would be something to argue about. I was trying to make the point that on the list of things to worry about, this should really be at the bottom of the list.<br><h4> Comment 692887 Copas: </h4>I was unaware that only important questions where to be asked, my mistake was my first question.<br><h4> Comment 692872 Matthew Whited: </h4>well no proof but he is right.  They both call the Opcode for jumping when false.  (which would make it the same as goto but no one likes gotos)<br><h4> Comment 696052 cdmckay: </h4>@peterchan: Just because he happened to be right doesn&#39;t justify his poor answer.<br><h4> Comment 712526 Mike Dunlavey: </h4>+ It is a little condescending. Personally, I try not to be, but I don&#39;t always succeed, when faced with such a question, if it&#39;s supposed to be serious. The sheer number of questions like this is amazing and a little disheartening.<br><h4> Comment 732064 Copas: </h4>StackOverflow wasn&#39;t built to be the home of only the most important questions. Even things that should be &quot;at the bottom of the list&quot; are worth answering and often (as this did) yield good discussion/answers. Being a jerk to someone who is new to the site when you have the high ground of 10k reputation is counter productive in every way.<br>

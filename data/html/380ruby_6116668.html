@@ -1,0 +1,249 @@
+ <h2> Title: How to run a single RSpec test? </h2> <h3> AnApprentice, question_id: 6116668 </h3>Score: 380, Tags: {ruby-on-rails,ruby,ruby-on-rails-3,rspec} <br><p>I have the following file:</p>
+
+<pre><code>/spec/controllers/groups_controller_spec.rb
+</code></pre>
+
+<p>What command in terminal do I use to run just that spec and in what directory do I run the command?</p>
+
+<p>My gem file:</p>
+
+<pre><code># Test ENVIRONMENT GEMS
+group :development, :test do
+    gem "autotest"
+    gem "rspec-rails", "~&gt; 2.4"
+    gem "cucumber-rails", "&gt;=0.3.2"
+    gem "webrat", "&gt;=0.7.2"
+    gem 'factory_girl_rails'
+    gem 'email_spec'
+end
+</code></pre>
+
+<p><strong>Spec file:</strong></p>
+
+<pre><code>require 'spec_helper'
+
+describe GroupsController do
+  include Devise::TestHelpers
+
+  describe "GET yourgroups" do
+    it "should be successful and return 3 items" do
+
+      Rails.logger.info 'HAIL MARRY'
+
+      get :yourgroups, :format =&gt; :json
+      response.should be_success
+      body = JSON.parse(response.body)
+      body.should have(3).items # @user1 has 3 permissions to 3 groups
+    end
+  end
+end
+</code></pre>
+<h4> Comment 87539115 Thomas Decaux: </h4><code>bundle exec rspec spec --help</code> wil give you the answer:<br><h4> Comment 84814758 Nesha Zoric: </h4>You can run your tests like bundle exec rspec ./spec/controllers/groups_controller_spec.rb:6, it runs this specific test only. More info here: <a href="https://kolosek.com/rails-rspec-setup" rel="nofollow noreferrer">kolosek.com/rails-rspec-setup</a><br>------------------------------------------------------------------ <br><h3> Answer 6116744 apneadiving: </h3><p>Usually I do:</p>
+<pre><code>rspec ./spec/controllers/groups_controller_spec.rb:42
+</code></pre>
+<p>Where <code>42</code> represents the line of the test I want to run.</p>
+<p>You can also use tags. See <a href="http://relishapp.com/rspec/rspec-core/v/2-3/dir/command-line/tag-option" rel="noreferrer">here</a>.</p>
+<p>Using <code>bundle exec</code>:</p>
+<pre><code>bundle exec rspec ./spec/controllers/groups_controller_spec.rb:42
+</code></pre>
+<h4> Comment 7095599 apneadiving: </h4>it&#39;s not a hack, it makes sure you use the very same version you declared in your gemfile. In your case, the mere <code>rspec</code> failed because the version on your system is more recent than the one in your gemfile.<br><h4> Comment 7095561 AnApprentice: </h4>bundle exec worked but why? Is that a hack any way to avoid that?<br><h4> Comment 27377573 therin: </h4>IMO this solution is dangerous, because it can lead you to think that a test is passing when it actually isn&#39;t - for example, if you add a few lines of code ahead of the test you&#39;re trying to fix. Tags are a better way to go.<br><h4> Comment 7095462 AnApprentice: </h4>Thanks tried that it does not work when I do rake spec /spec/path...:XX I get the error /System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/b&zwnj;&#8203;in/ruby -S bundle exec rspec ./spec/controllers/groups_controller_spec.rb ./spec/controllers/incoming_mails_controller_spec.rb ./spec/lib/mailing_job/mailingjob_find_reply_spec.rb ./spec/models/group_model_spec.rb ./spec/models/user_model_spec.rb<br><h4> Comment 7095469 AnApprentice: </h4>If I try using just RSPEC, i get this error: &quot;$ rspec spec/controllers/groups_controller_spec.rb:19 /Library/Ruby/Gems/1.8/gems/bundler-1.0.0/lib/bundler/runtim&zwnj;&#8203;e.rb:27:in `setup&#39;: You have already activated rspec-core 2.6.2, but your Gemfile requires rspec-core 2.6.0. Consider using bundle exec. (Gem::LoadError) &quot;<br><h4> Comment 7095507 muffinista: </h4>You can try &quot;bundle exec rspec spec/controllers/groups_controller_spec.rb:19&quot; in that case<br><h4> Comment 67976768 Ekkstein: </h4>I had to add a . (period) to the front of the path to get it to run ---------------------linebreak--------------------- <code>bundle exec rspec .&#47;spec&#47;controllers&#47;groups_controller_spec.rb:42</code><br><h4> Comment 107775144 Jason FB: </h4>There are a few reasons this is a bad answer and should not be the accepted answer— while it is often the quickest solution, you are bypassing the rake task and just instructing rspec to run the single test. In the past (prior to Rails 5), this worked fine. Running the rake task is better and less confusing for the dev long-term, the best is with <code>rake spec SPEC=</code><br><h4> Comment 125763334 Astm: </h4>check this <code>bundle exec rspec -f d spec&#47;controllers&#47;groups_controller_spec.rb</code><br><h4> Comment 41165808 styger: </h4>Instead of <code>bundle exec</code>, you can use <a href="https://github.com/sstephenson/rbenv/wiki/Understanding-binstubs" rel="nofollow noreferrer">binstubs</a><br><h4> Comment 52601862 Steve: </h4>If you are testing shared examples from an external file, this method will attempt to run a test at the specified line in the external file as well as the original referenced file.<br><h4> Comment 37396528 apneadiving: </h4>@therin tags belong to my answer + if you assume you do things wrong, conclusion will always be wrong<br><h4> Comment 37543373 nnyby: </h4>Is there a way to do this using Django&#39;s test framework?<br>------------------------------------------------------------------ <br><h3> Answer 54616209 eazy_beans: </h3><p>Not sure how long this has bee available but there is an Rspec configuration for run filtering - so now you can add this to your <code>spec_helper.rb</code>:</p>
+
+<pre><code>RSpec.configure do |config|
+  config.filter_run_when_matching :focus
+end
+</code></pre>
+
+<p>And then add a focus tag to the <code>it</code>, <code>context</code> or <code>describe</code> to run only that block:</p>
+
+<pre><code>it 'runs a test', :focus do
+  ...test code
+end
+</code></pre>
+
+<p>RSpec documentation:</p>
+
+<p><a href="https://www.rubydoc.info/github/rspec/rspec-core/RSpec/Core/Configuration#filter_run_when_matching-instance_method" rel="noreferrer">https://www.rubydoc.info/github/rspec/rspec-core/RSpec/Core/Configuration#filter_run_when_matching-instance_method</a></p>
+<h4> Comment 105006285 Michael Durrant: </h4>This requires changing infrastructure. And remembering to change it back.  I would recommend not doing this and using just the <code>rspec</code> commands to run the spec with appropriate parameter to indicate which<br>------------------------------------------------------------------ <br><h3> Answer 11871069 Grant Birchmeier: </h3><p>With Rake:</p>
+
+<pre><code>rake spec SPEC=path/to/spec.rb
+</code></pre>
+
+<p>(Credit goes to <a href="https://stackoverflow.com/a/143934/650475">this answer</a>.  Go vote him up.)</p>
+
+<p><strong>EDIT</strong> (thanks to @cirosantilli): To run one specific scenario within the spec, you have to supply a regex pattern match that matches the description.</p>
+
+<pre><code>rake spec SPEC=path/to/spec.rb \
+          SPEC_OPTS="-e \"should be successful and return 3 items\""
+</code></pre>
+<h4> Comment 19027259 jpw: </h4>This is the superior answer because it uses the &#39;rake spec&#39; command not the &#39;rspec&#39; command. That means the test database is properly re-initialized each time (which doesnt happen if you use &#39;rspec...&#39;)<br><h4> Comment 54898615 mgold: </h4>You can use <code>SPEC=path&#47;to&#47;spec.rb:42</code> to run the test on the given line number, although it seems any <code>it_behaves_like</code> tests will also get run (bug?).<br>------------------------------------------------------------------ <br><h3> Answer 6116715 Douglas F Shearer: </h3><p>You can pass a regex to the spec command which will only run <code>it</code> blocks matching the name you supply.</p>
+
+<pre><code>spec path/to/my_spec.rb -e "should be the correct answer"
+</code></pre>
+
+<p><strong>2019 Update: Rspec2 switched from the 'spec' command to the 'rspec' command.</strong></p>
+<h4> Comment 7095549 muffinista: </h4>It&#39;s &quot;spec&quot;, not &quot;rake spec&quot;.<br><h4> Comment 101392914 bott: </h4>That is amazing! But I think he wanted to run the test not only an example from the test (is a simple test example with only 1 example)<br><h4> Comment 124935164 Alien: </h4>This should be the correct answer, line number changes way too much to be useful.<br><h4> Comment 70669583 Eugen Mayer: </h4>this should be the correct answer, relating to a line number is seriously wrong - any any case<br><h4> Comment 7095488 Douglas F Shearer: </h4>If you have a compile error, your spec is not valid ruby. Make sure you are not missing a <code>do</code> after an <code>it</code>, <code>context</code> or <code>describe</code> declaration.<br><h4> Comment 7095429 AnApprentice: </h4>Thanks I tried that but it errors with: $ rake spec spec/controllers/incoming_mails_controller_spec.rb -e &quot;should be successful and return 3 items&quot; rake aborted! (eval):1:in `standard_rake_options&#39;: compile error (eval):1: syntax error, unexpected tIDENTIFIER, expecting $end should be successful and return 3 items<br><h4> Comment 7095441 AnApprentice: </h4>Updated with the actual spec file ideas?<br>------------------------------------------------------------------ <br><h3> Answer 24038190 Michael Durrant: </h3><p>There are many options:</p>
+
+<pre><code>rspec spec                           # All specs
+rspec spec/models                    # All specs in the models directory
+rspec spec/models/a_model_spec.rb    # All specs in the some_model model spec
+rspec spec/models/a_model_spec.rb:nn # Run the spec that includes line 'nn'
+rspec -e"text from a test"           # Runs specs that match the text
+rspec spec --tag focus               # Runs specs that have :focus =&gt; true
+rspec spec --tag focus:special       # Run specs that have :focus =&gt; special
+rspec spec --tag focus ~skip         # Run tests except those with :focus =&gt; true
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 7853245 GlyphGryph: </h3><p>My preferred method for running specific tests is slightly different -
+I added the lines</p>
+
+<pre><code>  RSpec.configure do |config|
+    config.filter_run :focus =&gt; true
+    config.run_all_when_everything_filtered = true
+  end
+</code></pre>
+
+<p>To my spec_helper file.</p>
+
+<p>Now, whenever I want to run one specific test (or context, or spec), I can simply add the tag "focus" to it, and run my test as normal - only the focused test(s) will run. If I remove all the focus tags, the <code>run_all_when_everything_filtered</code> kicks in and runs all the tests as normal.</p>
+
+<p>It's not quite as quick and easy as the command line options - it does require you to edit the file for the test you want to run. But it gives you a lot more control, I feel.</p>
+<h4> Comment 53075214 wired00: </h4>I definitely prefer this style, because I&#39;m commonly running tests via Rubymine/intelliJ. I like this method also because its similar to using fit/xit in jasmine / with gulp<br>------------------------------------------------------------------ <br><h3> Answer 30871681 Ingo: </h3><p>@apneadiving answer is a neat way of solving this. However, now we have a new method in Rspec 3.3. We can simply run <code>rspec spec/unit/baseball_spec.rb[#context:#it]</code> instead of using a line number. Taken from <a href="http://rspec.info/blog/2015/06/rspec-3-3-has-been-released/" rel="noreferrer">here:</a></p>
+<blockquote>
+<p>RSpec 3.3 introduces a new way to identify examples[...]</p>
+<p>For example, this command:</p>
+<p><code>$ rspec spec/unit/baseball_spec.rb[1:2,1:4]</code>
+…would run the 2nd and 4th example or group defined under the 1st top-level group defined in spec/unit/baseball_spec.rb.</p>
+</blockquote>
+<p>So instead of doing
+<code>rspec spec/unit/baseball_spec.rb:42</code> where it (test in line 42) is the first test, we can simply do
+<code>rspec spec/unit/baseball_spec.rb[1:1]</code> or <code>rspec spec/unit/baseball_spec.rb[1:1:1]</code> depending on how nested the test case is.</p>
+<h4> Comment 112189615 stwr667: </h4>Note that if your shell is ZSH (as is now default with all Macs), you need to wrap the last argument in quotes to prevent the <code>zsh: no matches found</code> error. E.g. <code>rspec &quot;spec&#47;unit&#47;baseball_spec.rb[1:1]&quot;</code><br>------------------------------------------------------------------ <br><h3> Answer 58127663 Allison: </h3><p>Run the commands from your project's root directory:</p>
+<pre><code># run all specs in the project's spec folder
+bundle exec rspec 
+
+# run specs nested under a directory, like controllers
+bundle exec rspec spec/controllers
+
+# run a single test file
+bundle exec rspec spec/controllers/groups_controller_spec.rb
+
+# run a test or subset of tests within a file
+# e.g., if the 'it', 'describe', or 'context' block you wish to test
+# starts at line 45, run:
+bundle exec rspec spec/controllers/groups_controller_spec.rb:45
+</code></pre>
+<p>Additionally, you can use the <code>--example</code> (<code>-e</code>) option to run specific tests that partially or fully match text labels in your 'it', 'describe', or 'context' blocks for the given test path:</p>
+<pre><code># run groups controller specs in blocks with a label containing 'spaghetti flag is false'
+bundle exec rspec spec/controllers/groups_controller_spec.rb -e 'spaghetti flag is false'
+
+# Less granularly, you can run specs for blocks containing a substring of text 
+# that matches one or more block labels, like 'spaghetti' or 'paghett'
+bundle exec rspec spec/controllers/groups_controller_spec.rb -e spaghetti
+</code></pre>
+<p>This will run all the tests nested inside the blocks with labels matching the string argument received by the example option.</p>
+<p>When using the example option, I recommend also appending <code>--format documentation</code> (shorthand: <code>-f documentation</code>) to your bundle command (e.g., <code>bundle exec rspec spec/some_file.rb -e spaghetti -f documentation</code>). Documentation-formatting replaces the normal <code>.</code>/<code>F</code> output with an easy-to-read pretty printed breakdown showing the nested block labels for the examples you're running and outputs the printed label for each example (<code>it</code> block) in green or red to denote whether it passed or failed. This provides better confirmation that your example argument matches the specs you <em>intended</em> to run, and it gives live visibility to which examples are passing/failing during longer test runs where the example argument matches many block labels and/or matched blocks contain many nested examples.</p>
+<p><strong>Additional Reading (Documentation Links)</strong></p>
+<ul>
+<li><a href="https://relishapp.com/rspec/rspec-core/v/3-10/docs/command-line/example-option" rel="noreferrer">Example Option</a></li>
+<li><a href="https://relishapp.com/rspec/rspec-core/v/3-10/docs/command-line/format-option" rel="noreferrer">Format Option</a></li>
+</ul>
+------------------------------------------------------------------ <br><h3> Answer 63791655 Foram: </h3><p>For single example of spec file  you need to add line number at the last , For Example</p>
+<pre><code>rspec spec/controllers/api/v1/card_list_controller_spec.rb:35
+</code></pre>
+<p>For single file you can specify your file path, For Example</p>
+<pre><code>rspec spec/controllers/api/v1/card_list_controller_spec.rb
+</code></pre>
+<p>For Whole Rspec Example in spec folder, you can try with this command</p>
+<pre><code>bundle exec rspec spec
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 41261214 Sandeep Kapil: </h3><p>For model, it will run case on line number 5 only</p>
+
+<pre><code>bundle exec rspec spec/models/user_spec.rb:5
+</code></pre>
+
+<p>For controller : it will run case on line number 5 only</p>
+
+<pre><code>bundle exec rspec spec/controllers/users_controller_spec.rb:5
+</code></pre>
+
+<p>For signal model or controller remove line number from above</p>
+
+<p>To run case on all models</p>
+
+<pre><code>bundle exec rspec spec/models
+</code></pre>
+
+<p>To run case on all controller</p>
+
+<pre><code>bundle exec rspec spec/controllers
+</code></pre>
+
+<p>To run all cases</p>
+
+<pre><code> bundle exec rspec 
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 41183694 Alupotha: </h3><h3>In rails 5,</h3>
+
+<p>I used this way to run single test file(all the tests in one file)</p>
+
+<pre><code>rails test -n /TopicsControllerTest/ -v
+</code></pre>
+
+<p>Class name can be used to match to the desired file <code>TopicsControllerTest</code></p>
+
+<p>My class <code>class TopicsControllerTest &lt; ActionDispatch::IntegrationTest</code></p>
+
+<p>Output : </p>
+
+<p><a href="https://i.stack.imgur.com/oBHpr.png" rel="noreferrer"><img src="https://i.stack.imgur.com/oBHpr.png" alt="enter image description here"></a></p>
+
+<p>If You want you can tweak the regex to match to single test method  <code>\TopicsControllerTest#test_Should_delete\</code> </p>
+
+<pre><code>rails test -n /TopicsControllerTest#test_Should_delete/ -v
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 60649660 Akshay Dhobale: </h3><p>You can use</p>
+
+<pre><code> rspec spec/controllers/groups_controller_spec.rb:&lt;line_number&gt;
+</code></pre>
+
+<p>line number should be line number of 'describe' or 'it' lines so that it will run tests present in that particular block.
+instead it will execute all the lines next to line_number.</p>
+
+<p>also you can create block with custom name and then can execute those blocks only.</p>
+------------------------------------------------------------------ <br><h3> Answer 40430789 Rudi: </h3><p>starting with rspec 2 you can use the following:</p>
+
+<pre><code># in spec/spec_helper.rb
+RSpec.configure do |config|
+  config.filter_run :focus =&gt; true
+  config.run_all_when_everything_filtered = true
+end
+
+# in spec/any_spec.rb
+describe "something" do
+  it "does something", :focus =&gt; true do
+    # ....
+  end
+end
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 6116802 MissingHandle: </h3><p>Given you're on a rails 3 project with rspec 2, From the rails root directory: </p>
+
+<pre><code>  bundle exec rspec spec/controllers/groups_controller_spec.rb 
+</code></pre>
+
+<p>should definitely work.  i got tired of typing that so i created an alias to shorten 'bundle exec rspec' to 'bersp'</p>
+
+<p>'bundle exec' is so that it loads the exact gem environment specified in your gem file: <a href="http://gembundler.com/" rel="nofollow">http://gembundler.com/</a></p>
+
+<p>Rspec2 switched from the 'spec' command to the 'rspec' command.</p>
+------------------------------------------------------------------ <br><h3> Answer 20328093 Rameshwar Vyevhare: </h3><p>I use this guard gem to auto-run my test. It execute test after create or update operations on test file. </p>
+
+<p><a href="https://github.com/guard/guard-test" rel="nofollow">https://github.com/guard/guard-test</a></p>
+
+<p>or 
+ usually you can run using following command </p>
+
+<p>rspec spec/controllers/groups_controller_spec.rb</p>
+------------------------------------------------------------------ <br><h3> Answer 27356319 Prabhakar: </h3><p>You can do something like this:</p>
+
+<pre><code> rspec/spec/features/controller/spec_file_name.rb
+ rspec/spec/features/controller_name.rb         #run all the specs in this controller
+</code></pre>

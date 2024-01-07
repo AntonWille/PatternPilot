@@ -1,0 +1,77 @@
+ <h2> Title: How to check if a specific key is present in a hash or not? </h2> <h3> Mohit Jain, question_id: 4528506 </h3>Score: 758, Tags: {ruby,data-structures,associative-array} <br><p>I want to check whether the "user" key is present or not in the session hash. How can I do this?</p>
+
+<p>Note that I don't want to check whether the key's value is nil or not. I just want to check whether the "user" <em>key</em> is present.</p>
+------------------------------------------------------------------ <br><h3> Answer 4528522 sepp2k: </h3><p><code>Hash</code>'s <code>key?</code> method tells you whether a given key is present or not.</p>
+
+<pre><code>session.key?("user")
+</code></pre>
+<h4> Comment 73017611 Akash Agarwal: </h4>This doesn&#39;t work for me, the :user method worked instead<br><h4> Comment 65029186 Bijan: </h4>nice: &quot;string&quot; accessor works for JSON.parse parsed objects, too :)<br><h4> Comment 131042611 Katelynn ruan: </h4>if(session[&quot;user&quot;]) also work, but not sure about the efficiency<br>------------------------------------------------------------------ <br><h3> Answer 18358357 Bozhidar Batsov: </h3><p>While <code>Hash#has_key?</code> gets the job done, as Matz notes <a href="http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-core/43765" rel="noreferrer">here</a>, it has been deprecated in favour of <code>Hash#key?</code>.</p>
+
+<pre><code>hash.key?(some_key)
+</code></pre>
+<h4> Comment 70462850 codeforester: </h4>Does anybody know for sure?<br><h4> Comment 52862720 Joshua Pinter: </h4>Nice reference to that change request and subsequent response from Matz.<br><h4> Comment 134913753 jayqui: </h4><code>#has_key</code> is actually not deprecated: <a href="https://github.com/rubocop/rubocop/issues/3224#issuecomment-226175176" rel="nofollow noreferrer">github.com/rubocop/rubocop/issues/3224#issuecomment-22617517&zwnj;&#8203;6</a><br>------------------------------------------------------------------ <br><h3> Answer 29030893 installero: </h3><p>Hash instance has a <a href="http://ruby-doc.org/core-2.1.5/Hash.html#method-i-key-3F" rel="noreferrer"><code>key?</code></a> method:</p>
+<pre><code>{a: 1}.key?(:a)
+=&gt; true
+</code></pre>
+<p>Be sure to use the symbol key or a string key depending on what you have in your hash:</p>
+<pre><code>{'a' =&gt; 2}.key?(:a)
+=&gt; false
+</code></pre>
+<h4> Comment 63594908 Beni Cherniavsky-Paskin: </h4>Apprently existed as early as Ruby 1.6: <a href="http://ruby-doc.com/docs/ProgrammingRuby/html/ref_c_hash.html#Hash.key_qm" rel="nofollow noreferrer">ruby-doc.com/docs/ProgrammingRuby/html/&hellip;</a> (perhaps earlier, dunno where to check documented)<br>------------------------------------------------------------------ <br><h3> Answer 24264694 Abdul Baig: </h3><p>It is very late but preferably symbols should be used as key:</p>
+
+<pre><code>my_hash = {}
+my_hash[:my_key] = 'value'
+
+my_hash.has_key?("my_key")
+ =&gt; false 
+my_hash.has_key?("my_key".to_sym)
+ =&gt; true 
+
+my_hash2 = {}
+my_hash2['my_key'] = 'value'
+
+my_hash2.has_key?("my_key")
+ =&gt; true 
+my_hash2.has_key?("my_key".to_sym)
+ =&gt; false 
+</code></pre>
+
+<p>But when creating hash if you pass string as key then it will search for the string in keys.</p>
+
+<p>But when creating hash you pass symbol as key then has_key? will search the keys by using symbol.</p>
+
+<hr>
+
+<p>If you are using Rails, you can use <code>Hash#with_indifferent_access</code> to avoid this; both <code>hash[:my_key]</code> and <code>hash["my_key"]</code> will point to the same record</p>
+<h4> Comment 60519801 Devon Parsons: </h4>If you are using Rails, you can use <code>Hash#with_indifferent_access</code> to avoid this; both <code>:my_key</code> and <code>&quot;my_key&quot;</code> will point to the same record<br><h4> Comment 124417329 q9f: </h4>This is the best answer especially when you are looking for a key coming from a variable, e.g., <code>my_hash.has_key? my_key.to_sym</code> :)<br>------------------------------------------------------------------ <br><h3> Answer 54572262 Arvind singh: </h3><p>Another way is here</p>
+
+<pre><code>hash = {one: 1, two: 2}
+
+hash.member?(:one)
+#=&gt; true
+
+hash.member?(:five)
+#=&gt; false
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 38944089 Deepak Mahakale: </h3><p>You can always use <code>Hash#key?</code> to check if the key is present in a hash or not. </p>
+
+<p>If not it will return you <code>false</code></p>
+
+<pre><code>hash =  { one: 1, two:2 }
+
+hash.key?(:one)
+#=&gt; true
+
+hash.key?(:four)
+#=&gt; false
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 60059950 Ahmad MOUSSA: </h3><p>In Rails 5, the <strong>has_key?</strong> method checks if key exists in hash. The syntax to use it is:</p>
+
+<pre><code>YourHash.has_key? :yourkey
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 75321976 Antonina Sych: </h3><pre><code>h = {}
+if h.respond_to?(:key?) &amp;&amp; h.key?('text') #with respond_to method check if it's hash
+   puts h['text'] 
+end
+</code></pre>
+<h4> Comment 132923156 Jeremy Caney: </h4>Remember that Stack Overflow isn&#39;t just intended to solve the immediate problem, but also to help future readers find solutions to similar problems, which requires understanding the underlying code. This is especially important for members of our community who are beginners, and not familiar with the syntax. Given that, <b>can you <a href="https://stackoverflow.com/posts/75321976/edit">edit</a> your answer to include an explanation of what you&#39;re doing</b> and why you believe it is the best approach?<br>

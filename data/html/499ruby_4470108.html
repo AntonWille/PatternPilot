@@ -1,0 +1,404 @@
+ <h2> Title: When monkey patching an instance method, can you call the overridden method from the new implementation? </h2> <h3> James Hollingworth, question_id: 4470108 </h3>Score: 499, Tags: {ruby,monkeypatching} <br><p>Say I am monkey patching a method in a class, how could I call the overridden method from the overriding method? I.e. Something a bit like <code>super</code></p>
+
+<p>E.g. </p>
+
+<pre><code>class Foo
+  def bar()
+    "Hello"
+  end
+end 
+
+class Foo
+  def bar()
+    super() + " World"
+  end
+end
+
+&gt;&gt; Foo.new.bar == "Hello World"
+</code></pre>
+<h4> Comment 34199586 Halil &#214;zg&#252;r: </h4>This is needed when you don&#39;t control the creation of <code>Foo</code> <i>and</i> the usage of <code>Foo::bar</code>. So you have to <a href="http://en.wikipedia.org/wiki/Monkey_patch" rel="nofollow noreferrer">monkey patch</a> the method.<br><h4> Comment 4885876 James Hollingworth: </h4>nope, i&#39;m monkey patching. I was hoping there would be something like super() I could use to call the original method<br><h4> Comment 4885846 Draco Ater: </h4>Shouldn&#39;t the first Foo class be some other and the second Foo inherit from it?<br>------------------------------------------------------------------ <br><h3> Answer 4471202 J&#246;rg W Mittag: </h3><p><strong>EDIT</strong>: It has been 9 years since I originally wrote this answer, and it deserves some cosmetic surgery to keep it current.</p>
+
+<p>You can see the last version before the edit <a href="http://StackOverflow.Com/revisions/4471202/8">here</a>.</p>
+
+<hr>
+
+<p>You can’t call the <em>overwritten</em> method by name or keyword. That’s one of the many reasons why monkey patching should be avoided and inheritance be preferred instead, since obviously you <em>can</em> call the <em>overridden</em> method.</p>
+
+<h1>Avoiding Monkey Patching</h1>
+
+<h2>Inheritance</h2>
+
+<p>So, if at all possible, you should prefer something like this:</p>
+
+<pre><code>class Foo
+  def bar
+    'Hello'
+  end
+end 
+
+class ExtendedFoo &lt; Foo
+  def bar
+    super + ' World'
+  end
+end
+
+ExtendedFoo.new.bar # =&gt; 'Hello World'
+</code></pre>
+
+<p>This works, if you control creation of the <code>Foo</code> objects. Just change every place which creates a <code>Foo</code> to instead create an <code>ExtendedFoo</code>. This works even better if you use the <a href="http://c2.com/cgi/wiki?DependencyInjection" rel="noreferrer">Dependency Injection Design Pattern</a>, the <a href="http://c2.com/cgi/wiki?FactoryMethodPattern" rel="noreferrer">Factory Method Design Pattern</a>, the <a href="http://c2.com/cgi/wiki?AbstractFactoryPattern" rel="noreferrer"> Abstract Factory Design Pattern</a> or something along those lines, because in that case, there is only place you need to change.</p>
+
+<h2>Delegation</h2>
+
+<p>If you <em>do not</em> control creation of the <code>Foo</code> objects, for example because they are created by a framework that is outside of your control (like <a href="/questions/tagged/ruby-on-rails" class="post-tag" title="show questions tagged &#39;ruby-on-rails&#39;" rel="tag">ruby-on-rails</a> for example), then you could use the <a href="http://c2.com/cgi/wiki?HandleBodyPattern" rel="noreferrer">Wrapper Design Pattern</a>:</p>
+
+<pre><code>require 'delegate'
+
+class Foo
+  def bar
+    'Hello'
+  end
+end 
+
+class WrappedFoo &lt; DelegateClass(Foo)
+  def initialize(wrapped_foo)
+    super
+  end
+
+  def bar
+    super + ' World'
+  end
+end
+
+foo = Foo.new # this is not actually in your code, it comes from somewhere else
+
+wrapped_foo = WrappedFoo.new(foo) # this is under your control
+
+wrapped_foo.bar # =&gt; 'Hello World'
+</code></pre>
+
+<p>Basically, at the boundary of the system, where the <code>Foo</code> object comes into your code, you wrap it into another object, and then use <em>that</em> object instead of the original one everywhere else in your code.</p>
+
+<p>This uses the <a href="http://Ruby-Doc.Org/stdlib/libdoc/delegate/rdoc/Object.html#method-i-DelegateClass" rel="noreferrer"><code>Object#DelegateClass</code></a> helper method from the <a href="http://Ruby-Doc.Org/stdlib/libdoc/delegate/rdoc/" rel="noreferrer"><code>delegate</code></a> library in the stdlib.</p>
+
+<h1>“Clean” Monkey Patching</h1>
+
+<h2><a href="http://Ruby-Doc.Org/core/Module.html#method-i-prepend" rel="noreferrer"><code>Module#prepend</code></a>: Mixin Prepending</h2>
+
+<p>The two methods above require changing the system to avoid monkey patching. This section shows the preferred and least invasive method of monkey patching, should changing the system not be an option.</p>
+
+<p><a href="http://Ruby-Doc.Org/core/Module.html#method-i-prepend" rel="noreferrer"><code>Module#prepend</code></a> was added to support more or less exactly this use case. <code>Module#prepend</code> does the same thing as <code>Module#include</code>, except it mixes in the mixin directly <em>below</em> the class:</p>
+
+<pre><code>class Foo
+  def bar
+    'Hello'
+  end
+end 
+
+module FooExtensions
+  def bar
+    super + ' World'
+  end
+end
+
+class Foo
+  prepend FooExtensions
+end
+
+Foo.new.bar # =&gt; 'Hello World'
+</code></pre>
+
+<p>Note: I also wrote a little bit about <code>Module#prepend</code> in this question: <a href="http://StackOverflow.Com/a/24912554/2988#24912554">Ruby module prepend vs derivation</a></p>
+
+<h3>Mixin Inheritance (broken)</h3>
+
+<p>I have seen some people try (and ask about why it doesn’t work here on StackOverflow) something like this, i.e. <code>include</code>ing a mixin instead of <code>prepend</code>ing it:</p>
+
+<pre><code>class Foo
+  def bar
+    'Hello'
+  end
+end 
+
+module FooExtensions
+  def bar
+    super + ' World'
+  end
+end
+
+class Foo
+  include FooExtensions
+end
+</code></pre>
+
+<p>Unfortunately, that won’t work. It’s a good idea, because it uses inheritance, which means that you can use <code>super</code>. However, <a href="http://Ruby-Doc.Org/core/Module.html#method-i-include" rel="noreferrer"><code>Module#include</code></a> inserts the mixin <em>above</em> the class in the inheritance hierarchy, which means that <code>FooExtensions#bar</code> will never be called (and if it <em>were</em> called, the <code>super</code> would not actually refer to <code>Foo#bar</code> but rather to <code>Object#bar</code> which doesn’t exist), since <code>Foo#bar</code> will always be found first.</p>
+
+<h2>Method Wrapping</h2>
+
+<p>The big question is: how can we hold on to the <code>bar</code> method, without actually keeping around an <em>actual method</em>? The answer lies, as it does so often, in functional programming. We get a hold of the method as an actual <em>object</em>, and we use a closure (i.e. a block) to make sure that we <em>and only we</em> hold on to that object:</p>
+
+<pre><code>class Foo
+  def bar
+    'Hello'
+  end
+end 
+
+class Foo
+  old_bar = instance_method(:bar)
+
+  define_method(:bar) do
+    old_bar.bind(self).() + ' World'
+  end
+end
+
+Foo.new.bar # =&gt; 'Hello World'
+</code></pre>
+
+<p>This is very clean: since <code>old_bar</code> is just a local variable, it will go out of scope at the end of the class body, and it is impossible to access it from anywhere, <em>even</em> using reflection! And since <a href="http://Ruby-Doc.Org/core/Module.html#method-i-define_method" rel="noreferrer"><code>Module#define_method</code></a> takes a block, and blocks close over their surrounding lexical environment (which is <em>why</em> we are using <code>define_method</code> instead of <code>def</code> here), <em>it</em> (and <em>only</em> it) will still have access to <code>old_bar</code>, even after it has gone out of scope.</p>
+
+<p>Short explanation:</p>
+
+<pre><code>old_bar = instance_method(:bar)
+</code></pre>
+
+<p>Here we are wrapping the <code>bar</code> method into an <a href="http://Ruby-Doc.Org/core/UnboundMethod.html" rel="noreferrer"><code>UnboundMethod</code></a> method object and assigning it to the local variable <code>old_bar</code>. This means, we now have a way to hold on to <code>bar</code> even after it has been overwritten.</p>
+
+<pre><code>old_bar.bind(self)
+</code></pre>
+
+<p>This is a bit tricky. Basically, in Ruby (and in pretty much all single-dispatch based OO languages), a method is bound to a specific receiver object, called <code>self</code> in Ruby. In other words: a method always knows what object it was called on, it knows what its <code>self</code> is. But, we grabbed the method directly from a class, how does it know what its <code>self</code> is?</p>
+
+<p>Well, it doesn’t, which is why we need to <a href="http://Ruby-Doc.Org/core/UnboundMethod.html#method-i-bind" rel="noreferrer"><code>bind</code></a> our <code>UnboundMethod</code> to an object first, which will return a <a href="http://Ruby-Doc.Org/core/Method.html" rel="noreferrer"><code>Method</code></a> object that we can then call. (<code>UnboundMethod</code>s cannot be called, because they don’t know what to do without knowing their <code>self</code>.)</p>
+
+<p>And what do we <code>bind</code> it to? We simply <code>bind</code> it to ourselves, that way it will behave <em>exactly</em> like the original <code>bar</code> would have!</p>
+
+<p>Lastly, we need to call the <code>Method</code> that is returned from <code>bind</code>. In Ruby 1.9, there is some nifty new syntax for that (<code>.()</code>), but if you are on 1.8, you can simply use the <a href="http://Ruby-Doc.Org/core/Method.html#method-i-call" rel="noreferrer"><code>call</code></a> method; that’s what <code>.()</code> gets translated to anyway.</p>
+
+<p>Here are a couple of other questions, where some of those concepts are explained:</p>
+
+<ul>
+<li><a href="http://StackOverflow.Com/a/4294660/2988#4294660">How do I reference a function in Ruby?</a></li>
+<li><a href="http://StackOverflow.Com/a/4334217/2988#4334217">Is Ruby’s code block same as C♯’s lambda expression?</a></li>
+</ul>
+
+<h1>“Dirty” Monkey Patching</h1>
+
+<h2><a href="http://Ruby-Doc.Org/core/Module.html#method-i-alias_method" rel="noreferrer"><code>alias_method</code></a> chain</h2>
+
+<p>The problem we are having with our monkey patching is that when we overwrite the method, the method is gone, so we cannot call it anymore. So, let’s just make a backup copy!</p>
+
+<pre><code>class Foo
+  def bar
+    'Hello'
+  end
+end 
+
+class Foo
+  alias_method :old_bar, :bar
+
+  def bar
+    old_bar + ' World'
+  end
+end
+
+Foo.new.bar # =&gt; 'Hello World'
+Foo.new.old_bar # =&gt; 'Hello'
+</code></pre>
+
+<p>The problem with this is that we have now polluted the namespace with a superfluous <code>old_bar</code> method. This method will show up in our documentation, it will show up in code completion in our IDEs, it will show up during reflection. Also, it still can be called, but presumably we monkey patched it, because we didn’t like its behavior in the first place, so we might not want other people to call it.</p>
+
+<p>Despite the fact that this has some undesirable properties, it has unfortunately become popularized through AciveSupport’s <a href="http://API.RubyOnRails.Org/classes/Module.html#method-i-alias_method_chain" rel="noreferrer"><code>Module#alias_method_chain</code></a>.</p>
+
+<h2>An aside: <a href="http://Ruby-Doc.Org/core/doc/syntax/refinements_rdoc.html" rel="noreferrer">Refinements</a></h2>
+
+<p>In case you only need the different behavior in a few specific places and not throughout the whole system, you can use Refinements to restrict the monkey patch to a specific scope. I am going to demonstrate it here using the <code>Module#prepend</code> example from above:</p>
+
+<pre><code>class Foo
+  def bar
+    'Hello'
+  end
+end 
+
+module ExtendedFoo
+  module FooExtensions
+    def bar
+      super + ' World'
+    end
+  end
+
+  refine Foo do
+    prepend FooExtensions
+  end
+end
+
+Foo.new.bar # =&gt; 'Hello'
+# We haven’t activated our Refinement yet!
+
+using ExtendedFoo
+# Activate our Refinement
+
+Foo.new.bar # =&gt; 'Hello World'
+# There it is!
+</code></pre>
+
+<p>You can see a more sophisticated example of using Refinements in this question: <a href="http://StackOverflow.Com/a/32988220/2988#32988220">How to enable monkey patch for specific method?</a></p>
+
+<hr>
+
+<h1>Abandoned ideas</h1>
+
+<p>Before the Ruby community settled on <code>Module#prepend</code>, there were multiple different ideas floating around that you may occasionally see referenced in older discussions. All of these are subsumed by <code>Module#prepend</code>.</p>
+
+<h2>Method Combinators</h2>
+
+<p>One idea was the idea of method combinators from CLOS. This is basically a very lightweight version of a subset of Aspect-Oriented Programming.</p>
+
+<p>Using syntax like</p>
+
+<pre><code>class Foo
+  def bar:before
+    # will always run before bar, when bar is called
+  end
+
+  def bar:after
+    # will always run after bar, when bar is called
+    # may or may not be able to access and/or change bar’s return value
+  end
+end
+</code></pre>
+
+<p>you would be able to “hook into” the execution of the <code>bar</code> method.</p>
+
+<p>It is however not quite clear if and how you get access to <code>bar</code>’s return value within <code>bar:after</code>. Maybe we could (ab)use the <code>super</code> keyword?</p>
+
+<pre><code>class Foo
+  def bar
+    'Hello'
+  end
+end 
+
+class Foo
+  def bar:after
+    super + ' World'
+  end
+end
+</code></pre>
+
+<h3>Replacement</h3>
+
+<p>The before combinator is equivalent to <code>prepend</code>ing a mixin with an overriding method that calls <code>super</code> at the very <em>end</em> of the method. Likewise, the after combinator is equivalent to <code>prepend</code>ing a mixin with an overriding method that calls <code>super</code> at the very <em>beginning</em> of the method.</p>
+
+<p>You can also do stuff before <em>and</em> after calling <code>super</code>, you can call <code>super</code> multiple times, and both retrieve and manipulate <code>super</code>’s return value, making <code>prepend</code> more powerful than method combinators.</p>
+
+<pre><code>class Foo
+  def bar:before
+    # will always run before bar, when bar is called
+  end
+end
+
+# is the same as
+
+module BarBefore
+  def bar
+    # will always run before bar, when bar is called
+    super
+  end
+end
+
+class Foo
+  prepend BarBefore
+end
+</code></pre>
+
+<p>and </p>
+
+<pre><code>class Foo
+  def bar:after
+    # will always run after bar, when bar is called
+    # may or may not be able to access and/or change bar’s return value
+  end
+end
+
+# is the same as
+
+class BarAfter
+  def bar
+    original_return_value = super
+    # will always run after bar, when bar is called
+    # has access to and can change bar’s return value
+  end
+end
+
+class Foo
+  prepend BarAfter
+end
+</code></pre>
+
+<h2><code>old</code> keyword</h2>
+
+<p>This idea adds a new keyword similar to <code>super</code>, which allows you to call the <em>overwritten</em> method the same way <code>super</code> lets you call the <em>overridden</em> method:</p>
+
+<pre><code>class Foo
+  def bar
+    'Hello'
+  end
+end 
+
+class Foo
+  def bar
+    old + ' World'
+  end
+end
+
+Foo.new.bar # =&gt; 'Hello World'
+</code></pre>
+
+<p>The main problem with this is that it is backwards incompatible: if you have method called <code>old</code>, you will no longer be able to call it!</p>
+
+<h3>Replacement</h3>
+
+<p><code>super</code> in an overriding method in a <code>prepend</code>ed mixin is essentially the same as <code>old</code> in this proposal.</p>
+
+<h2><code>redef</code> keyword</h2>
+
+<p>Similar to above, but instead of adding a new keyword for <em>calling</em> the overwritten method and leaving <code>def</code> alone, we add a new keyword for <em>redefining</em> methods. This is backwards compatible, since the syntax currently is illegal anyway:</p>
+
+<pre><code>class Foo
+  def bar
+    'Hello'
+  end
+end 
+
+class Foo
+  redef bar
+    old + ' World'
+  end
+end
+
+Foo.new.bar # =&gt; 'Hello World'
+</code></pre>
+
+<p>Instead of adding <em>two</em> new keywords, we could also redefine the meaning of <code>super</code> inside <code>redef</code>:</p>
+
+<pre><code>class Foo
+  def bar
+    'Hello'
+  end
+end 
+
+class Foo
+  redef bar
+    super + ' World'
+  end
+end
+
+Foo.new.bar # =&gt; 'Hello World'
+</code></pre>
+
+<h3>Replacement</h3>
+
+<p><code>redef</code>ining a method is equivalent to overriding the method in a <code>prepend</code>ed mixin. <code>super</code> in the overriding method behaves like <code>super</code> or <code>old</code> in this proposal.</p>
+<h4> Comment 38510605 Nakilon: </h4>Where do you find <code>old</code> and <code>redef</code>? My 2.0.0 doesn&#39;t have them. Ah, it&#39;s hard not to miss the <i>Other competing ideas that did not make it into Ruby were:</i><br><h4> Comment 15083416 Евген: </h4>Was looking for an explanation on patching like this ever since I started on ruby and rails. Great answer! The only thing missing for me was a note on class_eval vs. reopening a class. Here it is: <a href="http://stackoverflow.com/a/10304721/188462">stackoverflow.com/a/10304721/188462</a><br><h4> Comment 16721052 NARKOZ: </h4>Ruby 2.0 has refinements <a href="http://blog.wyeworks.com/2012/8/3/ruby-refinements-landed-in-trunk/" rel="nofollow noreferrer">blog.wyeworks.com/2012/8/3/ruby-refinements-landed-in-trunk</a><br><h4> Comment 11936269 J&#246;rg W Mittag: </h4>@KandadaBoggu: I&#39;m trying to figure out what <i>exactly</i> you mean by that :-) However, I&#39;m pretty sure it is no less thread-safe than any other kind of metaprogramming in Ruby. In particular, every call to <code>UnboundMethod#bind</code> will return a new, different <code>Method</code>, so, I don&#39;t see any conflict arising, regardless of whether you call it twice in a row or twice at the same time from different threads.<br><h4> Comment 96888139 cjspurgeon: </h4>Example of using prepend to cleanly monkey patch a class method: <a href="https://blog.daveallie.com/clean-monkey-patching/" rel="nofollow noreferrer">blog.daveallie.com/clean-monkey-patching</a> (which I was looking for when I arrived here)<br><h4> Comment 120152057 ADTC: </h4>I just upped your answer to 1200 votes! I was actually wondering if I had an object instance of <code>Foo</code> called <code>foo1</code> and I&#39;d monkey patch the object&#39;s <code>bar</code> method, does it affect the class <code>Foo</code>. Does it affect other object instances of <code>Foo</code> such as <code>foo2</code> or <code>foo3</code> whether already existing or newly created? <i>Just tested this, and apparently it does not!</i> The monkey patched <code>bar</code> in <code>foo1</code> belongs only to <code>foo1</code> and not to any other <code>Foo</code>. Interestingly, monkey patching the <code>bar</code> in <code>Foo</code> affects all <b>non-monkey-patched</b> instances of <code>Foo</code> (except <code>foo1</code>).<br><h4> Comment 38037261 Ajedi32: </h4>Fyi, <code>redef</code> (with some slight modifications to syntax) is totally possible to implement as a library.<br><h4> Comment 49911635 Ich: </h4>@J&#246;rgWMittag Can you explain, why you reverted my edit? <a href="http://stackoverflow.com/revisions/4471202/6">stackoverflow.com/revisions/4471202/6</a> I really found it useful to realize that I can&#39;t just copy&amp;past to try every solution in my code.<br><h4> Comment 49911777 J&#246;rg W Mittag: </h4>@Ich: there is no indication that any one of those will be implemented in any future version of Ruby. In fact, <code>Module#prepend</code> <i>specifically</i> supersedes all of them, it simply doesn&#39;t make sense to add any one of them.<br><h4> Comment 49916270 Ich: </h4>@J&#246;rgWMittag while that may be true, I just wanted to point out that they are not (yet) usable right away. So I wanted people to be more aware of that. The small sentence can easily be overlooked. I didn&#39;t want to give the impression that one of these features might be available any time.<br><h4> Comment 11936418 Harish Shetty: </h4>If every call to bind returns a new method it is thread safe. When I think about it, it makes sense. Thanks.<br><h4> Comment 18997068 Nathan: </h4>If using alias_method wrapped in a <code>base.class_eval</code>, it does not pollute the namespace -- at least not statically. In other words, if the module is being mixed in conditionally, then only when it is mixed in will the alias method name appear. It&#39;s not a bad solution.<br><h4> Comment 11935650 Harish Shetty: </h4>@J&#246;rg W Mittag, is the method wrapping approach thread safe? What happens when two concurrent threads call <code>bind</code> on the same <code>old_method</code> variable?<br>------------------------------------------------------------------ <br><h3> Answer 4470168 Veger: </h3><p>Take a look at aliasing methods, this is kind of renaming the method to a new name.</p>
+
+<p>For more information and a starting point take a look at this <a href="http://split-s.blogspot.com/2006/01/replacing-methods.html" rel="noreferrer">replacing methods article</a> (especially the first part).
+The <a href="http://www.ruby-doc.org/core/classes/Class.html" rel="noreferrer">Ruby API docs</a>, also provides (a less elaborate) example.</p>
+------------------------------------------------------------------ <br><h3> Answer 36708694 rplaurindo: </h3><p>The class that will make override must to be reloaded after class that contains the original method, so <code>require</code> it in the file that will make overrride.</p>

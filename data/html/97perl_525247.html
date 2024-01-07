@@ -1,0 +1,480 @@
+ <h2> Title: How do I daemonize an arbitrary script in unix? </h2> <h3> dreeves, question_id: 525247 </h3>Score: 97, Tags: {perl,unix,scripting,system-administration,daemon} <br><p>I'd like a daemonizer that can turn an arbitrary, generic script or command into a <a href="http://en.wikipedia.org/wiki/Daemon_(computer_software)" rel="noreferrer">daemon</a>.</p>
+
+<p>There are two common cases I'd like to deal with:</p>
+
+<ol>
+<li><p>I have a script that should run forever.  If it ever dies (or on reboot), restart it.  Don't let there ever be two copies running at once (detect if a copy is already running and don't launch it in that case).</p></li>
+<li><p>I have a simple script or command line command that I'd like to keep executing repeatedly forever (with a short pause between runs).  Again, don't allow two copies of the script to ever be running at once.</p></li>
+</ol>
+
+<p>Of course it's trivial to write a "while(true)" loop around the script in case 2 and then apply a solution for case 1, but a more general solution will just solve case 2 directly since that applies to the script in case 1 as well (you may just want a shorter or no pause if the script is not intended to ever die (of course if the script really <em>does</em> never die then the pause doesn't actually matter)).</p>
+
+<p>Note that the solution should not involve, say, adding file-locking code or PID recording to the existing scripts.</p>
+
+<p>More specifically, I'd like a program "daemonize" that I can run like</p>
+
+<pre><code>% daemonize myscript arg1 arg2
+</code></pre>
+
+<p>or, for example, </p>
+
+<pre><code>% daemonize 'echo `date` &gt;&gt; /tmp/times.txt'
+</code></pre>
+
+<p>which would keep a growing list of dates appended to times.txt. (Note that if the argument(s) to daemonize is a script that runs forever as in case 1 above, then daemonize will still do the right thing, restarting it when necessary.)  I could then put a command like above in my .login and/or cron it hourly or minutely (depending on how worried I was about it dying unexpectedly).</p>
+
+<p>NB: The daemonize script will need to remember the command string it is daemonizing so that if the same command string is daemonized again it does not launch a second copy.</p>
+
+<p>Also, the solution should ideally work on both OS X and linux but solutions for one or the other are welcome.</p>
+
+<p>EDIT: It's fine if you have to invoke it with <code>sudo daemonize myscript myargs</code>.</p>
+
+<p>(If I'm thinking of this all wrong or there are quick-and-dirty partial solutions, I'd love to hear that too.)</p>
+
+<hr>
+
+<p>PS: In case it's useful, <a href="https://stackoverflow.com/questions/473620/how-do-you-create-a-daemon-in-python">here's</a> a similar question specific to python.</p>
+
+<p>And <a href="https://stackoverflow.com/questions/38596/whats-the-best-way-to-keep-a-php-script-running-as-a-daemon/39609#39609">this</a> answer to a similar question has what appears to be a useful idiom for a quick-and-dirty demonizing of an arbitrary script:</p>
+<h4> Comment 31443780 w00t: </h4>See <a href="http://serverfault.com/questions/311593/keeping-a-linux-process-running-after-i-logout/312265#312265" title="keeping a linux process running after i logout">serverfault.com/questions/311593/&hellip;</a> for a pure shell version<br>------------------------------------------------------------------ <br><h3> Answer 2423550 Robert Menteer: </h3><p>You can daemonize any executable in Unix by using nohup and the &amp; operator:</p>
+
+<pre><code>nohup yourScript.sh script args&amp;
+</code></pre>
+
+<p>The nohup command allows you to shut down your shell session without it killing your script, while the &amp; places your script in the background so you get a shell prompt to continue your session. The only minor problem with this is standard out and standard error both get sent to ./nohup.out, so if you start several scripts in this manor their output will be intertwined. A better command would be:</p>
+
+<pre><code>nohup yourScript.sh script args &gt;script.out 2&gt;script.error&amp;
+</code></pre>
+
+<p>This will send standard out to the file of your choice and standard error to a different file of your choice. If you want to use just one file for both standard out and standard error you can us this:</p>
+
+<pre><code>nohup yourScript.sh script args &gt;script.out 2&gt;&amp;1 &amp;
+</code></pre>
+
+<p>The 2>&amp;1 tells the shell to redirect standard error (file descriptor 2) to the same file as standard out (file descriptor 1).</p>
+
+<p>To run a command only once and restart it if it dies you can use this script:</p>
+
+<pre><code>#!/bin/bash
+
+if [[ $# &lt; 1 ]]; then
+    echo "Name of pid file not given."
+    exit
+fi
+
+# Get the pid file's name.
+PIDFILE=$1
+shift
+
+if [[ $# &lt; 1 ]]; then
+    echo "No command given."
+    exit
+fi
+
+echo "Checking pid in file $PIDFILE."
+
+#Check to see if process running.
+PID=$(cat $PIDFILE 2&gt;/dev/null)
+if [[ $? = 0 ]]; then
+    ps -p $PID &gt;/dev/null 2&gt;&amp;1
+    if [[ $? = 0 ]]; then
+        echo "Command $1 already running."
+        exit
+    fi
+fi
+
+# Write our pid to file.
+echo $$ &gt;$PIDFILE
+
+# Get command.
+COMMAND=$1
+shift
+
+# Run command until we're killed.
+while true; do
+    $COMMAND "$@"
+    sleep 10 # if command dies immediately, don't go into un-ctrl-c-able loop
+done
+</code></pre>
+
+<p>The first argument is the name of the pid file to use. The second argument is the command. And all other arguments are the command's arguments.</p>
+
+<p>If you name this script restart.sh this is how you would call it:</p>
+
+<pre><code>nohup restart.sh pidFileName yourScript.sh script args &gt;script.out 2&gt;&amp;1 &amp;
+</code></pre>
+<h4> Comment 2433734 user50049: </h4>This handles only SIGHUP, there are other (normally) fatal signals that should be handled.<br><h4> Comment 25437214 Steven Lu: </h4>Another way to improve this script is probably to have it come up with a good location to place the $PIDFILE on its own rather than requiring it to be specified as an arg. It doesn&#39;t even clean up after itself! (which should be straightforward with a <code>trap EXIT</code>)<br><h4> Comment 25437310 Steven Lu: </h4>Also, consider that the use of <code>&lt;</code> in the <code>test</code> is an ASCII comparison not an integer comparison. It may still work, but may lead to bugs.<br><h4> Comment 25450977 Steven Lu: </h4>I&#39;ve posted my fixes to this script <a href="http://stackoverflow.com/a/17506743/340947">here</a>.<br><h4> Comment 29061726 Good Person: </h4>#!/bin/bash is wrong; prefer #!/bin/sh if possible or #!/usr/bin/env bash if not<br><h4> Comment 2416019 dreeves: </h4>Awesome; thank you.  I wonder if it should also have an option for a delay in restarting.  Or maybe better to just use it in conjunction with this:  <a href="http://stackoverflow.com/questions/555116/repeat-a-unix-command-every-x-seconds-forever" title="repeat a unix command every x seconds forever">stackoverflow.com/questions/555116/&hellip;</a><br>------------------------------------------------------------------ <br><h3> Answer 2467513 C. K. Young: </h3><p>I apologise for the long answer (please see comments about how my answer nails the spec). I'm trying to be comprehensive, so you have as good of a leg up as possible. :-)</p>
+
+<p>If you are able to install programs (have root access), and are willing to do one-time legwork to set up your script for daemon execution (i.e., more involved than simply specifying the command-line arguments to run on the command line, but only needing to be done once per service), I have a way that's more robust.</p>
+
+<p>It involves using <a href="http://cr.yp.to/daemontools.html" rel="noreferrer">daemontools</a>. The rest of the post describes how to set up services using daemontools.</p>
+
+<h3>Initial setup</h3>
+
+<ol>
+<li>Follow the instructions in <a href="http://cr.yp.to/daemontools/install.html" rel="noreferrer">How to install daemontools</a>. Some distributions (e.g., Debian, Ubuntu) already have packages for it, so just use that.</li>
+<li>Make a directory called <code>/service</code>. The installer should have already done this, but just verify, or if installing manually. If you dislike this location, you can change it in your <code>svscanboot</code> script, although most daemontools users are used to using <code>/service</code> and will get confused if you don't use it.</li>
+<li>If you're using Ubuntu or another distro that doesn't use standard <code>init</code> (i.e., doesn't use <code>/etc/inittab</code>), you will need to use the pre-installed <code>inittab</code> as a base for arranging <code>svscanboot</code> to be called by <code>init</code>. It's not hard, but you need to know how to configure the <code>init</code> that your OS uses.
+<code>svscanboot</code> is a script that calls <code>svscan</code>, which does the main work of looking for services; it's called from <code>init</code> so <code>init</code> will arrange to restart it if it dies for any reason.</li>
+</ol>
+
+<h3>Per-service setup</h3>
+
+<ol>
+<li>Each service needs a <em>service directory</em>, which stores housekeeping information about the service. You can also make a location to house these service directories so they're all in one place; usually I use <code>/var/lib/svscan</code>, but any new location will be fine.</li>
+<li><p>I usually use <a href="http://codepad.org/9CgRVihO" rel="noreferrer">a script</a> to set up the service directory, to save lots of manual repetitive work. e.g.,</p>
+
+<pre><code>sudo mkservice -d /var/lib/svscan/some-service-name -l -u user -L loguser "command line here"
+</code></pre>
+
+<p>where <code>some-service-name</code> is the name you want to give your service, <code>user</code> is the user to run that service as, and <code>loguser</code> is the user to run the logger as. (Logging is explained in just a little bit.)</p></li>
+<li>Your service has to run <strong>in the foreground</strong>. If your program backgrounds by default, but has an option to disable that, then do so. If your program backgrounds without a way to disable it, read up on <a href="http://cr.yp.to/daemontools/fghack.html" rel="noreferrer"><code>fghack</code></a>, although this comes at a trade-off: you can no longer control the program using <code>svc</code>.</li>
+<li>Edit the <code>run</code> script to ensure it's doing what you want it to. You may need to place a <code>sleep</code> call at the top, if you expect your service to exit frequently.</li>
+<li>When everything is set up right, create a symlink in <code>/service</code> pointing to your service directory. (Don't put service directories directly within <code>/service</code>; it makes it harder to remove the service from <code>svscan</code>'s watch.)</li>
+</ol>
+
+<h3>Logging</h3>
+
+<ol>
+<li>The daemontools way of logging is to have the service write log messages to standard output (or standard error, if you're using scripts generated with <code>mkservice</code>); <code>svscan</code> takes care of sending log messages to the logging service.</li>
+<li>The logging service takes the log messages from standard input. The logging service script generated by <code>mkservice</code> will create auto-rotated, timestamped log files in the <code>log/main</code> directory. The current log file is called <code>current</code>.</li>
+<li>The logging service can be started and stopped independently of the main service.</li>
+<li>Piping the log files through <a href="http://cr.yp.to/daemontools/tai64nlocal.html" rel="noreferrer"><code>tai64nlocal</code></a> will translate the timestamps into a human-readable format. (TAI64N is a 64-bit atomic timestamp with a nanosecond count.)</li>
+</ol>
+
+<h3>Controlling services</h3>
+
+<ol>
+<li>Use <a href="http://cr.yp.to/daemontools/svstat.html" rel="noreferrer"><code>svstat</code></a> to get the status of a service. Note that the logging service is independent, and has its own status.</li>
+<li>You control your service (start, stop, restart, etc.) using <a href="http://cr.yp.to/daemontools/svc.html" rel="noreferrer"><code>svc</code></a>. For example, to restart your service, use <code>svc -t /service/some-service-name</code>; <code>-t</code> means "send <code>SIGTERM</code>".</li>
+<li>Other signals available include <code>-h</code> (<code>SIGHUP</code>), <code>-a</code> (<code>SIGALRM</code>), <code>-1</code> (<code>SIGUSR1</code>), <code>-2</code> (<code>SIGUSR2</code>), and <code>-k</code> (<code>SIGKILL</code>).</li>
+<li>To down the service, use <code>-d</code>. You can also prevent a service from automatically starting at bootup by creating a file named <code>down</code> in the service directory.</li>
+<li>To start the service, use <code>-u</code>. This is not necessary unless you've downed it previously (or set it up not to auto-start).</li>
+<li>To ask the supervisor to exit, use <code>-x</code>; usually used with <code>-d</code> to terminate the service as well. This is the usual way to allow a service to be removed, but you have to unlink the service from <code>/service</code> first, or else <code>svscan</code> will restart the supervisor.
+Also, if you created your service with a logging service (<code>mkservice -l</code>), remember to also exit the logging supervisor (e.g., <code>svc -dx /var/lib/svscan/some-service-name/log</code>) before removing the service directory.</li>
+</ol>
+
+<h3>Summary</h3>
+
+<p>Pros:</p>
+
+<ol>
+<li>daemontools provides a bulletproof way to create and manage services. I use it for my servers, and I highly recommend it.</li>
+<li>Its logging system is very robust, as is the service auto-restart facility.</li>
+<li>Because it starts services with a shell script that you write/tune, you can tailor your service however you like.</li>
+<li>Powerful service control tools: you can send most any signal to a service, and can bring services up and down reliably.</li>
+<li>Your services are guaranteed a clean execution environment: they will execute with the same environment, process limits, etc., as what <code>init</code> provides.</li>
+</ol>
+
+<p>Cons:</p>
+
+<ol>
+<li>Each service takes a bit of setup. Thankfully, this only needs doing once per service.</li>
+<li>Services must be set up to run in the foreground. Also, for best results, they should be set up to log to standard output/standard error, rather than syslog or other files.</li>
+<li>Steep learning curve if you're new to the daemontools way of doing things. You have to restart services using <code>svc</code>, and cannot run the run scripts directly (since they would then not be under the control of the supervisor).</li>
+<li>Lots of housekeeping files, and lots of housekeeping processes. Each service needs its own service directory, and each service uses one supervisor process to auto-restart the service if it dies. (If you have many services, you will see <em>lots</em> of <code>supervise</code> processes in your process table.)</li>
+</ol>
+
+<p>In balance, I think daemontools is an excellent system for your needs. I welcome any questions about how to set it up and maintain it.</p>
+<h4> Comment 35726618 skytreader: </h4>We should have more posts like this in SO and in the net in general. Not just a recipe on how to achieve the desired effect but one that takes the trouble to explain the recipes. Why can&#39;t I upvote this more than once? :|<br><h4> Comment 2457534 C. K. Young: </h4>How my answer nails the spec: 1. You have to set up services, so as long as you don&#39;t set up duplicates (and as long as your service does not background itself), no duplicates will occur. 2. <code>supervise</code>, the supervisor, takes care of restarting any service that exits. It waits one second between restars; if that&#39;s not enough time for you, put in a sleep at the top of the service run script.<br><h4> Comment 2457538 C. K. Young: </h4>2a. <code>supervise</code> is itself backed by <code>svscan</code>, so if a supervisor dies, it will be restarted. 2b. <code>svscan</code> is backed by <code>init</code>, which will auto-restart <code>svscan</code> as necessary. 2c. If your <code>init</code> dies for any reason, you&#39;re screwed anyway. :-P<br><h4> Comment 2457555 C. K. Young: </h4>To answer other questions about housekeeping, the daemontools system doesn&#39;t use PID files, since they can get stale. Instead, all process information is kept by the supervisor backing a given service. The supervisor maintains a bunch of files (and FIFOs) in the service directory that tools like <code>svstat</code> and <code>svc</code> can work with.<br>------------------------------------------------------------------ <br><h3> Answer 2459629 uthark: </h3><p>You should have a look at <a href="http://www.clapper.org/software/daemonize/" rel="noreferrer">daemonize</a>. It allows to detect second copy (but it uses file locking mechanism). Also it works on different UNIX and Linux distributions.</p>
+
+<p>If you need to automatically start your application as daemon, then you need to create appropriate init-script.</p>
+
+<p>You can use the following template:</p>
+
+<pre><code>#!/bin/sh
+#
+# mydaemon     This shell script takes care of starting and stopping
+#               the &lt;mydaemon&gt;
+#
+
+# Source function library
+. /etc/rc.d/init.d/functions
+
+
+# Do preliminary checks here, if any
+#### START of preliminary checks #########
+
+
+##### END of preliminary checks #######
+
+
+# Handle manual control parameters like start, stop, status, restart, etc.
+
+case "$1" in
+  start)
+    # Start daemons.
+
+    echo -n $"Starting &lt;mydaemon&gt; daemon: "
+    echo
+    daemon &lt;mydaemon&gt;
+    echo
+    ;;
+
+  stop)
+    # Stop daemons.
+    echo -n $"Shutting down &lt;mydaemon&gt;: "
+    killproc &lt;mydaemon&gt;
+    echo
+
+    # Do clean-up works here like removing pid files from /var/run, etc.
+    ;;
+  status)
+    status &lt;mydaemon&gt;
+
+    ;;
+  restart)
+    $0 stop
+    $0 start
+    ;;
+
+  *)
+    echo $"Usage: $0 {start|stop|status|restart}"
+    exit 1
+esac
+
+exit 0
+</code></pre>
+<h4> Comment 2453088 Martin Wickman: </h4>Looks like a candidate for the correct answer. Especially considering its &quot;single instance checking&quot;.<br><h4> Comment 12918070 mbonnin: </h4>From /etc/rc.d/init.d/functions, daemonize just starts the binary from a new shell: $cgroup $nice /bin/bash -c <code>$corelimit &gt;&#47;dev&#47;null 2&gt;&amp;1 ; $*</code> So I doubt it&#39;s going to daemonize anything...<br><h4> Comment 45663172 jakem: </h4>I know this is old, but for anyone finding this later... this is correct. &quot;daemon&quot; as defined in /etc/init.d/functions does <i>not</i> actually daemonize for you. It&#39;s just a wrapper to do cgroups, check if the process is already running, set a user, set nice and ulimit values, etc. It does <i>not</i> daemonize the process for you. That&#39;s still your own job. :)<br><h4> Comment 2457502 dreeves: </h4>This might be the best possible answer -- I&#39;m not sure -- but if you think it is, can you also include an explanation for why the spec I gave in the question is wrong-headed?<br><h4> Comment 2457568 C. K. Young: </h4>I don&#39;t like the <code>killproc</code> in the stopping part: if you had a process that, say, ran <code>java</code>, the <code>killproc</code> will cause all other Java processes to be killed too.<br>------------------------------------------------------------------ <br><h3> Answer 526868 Alex B: </h3><p>I think you may want to try <a href="http://man.he.net/man8/start-stop-daemon" rel="noreferrer"><code>start-stop-daemon(8)</code></a>. Check out scripts in <code>/etc/init.d</code> in any Linux distro for examples. It can find started processes by command line invoked or PID file, so it matches all your requirements except being a watchdog for your script. But you can always start another daemon watchdog script that just restarts your script if necessary.</p>
+<h4> Comment 16267949 Bengt: </h4>There is no start-stop-daemon in Fedora, yet, so scripts depending upon it are not portable. See: <a href="https://fedoraproject.org/wiki/Features/start-stop-daemon" rel="nofollow noreferrer">fedoraproject.org/wiki/Features/start-stop-daemon</a><br><h4> Comment 30425063 mklement0: </h4>Just a heads-up for OSX users: no <code>start-stop-daemon</code> there, either (as of 10.9).<br><h4> Comment 30425179 Alex B: </h4>@mklement0 Well... a lot has changed in nearly 5 years.<br><h4> Comment 30427466 mklement0: </h4>My, how time flies. <code>start-stop-daemon</code> is still alive and kicking on Linux, though; but after reading answer <a href="http://stackoverflow.com/a/525406/45375">stackoverflow.com/a/525406/45375</a> I realized that OSX does its own thing: <code>launchd</code>.<br>------------------------------------------------------------------ <br><h3> Answer 10961927 jefz: </h3><p>As an alternative to the already mentioned <code>daemonize</code> and <code>daemontools</code>, there is the <a href="http://libslack.org/daemon/" rel="noreferrer">daemon</a> command of the libslack package.</p>
+
+<p><code>daemon</code> is quite configurable and does care about all the tedious daemon stuff such as automatic restart, logging or pidfile handling.</p>
+------------------------------------------------------------------ <br><h3> Answer 525406 Kamil Kisiel: </h3><p>If you're using OS X specifically, I suggest you take a look at how launchd works. It will automatically check to ensure your script is running and relaunch it if necessary. It also includes all sorts of scheduling features, etc. It should satisfy both requirement 1 and 2. </p>
+
+<p>As for ensuring only one copy of your script can run, you need to use a PID file. Generally I write a file to /var/run/.pid that contains a PID of the current running instance. if the file exists when the program runs, it checks if the PID in the file is actually running (the program may have crashed or otherwise forgotten to delete the PID file). If it is, abort. If not, start running and overwrite the PID file.</p>
+------------------------------------------------------------------ <br><h3> Answer 2460025 fastmultiplication: </h3><p>Daemontools ( <a href="http://cr.yp.to/daemontools.html" rel="noreferrer">http://cr.yp.to/daemontools.html</a> ) is a set of pretty hard-core utilities used to do this, written by dj bernstein.  I have used this with some success.  The annoying part about it is that none of the scripts return any visible results when you run them - just invisible return codes.  But once it's running it's bulletproof.</p>
+<h4> Comment 2457383 C. K. Young: </h4>Yes, I was going to write an entry that uses daemontools too. I&#39;ll write my own post, because I&#39;m hoping to be much more comprehensive with my answer, and hope to get the bounty that way. We&#39;ll see. :-)<br>------------------------------------------------------------------ <br><h3> Answer 525447 Douglas Leeder: </h3><p>First get <code>createDaemon()</code> from <a href="http://code.activestate.com/recipes/278731/" rel="nofollow noreferrer">http://code.activestate.com/recipes/278731/</a></p>
+
+<p>Then the main code:</p>
+
+<pre><code>import subprocess
+import sys
+import time
+
+createDaemon()
+
+while True:
+    subprocess.call(" ".join(sys.argv[1:]),shell=True)
+    time.sleep(10)
+</code></pre>
+<h4> Comment 339942 dreeves: </h4>I&#39;m kind of thinking of that as fundamental to the whole &quot;daemonize&quot; wrapper concept. (Eg, I could then cron it hourly or minutely to make sure it was always running.)  Am I thinking of this wrong?  Does createDaemon already guarantee that somehow?  What about after reboot?<br><h4> Comment 339014 dreeves: </h4>Ooh, thanks!  Want to make it slightly more general so you can do &quot;daemonize foo arg1 arg2&quot; as well as &quot;daemonize &#39;foo arg1 arg2&#39;&quot;?<br><h4> Comment 339080 Douglas Leeder: </h4>Ok, it&#39;ll join arguments now - however you will have to change it if you ever want to have spaces inside your arguments.<br><h4> Comment 339151 dreeves: </h4>Thanks Douglas!  There&#39;s a big flaw though:  running &quot;daemonize foo&quot; twice starts two copies of foo running.<br><h4> Comment 339232 Douglas Leeder: </h4>You could add some PID recording code, but it might be best to only run the script once...<br>------------------------------------------------------------------ <br><h3> Answer 17506743 Steven Lu: </h3><p>I have made a series of improvements on the <a href="https://stackoverflow.com/a/2423550/340947">other answer</a>.</p>
+
+<ol>
+<li>stdout out of this script is purely made up of stdout coming from its child UNLESS it exits due to detecting that the command is already being run</li>
+<li>cleans up after its pidfile when terminated</li>
+<li>optional configurable timeout period (Accepts any positive numeric argument, sends to <code>sleep</code>)</li>
+<li>usage prompt on <code>-h</code></li>
+<li>arbitrary command execution, rather than single command execution. The last arg OR remaining args (if more than one last arg) are sent to <code>eval</code>, so you can construct any sort of shell script as a string to send to this script as a last arg (or trailing args) for it to daemonize</li>
+<li>argument count comparisons done with <code>-lt</code> instead of <code>&lt;</code></li>
+</ol>
+
+<p>Here is the script: </p>
+
+<pre><code>#!/bin/sh
+
+# this script builds a mini-daemon, which isn't a real daemon because it
+# should die when the owning terminal dies, but what makes it useful is
+# that it will restart the command given to it when it completes, with a
+# configurable timeout period elapsing before doing so.
+
+if [ "$1" = '-h' ]; then
+    echo "timeout defaults to 1 sec.\nUsage: $(basename "$0") sentinel-pidfile [timeout] command [command arg [more command args...]]"
+    exit
+fi
+
+if [ $# -lt 2 ]; then
+    echo "No command given."
+    exit
+fi
+
+PIDFILE=$1
+shift
+
+TIMEOUT=1
+if [[ $1 =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
+        TIMEOUT=$1
+        [ $# -lt 2 ] &amp;&amp; echo "No command given (timeout was given)." &amp;&amp; exit
+        shift
+fi
+
+echo "Checking pid in file ${PIDFILE}." &gt;&amp;2
+
+#Check to see if process running.
+if [ -f "$PIDFILE" ]; then
+    PID=$(&lt; $PIDFILE)
+    if [ $? = 0 ]; then
+        ps -p $PID &gt;/dev/null 2&gt;&amp;1
+        if [ $? = 0 ]; then
+            echo "This script is (probably) already running as PID ${PID}."
+            exit
+        fi
+    fi
+fi
+
+# Write our pid to file.
+echo $$ &gt;$PIDFILE
+
+cleanup() {
+        rm $PIDFILE
+}
+trap cleanup EXIT
+
+# Run command until we're killed.
+while true; do
+    eval "$@"
+    echo "I am $$ and my child has exited; restart in ${TIMEOUT}s" &gt;&amp;2
+    sleep $TIMEOUT
+done
+</code></pre>
+
+<p>Usage: </p>
+
+<pre><code>$ term-daemonize.sh pidfilefortesting 0.5 'echo abcd | sed s/b/zzz/'
+Checking pid in file pidfilefortesting.
+azzzcd
+I am 79281 and my child has exited; restart in 0.5s
+azzzcd
+I am 79281 and my child has exited; restart in 0.5s
+azzzcd
+I am 79281 and my child has exited; restart in 0.5s
+^C
+
+$ term-daemonize.sh pidfilefortesting 0.5 'echo abcd | sed s/b/zzz/' 2&gt;/dev/null
+azzzcd
+azzzcd
+azzzcd
+^C
+</code></pre>
+
+<p>Beware that if you run this script from different directories it may use different pidfiles and not detect any existing running instances. Since it is designed to run and restart ephemeral commands provided through an argument there is no way to know whether something's been already started, because who is to say whether it is <em>the same command</em> or not? To improve on this enforcement of only running a single instance of something, a solution specific to the situation is required.</p>
+
+<p>Also, for it to function as a proper daemon, you must use (at the bare minimum) nohup as the other answer mentions. I have made no effort to provide any resilience to signals the process may receive. </p>
+
+<p>One more point to take note of is that killing this script (if it was called from yet another script which is killed, or with a signal) may not succeed in killing the child, especially if the child is <em>yet another</em> script. I am uncertain of why this is, but it seems to be something related to the way <code>eval</code> works, which is mysterious to me. So it may be prudent to replace that line with something that accepts only a single command like in the other answer.</p>
+------------------------------------------------------------------ <br><h3> Answer 46103500 nbari: </h3><p>You could give a try to <a href="https://immortal.run" rel="nofollow noreferrer">immortal</a> It is a *nix cross-platform (OS agnostic) supervisor. </p>
+
+<p>For a quick try on macOS:</p>
+
+<pre><code>brew install immortal
+</code></pre>
+
+<p>In case you are using <a href="https://immortal.run/freebsd/" rel="nofollow noreferrer">FreeBSD</a> from the ports or by using pkg:</p>
+
+<pre><code>pkg install immortal
+</code></pre>
+
+<p>For <a href="https://github.com/immortal/immortal/releases" rel="nofollow noreferrer">Linux</a> by downloading the precompiled binaries or from source: <a href="https://immortal.run/source/" rel="nofollow noreferrer">https://immortal.run/source/</a> </p>
+
+<p>You can either use it like this:</p>
+
+<pre><code>immortal -l /var/log/date.log date
+</code></pre>
+
+<p>Or by a <a href="https://immortal.run/post/run.yml/" rel="nofollow noreferrer">configuration YAML</a> file which gives you more options, for example:</p>
+
+<pre><code>cmd: date
+log:
+    file: /var/log/date.log
+    age: 86400 # seconds
+    num: 7     # int
+    size: 1    # MegaBytes
+    timestamp: true # will add timesamp to log
+</code></pre>
+
+<p>If you would like to keep also the standard error output in a separate file you could use something like:</p>
+
+<pre><code>cmd: date
+log:
+    file: /var/log/date.log
+    age: 86400 # seconds
+    num: 7     # int
+    size: 1    # MegaBytes
+stderr:
+    file: /var/log/date-error.log
+    age: 86400 # seconds
+    num: 7     # int
+    size: 1    # MegaBytes
+    timestamp: true # will add timesamp to log
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 2466937 Ether: </h3><p>This is a working version complete with an example which you can copy into an empty directory and try out (after installing the CPAN dependencies, which are <a href="http://search.cpan.org/perldoc/Getopt::Long" rel="nofollow noreferrer">Getopt::Long</a>, <a href="http://search.cpan.org/perldoc/File::Spec" rel="nofollow noreferrer">File::Spec</a>, <a href="http://search.cpan.org/perldoc/File::Pid" rel="nofollow noreferrer">File::Pid</a>, and <a href="http://search.cpan.org/perldoc/IPC::System::Simple" rel="nofollow noreferrer">IPC::System::Simple</a> -- all pretty standard and are highly recommended for any hacker: you can install them all at once with <code>cpan &lt;modulename&gt; &lt;modulename&gt; ...</code>).</p>
+
+<hr>
+
+<p><strong>keepAlive.pl:</strong></p>
+
+<pre><code>#!/usr/bin/perl
+
+# Usage:
+# 1. put this in your crontab, to run every minute:
+#     keepAlive.pl --pidfile=&lt;pidfile&gt; --command=&lt;executable&gt; &lt;arguments&gt;
+# 2. put this code somewhere near the beginning of your script,
+#    where $pidfile is the same value as used in the cron job above:
+#     use File::Pid;
+#     File::Pid-&gt;new({file =&gt; $pidfile})-&gt;write;
+
+# if you want to stop your program from restarting, you must first disable the
+# cron job, then manually stop your script. There is no need to clean up the
+# pidfile; it will be cleaned up automatically when you next call
+# keepAlive.pl.
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use File::Spec;
+use File::Pid;
+use IPC::System::Simple qw(system);
+
+my ($pid_file, $command);
+GetOptions("pidfile=s"   =&gt; \$pid_file,
+           "command=s"   =&gt; \$command)
+    or print "Usage: $0 --pidfile=&lt;pidfile&gt; --command=&lt;executable&gt; &lt;arguments&gt;\n", exit;
+
+my @arguments = @ARGV;
+
+# check if process is still running
+my $pid_obj = File::Pid-&gt;new({file =&gt; $pid_file});
+
+if ($pid_obj-&gt;running())
+{
+    # process is still running; nothing to do!
+    exit 0;
+}
+
+# no? restart it
+print "Pid " . $pid_obj-&gt;pid . " no longer running; restarting $command @arguments\n";
+
+system($command, @arguments);
+</code></pre>
+
+<hr>
+
+<p><strong>example.pl:</strong></p>
+
+<pre><code>#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use File::Pid;
+File::Pid-&gt;new({file =&gt; "pidfile"})-&gt;write;
+
+print "$0 got arguments: @ARGV\n";
+</code></pre>
+
+<hr>
+
+<p>Now you can invoke the example above with: <code>./keepAlive.pl --pidfile=pidfile --command=./example.pl 1 2 3</code> and the file <code>pidfile</code> will be created, and you will see the output:</p>
+
+<pre><code>Pid &lt;random number here&gt; no longer running; restarting ./example.pl 1 2 3
+./example.pl got arguments: 1 2 3
+</code></pre>
+<h4> Comment 2457018 dreeves: </h4>I believe this is not quite to spec, if I understand correctly.  In your solution (thanks, btw!) the program you want to daemonize has to be modified to write its PID to the the PID file.  I&#39;m hoping for a utility that can daemonize an arbitrary script.<br><h4> Comment 2463470 Ether: </h4>@dreeves: yes, but there are two ways around that: 1. the script invoked by keepAlive.pl (e.g. example.pl) could simply be a wrapper to execute the real program, or 2. keepAlive.pl could parse the table of active system processes (with CPAN&#39;s Proc::ProcessTable) to attempt to find the relevant process and its pid).<br>------------------------------------------------------------------ <br><h3> Answer 43394134 Adestin: </h3><p>You might also try <a href="http://mmonit.com" rel="nofollow noreferrer">Monit</a>. Monit is a service that monitors and reports on other services. While it's mainly used as a way to notify (via email and sms) about runtime problems, it can also do what most of the other suggestions here have advocated. It can auto (re)start and stop programs, send emails, initiate other scripts, and maintain a log of output that you can pick up. In addition, I've found it's easy to install and maintain since there's solid documentation.</p>
+------------------------------------------------------------------ <br><h3> Answer 65498408 oᴉɹǝɥɔ: </h3><p>There is also a very simple double-fork + <code>setsid</code> approach to detach any script from its parent process</p>
+<pre><code>( setsid my-regular-script arg [arg ...] 1&gt;stdout.log 2&gt;stderr.log &amp; )
+</code></pre>
+<p><code>setsid</code> is a part of standard <code>util-linux</code> package which has been with linux since birth. This works when launched  in any <code>POSIX</code> compatible shell I know.</p>
+<p>Another double-fork based approach doesn't even require any extra exacutables or packages and relies purely on <code>POSIX</code> based shell</p>
+<pre><code>( my-regular-script arg [arg ...] 1&gt;stdout.log 2&gt;stderr.log &amp; ) &amp;
+</code></pre>
+<p>It also survives becoming an orphan when the parent process leaves the stage</p>

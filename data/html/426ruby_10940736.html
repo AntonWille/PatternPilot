@@ -1,0 +1,447 @@
+ <h2> Title: rbenv not changing ruby version </h2> <h3> ajorgensen, question_id: 10940736 </h3>Score: 426, Tags: {ruby,rbenv} <br><p>I installed rbenv according to the github directions. I am running OSX but I have tried this on a Ubuntu 12.04 VM and got the same results. The following is what i get in my terminal when I try to change ruby versions:</p>
+
+<pre><code>rbenv versions
+* 1.9.3-p0 (set by /Users/user/.rbenv/version)
+1.9.3-p125
+
+rbenv global
+1.9.3-p0
+
+rbenv rehash
+
+ruby -v
+ruby 1.8.7 (2011-12-28 patchlevel 357) [universal-darwin11.0]
+
+which ruby
+/usr/bin/ruby
+</code></pre>
+
+<p>Anyone have any ideas as to why rbenv isn't switching the ruby version like it thinks it is? Also there is no .rbenv file in the local directory that would be causing the ruby version to default to 1.8.7</p>
+
+<pre><code>rbenv local
+rbenv: no local version configured for this directory
+</code></pre>
+<h4> Comment 127122285 Rachel Cynthia: </h4>If ruby was installed through brew, uninstall that first and then use rbenv.<br><h4> Comment 115732840 mfaani: </h4>make sure you follow ALL the installation <b>steps</b> for <code>rbenv</code>. See <a href="https://github.com/rbenv/rbenv/blob/master/README.md#homebrew-on-macos" rel="nofollow noreferrer">here</a> or <a href="https://stackoverflow.com/a/65460985/5175709">my answer</a><br><h4> Comment 14276228 d11wtq: </h4>Have you definitely put the init in your bashrc correctly?  What does your $PATH look like?<br><h4> Comment 14276871 Andrew Marshall: </h4>None of those commands change the Ruby version rbenv is using, but it appears it&#39;s not using your default Ruby.<br><h4> Comment 14276932 ajorgensen: </h4>@d11wtq was correct. it wasnt in my ~/.bash_profile correctly apparently.<br>------------------------------------------------------------------ <br><h3> Answer 12150580 defvol: </h3><p>Check that PATH contains <code>$HOME/.rbenv/shims</code> and <code>$HOME/.rbenv/bin</code></p>
+<pre><code>$ env | grep PATH
+</code></pre>
+<p>Also check that you have the following in your ~/.bash_profile if using bash or ~/.zshenv if using zsh</p>
+<pre><code>export PATH=&quot;$HOME/.rbenv/bin:$PATH&quot;
+eval &quot;$(rbenv init -)&quot;
+</code></pre>
+<p>NOTE:
+Make sure it's the last setting in your ~/.bash_profile . I ran into an issue where I installed a program that updated my .bash_profile and reset PATH.</p>
+<p>Finally, make sure your <code>$HOME</code> folder doesn't have a <code>.ruby-version</code> file that you may have created by accident if you were to have done <code>$ rbenv local &lt;ruby-version&gt;</code> in your <code>$HOME</code> folder. Doing <code>$ rbenv global &lt;ruby-version&gt;</code> modifies the <code>$HOME/.rbenv/version</code> file, and the existence of a <code>.ruby-version</code> file in the <code>$HOME</code> folder would override the version set by <code>$HOME/.rbenv/version</code>.</p>
+<p>From the docs:</p>
+<blockquote>
+<p>Choosing the Ruby Version
+When you execute a shim, rbenv determines which Ruby version to use by reading it from the following sources, in this order:</p>
+</blockquote>
+<blockquote>
+<p>The RBENV_VERSION environment variable, if specified. You can use the rbenv shell command to set this environment variable in your current shell session.</p>
+</blockquote>
+<blockquote>
+<p>The first .ruby-version file found by searching the directory of the script you are executing and each of its parent directories until reaching the root of your filesystem.</p>
+</blockquote>
+<blockquote>
+<p>The first .ruby-version file found by searching the current working directory and each of its parent directories until reaching the root of your filesystem. You can modify the .ruby-version file in the current working directory with the rbenv local command.</p>
+</blockquote>
+<blockquote>
+<p>The global ~/.rbenv/version file. You can modify this file using the rbenv global command. If the global version file is not present, rbenv assumes you want to use the &quot;system&quot; Ruby—i.e. whatever version would be run if rbenv weren't in your path.</p>
+</blockquote>
+<h4> Comment 22014446 Jeremy Ricketts: </h4>On OSX, don&#39;t forget to log out of your OSX session and then log back in for the changes to your bash profile to take effect.<br><h4> Comment 24483692 pdu: </h4>Or do <code>exec $SHELL -l</code> (lower L)<br><h4> Comment 25841494 Benedikt: </h4>Where do I have to add the &quot;$HOME/.rbenv/shims&quot; and &quot;$HOME/.rbenv/bin&quot;?<br><h4> Comment 28352386 merqlove: </h4>I made like this: <code>export RBENV_ROOT=&quot;$HOME&#47;.rbenv&quot; if which rbenv &gt; &#47;dev&#47;null; then eval &quot;$(rbenv init -)&quot;; fi</code> Working pretty good :) Also check for PATH init&#39;s after rbenv declaration.<br><h4> Comment 41714922 alexhilton: </h4>For my case, I need to append these two lines into .bashrc (Bash in Ubuntu) and then I got correct ruby version. It does not work if append it into .bash_profile.<br><h4> Comment 118271613 Nelson Mfinda: </h4>I need to append these two lines into <code>.zshrc</code> and then I got the correct ruby version. OS: MacOS Big Sur 11.2.3(Apple M1)<br><h4> Comment 127920721 Changwoo Rhee: </h4>% vim <code>~&#47;.zprofile</code> (mac os use zsh with .zprofile instead of bash with .bash_profile)<br><h4> Comment 132550611 Caleb: </h4>Confirming that this did not work for me until I moved them to the END of ~/.zshrc<br><h4> Comment 132857842 Sollace: </h4>For a slightly more generic version, I believe chruby uses <code>~&#47;.$(basename $SHELL)rc</code> to infer the correct file to append the above instructions into.<br><h4> Comment 132920711 Eelke van den Bos: </h4>In my case, jetbrains was overriding the <code>RBENV_VERSION</code> environment variable. Make sure you don&#39;t forget to select the correct runtime in your IDE if it does &#39;smart&#39; things like this ;-)<br><h4> Comment 121464019 Owais Akbani: </h4>instead of .bash_profile, .bash_rc worked for me. And the latest rbenv doesn&#39;t have a bin folder. You need to add shims folder.<br><h4> Comment 117197005 Mentalist: </h4>When I typed <code>env | grep PATH</code> I got <code>PATH=&#47;Users&#47;username&#47;.pyenv&#47;shims:&#47;usr&#47;local&#47;bin:&#47;usr&#47;bin:&#47;b&zwnj;&#8203;in:&#47;usr&#47;sbin:&#47;sbin:&#47;&zwnj;&#8203;opt&#47;X11&#47;bin:&#47;Users&#47;u&zwnj;&#8203;sername&#47;.rvm&#47;bin</code> (How do I make it stop looking for RVM? I uninstalled RVM and installed rbenv instead.)<br><h4> Comment 117197149 Mentalist: </h4>Please disregard my last comment. I figured it out. Even though <code>.bash_profile</code> had the correct <b>$PATH</b>, <code>.profile</code> did not. Fixed it.<br><h4> Comment 117600862 floer32: </h4>Side note: personally, I switched to <code>asdf</code>. <a href="https://wolfgangrittner.dev/switching-to-asdf-for-ruby/" rel="nofollow noreferrer">Here&#39;s a post about how to do that.</a>. The reason I chose it: it can also manage my node.js versions (and more)<br><h4> Comment 118090696 Jonathan: </h4>followed steps                                                                                                           export PATH=&quot;$HOME/.rbenv/bin:$PATH&quot; eval &quot;$(rbenv init -)&quot; and then i get the latest ruby version which is 3.0.0 ( the one i installed) but when i log out of the terminal &amp; log in.. it goes back to system ruby.. 2.0.0p648 (2015-12-16 revision 53162) [universal.x86_64-darwin15]..  what i am doing wrong ?? I installed ruby using rbenv.. followed <a href="https://wilsonmar.github.io/ruby-on-apple-mac-osx/#install-rbenv" rel="nofollow noreferrer">wilsonmar.github.io/ruby-on-apple-mac-osx/#install-rbenv</a> I am on mac os el capitan.<br><h4> Comment 58718151 Yathi: </h4>I had this because I was using zsh instead of bash. Solved it using  &quot;echo &#39;if which rbenv &gt; /dev/null; then eval &quot;$(rbenv init -)&quot;; fi&#39; &gt;&gt; ~/.zshenv&quot;<br><h4> Comment 66842238 ENG618: </h4>I just had to refer to the note, and move the imports below my homebrew path update in my .bash_profile.<br>------------------------------------------------------------------ <br><h3> Answer 16216746 mjmdavis: </h3><p>I fixed this by adding the following to my <code>~/.bash_profile</code>:</p>
+<pre><code>#PATH for rbenv
+export PATH=&quot;$HOME/.rbenv/shims:$PATH&quot;
+</code></pre>
+<p>This is what is documented at <a href="https://github.com/sstephenson/rbenv" rel="noreferrer">https://github.com/sstephenson/rbenv</a>.</p>
+<p>From what I can tell there <strong>isn't</strong> <code>~/.rbenv/bin</code> directory, which was mentioned in the post by @rodowi.</p>
+<h4> Comment 92147476 cjs1978: </h4>Worked for me after hours of trying other stuff. Thanks!<br><h4> Comment 70326808 Dennis: </h4>There won&#39;t be a <code>~&#47;.rbenv&#47;bin&#47;</code> if you installed via homebrew or linuxbrew. And you shouldn&#39;t have to set up the shims path yourself, as <a href="https://github.com/rbenv/rbenv#how-rbenv-hooks-into-your-shell" rel="nofollow noreferrer"><code>rbenv init</code> does this (and more) for you</a>.<br><h4> Comment 70762839 Martyn Chamberlin: </h4>This fixed my problem.<br><h4> Comment 91489589 onmyway133: </h4>This should be in the README<br><h4> Comment 118908287 mfaani: </h4>@onmyway133 it is in the readme. See <a href="https://stackoverflow.com/a/65460985/5175709">here</a><br><h4> Comment 135334945 Dreft: </h4>this worked for me!<br><h4> Comment 60939897 Jerome: </h4>+1 for the link. +1 for the answer which does contradict a better voted answer.  Which raises a further question - and if anyone can chime in - how can <code>export PATH=&quot;$HOME&#47;.rbenv&#47;bin:$PATH</code> work (as it was failing for me)?<br>------------------------------------------------------------------ <br><h3> Answer 17665743 alphadogg: </h3><p>This may be an old question, but Google led me here and, for posterity sake, thought I'd share.</p>
+
+<p>My problem persisted after many of the recommended solutions above. Like the OP, I installed rbenv and then a ruby version, but my laptop defaulted to system. What I had overlooked was that when I ran:</p>
+
+<pre><code>[~/.rbenv] $ rbenv versions
+* system (set by /Users/alphadogg/.rbenv/version)
+  2.0.0-p247
+</code></pre>
+
+<p>IOW, it was still defaulting to system. A quick</p>
+
+<pre><code>[~/.rbenv] $ rbenv local 2.0.0-p247
+</code></pre>
+
+<p>switched it to the new version.</p>
+<h4> Comment 42782111 Steve Midgley: </h4>Yes - funny how rbenv install guides don&#39;t mention running the local command at all. Lots of blogs remind you to run rbenv global but not local. Great answer.<br><h4> Comment 63197405 Jose Villalobos: </h4>I had to get rid of system by removing with YUM in Centos 7, only after that I could see the correct version selected in rbenv<br><h4> Comment 96519063 Ian Hyzy: </h4>I&#39;m shocked I had to dig this far for an answer, this is the correct one for me.<br><h4> Comment 100518202 John Wooten: </h4>I found that the rbenv versions command said that 2.3.1 was set in .ruby-versions by rvm perhaps.  I had stopped using rvm awhile ago and changed to rbenv.  Deleted .ruby-versions and ran rbenv versions again and it had the latest selected by rbenv ( be sure you have the eval statement above in .bash_profile!).  Now, all works as before.  Thanks for helping me get this solved.<br><h4> Comment 49642491 Mark Glossop: </h4>Same problem. Same solution. (May have to look at submitting a PR to advise when global Ruby version is overruled by a ~/.ruby-version...)<br>------------------------------------------------------------------ <br><h3> Answer 39238995 Sky Notify: </h3><p>First step is to find out which ruby is being called:</p>
+<pre><code>$ which ruby
+</code></pre>
+<p>Your system says:</p>
+<pre><code>/usr/bin/ruby
+</code></pre>
+<p>This is NOT the shim used by rbenv, which (on MacOS) should look like:</p>
+<pre><code>/Users/&lt;username&gt;/.rbenv/shims/ruby
+</code></pre>
+<p>The shim is actually a script that acts like a redirect to the version of ruby you set.</p>
+<p>I recommend that for trouble shooting you unset the project specific &quot;local&quot; version, and the shell specific &quot;shell&quot; version and just test using the &quot;global&quot; version setting which is determined in a plain text file in ~/.rbenv/version which will just be the version number &quot;1.9.3&quot; in your case.</p>
+<pre><code>$ rbenv global 1.9.3
+$ rbenv local --unset
+$ rbenv shell --unset
+</code></pre>
+<p>You can do <code>ls -laG</code> in the root of your project folder (not the home folder) to make sure there is no longer a &quot;.ruby-version&quot; file there.</p>
+<p>You can use <code>rbenv versions</code> to identify which version rbenv is set to use (and the location and name of the file that is setting that):</p>
+<pre><code>$ rbenv versions
+</code></pre>
+<p>NONE OF THAT MATTERS until you set the path correctly.</p>
+<p>Use this to make sure your *MacOS will obey you:</p>
+<pre><code>$ rbenv init -
+</code></pre>
+<p>Followed by:</p>
+<pre><code>$ which ruby
+</code></pre>
+<p>To make sure it looks like:</p>
+<pre><code>/Users/&lt;username&gt;/.rbenv/shims/ruby
+</code></pre>
+<p>Then run this to add the line to your profile so it runs each time you open a new terminal window:</p>
+<pre><code>$ echo 'eval &quot;$(rbenv init -)&quot;' &gt;&gt; ~/.bash_profile
+</code></pre>
+<p>There are other ways to modify the path, feel free to substitute any of them instead of running the rbenv init.</p>
+<p>NOTE: reinstall Rails with:</p>
+<pre><code>$ gem install rails
+</code></pre>
+<p>If you were trying to run Ruby on Rails, then you need to have this all working first, then install the rails gem again.  A previous install of Rails will use a hard coded path to the wrong ruby and several other things will be in the wrong place, so just install the gem again.</p>
+<p>P. S. If your MacOS won't obey you (*mentioned above) then you may have to find another way to modify your path, but that's unlikely to be a problem because &quot;Macs just work&quot; ;)</p>
+<h4> Comment 107507060 bananaforscale: </h4>Well explained solution. Thank you.<br><h4> Comment 88536722 Danny Santos: </h4>Ah mate, finally! Tried about 25 different solutions before I found this one, thank you<br><h4> Comment 112429984 Jerome: </h4>this response is the most helpful (and complete) one.  One small variant:  <code>if which rbenv &gt; &#47;dev&#47;null; then eval &quot;$(rbenv init -)&quot;; fi &gt;&gt; ~&#47;.bash_profile</code>  followed by <code>source ~&#47;.bash_profile</code><br><h4> Comment 130042524 Alex Glover: </h4>Don&#39;t know why, but running <code>$ rbenv local --unset; rbenv shell --unset</code> and setting the global version worked for me. Even after restoring the <code>.ruby-version</code> file with the same version number, rbenv started working as expected.<br>------------------------------------------------------------------ <br><h3> Answer 68123451 Promise Preston: </h3><p>I had this issue when setting up Ruby using rbenv on <strong>MacBook Pro Catalina OS</strong> and <strong>MacBook Pro Big Sur</strong>.</p>
+<p>Here's how I fixed:</p>
+<p>First run the command below to initialize rbenv:</p>
+<pre><code>rbenv init
+</code></pre>
+<p>This will give you some instruction on what to do. Basically you will have to open the <code>~/.zshrc</code> file and add this to the file <code>eval &quot;$(rbenv init -)&quot;</code>. You can accomplish this by running the command below:</p>
+<pre><code>echo 'eval &quot;$(rbenv init -)&quot;' &gt;&gt; ~/.zshrc
+</code></pre>
+<p>Next, run the command below to set your Ruby version:</p>
+<pre><code>rbenv local &lt;your-desired-ruby-version&gt;
+</code></pre>
+<p>In my case, my desired Ruby version was 3.0.1, so it was:</p>
+<pre><code>rbenv local 3.0.1
+</code></pre>
+<p>When you are done, quit your terminal using <strong>Command + Q</strong>, and then open a new terminal, this time when you run the command:</p>
+<pre><code>ruby -v 
+rbenv versions
+</code></pre>
+<p>You will see that your desired Ruby version has already been set up for you.</p>
+<h4> Comment 128251508 Gabriel Bueno: </h4>You are a 🌟. Worked on macOS Monterey.<br><h4> Comment 131841680 rubeonline: </h4>Worked on macOS Venutra 🔥<br><h4> Comment 132276859 Nika Nabakhteveli: </h4>Thanks 🙏🏻 works on Ventura too<br><h4> Comment 133088255 Duy Dau Dzu: </h4>Thanks a lot, it worked on Ventura M1 Mac too<br><h4> Comment 131382625 BobRodes: </h4>@PHPNoob The OP mentions that AFAICS. Right near the bottom, it says &quot;quit your terminal using Command + Q, and then open a new terminal.&quot; Unless I&#39;m missing something, that&#39;s specific directions on how to restart the terminal.<br>------------------------------------------------------------------ <br><h3> Answer 42002830 Bergrebell: </h3><p>In my case changing the <code>~/.zshenv</code> did not work. I had to make the changes inside <code>~/.zshrc</code>.</p>
+
+<p>I just added: </p>
+
+<pre><code># Include rbenv for ZSH
+export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init -)"
+</code></pre>
+
+<p>at the top of <code>~/.zshrc</code>, restarted the shell and logged out.</p>
+
+<p>Check if it worked:</p>
+
+<pre><code>➜  ~ rbenv install 2.4.0
+➜  ~ rbenv global 2.4.0
+➜  ~ rbenv global
+2.4.0
+➜  ~ ruby -v
+ruby 2.4.0p0 (2016-12-24 revision 57164) [x86_64-darwin16]
+</code></pre>
+<h4> Comment 126376687 GianPierre G&#225;lvez: </h4>Probably it will be necessary to run source ~/.zshrc, but it worked for me . Thanks you.<br><h4> Comment 106018622 Pokemon: </h4>This perfectly works. I added that into .bash_profile not /zshenv.<br><h4> Comment 136131376 keylogger: </h4>After trying many suggestions, finally this one works for me. Probably this needs to be added to the official document.<br><h4> Comment 132215646 ciemborowicz: </h4>Works for me, but I don&#39;t understand what is the difference. <code>.zshenv</code> was also executed (checked it with <code>echo</code> inside. Oh, and not with <code>bin</code>, but with <code>shims</code> in a <code>PATH</code>.<br>------------------------------------------------------------------ <br><h3> Answer 12021313 Neal: </h3><p>I just found this same problem. What I did was uninstall rbenv (via homebrew) and reinstall it. I also added </p>
+
+<pre><code>if which rbenv &gt; /dev/null; then eval "$(rbenv init -)"; fi
+</code></pre>
+
+<p>into ~/.bash_profile when I reinstalled rbenv. Works perfectly now.</p>
+<h4> Comment 20256758 dadoonet: </h4>Note for others that came to the same issue as me: For some reasons, which rbenv was working prior so this line was never executed. I fixed it using directly eval &quot;$(rbenv init -)&quot;.<br><h4> Comment 107507051 bananaforscale: </h4>Nice little eval statement for this use case!<br>------------------------------------------------------------------ <br><h3> Answer 39242206 Singhak: </h3><p>Run this command</p>
+<p>Add rbenv to bash so that it loads every time you open a terminal</p>
+<pre><code>echo 'if which rbenv &gt; /dev/null; then eval &quot;$(rbenv init -)&quot;; fi' &gt;&gt; ~/.bash_profile
+source ~/.bash_profile
+</code></pre>
+<p>this will solve your problem <a href="https://gorails.com/setup/osx/10.10-yosemite" rel="noreferrer">Reference</a></p>
+<h4> Comment 133609287 Mohmmaed-Amleh: </h4>thhhhhhhhhhhhhanks<br><h4> Comment 92939135 User7354632781: </h4>I spent hours to fix this. Finally your solution helped. Thanks!!<br><h4> Comment 117186762 rotimi-best: </h4>I also tried all the answers above, none worked for me except this one. Thanks<br>------------------------------------------------------------------ <br><h3> Answer 75421124 Prasannjeet Singh: </h3><h2>Update 2023 (Macbook Ventura+)</h2>
+<p>Even if you have <code>rbenv</code> installed, your computer could still serve the default ruby version. To fix this, just run the following:</p>
+<pre class="lang-bash prettyprint-override"><code>rbenv init
+</code></pre>
+<p>This might give an output like this:</p>
+<pre class="lang-bash prettyprint-override"><code># Load rbenv automatically by appending
+# the following to ~/.zshrc:
+
+eval &quot;$(rbenv init - zsh)&quot;
+</code></pre>
+<p>Just open your <code>.zshrc</code> file:</p>
+<pre class="lang-bash prettyprint-override"><code>sudo nano ~/.zshrc
+</code></pre>
+<p>(Or you can also open this file with any other text editor)</p>
+<p>Add this line:</p>
+<pre class="lang-bash prettyprint-override"><code>eval &quot;$(rbenv init - zsh)&quot;
+</code></pre>
+<p>Save the file (if used sudo nano, you can do so like this:)
+<code>CTRL + X</code> then <code>Y</code> then <code>Enter</code> (For Mac)</p>
+<p>Now, refresh your <code>.zshrc</code> profile like this:</p>
+<pre class="lang-bash prettyprint-override"><code>source ~/.zshrc
+</code></pre>
+<p>Now type <code>ruby --version</code>, this must give you the ruby version that was provided by <code>rbenv</code>.</p>
+<h4> Comment 133097602 Necmettin Sargın: </h4>it was CONTROL X instead of CMD X for me.<br><h4> Comment 133098130 Prasannjeet Singh: </h4>Indeed, it was <code>CTRL + X</code> for me as well. Updating the answer!<br>------------------------------------------------------------------ <br><h3> Answer 45949894 AmitF: </h3><p>run:</p>
+
+<pre><code>rbenv init
+</code></pre>
+
+<p>After I ran that, when i set my local rbenv version:</p>
+
+<pre><code>rbenv local 2.4.0
+</code></pre>
+
+<p>then my <code>ruby -v</code> and my <code>rbenv local</code> versions coincided.</p>
+
+<p>Note: You might also want to exit the directory you're in and then go back into it, i've noticed that was necessary for me in order to get things to work.</p>
+------------------------------------------------------------------ <br><h3> Answer 54726385 epicrato: </h3><p>If you are using <strong>bash</strong>, go to</p>
+
+<pre><code>~/.bash_profile
+</code></pre>
+
+<p>and add the following line (if it's not already there)</p>
+
+<pre><code>if which rbenv &gt; /dev/null; then eval "$(rbenv init -)"; fi
+</code></pre>
+
+<p>If you are using Zsh, go to</p>
+
+<pre><code>~/.zshrc
+</code></pre>
+
+<p>and add the same line of code, at the end of the .zshrc file.</p>
+
+<p>Then simply restart your terminal and it should be fine now.</p>
+<h4> Comment 104229013 Abhinay: </h4>People on Mac os Catalina, should follow the zsh instruction<br>------------------------------------------------------------------ <br><h3> Answer 41661031 djb: </h3><p>I had the same problem, but caused by Homebrew:</p>
+
+<pre><code>[~]$ rbenv version
+2.3.0 (set by /Users/user/.rbenv/version)
+[~]$ ruby -v
+ruby 2.3.3p222 (2016-11-21 revision 56859) [x86_64-darwin16]
+[~]$ which ruby
+/usr/local/bin/ruby
+</code></pre>
+
+<p>Somehow I had installed Ruby via Homebrew too, and the Homebrew path was ahead of the rbenv path in my <code>$PATH</code>. Running <code>brew uninstall ruby</code> fixed it for me.</p>
+<h4> Comment 127122255 Rachel Cynthia: </h4>If ruby was installed through brew, it must be uninstalled to use rbenv properly<br>------------------------------------------------------------------ <br><h3> Answer 21364118 htmldrum: </h3><p><code>rbenv help shell</code></p>
+
+<p>"Sets a shell-specific Ruby version by setting the 'RBENV_VERSION' environment variable in your shell. This version overrides localapplication-specific versions and the global version. should be a string matching a Ruby version known to rbenv.The special version string 'system' will use your default system Ruby. Run rbenv versions' for a list of available Ruby versions."</p>
+
+<p>Provided rbenv was installed correctly, ruby -v will correspond to </p>
+
+<p><code>rbenv shell 1.9.3-p125</code></p>
+<h4> Comment 62009908 Jeremy Rea: </h4>&#39;rbenv shell x.y.z&#39; is what worked for me. The &#39;rbenv local x.y.z&#39; described in the higher ranked answer above did not work on OS X.<br>------------------------------------------------------------------ <br><h3> Answer 75337844 Aun Abbas: </h3><p>I tried every solution, but nothing worked for me. Even I was including the path in the <code>.zshrc</code> file.</p>
+<p>In my case, I'm using <code>MacBook Pro M2</code> with macOS <code>Ventura 13.2</code>. And I'm using <code>React Native 0.71.2</code>, which needed Ruby <code>2.7.6</code> version.</p>
+<p>I simply placed the following code in the <code>.zprofile</code> instead of <code>.zshrc</code>, and it worked:</p>
+<pre><code>export PATH=&quot;$HOME/.rbenv/bin:$PATH&quot;
+eval &quot;$(rbenv init - zsh)&quot;
+</code></pre>
+<h4> Comment 133054429 stevec: </h4>I was only missing the second line. Once added, closed and reopened the terminal and it worked fine<br><h4> Comment 135498429 Manjeet Singh: </h4>both of these lines are mandatory. using only single won&#39;t work<br>------------------------------------------------------------------ <br><h3> Answer 34658433 Rootical V.: </h3><p>As for me the easiest way to use <code>rbenv</code> along with <code>zsh</code> is adding <code>rbenv</code> to plugins section in <code>.zshrc</code> config. In my case it looks similar to:</p>
+
+<pre><code># Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
+# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
+# Example format: plugins=(rails git textmate ruby lighthouse)
+# Add wisely, as too many plugins slow down shell startup.
+plugins=(git bower rails ruby rbenv gulp npm node nvm sublime)
+</code></pre>
+
+<p>After that there're no problems when installing, switching, using ruby versions with help of <code>rbenv</code>.</p>
+
+<p>Mind to restart your terminal session after made changes.</p>
+<h4> Comment 136197800 0hio: </h4>Only thing that worked for me<br>------------------------------------------------------------------ <br><h3> Answer 41774472 Basil Mariano: </h3><p>for fish shell user</p>
+
+<pre><code>set --universal fish_user_paths $fish_user_paths ~/.rbenv/shims/
+</code></pre>
+<h4> Comment 117435444 Clint Clinton: </h4>It worked, how did you come about this solution?<br><h4> Comment 122456322 Almokhtar: </h4>it works thank you, same question how did you comes with this ?????<br><h4> Comment 122637655 Basil Mariano: </h4>To be honest, I don&#39;t remember anymore lol That was 2017 answer and I wonder why this still works though focused on mobile development now so i never use this stuff anymore.<br>------------------------------------------------------------------ <br><h3> Answer 60860269 Daniel Viglione: </h3><p>The accepted answer suggests to add the following:</p>
+
+<pre><code>export PATH="$HOME/.rbenv/bin:$PATH"
+</code></pre>
+
+<p>This will not work on Mac OSX, which the OP references. In fact, if you install rbenv via <code>brew install rbenv</code>, which is really the only installation method in Mac OSX, since <code>curl -fsSL https://github.com/rbenv/rbenv-installer/raw/master/bin/rbenv-installer | bash</code> will FAIL in OSX, then the rbenv executable will be installed in:</p>
+
+<pre><code>$ which rbenv
+/usr/local/bin/rbenv
+</code></pre>
+
+<p>However, even in OSX, the rbenv root will remain in the $HOME directory:</p>
+
+<pre><code>~ viggy$ rbenv root
+/Users/viggy/.rbenv
+</code></pre>
+
+<p>What does this mean? It means when you install rubies, they will install in the given home directory under .rbenv:</p>
+
+<pre><code>$ rbenv install 2.6.0
+$ ls ~/.rbenv/versions
+2.6.0
+</code></pre>
+
+<p>Now the brew installation did some work that you would have to perform manually in Linux. For example, in Linux, you would have to install ruby-build manually as a plugin:</p>
+
+<pre><code>$ mkdir -p "$(rvbenv root)/plugins"
+$ git clone https://github.com/rbenv/ruby-build.git "(rbenv root)"/plugins/ruby-build
+</code></pre>
+
+<p>This is already done with the homebrew installation. There is one important step that must be done in the homebrew installation, as in the Linux installation. You must add the rbenv shims to your path. In order to do that, when your shell starts, you have to evaluate the following command (which will in turn add the rbenv shims to the beginning of your $PATH):</p>
+
+<pre><code>$ vim ~/.bash_profile
+eval "$(rbenv init -)"
+$ source ~/.bash_profile
+</code></pre>
+
+<p>Now when you run <code>echo $PATH</code>, you will see the rbenv shims:</p>
+
+<pre><code>$ echo $PATH
+/Users/viggy/.rbenv/shims:
+</code></pre>
+
+<p>Now check your ruby version and it will reflect the rbenv ruby installed:</p>
+
+<pre><code>ruby -v
+ruby 2.6.0p0 
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 74587404 Duy l&#234; kh&#225;nh: </h3><p>Adding the following to <code>.bashrc</code> works for me -</p>
+<p><code>export PATH=&quot;$HOME/.rbenv/shims:$PATH&quot;</code></p>
+<h4> Comment 131750928 ruud: </h4>this is exactly what the accepted answer of 2020 says .<br>------------------------------------------------------------------ <br><h3> Answer 11708787 Vincent: </h3><p>I came to the same problem.
+Fixed this by run the <code>rbenv global</code> command with <code>sudo</code>.
+I think it was something permission problem.</p>
+<p>update:
+I finally found the solution.
+There was one same file &quot;version&quot; on my mac,  which is under <code>/usr/local/Cellar/rbenv/0.3.0/</code>.
+I think it was created by mistake occasionally. you should remove it.</p>
+------------------------------------------------------------------ <br><h3> Answer 13194638 David: </h3><p>When I had these symptoms, the problem turned out to be that install had failed halfway through for the new Ruby version I was trying to switch to, without me noticing. The fix was to delete &amp; reinstall it.</p>
+
+<p>(This meant that even though ruby 1.9.3 showed up in the rbenv list of available versions, it didn't have an executable on the path where rbenv assumed it would. Since rbenv tries to change your ruby version just by prepending a location to your path, if there's nothing actually in the location it prepends, your OS will happily continue searching your default path and find your system version, in my case like the question's 1.8.7.)</p>
+------------------------------------------------------------------ <br><h3> Answer 43703280 elimcjah: </h3><p>Make sure the last line of your <code>.bash_profile</code> is:</p>
+
+<pre><code>export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init -)"
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 20578623 John K. Chow: </h3><p>This happened to me right after I reinstalled <code>rbenv</code>. Apparently I had a <code>.ruby-version</code> file in my home directory, specifying a version that no longer existed. Once I deleted the file, everything worked.</p>
+------------------------------------------------------------------ <br><h3> Answer 65460985 mfaani: </h3><p>There a lot of of misleading answers that work. I thought it was worth mentioning the steps from the <a href="https://github.com/rbenv/rbenv#homebrew-on-macos" rel="nofollow noreferrer"><code>rbenv</code> README</a>.</p>
+<ol>
+<li><code>$ brew install rbenv</code></li>
+<li><code>$ rbenv init</code> <strong>and follow</strong> the instructions it gives you. This is what I got:</li>
+</ol>
+<pre><code>~ $ rbenv init
+# Load rbenv automatically by appending
+# the following to ~/.bash_profile:
+
+eval &quot;$(rbenv init -)&quot;
+</code></pre>
+<p>I updated my <code>~/.bash_profile</code>...</p>
+<ol start="3">
+<li>Close terminal and open it again</li>
+<li>Verify it's working correctly by running:</li>
+</ol>
+<pre><code>$ curl -fsSL https://github.com/rbenv/rbenv-installer/raw/master/bin/rbenv-doctor | bash
+</code></pre>
+<ol start="5">
+<li>Now just install the version you want by doing: <code>rbenv install &lt;version&gt;</code></li>
+</ol>
+------------------------------------------------------------------ <br><h3> Answer 65519452 Ol&#39;seun Iyadi: </h3><p>Linux / Ubuntu Users
+Step 1:</p>
+<pre><code>$ rbenv versions
+  system
+  2.6.0
+* 2.7.0 (set by /home/User/Documents/sample-app/.ruby-version) #Yours will be different
+  2.7.2
+
+</code></pre>
+<p>Step 2:</p>
+<pre><code>$ nano /home/User/Documents/sample-app/.ruby-version
+</code></pre>
+<p>Step 3:</p>
+<pre><code>$ ruby -v
+ruby 2.7.2p137 (2020-10-01 revision 5445e04352) [x86_64-linux]
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 11146317 poseid: </h3><p>Strangely, <code>rbenv</code> version did not set the <code>.rbenv</code> file.</p>
+<p>Check with: <code>ls -ltra</code> --&gt; to see that a <code>rbenv</code> was written.</p>
+------------------------------------------------------------------ <br><h3> Answer 13487991 postmodern: </h3><p>You could try using <a href="https://github.com/postmodern/chruby#readme" rel="nofollow">chruby</a>? chruby does not rely on shims, instead it only modifies <code>PATH</code>, <code>GEM_HOME</code>, <code>GEM_PATH</code>.</p>
+------------------------------------------------------------------ <br><h3> Answer 22140224 ajain: </h3><p>I forgot to delete rvm before installing rbenv. I deleted rvm and re-installed rbenv, but system still wasn't using the version of Ruby being designated as global by rbenv. I tried shutting Terminal, but it only worked once I restarted the whole machine.</p>
+------------------------------------------------------------------ <br><h3> Answer 74542943 Harshal Yeole: </h3><p><a href="https://i.stack.imgur.com/9fs1a.jpg" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/9fs1a.jpg" alt="enter image description here" /></a></p>
+<p>Apparently, it worked for me when I used the <strong>Rosetta</strong> terminal</p>
+<p>You can try doing the same thing using <strong>Rosetta</strong> terminal</p>
+<p>by going into</p>
+<p>Finder &gt; Utilities &gt; Terminal &gt; Get Info</p>
+------------------------------------------------------------------ <br><h3> Answer 64720716 David Hempy: </h3><p>All the other answers here give good advice for various situations, but there is an easier way.</p>
+<p>The rbenv docs point us to the rbenv-doctor diagnostic tool that will quickly verify all these potential pitfalls on your system:</p>
+<pre><code>curl -fsSL https://github.com/rbenv/rbenv-installer/raw/master/bin/rbenv-doctor | bash
+</code></pre>
+<p>When all is well, you'll see this:</p>
+<pre><code>$ curl -fsSL https://github.com/rbenv/rbenv-installer/raw/master/bin/rbenv-doctor | bash                                     &lt;aws:hd-pmp-developer&gt;
+Checking for `rbenv' in PATH: /usr/local/bin/rbenv
+Checking for rbenv shims in PATH: OK
+Checking `rbenv install' support: /usr/local/bin/rbenv-install (ruby-build 20201005)
+Counting installed Ruby versions: 1 versions
+Checking RubyGems settings: OK
+Auditing installed plugins: OK
+</code></pre>
+<p>Now, if we break one of those expectations (e.g. remove rbenv-install), the tool will point us directly to the problem, with a link to how to fix it:</p>
+<pre><code>$ mv /usr/local/bin/rbenv-install rbenv-install-GONE
+                                                                      
+$ curl -fsSL https://github.com/rbenv/rbenv-installer/raw/master/bin/rbenv-doctor | bash                                     
+Checking for `rbenv' in PATH: /usr/local/bin/rbenv
+Checking for rbenv shims in PATH: OK
+
+===&gt; Checking `rbenv install' support: not found &lt;===
+  Unless you plan to add Ruby versions manually, you should install ruby-build.
+  Please refer to https://github.com/rbenv/ruby-build#installation
+
+Counting installed Ruby versions: 1 versions
+Checking RubyGems settings: OK
+Auditing installed plugins: OK
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 66859331 Sachin D Naik: </h3><p>Adding eval &quot;$(rbenv init -)&quot; to the .bash_profile on my mac resolved this issue.
+rbenv local 
+ruby -v gave the set </p>
+------------------------------------------------------------------ <br><h3> Answer 75603798 Suresh B B: </h3><p>HOW TO INSTALL RUBY RBENV
+Just like many other tools, we turn to the popular Homebrew macOS package manager. Run the following command in your terminal:</p>
+<pre><code>brew install rbenv ruby-build
+</code></pre>
+<p>Once everything is installed, we need to instruct rbenv to setup our shell, so we’re using the Ruby runtime version that we’ve customly installed with rbenv whenever we open a new terminal window to type commands in the prompt (as opposed to the preinstalled Ruby 2.6.8 version on the macOS).</p>
+<p>To setup rbenv with your shell run the following command:</p>
+<pre><code>rbenv init
+</code></pre>
+<p>Follow the on-screen printed instructions if any extra configuration is required on your part. You might be asked to paste a command in your shell’s configuration. If you’re on a macOS and haven’t changed from the default Z Shell (ZSH), then you’ll want to make sure you add the following line of code to the top of your ~/.zshrc file:</p>
+<pre><code>eval &quot;$(rbenv init - zsh)&quot;
+</code></pre>
+<p>The rbenv install process is now complete. You might want to run some diagnostic checks to ensure that everything is set up correctly. If so, you can run the rbenv-doctor tool that the rbenv GitHub project provides:</p>
+<p>Open a new terminal window so that you have the new rbenv environment loaded
+Run the command:
+curl -fsSL <a href="https://github.com/rbenv/rbenv-installer/raw/main/bin/rbenv-doctor" rel="nofollow noreferrer">https://github.com/rbenv/rbenv-installer/raw/main/bin/rbenv-doctor</a> | zsh
+Warning: This command shouldn’t be taken lightly, as you are piping commands into your development environment’s shell that originate from a public and open source GitHub repository. It is possible that a malicious actor had tampered with the source code, so you are highly encouraged to review the code properly before you run this command.</p>
+<p>How do you use rbenv to install a new Ruby version?
+Congrats on building your own Ruby virtual environment! Now that you have a functional rbenv setup we can use it to completely manage your Ruby versions.</p>
+<p>To begin, you want to list which Ruby versions are available for installation so you can choose the latest Ruby release, or perhaps a specific version that you’re looking for. To use rbenv to list all Ruby versions, run the following command:</p>
+<pre><code>rbenv install -l
+</code></pre>
+<p>The output of which was:</p>
+<p>2.6.10
+2.7.6
+3.0.4
+3.1.2
+jruby-9.3.6.0
+mruby-3.1.0
+picoruby-3.0.0
+rbx-5.0
+truffleruby-22.1.0
+truffleruby+graalvm-22.1.0</p>
+<p>Only latest stable releases for each Ruby implementation are shown.
+Use 'rbenv install --list-all / -L' to show all local versions.
+You can then proceed to installing one of these Ruby versions. Let’s use rbenv to install a Ruby version of 3.1.2:</p>
+<pre><code>rbenv install 3.1.2
+</code></pre>
+<p>The command will then start fetching the relevant source code files to extract, compile, and then install the Ruby 3.1.2 runtime version available to your shell.</p>
+<p>When you’ve finished installing it, you should set it to be the chosen version anytime your shell starts. To do that, you need to run:</p>
+<pre><code>rbenv global 3.1.2
+</code></pre>
+<p>Finally, you can verify that this is working as expected by running the ruby --version in your shell, which should output a similar result:</p>
+------------------------------------------------------------------ <br><h3> Answer 70380072 Raja Bose: </h3><p>I will suggest do not use rbenv has couple of issues.</p>
+<ol>
+<li>it does not come with bundle version once you install ruby</li>
+<li>most of time create bundler version pickup issue while running bundle install</li>
+</ol>
+<p>To cut down this much effort,I would suggest to use rvm, make life easier.
+follow this link to install rvm <a href="https://nrogap.medium.com/install-rvm-in-macos-step-by-step-d3b3c236953b" rel="nofollow noreferrer">https://nrogap.medium.com/install-rvm-in-macos-step-by-step-d3b3c236953b</a></p>
+<h4> Comment 127430143 Stephen Mariano Cabrera: </h4>This doesn&#39;t solve the OP&#39;s problem if their organization is using rbenv or if they must use rbenv for some other reason. It&#39;s unrelated to the question<br>

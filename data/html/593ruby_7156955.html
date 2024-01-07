@@ -1,0 +1,424 @@
+ <h2> Title: What&#39;s the difference between equal?, eql?, ===, and ==? </h2> <h3> denniss, question_id: 7156955 </h3>Score: 593, Tags: {ruby,comparison,operators,equality} <br><p>I am trying to understand the difference between these four methods. I know by default that <code>==</code> calls the method <code>equal?</code> which returns true when both operands refer to exactly the same object.</p>
+
+<p><code>===</code> by default also calls <code>==</code> which calls <code>equal?</code>... okay, so if all these three methods are not overridden, then I guess
+<code>===</code>, <code>==</code> and <code>equal?</code> do exactly the same thing?</p>
+
+<p>Now comes <code>eql?</code>. What does this do (by default)? Does it make a call to the operand's hash/id? </p>
+
+<p>Why does Ruby have so many equality signs? Are they supposed to differ in semantics?</p>
+<h4> Comment 8586960 Nemo157: </h4>@Peter: That&#39;s because strings override all of the equality operators. Trying using <code>a = Object.new; b = Object.new</code> then all <code>==</code>, <code>===</code>, <code>.equal?</code>, <code>.eql?</code> will return <code>true</code> for <code>a</code> vs <code>a</code> and false for <code>a</code> vs <code>b</code>.<br><h4> Comment 8586929 PeterWong: </h4>I just started a irb and had the following result which contradicts yours...All of these 3 are true: <code>&quot;a&quot; == &quot;a&quot;</code>, <code>&quot;a&quot; === &quot;a&quot;</code> and <code>&quot;a&quot;.eql? &quot;a&quot;</code>. But this is false: <code>&quot;a&quot;.equal? &quot;a&quot;</code> (Mine is ruby 1.9.2-p180)<br>------------------------------------------------------------------ <br><h3> Answer 7157051 jtbandes: </h3><p>I'm going to heavily quote <a href="http://ruby-doc.org/core/Object.html#method-i-eql-3F" rel="noreferrer">the Object documentation</a> here, because I think it has some great explanations. I encourage you to read it, and also the documentation for these methods as they're overridden in other classes, like <a href="http://ruby-doc.org/core/classes/String.html" rel="noreferrer">String</a>.</p>
+<p><em>Side note: if you want to try these out for yourself on different objects, use something like this:</em></p>
+<pre><code>class Object
+  def all_equals(o)
+    ops = [:==, :===, :eql?, :equal?]
+    Hash[ops.map(&amp;:to_s).zip(ops.map {|s| send(s, o) })]
+  end
+end
+
+&quot;a&quot;.all_equals &quot;a&quot; # =&gt; {&quot;==&quot;=&gt;true, &quot;===&quot;=&gt;true, &quot;eql?&quot;=&gt;true, &quot;equal?&quot;=&gt;false}
+</code></pre>
+<hr />
+<h2><code>==</code> — generic &quot;equality&quot;</h2>
+<blockquote>
+<p>At the Object level, <code>==</code> returns true only if <code>obj</code> and <code>other</code> are the same object. Typically, this method is overridden in descendant classes to provide class-specific meaning.</p>
+</blockquote>
+<p>This is the most common comparison, and thus the most fundamental place where you (as the author of a class) get to decide if two objects are &quot;equal&quot; or not.</p>
+<h2><code>===</code> — case equality</h2>
+<blockquote>
+<p>For class Object, effectively the same as calling <code>#==</code>, but typically overridden by descendants to provide meaningful semantics in case statements.</p>
+</blockquote>
+<p>This is incredibly useful. Examples of things which have interesting <code>===</code> implementations:</p>
+<ul>
+<li>Range</li>
+<li>Regex</li>
+<li>Proc (in Ruby 1.9)</li>
+</ul>
+<p>So you can do things like:</p>
+<pre><code>case some_object
+when /a regex/
+  # The regex matches
+when 2..4
+  # some_object is in the range 2..4
+when lambda {|x| some_crazy_custom_predicate }
+  # the lambda returned true
+end
+</code></pre>
+<p>See <a href="https://stackoverflow.com/questions/1735717/help-refactoring-this-nasty-ruby-if-else-statement/1735777#1735777">my answer here</a> for a neat example of how <code>case</code>+<code>Regex</code> can make code a lot cleaner. And of course, by providing your own <code>===</code> implementation, you can get custom <code>case</code> semantics.</p>
+<h2><code>eql?</code> — <code>Hash</code> equality</h2>
+<blockquote>
+<p>The <code>eql?</code> method returns true if <code>obj</code> and <code>other</code> refer to the same hash key. This is used by <code>Hash</code> to test members for equality. <strong>For objects of class <code>Object</code>, <code>eql?</code> is synonymous with <code>==</code>.</strong> Subclasses normally continue this tradition by aliasing <code>eql?</code> to their overridden <code>==</code> method, but there are exceptions. <code>Numeric</code> types, for example, perform type conversion across <code>==</code>, but not across <code>eql?</code>, so:</p>
+<pre><code>1 == 1.0     #=&gt; true
+1.eql? 1.0   #=&gt; false
+</code></pre>
+</blockquote>
+<p>So you're free to override this for your own uses, or you can override <code>==</code> and use <code>alias :eql? :==</code> so the two methods behave the same way.</p>
+<h2><code>equal?</code> — identity comparison</h2>
+<blockquote>
+<p>Unlike <code>==</code>, the <code>equal?</code> method should never be overridden by subclasses: it is used to determine object identity (that is, <code>a.equal?(b)</code> iff <code>a</code> is the same object as <code>b</code>).</p>
+</blockquote>
+<p>This is effectively pointer comparison.</p>
+<h4> Comment 17390352 sawa: </h4>As I understand from your answer, the strictness is: equal? &lt; eql? &lt; == &lt; ===. Normally, you use ==. For some loose purposes, you use ===. For strict situation, you use eql?, and for complete identity, you use equal?.<br><h4> Comment 17421386 jtbandes: </h4>The notion of strictness isn&#39;t enforced or even suggested in the documentation, it just so happens that <code>Numeric</code> handles it in a stricter manner than <code>==</code>. It&#39;s really up to the author of the class. <code>===</code> is infrequently used outside of <code>case</code> statements.<br><h4> Comment 43066053 Mark Amery: </h4>Fun fact: the official docs now link to this answer (see <a href="http://www.ruby-doc.org/core-2.1.5/String.html#method-i-3D-3D-label-Equality" rel="nofollow noreferrer">ruby-doc.org/core-2.1.5/&hellip;</a>).<br><h4> Comment 23892505 Kelvin: </h4>@sawa I usually think of <code>===</code> as meaning &quot;matches&quot; (roughly). As in, &quot;does the regexp match the string&quot; or &quot;does the range match (include) the number&quot;.<br><h4> Comment 18003637 apeiros: </h4>== is equality in terms of bigger/smaller too. I.e., if you include Comparable, it&#39;ll be defined in terms of &lt;=&gt; returning 0. This is why 1 == 1.0 returns true.<br><h4> Comment 27544696 ChrisPhoenix: </h4>Great answer. One question it left unanswered for me is whether any of these equalities inherit from each other. If I redefine ==, does that change the behavior of ===? Et cetera. A bit of playing shows that === adopts the behavior of ==, but == and eql? don&#39;t affect each other.<br><h4> Comment 39811151 Daniel: </h4><code>eql?</code> should be called &quot;hash equality&quot;, because it&#39;s used when checking that Hash keys are the same. This is why <code>{1=&gt;true, 1.0=&gt;true}.size == 2</code> and <code>[1, 1.0].size == 2</code>. From the Object documention: &quot;The eql? method returns true if obj and other refer to the same hash key.&quot;<br><h4> Comment 85432124 AlexChaffee: </h4>Note that you must override eql? in your own subclasses for <code>uniq</code> etc. to work. This should not be necessary -- the docs for object.c say &quot;The &lt;code&gt;eql?&lt;/code&gt; method returns &lt;code&gt;true&lt;/code&gt; if +obj+ and +other+ refer to the same hash key.&quot; -- but apparently the base class doesn&#39;t actually do that, instead just comparing object pointers -- see <a href="https://github.com/ruby/ruby/edit/trunk/object.c#L205" rel="nofollow noreferrer">github.com/ruby/ruby/edit/trunk/object.c#L205</a><br><h4> Comment 34340890 Bob Stine: </h4>FWIW, checking the behavior with a = [1, 2, 3]; b = [1, 2, 3] was a help for me.<br><h4> Comment 39823603 jtbandes: </h4>Thanks @Daniel, I&#39;ve updated my answer to incorporate those changes that have been made to the docs since I wrote it 3 years ago :)<br><h4> Comment 38549040 Kelvin: </h4>Another class that overrides <code>===</code> is <code>Class</code>; it works similar to <code>is_a?</code>. This is why you can do: <code>case obj; when String; :string; when Array; :array end</code><br><h4> Comment 66416653 Iggy: </h4>Here is another way to remember it: the longer the operator, the more restrictive it gets; except <code>===</code>. <a href="http://www.wellho.net/mouth/985_Equality-in-Ruby-eql-and-equal-.html" rel="nofollow noreferrer">wellho.net/mouth/985_Equality-in-Ruby-eql-and-equal-.html</a><br>------------------------------------------------------------------ <br><h3> Answer 29463917 Andreas Rayo Kniep: </h3><p>I love jtbandes answer, but since it is pretty long, I will add my own compact answer:</p>
+
+<p><strong><code>==</code>, <code>===</code>, <code>eql?</code>, <code>equal?</code></strong><br>
+are 4 comparators, ie. 4 ways to compare 2 objects, in Ruby.<br>
+As, in Ruby, all comparators (and most operators) are actually method-calls, you can change, overwrite, and define the semantics of these comparing methods yourself. However, it is important to understand, when Ruby's internal language constructs use which comparator:</p>
+
+<p><strong><code>==</code> (value comparison)</strong><br>
+Ruby uses :== everywhere to compare the <strong>values</strong> of 2 objects, eg. Hash-values:</p>
+
+<pre><code>{a: 'z'}  ==  {a: 'Z'}    # =&gt; false
+{a: 1}    ==  {a: 1.0}    # =&gt; true
+</code></pre>
+
+<p><strong><code>===</code> (case comparison)</strong><br>
+Ruby uses :=== in case/when constructs. The following code snippets are logically identical:</p>
+
+<pre><code>case foo
+  when bar;  p 'do something'
+end
+
+if bar === foo
+  p 'do something'
+end
+</code></pre>
+
+<p><strong><code>eql?</code> (Hash-key comparison)</strong><br>
+Ruby uses :eql? (in combination with the method hash) to compare Hash-keys. In most classes :eql? is identical with :==.<br>
+Knowledge about :eql? is only important, when you want to create your own special classes:</p>
+
+<pre><code>class Equ
+  attr_accessor :val
+  alias_method  :initialize, :val=
+  def hash()           self.val % 2             end
+  def eql?(other)      self.hash == other.hash  end
+end
+
+h = {Equ.new(3) =&gt; 3,  Equ.new(8) =&gt; 8,  Equ.new(15) =&gt; 15}    #3 entries, but 2 are :eql?
+h.size            # =&gt; 2
+h[Equ.new(27)]    # =&gt; 15
+</code></pre>
+
+<p>Note: The commonly used Ruby-class Set also relies on Hash-key-comparison.</p>
+
+<p><strong><code>equal?</code> (object identity comparison)</strong><br>
+Ruby uses :equal? to check if two objects are identical. This method (of class BasicObject) is not supposed to be overwritten.</p>
+
+<pre><code>obj = obj2 = 'a'
+obj.equal? obj2       # =&gt; true
+obj.equal? obj.dup    # =&gt; false
+</code></pre>
+<h4> Comment 53684959 odigity: </h4>It&#39;s a good answer, but it&#39;s almost almost as long as jtbandes&#39;s.  :)<br><h4> Comment 92641899 Cary Swoveland: </h4>@odigity, about 70% as long. I could think of many things to spend that 30% on.<br><h4> Comment 103047915 Alexis Wilke: </h4>Is the <i>case comparison</i> really equivalent to <code>bar === foo</code> and not <code>foo === bar</code>? I would hope the latter is correct and it is important since the compiler call the left hand side :===`&#39;<br><h4> Comment 103321504 Andreas Rayo Kniep: </h4>As far as I know, it is <code>bar === foo</code>: Ruby uses the case value on the left hand side and the case variable on the right hand side. This might have to do with avoiding NPEs (Null Pointer Exceptions).<br><h4> Comment 106727902 pjvleeuwen: </h4>The <code>===</code> method of the object used in the <code>when</code> will be used. So it will be the <code>===</code> method of the <code>when</code> that determines the semantics for the match. E.g. the <a href="https://ruby-doc.org/core-2.7.0/Module.html#method-i-3D-3D-3D" rel="nofollow noreferrer"><code>Module#===</code></a> does a <code>is_a?</code> like thing, while the <code>Regexp#===</code> does a <code>match</code>.<br><h4> Comment 100263922 Andrey Tarantsov: </h4>I think the example of <code>eql?</code> is very misleading. <code>eql?</code> is an equality comparison that&#39;s <i>consistent</i> with how hash is computed, i.e. <code>a.eql?(b)</code> guarantees that <code>a.hash == b.hash</code>. It does <i>not</i> simply compare the hash codes.<br>------------------------------------------------------------------ <br><h3> Answer 37512484 BrunoF: </h3><h2>Equality operators: == and !=</h2>
+
+<p>The == operator, also known as equality or double equal, will return true if both objects are equal and false if they are not.</p>
+
+<pre><code>"koan" == "koan" # Output: =&gt; true
+</code></pre>
+
+<p>The != operator, also known as inequality, is the opposite of ==. It will return true if both objects are not equal and false if they are equal.</p>
+
+<pre><code>"koan" != "discursive thought" # Output: =&gt; true
+</code></pre>
+
+<p>Note that two arrays with the same elements in a different order are not equal, uppercase and lowercase versions of the same letter are not equal and so on. </p>
+
+<p>When comparing numbers of different types (e.g., integer and float), if their numeric value is the same, == will return true.</p>
+
+<pre><code>2 == 2.0 # Output: =&gt; true
+</code></pre>
+
+<h2>equal?</h2>
+
+<p>Unlike the == operator which tests if both operands are equal, the equal method checks if the two operands refer to the same object. This is the strictest form of equality in Ruby.</p>
+
+<p>Example:
+    a = "zen"
+    b = "zen"</p>
+
+<pre><code>a.object_id  # Output: =&gt; 20139460
+b.object_id  # Output :=&gt; 19972120
+
+a.equal? b  # Output: =&gt; false
+</code></pre>
+
+<p>In the example above, we have two strings with the same value. However, they are two distinct objects, with different object IDs. Hence, the equal? method will return false.</p>
+
+<p>Let's try again, only this time b will be a reference to a. Notice that the object ID is the same for both variables, as they point to the same object.</p>
+
+<pre><code>a = "zen"
+b = a
+
+a.object_id  # Output: =&gt; 18637360
+b.object_id  # Output: =&gt; 18637360
+
+a.equal? b  # Output: =&gt; true
+</code></pre>
+
+<h2>eql?</h2>
+
+<p>In the Hash class, the eql? method it is used to test keys for equality. Some background is required to explain this. In the general context of computing, a hash function takes a string (or a file) of any size and generates a string or integer of fixed size called hashcode, commonly referred to as only hash. Some commonly used hashcode types are MD5, SHA-1, and CRC. They are used in encryption algorithms, database indexing, file integrity checking, etc. Some programming languages, such as Ruby, provide a collection type called hash table. Hash tables are dictionary-like collections which store data in pairs, consisting of unique keys and their corresponding values. Under the hood, those keys are stored as hashcodes. Hash tables are commonly referred to as just hashes. Notice how the word hashcan refer to a hashcode or to a hash table. In the context of Ruby programming, the word hash almost always refers to the dictionary-like collection.</p>
+
+<p>Ruby provides a built-in method called hash for generating hashcodes. In the example below, it takes a string and returns a hashcode. Notice how strings with the same value always have the same hashcode, even though they are distinct objects (with different object IDs).</p>
+
+<pre><code>"meditation".hash  # Output: =&gt; 1396080688894079547
+"meditation".hash  # Output: =&gt; 1396080688894079547
+"meditation".hash  # Output: =&gt; 1396080688894079547
+</code></pre>
+
+<p>The hash method is implemented in the Kernel module, included in the Object class, which is the default root of all Ruby objects. Some classes such as Symbol and Integer use the default implementation, others like String and Hash provide their own implementations. </p>
+
+<pre><code>Symbol.instance_method(:hash).owner  # Output: =&gt; Kernel
+Integer.instance_method(:hash).owner # Output: =&gt; Kernel
+
+String.instance_method(:hash).owner  # Output: =&gt; String
+Hash.instance_method(:hash).owner  # Output: =&gt; Hash
+</code></pre>
+
+<p>In Ruby, when we store something in a hash (collection), the object provided as a key (e.g., string or symbol) is converted into and stored as a hashcode. Later, when retrieving an element from the hash (collection), we provide an object as a key, which is converted into a hashcode and compared to the existing keys. If there is a match, the value of the corresponding item is returned. The comparison is made using the eql? method under the hood. </p>
+
+<pre><code>"zen".eql? "zen"    # Output: =&gt; true
+# is the same as
+"zen".hash == "zen".hash # Output: =&gt; true
+</code></pre>
+
+<p>In most cases, the eql? method behaves similarly to the == method. However, there are a few exceptions. For instance, eql? does not perform implicit type conversion when comparing an integer to a float.</p>
+
+<pre><code>2 == 2.0    # Output: =&gt; true
+2.eql? 2.0    # Output: =&gt; false
+2.hash == 2.0.hash  # Output: =&gt; false
+</code></pre>
+
+<h2>Case equality operator: ===</h2>
+
+<h2> </h2>
+
+<p>Many of Ruby's built-in classes, such as String, Range, and Regexp, provide their own implementations of the === operator, also known as case-equality, triple equals or threequals. Because it's implemented differently in each class, it will behave differently depending on the type of object it was called on. Generally, it returns true if the object on the right "belongs to" or "is a member of" the object on the left. For instance, it can be used to test if an object is an instance of a class (or one of its subclasses).</p>
+
+<pre><code>String === "zen"  # Output: =&gt; true
+Range === (1..2)   # Output: =&gt; true
+Array === [1,2,3]   # Output: =&gt; true
+Integer === 2   # Output: =&gt; true
+</code></pre>
+
+<p>The same result can be achieved with other methods which are probably best suited for the job. It's usually better to write code that is easy to read by being as explicit as possible, without sacrificing efficiency and conciseness. </p>
+
+<pre><code>2.is_a? Integer   # Output: =&gt; true
+2.kind_of? Integer  # Output: =&gt; true
+2.instance_of? Integer # Output: =&gt; false
+</code></pre>
+
+<p>Notice the last example returned false because integers such as 2 are instances of the Fixnum class, which is a subclass of the Integer class. The ===, is_a? and instance_of? methods return true if the object is an instance of the given class or any subclasses. The instance_of method is stricter and only returns true if the object is an instance of that exact class, not a subclass. </p>
+
+<p>The is_a? and kind_of? methods are implemented in the Kernel module, which is mixed in by the Object class. Both are aliases to the same method. Let's verify:</p>
+
+<p>Kernel.instance_method(:kind_of?) == Kernel.instance_method(:is_a?) # Output: => true</p>
+
+<h3>Range Implementation of ===</h3>
+
+<p>When the === operator is called on a range object, it returns true if the value on the right falls within the range on the left.</p>
+
+<pre><code>(1..4) === 3  # Output: =&gt; true
+(1..4) === 2.345 # Output: =&gt; true
+(1..4) === 6  # Output: =&gt; false
+
+("a".."d") === "c" # Output: =&gt; true
+("a".."d") === "e" # Output: =&gt; false
+</code></pre>
+
+<p>Remember that the === operator invokes the === method of the left-hand object. So (1..4) === 3 is equivalent to (1..4).=== 3. In other words, the class of the left-hand operand will define which implementation of the === method will be called, so the operand positions are not interchangeable. </p>
+
+<h3>Regexp Implementation of ===</h3>
+
+<p>Returns true if the string on the right matches the regular expression on the left.
+    /zen/ === "practice zazen today"  # Output: => true
+    # is the same as
+    "practice zazen today"=~ /zen/</p>
+
+<h3>Implicit usage of the === operator on case/when statements</h3>
+
+<p>This operator is also used under the hood on case/when statements. That is its most common use.</p>
+
+<pre><code>minutes = 15
+
+case minutes
+  when 10..20
+    puts "match"
+  else
+    puts "no match"
+end
+
+# Output: match
+</code></pre>
+
+<p>In the example above, if Ruby had implicitly used the double equal operator (==), the range 10..20 would not be considered equal to an integer such as 15. They match because the triple equal operator (===) is implicitly used in all case/when statements. The code in the example above is equivalent to:</p>
+
+<pre><code>if (10..20) === minutes
+  puts "match"
+else
+  puts "no match"
+end
+</code></pre>
+
+<h2>Pattern matching operators: =~ and !~</h2>
+
+<h2> </h2>
+
+<p>The =~ (equal-tilde) and !~ (bang-tilde) operators are used to match strings and symbols against regex patterns. </p>
+
+<p>The implementation of the =~ method in the String and Symbol classes expects a regular expression (an instance of the Regexp class) as an argument. </p>
+
+<pre><code>"practice zazen" =~ /zen/   # Output: =&gt; 11
+"practice zazen" =~ /discursive thought/ # Output: =&gt; nil
+
+:zazen =~ /zen/    # Output: =&gt; 2
+:zazen =~ /discursive thought/  # Output: =&gt; nil
+</code></pre>
+
+<p>The implementation in the Regexp class expects a string or a symbol as an argument. </p>
+
+<pre><code>/zen/ =~ "practice zazen"  # Output: =&gt; 11
+/zen/ =~ "discursive thought" # Output: =&gt; nil
+</code></pre>
+
+<p>In all implementations, when the string or symbol matches the Regexp pattern, it returns an integer which is the position (index) of the match. If there is no match, it returns nil. Remember that, in Ruby, any integer value is "truthy" and nil is "falsy", so the =~ operator can be used in if statements and ternary operators.</p>
+
+<pre><code>puts "yes" if "zazen" =~ /zen/ # Output: =&gt; yes
+"zazen" =~ /zen/?"yes":"no" # Output: =&gt; yes
+</code></pre>
+
+<p>Pattern-matching operators are also useful for writing shorter if statements. Example:</p>
+
+<pre><code>if meditation_type == "zazen" || meditation_type == "shikantaza" || meditation_type == "kinhin"
+  true
+end
+Can be rewritten as:
+if meditation_type =~ /^(zazen|shikantaza|kinhin)$/
+  true
+end
+</code></pre>
+
+<p>The !~ operator is the opposite of =~, it returns true when there is no match and false if there is a match.</p>
+
+<p>More info is available at <a href="http://www.zenruby.info/2016/05/ruby-operators-equality-comparison.html" rel="noreferrer">this blog post</a>.</p>
+<h4> Comment 63462244 Qqwy: </h4>I find this a better answer than the currently accepted answer, as it provides nice examples and is less ambigous about what the different kinds of equality mean and why they exist/where they are used.<br><h4> Comment 79568269 Abdullah Fadhel: </h4>I love this answer. Thanks<br><h4> Comment 63755842 Mike R: </h4>Very detailed answer, but on my irb (ruby v 2.2.1) <code>:zen === &quot;zen&quot;</code> returns false<br><h4> Comment 63756543 BrunoF: </h4>@MikeR Thank you for letting me know. I have corrected the answer.<br><h4> Comment 67805217 user1883793: </h4>I think you mean type_of? &quot;Notice the last example returned false because integers such as 2 are instances of the Fixnum class, which is a subclass of the Integer class. The ===, is_a? and instance_of? (TYPE_OF?)&quot; ?<br><h4> Comment 100264043 Andrey Tarantsov: </h4>The statement that <code>a.eql?(b)</code> is the same as <code>a.hash == b.hash</code> is false. <code>a.eql?(b)</code> implies <code>a.hash == b.hash</code>, but the reverse isn&#39;t true: hash codes can match even when objects are not <code>eql?</code>.<br><h4> Comment 100266026 BrunoF: </h4>That&#39;s true, but how likely is it to happen in the real world?<br>------------------------------------------------------------------ <br><h3> Answer 29582827 kalibbala: </h3><p>Ruby exposes several different methods for handling equality:</p>
+
+<pre class="lang-ruby prettyprint-override"><code>a.equal?(b) # object identity - a and b refer to the same object
+
+a.eql?(b) # object equivalence - a and b have the same value
+
+a == b # object equivalence - a and b have the same value with type conversion.
+</code></pre>
+
+<p>Continue reading by clicking the link below, it gave me a clear summarized understanding.</p>
+
+<blockquote>
+  <p><a href="https://www.relishapp.com/rspec/rspec-expectations/v/2-0/docs/matchers/equality-matchers" rel="nofollow noreferrer">https://www.relishapp.com/rspec/rspec-expectations/v/2-0/docs/matchers/equality-matchers</a></p>
+</blockquote>
+
+<p>Hope it helps others.</p>
+------------------------------------------------------------------ <br><h3> Answer 42742902 akuhn: </h3><p>I would like to expand on the <code>===</code> operator.</p>
+
+<p><code>===</code> is not an equality operator!</p>
+
+<p>Not.</p>
+
+<p>Let's get that point really across. </p>
+
+<p>You might be familiar with <code>===</code> as an equality operator in Javascript and PHP, but this just not an equality operator in Ruby and has fundamentally different semantics.</p>
+
+<p>So what does <code>===</code> do?</p>
+
+<p><code>===</code> is the pattern matching operator!</p>
+
+<ul>
+<li><code>===</code> matches regular expressions</li>
+<li><code>===</code> checks range membership</li>
+<li><code>===</code> checks being instance of a class  </li>
+<li><code>===</code> calls lambda expressions</li>
+<li><code>===</code> sometimes checks equality, but mostly it does not</li>
+</ul>
+
+<p>So how does this madness make sense?</p>
+
+<ul>
+<li><code>Enumerable#grep</code> uses <code>===</code> internally</li>
+<li><code>case when</code> statements use <code>===</code> internally</li>
+<li>Fun fact, <code>rescue</code> uses <code>===</code> internally</li>
+</ul>
+
+<p>That is why you can use regular expressions and classes and ranges and even lambda expressions in a <code>case when</code> statement.</p>
+
+<p>Some examples</p>
+
+<pre><code>case value
+when /regexp/
+  # value matches this regexp
+when 4..10
+  # value is in range
+when MyClass
+  # value is an instance of class
+when -&gt;(value) { ... }
+  # lambda expression returns true
+when a, b, c, d
+  # value matches one of a through d with `===`
+when *array
+  # value matches an element in array with `===`
+when x
+  # values is equal to x unless x is one of the above
+end
+</code></pre>
+
+<p>All these example work with <code>pattern === value</code> too, as well as with <code>grep</code> method.</p>
+
+<pre><code>arr = ['the', 'quick', 'brown', 'fox', 1, 1, 2, 3, 5, 8, 13]
+arr.grep(/[qx]/)                                                                                                                            
+# =&gt; ["quick", "fox"]
+arr.grep(4..10)
+# =&gt; [5, 8]
+arr.grep(String)
+# =&gt; ["the", "quick", "brown", "fox"]
+arr.grep(1)
+# =&gt; [1, 1]
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 23215275 Kishore Mohan: </h3><h1>===  #---case equality</h1>
+
+<h1>== #--- generic equality</h1>
+
+<p>both works similar but "===" even do case statements</p>
+
+<pre><code>"test" == "test"  #=&gt; true
+"test" === "test" #=&gt; true
+</code></pre>
+
+<p><strong>here the difference</strong></p>
+
+<pre><code>String === "test"   #=&gt; true
+String == "test"  #=&gt; false
+</code></pre>
+<h4> Comment 53058795 mwfearnley: </h4>They <i>don&#39;t</i> work similarly, even though it tends to be true that when <code>a==b</code> then <code>a===b</code>.  But <code>a===b</code> is much more powerful.  <code>===</code> is not symmetric, and <code>a===b</code> means a very different thing from <code>b===a</code>, let alone <code>a==b</code>.<br>------------------------------------------------------------------ <br><h3> Answer 67807638 Pratik Gaikwad: </h3><ol>
+<li>.eql? - This operator returns true if the receiver and argument have both the same type and equal values.</li>
+</ol>
+<p>for example - 10.eql?(10.0) is false.</p>
+<ol start="2">
+<li>=== -  it will test equality in case statement.</li>
+</ol>
+<p>for example - (1...10) === 1 is true</p>
+<ol start="3">
+<li>== -  This  operator checks whether the two given operands are equal or not. If equals, it returns TRUE, Otherwise it returns FALSE.</li>
+</ol>
+<p>for example - (1...10) == 1 is false</p>
+<p>for more example <a href="https://stackpointers.com/operators-in-ruby/" rel="nofollow noreferrer">click here</a></p>
+------------------------------------------------------------------ <br><h3> Answer 23304475 Tom Phan: </h3><p>I wrote a simple test for all the above.</p>
+
+<pre><code>def eq(a, b)
+  puts "#{[a, '==',  b]} : #{a == b}"
+  puts "#{[a, '===', b]} : #{a === b}"
+  puts "#{[a, '.eql?', b]} : #{a.eql?(b)}"
+  puts "#{[a, '.equal?', b]} : #{a.equal?(b)}"
+end
+
+eq("all", "all")
+eq(:all, :all)
+eq(Object.new, Object.new)
+eq(3, 3)
+eq(1, 1.0)
+</code></pre>

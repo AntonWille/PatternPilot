@@ -1,0 +1,116 @@
+ <h2> Title: Rails update_attributes without save? </h2> <h3> tybro0103, question_id: 6770350 </h3>Score: 423, Tags: {ruby-on-rails,ruby,ruby-on-rails-3,ruby-on-rails-4,rails-activerecord} <br><p>Is there an alternative to <code>update_attributes</code> that does not save the record?</p>
+<p>So I could do something like:</p>
+<pre><code>@car = Car.new(:make =&gt; 'GMC')
+#other processing
+@car.update_attributes(:model =&gt; 'Sierra', :year =&gt; &quot;2012&quot;, :looks =&gt; &quot;Super Sexy, wanna make love to it&quot;)
+#other processing
+@car.save
+</code></pre>
+<p>BTW, I know I can <code>@car.model = 'Sierra'</code>, but I want to update them all on one line.</p>
+<h4> Comment 14396604 elado: </h4>For 3.1+, use <code>assign_attributes</code> <a href="http://apidock.com/rails/ActiveRecord/Base/assign_attributes" rel="nofollow noreferrer">apidock.com/rails/ActiveRecord/Base/assign_attributes</a><br><h4> Comment 14396608 Alpha Beta Charlie: </h4>You can use update_column(name, value) Updates a single attribute of an object, without calling save. 1. Validation is skipped. 2. Callbacks are skipped. 3. updated_at/updated_on column is not updated if that column is available. <a href="http://apidock.com/rails/ActiveRecord/Persistence/update_column" rel="nofollow noreferrer">apidock.com/rails/ActiveRecord/Persistence/update_column</a><br><h4> Comment 14396599 Anatoly: </h4><b>attributes</b> non-destructive method. See <a href="http://api.rubyonrails.org/classes/ActiveRecord/Base.html#method-i-attributes-3D" rel="nofollow noreferrer">API</a> for details<br><h4> Comment 8030260 Anatoly: </h4>what do you mean &quot;not save the record&quot;?<br><h4> Comment 8030280 tybro0103: </h4>update_attributes saves the model the DB. I&#39;m wondering if there&#39;s a similar method that doesn&#39;t.<br>------------------------------------------------------------------ <br><h3> Answer 11783090 Ajedi32: </h3><p>I believe what you are looking for is <a href="http://api.rubyonrails.org/classes/ActiveModel/AttributeAssignment.html#method-i-assign_attributes" rel="noreferrer"><code>assign_attributes</code></a>.</p>
+
+<p>It's basically the same as update_attributes but it doesn't save the record:</p>
+
+<pre><code>class User &lt; ActiveRecord::Base
+  attr_accessible :name
+  attr_accessible :name, :is_admin, :as =&gt; :admin
+end
+
+user = User.new
+user.assign_attributes({ :name =&gt; 'Josh', :is_admin =&gt; true }) # Raises an ActiveModel::MassAssignmentSecurity::Error
+user.assign_attributes({ :name =&gt; 'Bob'})
+user.name        # =&gt; "Bob"
+user.is_admin?   # =&gt; false
+user.new_record? # =&gt; true
+</code></pre>
+<h4> Comment 18884229 Haegin: </h4>assign_attributes is available from Rails 3.1 onwards, so you can&#39;t use it if you&#39;re still running an old version of Rails.<br><h4> Comment 67902408 wasipeer: </h4>i am using assign attributes but getting a problem. i have a model templates that have many stages(nested model). when i can assign_attributes on templates, it save nested stages which is causing problem for me.<br><h4> Comment 51045912 stevenspiel: </h4>I have to look this up every time<br><h4> Comment 51046090 Ajedi32: </h4>@mr.musicman Yeah, that&#39;s actually why I initially wrote this answer. I found myself looking it up way too often, and the StackOverflow question about it didn&#39;t have <code>assign_attributes</code> as an answer.<br><h4> Comment 16478438 Robin: </h4>Your example is a little bit misleading since you haven&#39;t pasted this line from the model: <code>attr_accessible :is_admin, :as =&gt; :admin</code> ;)<br><h4> Comment 16483581 Ajedi32: </h4>@Robin Or simply: <code>attr_protected :is_admin</code>. Or: <code>attr_accessible :name</code> The point being that in this example, :is_admin is protected. I should also note that attempting to mass assign a protected attribute with <code>.assign_attributes</code> does indeed raise an <code>ActiveModel::MassAssignmentSecurity::Error</code>, even though that isn&#39;t shown in the example.<br><h4> Comment 16483678 Robin: </h4>Yeah but my line is from the doc you linked to. I&#39;m just saying you should have copied/pasted the whole example. But yes, you can just say that it&#39;s protected.<br><h4> Comment 16483799 Ajedi32: </h4>@Robin I&#39;ll update the example to be a bit more specific. The example in the docs is also a bit misleading, as it doesn&#39;t mention that <code>user.assign_attributes({ :name =&gt; &#39;Josh&#39;, :is_admin =&gt; true })</code> raises an error message and doesn&#39;t actually set the user&#39;s name property.<br><h4> Comment 16484052 Robin: </h4>You&#39;re right, it does throw an error... strange that they don&#39;t mention it.<br>------------------------------------------------------------------ <br><h3> Answer 18763082 Yarin: </h3><p>You can use <code>assign_attributes</code> or <code>attributes=</code> (they're the same)</p>
+
+<p><strong>Update methods cheat sheet (for Rails 6):</strong> </p>
+
+<ul>
+<li><code>update</code> = <code>assign_attributes</code> + <code>save</code>  </li>
+<li><code>attributes=</code> = alias of <code>assign_attributes</code></li>
+<li><code>update_attributes</code> = deprecated, alias of <code>update</code>   </li>
+</ul>
+
+<p><strong>Source:</strong><br>
+<a href="https://github.com/rails/rails/blob/master/activerecord/lib/active_record/persistence.rb" rel="noreferrer">https://github.com/rails/rails/blob/master/activerecord/lib/active_record/persistence.rb</a><br>
+<a href="https://github.com/rails/rails/blob/master/activerecord/lib/active_record/attribute_assignment.rb" rel="noreferrer">https://github.com/rails/rails/blob/master/activerecord/lib/active_record/attribute_assignment.rb</a></p>
+
+<p><strong>Another cheat sheet:</strong><br>
+<a href="http://www.davidverhasselt.com/set-attributes-in-activerecord/#cheat-sheet" rel="noreferrer">http://www.davidverhasselt.com/set-attributes-in-activerecord/#cheat-sheet</a></p>
+<h4> Comment 57282237 ClassyPimp: </h4>in case of .attributes = val, if your model has_one and accepts_nested_attributes_for another model, passing that_model_attributes (without id) will delete the existing has_one model, even if you didn&#39;t persist (e.g. save). But assign_attributes doesn&#39;t behave like that.<br>------------------------------------------------------------------ <br><h3> Answer 6770672 bbonamin: </h3><p>You can use the 'attributes' method:</p>
+
+<pre><code>@car.attributes = {:model =&gt; 'Sierra', :years =&gt; '1990', :looks =&gt; 'Sexy'}
+</code></pre>
+
+<p>Source: <a href="http://api.rubyonrails.org/classes/ActiveRecord/Base.html" rel="noreferrer">http://api.rubyonrails.org/classes/ActiveRecord/Base.html</a></p>
+
+<p><strong>attributes=(new_attributes, guard_protected_attributes = true)</strong>
+Allows you to set all the attributes at once by passing in a hash with keys matching the attribute names (which again matches the column names).</p>
+
+<p>If guard_protected_attributes is true (the default), then sensitive attributes can be protected from this form of mass-assignment by using the attr_protected macro. Or you can alternatively specify which attributes can be accessed with the attr_accessible macro. Then all the attributes not included in that won’t be allowed to be mass-assigned.</p>
+
+<pre><code>class User &lt; ActiveRecord::Base
+  attr_protected :is_admin
+end
+
+user = User.new
+user.attributes = { :username =&gt; 'Phusion', :is_admin =&gt; true }
+user.username   # =&gt; "Phusion"
+user.is_admin?  # =&gt; false
+
+user.send(:attributes=, { :username =&gt; 'Phusion', :is_admin =&gt; true }, false)
+user.is_admin?  # =&gt; true
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 37280123 Michael Gaskill: </h3><p>For mass assignment of values to an ActiveRecord model without saving, use either the <code>assign_attributes</code> or <code>attributes=</code> methods.  These methods are available in Rails 3 and newer.  However, there are minor differences and version-related gotchas to be aware of.</p>
+
+<p>Both methods follow this usage:</p>
+
+<pre><code>@user.assign_attributes{ model: "Sierra", year: "2012", looks: "Sexy" }
+
+@user.attributes = { model: "Sierra", year: "2012", looks: "Sexy" }
+</code></pre>
+
+<p>Note that neither method will perform validations or execute callbacks; callbacks and validation will happen when <code>save</code> is called.</p>
+
+<h1>Rails 3</h1>
+
+<p><code>attributes=</code> differs slightly from <code>assign_attributes</code> in Rails 3.  <code>attributes=</code> will check that the argument passed to it is a Hash, and returns immediately if it is not; <code>assign_attributes</code> has no such Hash check.  See the <a href="http://api.rubyonrails.org/v3.2.1/classes/ActiveRecord/AttributeAssignment.html#method-i-attributes-3D" rel="noreferrer">ActiveRecord Attribute Assignment API documentation for <code>attributes=</code></a>.</p>
+
+<p>The following invalid code will silently fail by simply returning without setting the attributes:</p>
+
+<pre><code>@user.attributes = [ { model: "Sierra" }, { year: "2012" }, { looks: "Sexy" } ]
+</code></pre>
+
+<p><code>attributes=</code> will silently behave as though the assignments were made successfully, when really, they were not.</p>
+
+<p>This invalid code will raise an exception when <code>assign_attributes</code> tries to stringify the hash keys of the enclosing array:</p>
+
+<pre><code>@user.assign_attributes([ { model: "Sierra" }, { year: "2012" }, { looks: "Sexy" } ])
+</code></pre>
+
+<p><code>assign_attributes</code> will raise a <code>NoMethodError</code> exception for <code>stringify_keys</code>, indicating that the first argument is not a Hash.  The exception itself is not very informative about the actual cause, but the fact that an exception does occur is <em>very</em> important.</p>
+
+<p>The only difference between these cases is the method used for mass assignment: <code>attributes=</code> silently succeeds, and <code>assign_attributes</code> raises an exception to inform that an error has occurred.</p>
+
+<p>These examples may seem contrived, and they are to a degree, but this type of error can easily occur when converting data from an API, or even just using a series of data transformation and forgetting to <code>Hash[]</code> the results of the final <code>.map</code>.  Maintain some code 50 lines above and 3 functions removed from your attribute assignment, and you've got a recipe for failure.</p>
+
+<p>The lesson with Rails 3 is this: <em>always</em> use <code>assign_attributes</code> instead of <code>attributes=</code>.</p>
+
+<h1>Rails 4</h1>
+
+<p>In Rails 4, <code>attributes=</code> is simply an alias to <code>assign_attributes</code>.  See the <a href="http://api.rubyonrails.org/classes/ActiveRecord/AttributeAssignment.html" rel="noreferrer">ActiveRecord Attribute Assignment API documentation for <code>attributes=</code></a>.</p>
+
+<p>With Rails 4, either method may be used interchangeably.  Failure to pass a Hash as the first argument will result in a very helpful exception: <code>ArgumentError: When assigning attributes, you must pass a hash as an argument.</code></p>
+
+<h1>Validations</h1>
+
+<p>If you're pre-flighting assignments in preparation to a <code>save</code>, you might be interested in validating before save, as well.  You can use the <code>valid?</code> and <code>invalid?</code> methods for this.  Both return boolean values.  <code>valid?</code> returns true if the unsaved model passes all validations or false if it does not.  <code>invalid?</code> is simply the inverse of <code>valid?</code></p>
+
+<p><code>valid?</code> can be used like this:</p>
+
+<pre><code>@user.assign_attributes{ model: "Sierra", year: "2012", looks: "Sexy" }.valid?
+</code></pre>
+
+<p>This will give you the ability to handle any validations issues in advance of calling <code>save</code>.</p>

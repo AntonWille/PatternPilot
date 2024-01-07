@@ -1,0 +1,140 @@
+ <h2> Title: How to make --no-ri --no-rdoc the default for gem install? </h2> <h3> Ricardo Acras, question_id: 1381725 </h3>Score: 1093, Tags: {ruby,rubygems} <br><p>I don't use the RI or RDoc output from the gems I install in my machine or in the servers I handle (I use other means of documentation).</p>
+
+<p>Every gem I install installs RI and RDoc documentation by default, because I forget to set <code>--no-ri --no-rdoc</code>.</p>
+
+<p>Is there a way to make those two flags the default?</p>
+<h4> Comment 31708988 patm: </h4>It&#39;s not a good idea though. I recently needed to write code on the road and when I launched <code>gem server</code> I remembered that I had these in my <code>$HOME&#47;.gemrc</code> and really killed me... Google isn&#39;t always there.<br><h4> Comment 36824571 sir-pinecone: </h4>Depends on the context. It&#39;s a great idea if you can tether or you&#39;re doing this on a server that doesn&#39;t need gem documentation.<br><h4> Comment 61880956 max pleaner: </h4>with pry one can use <code>show-source</code> as an alternative to generated docs. It will show inline comments, which are generally the same content as the ri/rdoc anyway.<br>------------------------------------------------------------------ <br><h3> Answer 1386014 Jirapong: </h3><p>You just add the following line to your local <code>~/.gemrc</code> file (it is in your <em>home</em> folder):</p>
+<pre><code>gem: --no-document
+</code></pre>
+<p>by</p>
+<pre><code>echo 'gem: --no-document' &gt;&gt; ~/.gemrc
+</code></pre>
+<p>or you can add this line to the global <code>gemrc</code> config file.</p>
+<p>Here is how to find it (in Linux):</p>
+<pre><code>strace gem source 2&gt;&amp;1 | grep gemrc
+</code></pre>
+<p>The <code>--no-document</code> option is documented in <a href="https://guides.rubygems.org/command-reference/#installupdate-options" rel="noreferrer">the RubyGems CLI Reference</a>.</p>
+<h4> Comment 13720650 rxgx: </h4>@gdelfino&#39;s answer is the least obtrusive<br><h4> Comment 25205470 James Lim: </h4>deprecated - please see my answer<br><h4> Comment 8792634 wjl: </h4>/etc/gemrc didn&#39;t work for me, but .gemrc did. I wonder if it&#39;s rvm specific that it doesn&#39;t read the system gemrc?<br><h4> Comment 5155331 Hackeron: </h4>Anyway to make this a system wide default without editing /etc/skel and every user&#39;s home directory?<br><h4> Comment 9076193 PhilT: </h4>Yea I&#39;m using RVM and <code>&#47;etc&#47;gemrc</code> doesn&#39;t work for me either.<br><h4> Comment 29787476 Michael Mims: </h4>Use <code>ruby -e &quot;require &#39;etc&#39;;puts Etc.sysconfdir&quot;</code> to determine the path to your <code>gemrc</code> config file.<br><h4> Comment 63172026 Hubro: </h4>If ruby was compiled with a prefix like <code>--prefix=&#47;opt&#47;ruby</code>, then the config file path will be <code>&#47;opt&#47;ruby&#47;etc&#47;gemrc</code> (confirmed with ruby 2.3.1)<br><h4> Comment 96923975 hd1: </h4>On FreeBSD,  <code>truss gem source 2&gt;&amp;1 | grep gemrc | awk -F &#39;&quot;&#39; &#39;{print $2}&#39;</code> is the magic incantation to give you the relevant paths directly.<br><h4> Comment 101792723 oskarpearson: </h4>To find your gemrc file, run <code>gem env</code> and find the displayed <code>SYSTEM CONFIGURATION DIRECTORY</code> output field. Create or edit the gemrc file in that directory.<br><h4> Comment 80143972 PJSCopeland: </h4>I didn&#39;t have any <code>gemrc</code> but my system was quite happy to use a brand new one at <code>~&#47;.gemrc</code>.<br><h4> Comment 9076205 PhilT: </h4>I think opinion was split on the default so it was never changed.<br>------------------------------------------------------------------ <br><h3> Answer 7662245 gdelfino: </h3><p>From <a href="https://rvm.io/gemsets/basics/" rel="noreferrer">RVM’s documentation</a>:</p>
+
+<blockquote>
+  <p>Just add this line to your <code>~/.gemrc</code> or <code>/etc/gemrc</code>:</p>
+</blockquote>
+
+<pre><code>gem: --no-document
+</code></pre>
+
+<hr>
+
+<p><strong>Note:</strong> The original answer was:</p>
+
+<pre><code>install: --no-rdoc --no-ri 
+update: --no-rdoc --no-ri 
+</code></pre>
+
+<p>This is no longer valid; the RVM docs have since been updated, thus the current answer to only include the <code>gem</code> directive is the correct one.</p>
+<h4> Comment 22636260 iono: </h4><a href="https://github.com/rubygems/rubygems/blob/master/History.txt" rel="nofollow noreferrer">Since RubyGems version 2.0.0preview2</a>, you can instead use <code>--no-document</code> or <code>--document=rdoc</code> for just rdoc.<br><h4> Comment 25173177 David Grayson: </h4>I disagree with @mpapis&#39;s edit on Jun 20, 2013.  He totally changed this answer and there were lots of people that voted for it because they thought it was better than the accepted answer.  The person who posted this answer explicitly wrote that they do not want to add those two options to every gem command because it breaks some commands.  Before @mpapis totally changed the answer, the code in the answer was:  <code>install: --no-rdoc --no-ri\nupdate:  --no-rdoc --no-ri</code>   @mpapis, why did you change the RVM documentation and also change this answer?<br><h4> Comment 29787517 Michael Mims: </h4>Use <code>ruby -e &quot;require &#39;etc&#39;;puts Etc.sysconfdir&quot;</code> to determine the path to your <code>gemrc</code> config file.<br><h4> Comment 45229787 raskhadafi: </h4>This one is deprecated see <a href="http://guides.rubygems.org/command-reference/#gem-install" rel="nofollow noreferrer">guides.rubygems.org/command-reference/#gem-install</a><br><h4> Comment 25177741 mpapis: </h4>because it is true, there is no reason to keep two separate lines, keeping track of multi project compatibility is tricky - and the RVM docs get sometimes updated when we find something is off - like in this case, it is not true that rubygems would behave wrong, it&#39;s all fine to use <code>gem:</code> instead of two separate entries.<br><h4> Comment 26147605 bain: </h4>RVM docs say to use <code>rvm_gem_options</code> in <code>~&#47;.rvmrc</code>  ie. to disable docs <code>export rvm_gem_options=&quot;--nodocument&quot;</code> or to enable docs <code>export rvm_gem_options=&quot;--document rdoc,ri&quot;</code><br><h4> Comment 24830433 MattiSG: </h4><code>&#47;etc&#47;gemrc</code> doesn&#39;t seem to work in practice, and <a href="http://docs.rubygems.org/read/chapter/11" rel="nofollow noreferrer">the documentation</a> agrees with it.<br><h4> Comment 24921978 mpapis: </h4><code>&#47;etc&#47;gemrc</code> will work for RVMs binary rubies because they use <code>--sysconfdir=&#47;etc</code> you could build your rubies with it too like this: <code>rvm install 2.0.0 -C --sysconfdir=&#47;etc</code> to get <code>&#47;etc&#47;gemrc</code> working for compiled rubies, otherwise use <code>$MY_RUBY_HOME&#47;gemrc</code>.<br>------------------------------------------------------------------ <br><h3> Answer 17201281 James Lim: </h3><p>Note that <code>--no-ri</code> and <code>--no-rdoc</code> have been deprecated according to the new <a href="http://guides.rubygems.org/command-reference/#gem_install" rel="noreferrer">guides</a>. The recommended way is to use <code>--no-document</code> in <code>~/.gemrc</code> or <code>/etc/gemrc</code>.</p>
+
+<pre><code>install: --no-document
+update: --no-document
+</code></pre>
+
+<p>or</p>
+
+<pre><code>gem: --no-document
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 12748222 Slava V: </h3><p>On Linux (and probably Mac):</p>
+
+<pre><code>echo 'gem: --no-document' &gt;&gt; ~/.gemrc
+</code></pre>
+
+<p>This one-liner used to be in comments here, but somehow disappeared.</p>
+<h4> Comment 21170453 nickgrim: </h4>You should use <code>&gt;&gt;</code> in case the user already has a <code>~&#47;.gemrc</code>.<br><h4> Comment 83892244 Slava V: </h4>@Lykos <code>--no-doc --no-ri</code> is deprecated (see <a href="http://guides.rubygems.org/command-reference/#gem_install" rel="nofollow noreferrer">guides.rubygems.org/command-reference/#gem_install</a> for options)<br><h4> Comment 83847887 ltdev: </h4>Is there a difference between this <code>echo &#39;gem: --no-doc --no-ri&#39; &gt;&gt; ~&#47;.gemrc</code> and the one you wrote or both have same effect?<br>------------------------------------------------------------------ <br><h3> Answer 3740720 David: </h3><h1>/home/{user}/.gemrc</h1>
+<pre><code>---
+:update_sources: true
+:sources:
+- https://gems.rubyforge.org/
+- https://gems.github.com
+:benchmark: false
+:bulk_threshold: 1000
+:backtrace: false
+:verbose: true
+gem: --no-ri --no-rdoc
+</code></pre>
+<p><a href="http://webonrails.com/2008/12/03/skiping-installation-of-ri-and-rdoc-documentation-while-installing-gems/" rel="nofollow noreferrer">http://webonrails.com/2008/12/03/skiping-installation-of-ri-and-rdoc-documentation-while-installing-gems/</a></p>
+<h4> Comment 9095772 F&#233;lix Saparelli: </h4>Actually, &quot;first result on Google&quot; shows: &quot;&quot;first result on Google&quot; shows: &quot;&quot;first result on Google&quot; shows: &quot;&quot;... ERROR: Stack Overflow.<br><h4> Comment 8792624 wjl: </h4>Please don&#39;t post &quot;first result on Google&quot; replies. The first result on Google now shows your reply, self-proving why you shouldn&#39;t do this. Thanks, of course, for your answer.<br><h4> Comment 133984653 avisri: </h4><code>---</code>  `    :update_sources: true `  `    :sources: `     - <a href="https://rubygems.org/" rel="nofollow noreferrer">rubygems.org</a>     #- <a href="https://gems.rubyforge.org/" rel="nofollow noreferrer">gems.rubyforge.org</a>     #- <a href="https://gems.github.com" rel="nofollow noreferrer">gems.github.com</a>     :benchmark: false`   :bulk_threshold: 1000 `    :backtrace: false `   :verbose: true` `    gem: --no-document` `     With https :)<br><h4> Comment 9793552 wchrisjohnson: </h4>I have to add my thanks for steve&#39;s comment (above). I was pulling my hair out as to why I could not install the latest RubyGems. Turns out I had a malformed .gemrc file as well. I kept getting this error: ../.rbenv/versions/1.9.2-p290/lib/ruby/1.9.1/psych.rb:148:in `parse&#39;: couldn&#39;t parse YAML at line 2 column 10 (Psych::SyntaxError)<br><h4> Comment 120126436 ecoologic: </h4>and if you type &quot;google&quot; into google you&#39;ll break the internet<br><h4> Comment 8786324 stevenhaddox: </h4>Thanks for this example, perfect to help me strip out the embedded Ruby that I copied &amp; pasted at some point and then resulted in psych errors while installing RubyGems 1.8.10 under Ruby 1.9.2.<br>------------------------------------------------------------------ <br><h3> Answer 3135423 Viachaslau Tysianchuk: </h3><p>On Windows XP the path to the .gemrc file is </p>
+
+<pre><code>c:\Documents and Settings\All Users\Application Data\gemrc 
+</code></pre>
+
+<p>and this file is not created by default, you should create it yourself.</p>
+<h4> Comment 3553594 Viachaslau Tysianchuk: </h4>Under Windows 7 it&#39;s C:\ProgramData\gemrc<br><h4> Comment 12621585 jtzero: </h4>the win7 location works for windows 200. Also make sure you have &quot;Hide extensions for known file types&quot; off it wont pick up gemrc.txt.... facepalm<br>------------------------------------------------------------------ <br><h3> Answer 18756011 Gabe: </h3><p>A oneliner for the windows 7 users:</p>
+
+<p><code>(echo install: --no-document &amp;&amp; echo update: --no-document) &gt;&gt; c:\ProgramData\gemrc</code></p>
+------------------------------------------------------------------ <br><h3> Answer 1382049 Vincent Robert: </h3><p>You can specify default options using the <code>.gemrc</code> configuration file.</p>
+
+<p><a href="http://rubygems.org/read/chapter/11" rel="noreferrer">Documentation about gem configuration file</a></p>
+------------------------------------------------------------------ <br><h3> Answer 22888997 Adam: </h3><p>As mentioned above, put <code>gem: --no-document</code> in your gem file. However, the system-wide gemrc will not always necessarily go into <code>/etc/gemrc</code>. If you are using RVM, or you have Ruby installed under <code>/usr/local/bin</code>, it needs to go in a different location. You can find this location by running <code>irb</code> and typing...</p>
+
+<pre><code>require 'rubygems'
+Gem::ConfigFile::SYSTEM_WIDE_CONFIG_FILE
+</code></pre>
+
+<p>See the original post on this over <a href="https://stackoverflow.com/questions/6219668/disable-rdoc-and-ri-generation-by-default-for-rubygems-1-8-x/22888918#22888918">here</a>.</p>
+<h4> Comment 96393644 Andrew Burns: </h4>Oneliner: <code>ruby -rrubygems -e&#39;puts Gem::ConfigFile::SYSTEM_WIDE_CONFIG_FILE&#39;</code><br>------------------------------------------------------------------ <br><h3> Answer 8673894 Andreas: </h3><p>Step by steps:</p>
+
+<p>To create/edit the .gemrc file from the terminal:</p>
+
+<pre><code>vi  ~/.gemrc
+</code></pre>
+
+<p>You will open a editor called vi. 
+paste in:</p>
+
+<pre><code>gem: --no-ri --no-rdoc
+</code></pre>
+
+<p>click 'esc'-button.</p>
+
+<p>type in:</p>
+
+<pre><code>:exit
+</code></pre>
+
+<p>You can check if everything is correct with this command:</p>
+
+<pre><code>sudo /Applications/TextEdit.app/Contents/MacOS/TextEdit ~/.gemrc
+</code></pre>
+<h4> Comment 11106714 Martijn Heemels: </h4>To clarify, that last command is OS X specific. It opens the <code>~&#47;.gemrc</code> file in a texteditor.<br><h4> Comment 11385645 Gary S. Weaver: </h4>~ is representation for home directory. (the following stuff in caps are environment variables) Order of checking directories for .gemrc: 1. Use HOME if it is defined. 2. Use USERPROFILE if it is defined. 3. Use HOMEDRIVE and HOMEPATH together if they are defined. 4. Use the path you get by having Ruby expand “~”. 5. Use “C:/” if you are on a Windows machine. That is per: <a href="http://docs.rubygems.org/read/chapter/12" rel="nofollow noreferrer">docs.rubygems.org/read/chapter/12</a><br><h4> Comment 71278419 jbbuckley: </h4>You shouldn&#39;t need <code>sudo</code> to edit your own user&#39;s <code>~&#47;.gemrc</code>.<br>------------------------------------------------------------------ <br><h3> Answer 22566073 peter: </h3><p>On Windows7 the .gemrc file is not present, you can let Ruby create one like this (it's not easy to do this in explorer).</p>
+
+<pre><code>gem sources --add http://rubygems.org
+</code></pre>
+
+<p>You will have to confirm (it's unsafe).
+Now the file is created in your userprofile folder (c:\users\)</p>
+
+<p>You can edit the textfile to remove the source you added or you can remove it with</p>
+
+<pre><code>gem sources --remove http://rubygems.org
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 39741276 Rajkaran Mishra: </h3><p>For Windows users, Ruby doesn't set up .gemrc file. So you have to create .gemrc file in your home directory (<code>echo %USERPROFILE%</code>) and put following line in it:</p>
+
+<pre><code>gem: --no-document
+</code></pre>
+
+<p>As already mentioned in previous answers, don't use --no-ri and --no-rdoc cause its deprecated. See it yourself:</p>
+
+<pre><code>gem help install
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 75965782 avisri: </h3><p>~/.gemrc file</p>
+<pre><code>---
+gem: --no-document
+:update_sources: true
+:sources:
+- https://rubygems.org/
+:benchmark: false
+:bulk_threshold: 1000
+:backtrace: false
+:verbose: true
+</code></pre>
+<p>Use HTTPS and a known source. An improvement over the above answer.</p>
+<p>PS: I tried to post the comment and could not get it to format nicely. Finally resorted to posting a new answer.</p>

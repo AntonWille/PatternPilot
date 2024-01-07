@@ -1,0 +1,188 @@
+ <h2> Title: How to convert a unix timestamp (seconds since epoch) to Ruby DateTime? </h2> <h3> Tronathan, question_id: 7816365 </h3>Score: 442, Tags: {ruby,datetime,timestamp} <br><p>How do you convert a Unix timestamp (seconds since epoch) to Ruby DateTime?</p>
+------------------------------------------------------------------ <br><h3> Answer 7816368 Adam Eberlin: </h3><p>Sorry, brief moment of synapse failure. Here's the real answer.</p>
+
+<pre><code>require 'date'
+
+Time.at(seconds_since_epoch_integer).to_datetime
+</code></pre>
+
+<p><strong>Brief example</strong> (this takes into account the current system timezone):</p>
+
+<pre><code>$ date +%s
+1318996912
+
+$ irb
+
+ruby-1.9.2-p180 :001 &gt; require 'date'
+ =&gt; true 
+
+ruby-1.9.2-p180 :002 &gt; Time.at(1318996912).to_datetime
+ =&gt; #&lt;DateTime: 2011-10-18T23:01:52-05:00 (13261609807/5400,-5/24,2299161)&gt; 
+</code></pre>
+
+<p><strong>Further update</strong> (for UTC):</p>
+
+<pre><code>ruby-1.9.2-p180 :003 &gt; Time.at(1318996912).utc.to_datetime
+ =&gt; #&lt;DateTime: 2011-10-19T04:01:52+00:00 (13261609807/5400,0/1,2299161)&gt;
+</code></pre>
+
+<p><strong>Recent Update</strong>: I benchmarked the top solutions in this thread while working on a HA service a week or two ago, and was surprised to find that <code>Time.at(..)</code> outperforms <code>DateTime.strptime(..)</code> (update: added more benchmarks).</p>
+
+<pre><code># ~ % ruby -v
+#  =&gt; ruby 2.1.5p273 (2014-11-13 revision 48405) [x86_64-darwin13.0]
+
+irb(main):038:0&gt; Benchmark.measure do
+irb(main):039:1*   ["1318996912", "1318496912"].each do |s|
+irb(main):040:2*     DateTime.strptime(s, '%s')
+irb(main):041:2&gt;   end
+irb(main):042:1&gt; end
+
+=&gt; #&lt;Benchmark ... @real=2.9e-05 ... @total=0.0&gt;
+
+irb(main):044:0&gt; Benchmark.measure do
+irb(main):045:1&gt;   [1318996912, 1318496912].each do |i|
+irb(main):046:2&gt;     DateTime.strptime(i.to_s, '%s')
+irb(main):047:2&gt;   end
+irb(main):048:1&gt; end
+
+=&gt; #&lt;Benchmark ... @real=2.0e-05 ... @total=0.0&gt;
+
+irb(main):050:0* Benchmark.measure do
+irb(main):051:1*   ["1318996912", "1318496912"].each do |s|
+irb(main):052:2*     Time.at(s.to_i).to_datetime
+irb(main):053:2&gt;   end
+irb(main):054:1&gt; end
+
+=&gt; #&lt;Benchmark ... @real=1.5e-05 ... @total=0.0&gt;
+
+irb(main):056:0* Benchmark.measure do
+irb(main):057:1*   [1318996912, 1318496912].each do |i|
+irb(main):058:2*     Time.at(i).to_datetime
+irb(main):059:2&gt;   end
+irb(main):060:1&gt; end
+
+=&gt; #&lt;Benchmark ... @real=2.0e-05 ... @total=0.0&gt;
+</code></pre>
+<h4> Comment 19934581 Vitaly Babiy: </h4>This is not the same as the above anser, Time.at assumes current timezone, where DateTime.strptime uses UTC.<br><h4> Comment 12338231 tybro0103: </h4>It&#39;s funny but Time.at().to_datetime seems more pleasant than DateTime.strptime() simply because of readability...At least to me anyway<br><h4> Comment 44137294 Claw: </h4>It&#39;s not too surprising that <code>Time.at</code> outperforms <code>DateTime.strptime</code>. The latter has to parse a string, which is generally much slower than taking in a number directly.<br><h4> Comment 44211232 WattsInABox: </h4>Your benchmark isn&#39;t exactly testing <code>DateTime.strptime</code> because it&#39;s creating two new Strings every iteration which is very expensive. It&#39;s not just the string parsing like @claw said<br><h4> Comment 44532650 Adam Eberlin: </h4>@Claw et al - Thanks, noted. See updated benchmarks.<br><h4> Comment 60155775 Adam Eberlin: </h4>@WattsInABox, I missed your comment somehow, but the mere fact that strptime requires a string makes it inherently more expensive. Cheers.<br><h4> Comment 9539709 Tronathan: </h4>Thank you... The following answer is a little more succinct, I found Time.at but was trying to find a DateTime equivalent.<br><h4> Comment 101894486 WattsInABox: </h4>@AdamEberlin I know I&#39;m 3 years late in replying (lol) but my point was if you just create that &#39;%s&#39; outside of that loop, then you&#39;ll likely drastically speed up the DateTime.strptime call. You&#39;ll create 1 string instead of thousands... And also turn those ints into strings in the array itself...<br>------------------------------------------------------------------ <br><h3> Answer 7819254 steenslag: </h3><p><code>DateTime.strptime</code> can handle seconds since epoch. The number must be converted to a string:</p>
+
+<pre><code>require 'date'
+DateTime.strptime("1318996912",'%s')
+</code></pre>
+<h4> Comment 45178823 Mini John: </h4>It does handle miliseconds with&#39;<code>%Q</code> tho.<br><h4> Comment 30698704 Dan Sandberg: </h4>This doesn&#39;t handle fractional seconds<br><h4> Comment 71938081 skensell: </h4>To follow up on @TheMiniJohn&#39;s answer. It looks like <code>Time</code> is necessary instead of <code>DateTime</code>.  So use <code>Time.strptime(&quot;1318996912345&quot;,&#39;%Q&#39;).to_f</code> and you will see the milliseconds preserved, while <code>DateTime.strptime(&quot;1318996912345&quot;,&#39;%Q&#39;).to_f</code> does not preserve it.<br><h4> Comment 112886332 JellicleCat: </h4><code>Time.at 1318996912</code> is preferable in some cases because it infers the time for your local timezone, as WattsInABox pointed out.<br>------------------------------------------------------------------ <br><h3> Answer 19430869 WattsInABox: </h3><p><strong>Time Zone Handling</strong></p>
+
+<p>I just want to clarify, even though this has been commented so future people don't miss this very important distinction.</p>
+
+<pre><code>DateTime.strptime("1318996912",'%s') # =&gt; Wed, 19 Oct 2011 04:01:52 +0000
+</code></pre>
+
+<p>displays a return value in UTC and requires the seconds to be a String and outputs a UTC Time object, whereas</p>
+
+<pre><code>Time.at(1318996912) # =&gt; 2011-10-19 00:01:52 -0400
+</code></pre>
+
+<p>displays a return value in the LOCAL time zone, normally requires a FixNum argument, but the Time object itself is still in UTC even though the display is not. </p>
+
+<p>So even though I passed the same integer to both methods, I seemingly two different results because of how the class' <code>#to_s</code> method works. However, as @Eero had to remind me twice of:</p>
+
+<pre><code>Time.at(1318996912) == DateTime.strptime("1318996912",'%s') # =&gt; true
+</code></pre>
+
+<p>An equality comparison between the two return values still returns true. Again, this is because the values are basically the same (although different classes, the <code>#==</code> method takes care of this for you), but the <code>#to_s</code> method prints drastically different strings. Although, if we look at the strings, we can see they are indeed the same time, just printed in different time zones.</p>
+
+<p><strong>Method Argument Clarification</strong></p>
+
+<p>The docs also say "If a numeric argument is given, the result is in local time." which makes sense, but was a little confusing to me because they don't give any examples of non-integer arguments in the docs. So, for some non-integer argument examples:</p>
+
+<pre><code>Time.at("1318996912")
+TypeError: can't convert String into an exact number
+</code></pre>
+
+<p>you can't use a String argument, but you can use a Time argument into <code>Time.at</code> and it will return the result in the time zone of the argument:</p>
+
+<pre><code>Time.at(Time.new(2007,11,1,15,25,0, "+09:00"))
+=&gt; 2007-11-01 15:25:00 +0900
+</code></pre>
+
+<p><strong>Benchmarks</strong></p>
+
+<p>After a discussion with @AdamEberlin on his answer, I decided to publish slightly changed benchmarks to make everything as equal as possible. Also, I never want to have to build these again so this is as good a place as any to save them.</p>
+
+<p>Time.at(int).to_datetime ~ 2.8x faster</p>
+
+<pre><code>09:10:58-watsw018:~$ ruby -v
+ruby 2.3.7p456 (2018-03-28 revision 63024) [universal.x86_64-darwin18]
+09:11:00-watsw018:~$ irb
+irb(main):001:0&gt; require 'benchmark'
+=&gt; true
+irb(main):002:0&gt; require 'date'
+=&gt; true
+irb(main):003:0&gt;
+irb(main):004:0* format = '%s'
+=&gt; "%s"
+irb(main):005:0&gt; times = ['1318996912', '1318496913']
+=&gt; ["1318996912", "1318496913"]
+irb(main):006:0&gt; int_times = times.map(&amp;:to_i)
+=&gt; [1318996912, 1318496913]
+irb(main):007:0&gt;
+irb(main):008:0* datetime_from_strptime = DateTime.strptime(times.first, format)
+=&gt; #&lt;DateTime: 2011-10-19T04:01:52+00:00 ((2455854j,14512s,0n),+0s,2299161j)&gt;
+irb(main):009:0&gt; datetime_from_time = Time.at(int_times.first).to_datetime
+=&gt; #&lt;DateTime: 2011-10-19T00:01:52-04:00 ((2455854j,14512s,0n),-14400s,2299161j)&gt;
+irb(main):010:0&gt;
+irb(main):011:0* datetime_from_strptime === datetime_from_time
+=&gt; true
+irb(main):012:0&gt;
+irb(main):013:0* Benchmark.measure do
+irb(main):014:1*   100_000.times {
+irb(main):015:2*     times.each do |i|
+irb(main):016:3*       DateTime.strptime(i, format)
+irb(main):017:3&gt;     end
+irb(main):018:2&gt;   }
+irb(main):019:1&gt; end
+=&gt; #&lt;Benchmark::Tms:0x00007fbdc18f0d28 @label="", @real=0.8680500000045868, @cstime=0.0, @cutime=0.0, @stime=0.009999999999999998, @utime=0.86, @total=0.87&gt;
+irb(main):020:0&gt;
+irb(main):021:0* Benchmark.measure do
+irb(main):022:1*   100_000.times {
+irb(main):023:2*     int_times.each do |i|
+irb(main):024:3*       Time.at(i).to_datetime
+irb(main):025:3&gt;     end
+irb(main):026:2&gt;   }
+irb(main):027:1&gt; end
+=&gt; #&lt;Benchmark::Tms:0x00007fbdc3108be0 @label="", @real=0.33059399999910966, @cstime=0.0, @cutime=0.0, @stime=0.0, @utime=0.32000000000000006, @total=0.32000000000000006&gt;
+</code></pre>
+
+<p>****edited to not be completely and totally incorrect in every way****</p>
+
+<p>****added benchmarks****</p>
+<h4> Comment 36620441 Eero: </h4>I&#39;m sorry, but what you corrected is still wrong! :-)  Run <code>Time.use_zone &quot;Samoa&quot; do Time.at(1318996912) == DateTime.strptime(&quot;1318996912&quot;,&#39;%s&#39;) end</code> to verify that the times are equal, there is no LOCAL timestamp, and in both cases the Unix timestamp is interpreted as being in UTC.    <code>Time.at</code> <i>presents</i> the resulting Time object in the local time zone, and <code>DateTime.strptime</code> <i>presents</i> the resulting DateTime object in UTC, but regardless of presentation they are equal, as they are the equivalent moment in time.<br><h4> Comment 35315660 Eero: </h4>Seemed plausible, and I upvoted already (cannot rescind now), but upon further checking your claim regarding UTC is untrue.  The resulting DateTime/Time object will be in UTC vs local, yes, but the original timestamp is interpreted as being in UTC in both cases!  So the moment in time is equal regardless of method.  Try <code>Time.at(1318996912) == DateTime.strptime(&quot;1318996912&quot;,&#39;%s&#39;)</code> in a non-UTC timezone and you will see!<br><h4> Comment 78344475 BigRon: </h4>Time is an mfer. I suppose I&#39;m getting these results because of the way <a href="https://github.com/rails/rails/blob/08e05d4a49c1ba1327e3e6821eba1f0c93361ab2/activesupport/lib/active_support/core_ext/time/calculations.rb#L42" rel="nofollow noreferrer">Rails supers <code>Time.at</code></a>, and my Time.zone must not be set properly in Ruby<br><h4> Comment 78199799 BigRon: </h4>The statement <i>whereas <code>Time.at(1318996912) # =&gt; 2011-10-19 00:01:52 -0400</code> displays a return value in the LOCAL time zone</i>  does not appear to be accurate... Can you please verify? I believe your statement would only be true if you used <code>Time.zone.at(1318996912)</code><br><h4> Comment 78238111 WattsInABox: </h4>Yeah, that appears to be accurate. My local machine is set to EST and the times display in EST.<br><h4> Comment 78319789 WattsInABox: </h4>Can you provide an example where this is not the case @BigRon? What time zone, ruby version, etc does not behave this way?<br><h4> Comment 78343725 BigRon: </h4>Ruby 2.3.0: <code>Time.zone.name #=&gt; &quot;Central Time (US &amp; Canada)&quot;</code> <code>Time.at(1318996912) #=&gt;  2011-10-19 04:01:52 +0000</code> <code>Time.zone.at(1318996912) #=&gt; Tue, 18 Oct 2011 23:01:52 CDT -05:00</code>. <b>Time.at</b> will always return time in UTC, no?<br><h4> Comment 78343952 BigRon: </h4>... but the <a href="https://ruby-doc.org/core-2.3.0/Time.html#method-c-at" rel="nofollow noreferrer">ruby docs</a> appear to agree with you, &quot;If a numeric argument is given, the result is in local time.&quot; Somehow my results are different...<br><h4> Comment 78352717 WattsInABox: </h4>yeah, try booting into an irb console outside of any project or gemset with rails installed to verify if you&#39;re super curious<br>------------------------------------------------------------------ <br><h3> Answer 21732828 Tejasvi Manmatha: </h3><p>One command to convert date time to Unix format and then to string</p>
+
+<pre><code>    DateTime.strptime(Time.now.utc.to_i.to_s,'%s').strftime("%d %m %y")
+
+    Time.now.utc.to_i #Converts time from Unix format
+    DateTime.strptime(Time.now.utc.to_i.to_s,'%s') #Converts date and time from unix format to DateTime
+</code></pre>
+
+<p>finally strftime is used to format date</p>
+
+<p>Example:</p>
+
+<pre><code>    irb(main):034:0&gt; DateTime.strptime("1410321600",'%s').strftime("%d %m %y")
+    "10 09 14"
+</code></pre>
+<h4> Comment 106131797 Trevor McCasland: </h4>One thing to note is that epoch format does not have a timezone so chaining utc before chaining to_i is not necessary in <code>Time.now.utc.to_i</code>.<br>------------------------------------------------------------------ <br><h3> Answer 32409263 sbutterworth: </h3><p>This tells you the date of the number of seconds in future from the moment you execute the code.</p>
+
+<pre><code>time = Time.new + 1000000000 #date in 1 billion seconds
+</code></pre>
+
+<p>puts(time) </p>
+
+<p>according to the current time I am answering the question it prints <code>047-05-14 05:16:16 +0000</code> (1 billion seconds in future)</p>
+
+<p>or if you want to count billion seconds from a particular time, it's in format <code>Time.mktime(year, month,date,hours,minutes)</code></p>
+
+<pre><code>time = Time.mktime(1987,8,18,6,45) + 1000000000
+</code></pre>
+
+<p>puts("I would be 1 Billion seconds old on: "+time)</p>
+------------------------------------------------------------------ <br><h3> Answer 19303368 pjammer: </h3><p>If you wanted just a Date, you can do <code>Date.strptime(invoice.date.to_s, '%s')</code> where <code>invoice.date</code> comes in the form of an<code>Fixnum</code> and then converted to a <code>String</code>.</p>
+<h4> Comment 77587742 Chloe: </h4><code>Time.at(1500923406).to_date.to_s</code> =&gt; <code>&quot;2017-07-24&quot;</code><br>

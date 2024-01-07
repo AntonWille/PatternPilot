@@ -1,0 +1,105 @@
+ <h2> Title: Rails 4: List of available datatypes </h2> <h3> Nicolas Raoul, question_id: 17918117 </h3>Score: 439, Tags: {ruby-on-rails,ruby,ruby-on-rails-4,rails-activerecord} <br><p>Where can I find a list of data types that can be used in Ruby on Rails 4? 
+Such as </p>
+
+<ul>
+<li><code>text</code> </li>
+<li><code>string</code> </li>
+<li><code>integer</code> </li>
+<li><code>float</code> </li>
+<li><code>date</code>  </li>
+</ul>
+
+<p>I keep learning about new ones and I'd love to have a list I could easily refer to.</p>
+<h4> Comment 35195780 Dty: </h4>I for one did not know AR datatypes didn&#39;t change between rails 3 and 4 so I&#39;m thankful this question/answer is here.<br><h4> Comment 34634997 Mark Thomas: </h4>possible duplicate of <a href="http://stackoverflow.com/questions/3956186/where-is-the-documentation-page-for-activerecord-data-types">Where is the documentation page for ActiveRecord data types?</a><br><h4> Comment 34658281 Nicolas Raoul: </h4>@MarkThomas: Not a duplicate. My question here is specifically for Rails 4.<br><h4> Comment 34674540 Mark Thomas: </h4>The accepted answer in that question is essentially the same as your accepted answer. Both point to the Rails 4 docs. Also, it&#39;s a moot point because ActiveRecord datatypes didn&#39;t change from Rails 3 to Rails 4.<br>------------------------------------------------------------------ <br><h3> Answer 17918118 Nicolas Raoul: </h3><p>Here are all the Rails 4 (ActiveRecord migration) datatypes:</p>
+<ul>
+<li><code>:binary</code></li>
+<li><code>:boolean</code></li>
+<li><code>:date</code></li>
+<li><code>:datetime</code></li>
+<li><code>:decimal</code></li>
+<li><code>:float</code></li>
+<li><code>:integer</code></li>
+<li><code>:bigint</code></li>
+<li><code>:primary_key</code></li>
+<li><code>:references</code></li>
+<li><code>:string</code></li>
+<li><code>:text</code></li>
+<li><code>:time</code></li>
+<li><code>:timestamp</code></li>
+</ul>
+<p>Source: <a href="http://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/SchemaStatements.html#method-i-add_column" rel="noreferrer">http://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/SchemaStatements.html#method-i-add_column</a><br />
+These are the same as with <a href="https://stackoverflow.com/questions/4685009/rails-3-datatypes">Rails 3</a>.</p>
+<p>If you use PostgreSQL, you can also take advantage of these:</p>
+<ul>
+<li><code>:hstore</code></li>
+<li><code>:json</code></li>
+<li><code>:jsonb</code></li>
+<li><code>:array</code></li>
+<li><code>:cidr_address</code></li>
+<li><code>:ip_address</code></li>
+<li><code>:mac_address</code></li>
+</ul>
+<p>They are stored as strings if you run your app with a not-PostgreSQL database.</p>
+<p><strong>More PostgreSQL data types</strong></p>
+<ul>
+<li><a href="https://github.com/rails/rails/blob/4-2-stable/activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb#L76" rel="noreferrer">Rails 4</a></li>
+<li><a href="https://github.com/rails/rails/blob/5-2-stable/activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb#L80" rel="noreferrer">Rails 5</a></li>
+<li><a href="https://github.com/rails/rails/blob/6-1-stable/activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb#L101" rel="noreferrer">Rails 6</a></li>
+<li><a href="https://github.com/rails/rails/blob/main/activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb#L123" rel="noreferrer">Rails 7</a></li>
+</ul>
+<h4> Comment 26177940 Althaf Hameez: </h4>I believe these are the datatypes that are supported across all databases. However as Peter de Ridder mentions there are some datatypes like hstore which are still supported.<br><h4> Comment 45490538 bpercevic: </h4>I&#39;d like to add that if you&#39;re using a non-postgres database and your application schema_format is not set to use :sql, then your schema.rb file wont be able to dump the table that uses types like :json. The schema will still be dumped for the tables that use default types but you&#39;ll see a comment for the table with special types like, &quot;could not dump table...&quot;. <a href="http://stackoverflow.com/questions/23284164/rails-3-migration-error-when-using-json-as-a-column-type-in-an-activerecord-bac">Look here to set the schema_format</a>.<br><h4> Comment 45490811 bpercevic: </h4>Also, those columns will have type <code>nil</code> in a non-postgres database. You can inspect the type in the console with <code>Model.columns_hash[&quot;column_name&quot;].type</code>. These are just things that I&#39;ve run into when using :json column type, I may be wrong and this may not happen to everyone but I thought I&#39;d let future readers know in case they have troubles. Regardless, +1 for this answer because it really helped me.<br><h4> Comment 47919409 Robbie Guilfoyle: </h4>I would also like to add <code>:jsonb</code>. Difference is here: &quot;The json data type stores an exact copy of the input text, which processing functions must reparse on each execution; while jsonb data is stored in a decomposed binary format that makes it slightly slower to input due to added conversion overhead, but significantly faster to process, since no reparsing is needed. jsonb also supports indexing, which can be a significant advantage.&quot;  <a href="http://www.postgresql.org/docs/9.4/static/datatype-json.html" rel="nofollow noreferrer">postgresql.org/docs/9.4/static/datatype-json.html</a><br><h4> Comment 65776836 Toby 1 Kenobi: </h4>Rails 4 also has a <code>:bigint</code> type<br><h4> Comment 39619774 ahnbizcad: </h4>Question: postgres documentation doesn&#39;t seem to have <code>text</code> data type. Yet, rails can still handle it? What goes on in the background?<br><h4> Comment 39690854 makhan: </h4>PostgreSQL does have a text datatype. Under the hood all varchar/text fields are variable length arrays. <a href="http://www.postgresql.org/docs/9.3/interactive/datatype-character.html" rel="nofollow noreferrer">postgresql.org/docs/9.3/interactive/datatype-character.html</a><br>------------------------------------------------------------------ <br><h3> Answer 22725797 lflores: </h3><p>You might also find it useful to know generally what these data types are used for:</p>
+
+<ul>
+<li><code>:string</code> - is for small data types such as a title. (<a href="https://stackoverflow.com/questions/3354330/difference-between-string-and-text-in-rails">Should you choose string or text?</a>)</li>
+<li><code>:text</code> - is for longer pieces of textual data, such as a paragraph of information</li>
+<li><code>:binary</code> - is for storing data such as images, audio, or movies.</li>
+<li><code>:boolean</code> - is for storing true or false values.</li>
+<li><code>:date</code> - store only the date</li>
+<li><code>:datetime</code> - store the date and time into a column. </li>
+<li><code>:time</code> - is for time only</li>
+<li><code>:timestamp</code> - for storing date and time into a column.(<a href="https://stackoverflow.com/questions/409286/datetime-vs-timestamp">What's the difference between datetime and timestamp?</a>)</li>
+<li><code>:decimal</code> - is for decimals (<a href="https://stackoverflow.com/questions/813287/how-to-store-decimal-values-in-sql-server">example of how to use decimals</a>).</li>
+<li><code>:float</code> - is for decimals. (<a href="https://stackoverflow.com/questions/8514167/float-vs-decimal-in-activerecord">What's the difference between decimal and float?</a>)</li>
+<li><code>:integer</code> - is for whole numbers.</li>
+<li><code>:primary_key</code> - unique key that can uniquely identify each row in a table</li>
+</ul>
+
+<p>There's also references used to create associations. But, <a href="https://stackoverflow.com/questions/6242100/what-is-and-examples-of-using-data-type-references">I'm not sure this is an actual data type</a>.</p>
+
+<p>New Rails 4 datatypes available in PostgreSQL: </p>
+
+<ul>
+<li><code>:hstore</code> - storing key/value pairs within a single value (<a href="http://www.postgresql.org/docs/9.1/static/hstore.html" rel="noreferrer">learn more about this new data type</a>)</li>
+<li><code>:array</code> - an arrangement of numbers or strings in a particular row (<a href="http://reefpoints.dockyard.com/ruby/2012/09/18/rails-4-sneak-peek-postgresql-array-support.html" rel="noreferrer">learn more about it and see examples</a>)</li>
+<li><code>:cidr_address</code> - used for IPv4 or IPv6 host addresses</li>
+<li><code>:inet_address</code> - used for IPv4 or IPv6 host addresses, same as cidr_address but it also accepts values with nonzero bits to the right of the netmask</li>
+<li><code>:mac_address</code> - used for MAC host addresses</li>
+</ul>
+
+<p>Learn more about the address datatypes <a href="http://reefpoints.dockyard.com/ruby/2012/05/18/rails-4-sneak-peek-expanded-activerecord-support-for-postgresql-datatype.html" rel="noreferrer">here</a> and <a href="http://blog.remarkablelabs.com/2012/12/a-love-affair-with-postgresql-rails-4-countdown-to-2013" rel="noreferrer">here</a>. </p>
+
+<p>Also, here's the official guide on migrations: <a href="http://edgeguides.rubyonrails.org/migrations.html" rel="noreferrer">http://edgeguides.rubyonrails.org/migrations.html</a></p>
+<h4> Comment 40313678 nlh: </h4>Absolutely terrific answer - many thanks for this.  The links to the articles on differences literally took the questions right out of my mouth.<br><h4> Comment 39619804 ahnbizcad: </h4>Applause. +1 for thoroughness, and anticipation of usage. That&#39;s UX mentality right there.<br><h4> Comment 51292119 TNT: </h4>For Postgres there  is additionally a <code>uuid</code> type which can be used as <i>normal field</i> like <code>t.uuid :name...</code>   or as primary key like <code>create_table :users, id: :uuid do...</code> or e.g. <code>t.primary_key :id, :uuid, :default =&gt; &#39;uuid_generate_v1()&#39;</code><br><h4> Comment 52176933 Eliot Sykes: </h4>Additional PostgreSQL types supported by Rails listed in the <a href="http://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/PostgreSQL/ColumnMethods.html" rel="nofollow noreferrer">API docs for <code>ActiveRecord::ConnectionAdapters::PostgreSQL::ColumnMethods</code></a>. Highlights include <code>money</code>, <code>json</code>, <code>xml</code>, <code>daterange</code><br><h4> Comment 77109788 Martin Sommer: </h4>Yes, uuid was added for Postgres, but it is not returned with an Active Record create(). Has that issue been fixed with Rails 5?<br><h4> Comment 78658938 mcr: </h4>It&#39;s not &quot;inet_address&quot;, (now?), but &quot;inet&quot; in rails5.<br>------------------------------------------------------------------ <br><h3> Answer 25702629 gotqn: </h3><p>It is important to know not only the types but the mapping of these types to the database types, too:</p>
+
+<p><img src="https://i.stack.imgur.com/Q0j0x.png" alt="enter image description here"></p>
+
+<p><img src="https://i.stack.imgur.com/tuRiZ.png" alt="enter image description here"></p>
+
+<hr>
+
+<p>Source added - <a href="https://pragprog.com/book/rails4/agile-web-development-with-rails-4">Agile Web Development with Rails 4</a></p>
+<h4> Comment 50177765 Hugo: </h4>Is there a spot on the guides or a single source of truth for these things over time?<br><h4> Comment 44569338 Freedom_Ben: </h4>I would be interested to see the json type in this table, if you feel up to it<br><h4> Comment 44573316 gotqn: </h4>You can always check the <code>NATIVE_DATABASE_TYPES</code> for the adapter you need -  <a href="https://github.com/rails/rails/blob/master/activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb#L106" rel="nofollow noreferrer">github.com/rails/rails/blob/master/activerecord/lib/&hellip;</a><br><h4> Comment 132339290 Ali Akbar: </h4><code>date</code> and <code>datetime</code> are mapped to <code>date</code> for oracle database. How does active record determine to which data type it should map when fetching?<br>------------------------------------------------------------------ <br><h3> Answer 30132729 tomascharad: </h3><p>You can access this list everytime you want (even if you don't have Internet access) through:</p>
+
+<pre><code>rails generate model -h
+</code></pre>
+<h4> Comment 110612827 yohanes: </h4>at &#39;Available field types:&#39; section<br>------------------------------------------------------------------ <br><h3> Answer 17918237 Peter de Ridder: </h3><p>Rails4 has some added datatypes for Postgres.</p>
+
+<p>For example, railscast #400 names two of them:</p>
+
+<blockquote>
+  <p>Rails 4 has support for native datatypes in Postgres and we’ll show two of these here, although a lot more are supported: array and hstore. We can store arrays in a string-type column and specify the type for hstore.</p>
+</blockquote>
+
+<p>Besides, you can also use cidr, inet and macaddr. For more information:</p>
+
+<p><a href="https://blog.engineyard.com/2013/new-in-rails-4" rel="noreferrer">https://blog.engineyard.com/2013/new-in-rails-4</a></p>

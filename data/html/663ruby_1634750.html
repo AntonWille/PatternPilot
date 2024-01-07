@@ -1,0 +1,333 @@
+ <h2> Title: Ruby function to remove all white spaces? </h2> <h3> gpwu, question_id: 1634750 </h3>Score: 663, Tags: {ruby,string} <br><p>What is the Ruby function to remove <strong>all</strong> white spaces? I'm looking for something kind of like PHP's <code>trim()</code>?</p>
+<h4> Comment 1503901 Sinan &#220;n&#252;r: </h4>Your question is not clear: Do you want to remove all whitespace or do you want to get rid of leading and trailing whitespace?<br><h4> Comment 11003019 Tadeck: </h4>PHP&#39;s <a href="http://php.net/manual/en/function.trim.php" rel="nofollow noreferrer"><code>trim()</code></a> strips whitespace &quot;<i>from the beginning and end of a string</i>&quot; (as stated within <a href="http://php.net/manual/en/function.trim.php" rel="nofollow noreferrer">documentation</a>), it does not remove &quot;all whitespaces&quot;.<br><h4> Comment 21395012 Merovex: </h4>When in doubt, look at the Ruby online documentation for the String class (see .strip below).<br><h4> Comment 81935935 MatzFan: </h4>Note that all answers using <code>String#strip</code> or matching <code>&#47;\s+&#47;</code> will remove only ASCII whitespace. If you want to ensure any non-ASCII whitespace is captured too (e.g. HTML&#39;s <code>&amp;nbsp</code>) see the oddly unpopular answer from @EBooker.<br><h4> Comment 100679861 New Alexandria: </h4>Pity that such great answers cannot get the final dignity of one being accepted<br>------------------------------------------------------------------ <br><h3> Answer 76483761 Ines El Euch: </h3><p>If I am on Rails I use squish to remove all extra spaces in a string, in Ruby alone I would use strip to remove trailing spaces from beginning an d end of the string and finally if I want the same functionality as squish without having to import ActiveModel, I use this mystring.gsub(/\s{1,}/, ' ').strip</p>
+------------------------------------------------------------------ <br><h3> Answer 1634754 Ed S.: </h3><pre><code>s = "I have white space".delete(' ')
+</code></pre>
+
+<p>And to emulate PHP's <code>trim()</code> function:</p>
+
+<pre><code>s = "   I have leading and trailing white space   ".strip
+</code></pre>
+<h4> Comment 16558409 joel.neely: </h4>@ckarbass @Ed S. It isn&#39;t as popular because it isn&#39;t the same. The original question used the phrase &quot;all whitespace&quot;, which includes tabs, newlines, etc. This proposed answer will not remove those other whitespace characters. As for &quot;overly complex&quot;, I suggest comparing the simple regular expression to <code>.delete(&#39; &#39;).delete(&#39;\t&#39;).delete(&#39;\n&#39;) ...</code>, which is overly verbose and provides many opportunities for typos and errors of omission.<br><h4> Comment 16004393 Ed S.: </h4>@ckarbass: Because many people prefer overly complex solutions to simple problems.  It goes away with experience.<br><h4> Comment 17198388 Ed S.: </h4>@joel.neely: I answered this question a long time ago, but read the question again, this time more carefully.  The OP asked for <i>&quot;a function to remove all whitespace&quot;</i>, but then asked for <i>&quot;something like PHP&#39;s trim()&quot;</i>.  So, it&#39;s a bit difficult to know exactly what they want here.  <code>trim()</code> certainly does not remove newlines and other whitespace characters.  You&#39;re choosing one interpretation of a vague question.<br><h4> Comment 16003509 ckarbass: </h4>this is much more readable than the regex, why is it not as popular?<br><h4> Comment 58411404 Ed S.: </h4>@Gavriel: Yeah I&#39;m pretty sure that was covered six and a half years ago.<br><h4> Comment 17204020 Ed S.: </h4>@joel.neely: That said, I agree that a solution which goes beyond the literal interpretation of the question is a better one in this case (i.e., a regex removing all characters which would constitute whitespace rather than a string of <code>delete()</code> calls.)<br><h4> Comment 29915671 Ed S.: </h4>@Bulwersator: And if neither of those things are requirements then you&#39;re simply wasting time implementing a more complicated solution than you need.  YAGNI<br><h4> Comment 29913205 Bulwersator: </h4>@ckarbass: Because regex may be used to do also other more complicated things and the same regex is more likely to work in different language than this function.<br><h4> Comment 16030994 Jason Axelson: </h4>I think it is because many people are actually looking for strip. Even the one that only mentions strip is higher than this entry.<br><h4> Comment 16031041 Ed S.: </h4>@JasonAxelson: You&#39;re riht about <code>strip</code>, it&#39;s a better alternative than what I posted (and I commented such and voted that response up... wow, almost three years ago now).  The thing is, many people rush to use regular expressions when it&#39;s overkill. They do accomplish different things however.<br><h4> Comment 58372918 Gavriel: </h4>but this removes only <code>spaces</code>, not all <code>white spaces</code><br><h4> Comment 129217428 David Morales: </h4>It&#39;s not necessary to call <code>delete</code> several times. As seen in @ndnenkov answer, you can call <code>delete(&quot; \t\r\n&quot;)</code><br>------------------------------------------------------------------ <br><h3> Answer 1634814 joel.neely: </h3><p>If you want to remove only leading and trailing whitespace (like PHP's trim) you can use <code>.strip</code>, but if you want to remove <strong><em>all</em></strong> whitespace, you can use <code>.gsub(/\s+/, "")</code> instead .</p>
+<h4> Comment 8135956 dylanfm: </h4>\s+ means 1 or more whitespace characters (space, newline, tab). The // surrounding show that it&#39;s a regular expression.<br><h4> Comment 7896108 Rails beginner: </h4>Does &quot;/\s+/&quot; simple mean whitespace?<br><h4> Comment 38862148 m_x: </h4>also note that ActiveSupport (rails) adds <code>String#remove(pattern)</code> which is a shortcut to <code>String#gsub(pattern, &#39;&#39;)</code> (plus a destructive <code>remove!</code> version). Quite handy.<br><h4> Comment 76200404 joel.neely: </h4>@LouisSayers Technically true. My preference is to communicate intent; &quot;replace all runs of whitespace with empty string&quot; seems more direct to me (and possibly an insignificant bit less string manipulation) than &quot;replace each whitespace character with empty string&quot;. YMMV.<br><h4> Comment 76146272 Louis Sayers: </h4>Note: The <code>&#39;+&#39;</code> in <code>&quot;\s+&quot;</code> is not necessary here, as all whitespace will be removed with just <code>gsub(&quot;&#47;\s&#47;&quot;, &#39;&#39;)</code><br><h4> Comment 109945101 Matthew: </h4>Neither <code>.strip</code> nor the <code>gsub</code> alternative remove unicode whitespace characters... <code>&quot;\u00a0&quot;.strip.length</code> returns 1. See <a href="https://stackoverflow.com/a/30810885/145725">stackoverflow.com/a/30810885/145725</a> for an answer that works correctly in these situations.<br><h4> Comment 64205029 Tom Lord: </h4>Technically, <code>\s</code> means <code>&quot; &quot;</code>, <code>&quot;\n&quot;</code>, <code>&quot;\t&quot;</code>, <code>&quot;\r&quot;</code>, <code>&quot;\f&quot;</code> or<code>&quot;\v&quot;</code>. However, only the first 3 (or possibly 4) are even remotely common.<br>------------------------------------------------------------------ <br><h3> Answer 37148258 ndnenkov: </h3><p><a href="http://ruby-doc.org/core-2.3.1/String.html#method-i-strip" rel="noreferrer"><code>String#strip</code></a> - remove all whitespace from the start and the end.</p>
+
+<p><a href="http://ruby-doc.org/core-2.3.1/String.html#method-i-lstrip" rel="noreferrer"><code>String#lstrip</code></a> - just from the start.</p>
+
+<p><a href="http://ruby-doc.org/core-2.3.1/String.html#method-i-rstrip" rel="noreferrer"><code>String#rstrip</code></a> - just from the end.</p>
+
+<p><a href="http://ruby-doc.org/core-2.3.1/String.html#method-i-chomp" rel="noreferrer"><code>String#chomp</code></a> (with no arguments) - deletes line separators (<code>\n</code> or <code>\r\n</code>) from the end.</p>
+
+<p><a href="http://ruby-doc.org/core-2.3.1/String.html#method-i-chop" rel="noreferrer"><code>String#chop</code></a> - deletes the last character.</p>
+
+<p><a href="http://ruby-doc.org/core-2.3.1/String.html#method-i-delete" rel="noreferrer"><code>String#delete</code></a> - <code>x.delete(" \t\r\n")</code> - deletes all listed whitespace.</p>
+
+<p><a href="http://ruby-doc.org/core-2.3.1/String.html#method-i-gsub" rel="noreferrer"><code>String#gsub</code></a> - <code>x.gsub(/[[:space:]]/, '')</code> - removes all whitespace, including <a href="http://www.fileformat.info/info/unicode/char/00a0/index.htm" rel="noreferrer">unicode ones</a>.</p>
+
+<hr>
+
+<p><strong>Note</strong>: All the methods above return a new string instead of mutating the original. If you want to change the string in place, call the corresponding method with <code>!</code> at the end.</p>
+<h4> Comment 98072764 MatzFan: </h4>Only the final example in this answer catches the dread ASCII 160 &#39;non-breaking space&#39;, the bane of web scrapers. <code>#strip</code> does not. See <a href="https://stackoverflow.com/questions/4859438/how-do-i-remove-a-non-breaking-space-in-ruby" title="how do i remove a non breaking space in ruby">stackoverflow.com/questions/4859438/&hellip;</a><br><h4> Comment 75956203 ndnenkov: </h4>@juliangonzalez, <code>#delete</code> doesn&#39;t, <code>#delete!</code> does.<br><h4> Comment 71279758 slothbear: </h4>The String#delete example appears to use a regex, but <code>\s</code> is in quotes instead of slashes. Also I couldn&#39;t find any mention in the documentation that delete can take a regex as an argument.<br><h4> Comment 71279882 ndnenkov: </h4>@slothbear, it&#39;s not a regex, it&#39;s a small set of patterns that resemble regexes. As for the documentation <a href="https://ruby-doc.org/core-2.4.0/String.html#method-i-delete" rel="nofollow noreferrer"><code>#delete</code></a> is said to work similarly to <a href="https://ruby-doc.org/core-2.4.0/String.html#method-i-count" rel="nofollow noreferrer"><code>#count</code></a>. You can try it in the console as well.<br><h4> Comment 71379945 slothbear: </h4>Thanks for teaching me something new. And also thanks for the reminder to try things in the smallest possible context (command line).<br><h4> Comment 135076695 Cadoiz: </h4>Apparently, the difference between <code>[[:space:]]</code> as in <code>.gsub(&#47;[[:space:]]&#47;, &#39;&#39;)</code> and <code>\s</code> <a href="https://stackoverflow.com/a/1634814/4575793">as in <code>.gsub(&#47;\s+&#47;, &quot;&quot;)</code></a> is that the first <a href="https://stackoverflow.com/questions/1634750/ruby-function-to-remove-all-white-spaces/37148258#comment109945101_1634814">remove unicode whitespace characters</a>, while the latter <a href="https://stackoverflow.com/questions/1634750/ruby-function-to-remove-all-white-spaces/37148258#comment64205029_1634814">only replaces <code>&quot; &quot;</code>, <code>&quot;\n&quot;</code>, <code>&quot;\t&quot;</code>, <code>&quot;\r&quot;</code>, <code>&quot;\f&quot;</code> and <code>&quot;\v&quot;</code></a><br><h4> Comment 71476443 ndnenkov: </h4>@slothbear, while the thing about about <code>#delete</code> patterns is true, <code>\s</code> in general just refers to space: <code>&quot;\s&quot; == &#39; &#39; # =&gt; true</code>. Hence the previous version only removed spaces. Updated my answer.<br><h4> Comment 75954228 juliangonzalez: </h4>delete returns <code>nil</code> when no space is found.<br>------------------------------------------------------------------ <br><h3> Answer 1634755 jrhicks: </h3><p>Related answer:</p>
+
+<pre><code>"   clean up my edges    ".strip
+</code></pre>
+
+<p>returns</p>
+
+<pre><code>"clean up my edges"
+</code></pre>
+<h4> Comment 17793700 scarver2: </h4>If there is a possibility that the variable is <code>nil</code>, be sure to run <code>.to_s</code> method before running strip so that the strip method does not raise an error. Ex. <code>str=nil; str.to_s.strip #=&gt; &quot;&quot;</code><br><h4> Comment 90157741 slindsey3000: </h4>I prefer some_data.strip! if some_data.is_a? String<br><h4> Comment 1503888 Ed S.: </h4>That&#39;s the one I forgot about.  I knew there was a method to remove whitespace which would do so by default if no arguments were passed. +1<br><h4> Comment 15102022 Brett H: </h4>This is equivalent to trim. Please refer to the quote from @Tadeck above.<br>------------------------------------------------------------------ <br><h3> Answer 19424702 Radhika: </h3><p><strong>If you are using Rails/ActiveSupport</strong>, you can use <code>squish</code> method. It removes white space on both ends of the string and groups multiple white space to single space.</p>
+
+<p>For eg.</p>
+
+<pre><code>" a  b  c ".squish
+</code></pre>
+
+<p>will result to: </p>
+
+<pre><code>"a b c"
+</code></pre>
+
+<p>Check <a href="http://api.rubyonrails.org/classes/String.html#method-i-squish" rel="noreferrer">this reference from api.rubyonrails.org</a>.</p>
+<h4> Comment 28797006 kleopatra: </h4>Note that <a href="http://meta.stackoverflow.com/tags/link-only-answers/info">link-only answers</a> are discouraged, SO answers should be the end-point of a search for a solution (vs. yet another stopover of references, which  tend to get stale over time). Please consider adding a stand-alone synopsis here, keeping the link as a reference.<br><h4> Comment 42809379 Justin Force: </h4>This is from ActiveSupport. You don&#39;t need all of Rails to use it, but you do need at least ActiveSupport and a <code>require &#39;active_support&#47;core_ext&#47;string&#47;filters&#39;</code><br><h4> Comment 29369542 ksugiarto: </h4>I think this answer was enough explained and the fact that link was reference since the answer itself was clear explained. This function was good, thanks<br><h4> Comment 106857202 Purplejacket: </h4>To be clear, this is <i>any</i> whitespace.  E.g. <code>&quot;a \t \n \f \r \v b&quot;.squish == &quot;a b&quot;</code><br>------------------------------------------------------------------ <br><h3> Answer 17469646 rusllonrails: </h3><pre><code>"1232 23 2 23 232 232".delete(' ')
+=&gt; "123223223232232"
+</code></pre>
+
+<p>Delete works faster =)</p>
+
+<pre><code>user         system     total      real
+gsub, s      0.180000   0.010000   0.190000 (0.193014)
+gsub, s+     0.200000   0.000000   0.200000 (0.196408)
+gsub, space  0.220000   0.000000   0.220000 (0.222711)
+gsub, join   0.200000   0.000000   0.200000 (0.193478)
+delete       0.040000   0.000000   0.040000 (0.045157)
+</code></pre>
+<h4> Comment 58372926 Gavriel: </h4>but this removes only <code>spaces</code>, not all <code>white spaces</code><br><h4> Comment 93092851 Seth Jeffery: </h4><code>delete(&quot; \t\r\n&quot;)</code> will take care of typical whitespace, and is still faster than gsub.<br><h4> Comment 135077638 Cadoiz: </h4><a href="https://stackoverflow.com/questions/1634750/ruby-function-to-remove-all-white-spaces/37148258#comment64205029_1634814">Technically, <code>\s</code> means one of these 6: <code>\n\t \r\f\v</code>. However, only the first 3 (or possibly 4) are even remotely common</a>. So <b>tl;dr:</b> <code>delete(&quot; \n\t\r\f\v&quot;)</code> is the faster equivalent of <code>.gsub(&#47;\s&#47;, &quot;&quot;)</code>.<br>------------------------------------------------------------------ <br><h3> Answer 8909724 Jules Copeland: </h3><p>It's a bit late, but anyone else googling this page might be interested in this version -</p>
+
+<p>If you want to clean up a chunk of pre-formatted text that a user may have cut &amp; pasted into your app somehow, but preserve the word spacing, try this:</p>
+
+<pre><code>content = "      a big nasty          chunk of     something
+
+that's been pasted                        from a webpage       or something        and looks 
+
+like      this
+
+"
+
+content.gsub(/\s+/, " ").strip
+
+#=&gt; "a big nasty chunk of something that's been pasted from a webpage or something and looks like this"
+</code></pre>
+<h4> Comment 12837530 Phillip Koebbe: </h4>One could also use Rails&#39; <code>squish</code> method: <a href="http://apidock.com/rails/String/squish" rel="nofollow noreferrer">apidock.com/rails/String/squish</a><br><h4> Comment 16457852 Andrew Grimm: </h4>Or if you don&#39;t have Rails, and you don&#39;t have newlines, <code>squeeze(&quot; &quot;)</code> might work.<br>------------------------------------------------------------------ <br><h3> Answer 16434908 scarver2: </h3><p>Ruby's <code>.strip</code> method performs the PHP equivalent to <code>trim()</code>.</p>
+
+<p>To remove all whitespace:</p>
+
+<pre><code>"  leading    trailing   ".squeeze(' ').strip
+=&gt; "leading trailing"
+</code></pre>
+
+<p>@Tass made me aware that my original answer removes duplicate letters in succession - YUCK! I've since switched to the squish method which is smarter about such occurrences if using the Rails framework.</p>
+
+<pre><code>require 'active_support/all'
+"  leading    trailing   ".squish
+=&gt; "leading trailing"
+
+"  good    men   ".squish
+=&gt; "good men"
+</code></pre>
+
+<p>Cite: <a href="http://apidock.com/rails/String/squish" rel="noreferrer">http://apidock.com/rails/String/squish</a></p>
+<h4> Comment 25429611 Tass: </h4>This will remove &quot;joined&quot; duplicate characters. <code>&quot;good men&quot;.squeeze.strip</code> will return <code>&quot;god men&quot;</code><br>------------------------------------------------------------------ <br><h3> Answer 58089540 Sapphire_Brick: </h3><p>To remove whitespace on both sides:</p>
+<blockquote>
+<p>Kind of like php's trim()</p>
+</blockquote>
+<pre><code>&quot;   Hello  &quot;.strip
+</code></pre>
+<p>To remove all spaces:</p>
+<pre><code>&quot;   He    llo  &quot;.gsub(/ /, &quot;&quot;)
+</code></pre>
+<p>To remove all whitespace:</p>
+<pre><code>&quot;   He\tllo  &quot;.gsub(/\s/, &quot;&quot;)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 19130902 Buddy: </h3><pre><code>" Raheem Shaik ".strip
+</code></pre>
+
+<p>It will removes left &amp; right side spaces.
+This code would give us: <code>"Raheem Shaik"</code></p>
+------------------------------------------------------------------ <br><h3> Answer 27602632 mahemoff: </h3><p><code>split.join</code> will blast all spaces anywhere in the string.</p>
+<pre><code>&quot;  a b  c    \nd  \t   &quot;.split.join
+&gt; &quot;abcd&quot;
+</code></pre>
+<p>It's easy to type and remember, so it's nice on the console and for quick hacking. Arguably not welcome in serious code though as it masks the intent.</p>
+<p><em>(Based on Piotr's comment in <a href="https://stackoverflow.com/a/1634763/18706">Justicle's answer</a> above.)</em></p>
+<h4> Comment 70696324 Boomerange: </h4>Many, many thanks for this comment :-) This is the only method that works if you have long string which looks like a paragraph.<br>------------------------------------------------------------------ <br><h3> Answer 1634763 Justicle: </h3><p>Also don't forget:</p>
+
+<pre><code>$ s = "   I have white space   ".split
+=&gt; ["I", "have", "white", "space"]
+</code></pre>
+<h4> Comment 14420486 Piotr Brudny: </h4>So s.split.join will do the job.<br><h4> Comment 33835075 tbloncar: </h4>This is nice when iterating: <code>[&quot; Hello World&quot;, &quot;Big Giraffe &quot;].map(&amp;:split).map(&amp;:join) #=&gt; [&quot;HelloWorld&quot;, &quot;BigGiraffe&quot;]</code><br>------------------------------------------------------------------ <br><h3> Answer 30810885 EBooker: </h3><p>To remove all whitespace characters, including non-ASCII ones (e.g., non-breaking space), in a string you could try using <code>gsub</code> with <code>:space</code> as the matcher and <code>&quot;&quot;</code> (empty string) as the replacement:</p>
+<pre class="lang-rb prettyprint-override"><code>string = &quot;   Some Special Text Values &quot;.gsub(/[[:space:]]+/, &quot;&quot;)
+puts '[' + string + ']' # &quot;[SomeSpecialTextValues]
+
+string = &quot;   em spaces   &quot;.gsub(/[[:space:]]+/, &quot;&quot;)
+puts '[' + string.strip + ']' # [emspaces]
+</code></pre>
+<p>To remove leading and trailing whitespace characters, you can try:</p>
+<pre class="lang-rb prettyprint-override"><code>string = &quot;   em spaces   &quot;
+ .gsub(/^[[:space:]]+/, &quot;&quot;)
+ .gsub(/[[:space:]]+$/, &quot;&quot;)
+puts '[' + string.strip + ']' # [em spaces]
+
+string = &quot;   em spaces   &quot;.strip
+puts '[' + string.strip + ']' # [   em spaces]
+</code></pre>
+<p>Note how <code>strip</code> only removes the trailing whitespaces (i.e., <code>SPACE U+0020</code>) while leaving the leading whitespaces (i.e., <code>EM SPACE U+2003</code>) as-is. That's because <code>strip</code> only removes ASCII whitespace characters.</p>
+<h4> Comment 81935728 MatzFan: </h4>This is actually the best answer IMHO, as in the wild HTML <code>&amp;nbsp</code> and any other non-ASCII whitespaces will <b>not</b> be removed by <code>String#strip</code> or matched by <code>&#47;\s&#47;</code>. See the section entitled &quot;POSIX bracket expressions&quot; in the <a href="https://ruby-doc.org/core-2.4.2/Regexp.html" rel="nofollow noreferrer">Regexp docs</a><br><h4> Comment 135237969 uzluisf: </h4>Instead of creating another similar answer, I decided to piggyback on yours, EBooker. Great job!<br>------------------------------------------------------------------ <br><h3> Answer 32280383 euccas: </h3><p>Use gsub or delete. The difference is gsub could remove tabs, while delete cannot. Sometimes you do have tabs in files which are added by the editors.</p>
+
+<pre><code>a = "\tI have some whitespaces.\t"
+a.gsub!(/\s/, '')  #=&gt;  "Ihavesomewhitespaces."
+a.gsub!(/ /, '')   #=&gt;  "\tIhavesomewhitespaces.\t"
+a.delete!(" ")     #=&gt;  "\tIhavesomewhitespaces.\t"
+a.delete!("/\s/")  #=&gt;  "\tIhavesomewhitespaces.\t"
+a.delete!('/\s/')  #=&gt;  using single quote is unexpected, and you'll get "\tI have ome whitepace.\t"
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 48103045 bdbasinger: </h3><p>The gsub method will do just fine.<br>
+The gsub method can be called on a string and says:</p>
+
+<pre><code>a = "this is a string"
+a = a.gsub(" ","")
+puts a
+#Output: thisisastring
+</code></pre>
+
+<p>The gsub method searches for every occurrence of the first argument
+and replaces it with the second argument. In this case, it will replace every space within the string and remove it.</p>
+
+<p>Another example:</p>
+
+<pre><code>b = "the white fox has a torn tail"
+</code></pre>
+
+<p>Let's replace every occurrence of the letter " t " with a capital " T "</p>
+
+<pre><code>b = b.gsub("t","T")
+puts b 
+#Output: The whiTe fox has a Torn Tail
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 68944694 Saurabh Thakur: </h3><p>A lot of suggestions work here, but when I read your question and the specific line saying &quot;removing all the whitespace&quot;, what came to my mind was this:</p>
+<pre><code>&quot; a b c &quot; =&gt; &quot;abc&quot;
+</code></pre>
+<p>And if that is really what is required, you can do this simple operation</p>
+<pre class="lang-rb prettyprint-override"><code>wide_string = &quot; a b c &quot;
+
+narrow_string = wide_string.delete(&quot; &quot;)
+
+# you can pass all the different kinds 
+# of whitespaces that you want to remove
+
+puts narrow_string # =&gt; &quot;abc&quot;
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 17469754 edikgat: </h3><pre><code>"asd sda sda sd".gsub(' ', '')
+=&gt; "asdsdasdasd"
+</code></pre>
+<h4> Comment 58372884 Gavriel: </h4>but this removes only <code>spaces</code>, not all <code>white spaces</code><br>------------------------------------------------------------------ <br><h3> Answer 37087697 Michael Gaskill: </h3><p>For behavior exactly matching PHP <code>trim</code>, the simplest method is to use the <code>String#strip</code> method, like so:</p>
+
+<pre><code>string = "  Many have tried; many have failed!    "
+puts "Original [#{string}]:#{string.length}"
+new_string = string.strip
+puts "Updated  [#{new_string}]:#{new_string.length}"
+</code></pre>
+
+<p>Ruby also has an edit-in-place version, as well, called <code>String.strip!</code> (note the trailing '!').  This doesn't require creating a copy of the string, and can be significantly faster for some uses:</p>
+
+<pre><code>string = "  Many have tried; many have failed!    "
+puts "Original [#{string}]:#{string.length}"
+string.strip!
+puts "Updated  [#{string}]:#{string.length}"
+</code></pre>
+
+<p>Both versions produce this output:</p>
+
+<pre><code>Original [  Many have tried; many have failed!    ]:40
+Updated  [Many have tried; many have failed!]:34
+</code></pre>
+
+<p>I created a benchmark to test the performance of some basic uses of <code>strip</code> and <code>strip!</code>, as well as some alternatives.  The test is this:</p>
+
+<pre><code>require 'benchmark'
+
+string = 'asdfghjkl'
+Times = 25_000
+
+a = Times.times.map {|n| spaces = ' ' * (1+n/4); "#{spaces}#{spaces}#{string}#{spaces}" }
+b = Times.times.map {|n| spaces = ' ' * (1+n/4); "#{spaces}#{spaces}#{string}#{spaces}" }
+c = Times.times.map {|n| spaces = ' ' * (1+n/4); "#{spaces}#{spaces}#{string}#{spaces}" }
+d = Times.times.map {|n| spaces = ' ' * (1+n/4); "#{spaces}#{spaces}#{string}#{spaces}" }
+
+puts RUBY_DESCRIPTION
+puts "============================================================"
+puts "Running tests for trimming strings"
+
+Benchmark.bm(20) do |x|
+  x.report("s.strip:")                 { a.each {|s| s = s.strip } }
+  x.report("s.rstrip.lstrip:")         { a.each {|s| s = s.rstrip.lstrip } }
+  x.report("s.gsub:")                  { a.each {|s| s = s.gsub(/^\s+|\s+$/, "") } }
+  x.report("s.sub.sub:")               { a.each {|s| s = s.sub(/^\s+/, "").sub(/\s+$/, "") } }
+
+  x.report("s.strip!")                 { a.each {|s| s.strip! } }
+  x.report("s.rstrip!.lstrip!:")       { b.each {|s| s.rstrip! ; s.lstrip! } }
+  x.report("s.gsub!:")                 { c.each {|s| s.gsub!(/^\s+|\s+$/, "") } }
+  x.report("s.sub!.sub!:")             { d.each {|s| s.sub!(/^\s+/, "") ; s.sub!(/\s+$/, "") } }
+end
+</code></pre>
+
+<p>These are the results:</p>
+
+<pre><code>ruby 2.2.5p319 (2016-04-26 revision 54774) [x86_64-darwin14]
+============================================================
+Running tests for trimming strings
+                           user     system      total        real
+s.strip:               2.690000   0.320000   3.010000 (  4.048079)
+s.rstrip.lstrip:       2.790000   0.060000   2.850000 (  3.110281)
+s.gsub:               13.060000   5.800000  18.860000 ( 19.264533)
+s.sub.sub:             9.880000   4.910000  14.790000 ( 14.945006)
+s.strip!               2.750000   0.080000   2.830000 (  2.960402)
+s.rstrip!.lstrip!:     2.670000   0.320000   2.990000 (  3.221094)
+s.gsub!:              13.410000   6.490000  19.900000 ( 20.392547)
+s.sub!.sub!:          10.260000   5.680000  15.940000 ( 16.411131)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 35309112 Jeremy Gunter: </h3><p>My personal preference is using the method <code>.tr</code></p>
+
+<p>as in:</p>
+
+<pre><code>string = "this is a string to smash together"
+
+string.tr(' ', '') # =&gt; "thisisastringtosmashtogether"
+</code></pre>
+
+<p>Thanks to @FrankScmitt for pointing out that to make this delete <em>all</em> whitespace(not just spaces) you would need to write it as such:</p>
+
+<pre><code>string = "this is a string with tabs\t and a \nnewline"
+
+string.tr(" \n\t", '') # =&gt; "thisisastringwithtabsandanewline"
+</code></pre>
+<h4> Comment 58327837 Gavriel: </h4>but this removes only <code>spaces</code>, not <code>all white spaces</code><br><h4> Comment 58328003 Frank Schmitt: </h4>To remove all white spaces (space, tab, newline), consider using <code>s.tr(&quot; \t\n&quot;, &#39;&#39;)</code> instead.<br><h4> Comment 58372721 Jeremy Gunter: </h4>@Gavriel - I misread/misunderstood the question, thank you for pointing that out.<br><h4> Comment 58372722 Jeremy Gunter: </h4>@FrankSchmitt I added your correction to my answer, to more properly answer the OP&#39;s question. Thank you for correcting me.<br>------------------------------------------------------------------ <br><h3> Answer 40266381 Brad: </h3><p>I was trying to do this as I wanted to use a records "title" as an id in the view but the titles had spaces.</p>
+
+<p>a solution is:</p>
+
+<pre><code>record.value.delete(' ') # Foo Bar -&gt; FooBar
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 61895370 Melanie Palen: </h3><p>I'm a bit late to the game, but I remove trailing and leading whitespaces by using <code>strip!</code>. If you have an array, such as I did, I needed to iterate through the array and save it after the instance ended. The ! took care of this. This removed all whitespaces at the end or the beginning, not just the first leading or the last trailing.</p>
+
+<p>For example:</p>
+
+<pre><code>array = ["hello ","   Melanie", "is", " new ", "to  ", " programming"]
+array.each do |i|
+  i.strip!
+end
+</code></pre>
+
+<p>This would output to: ["hello","Melanie", "is", "new ", "to", "programming"]. I further explored/shared this <a href="https://www.youtube.com/watch?v=Ef_hGfJGt3U" rel="nofollow noreferrer">in a video I made to highlight this code for similar question I had</a>.</p>
+
+<p>I'm newer to programming and using strip did not work as it didn't save it to the array after the loop ended.</p>
+------------------------------------------------------------------ <br><h3> Answer 42540715 Artur Okoński: </h3><p>I would use something like this to remove all spaces:</p>
+<pre><code>my_string = &quot;   Foo  \t bar\nbaz quux \n   &quot;
+
+my_string.split.join
+=&gt; &quot;Foobarbazquux&quot;
+</code></pre>
+<h4> Comment 134237508 ggorlen: </h4>Repost of <a href="https://stackoverflow.com/a/27602632/6243352">stackoverflow.com/a/27602632/6243352</a> from 3 years earlier<br>------------------------------------------------------------------ <br><h3> Answer 36587445 Dharmesh Rupani: </h3><p>Ruby's <code>.scan()</code> and <code>.join()</code> methods of String can also help to overcome whitespace in string.</p>
+
+<p><code>scan(/\w+/).join</code> will remove all spaces and join the string</p>
+
+<pre><code>string = "White spaces in me".scan(/\w+/).join
+=&gt;"Whitespacesinme"
+</code></pre>
+
+<p>It is also removing space from left and right part of the string. Means <code>ltrim</code>, <code>rtrim</code> and <code>trim</code>. Just in case if someone has background over <code>C</code>, <code>FoxPro</code> or <code>Visual Basic</code> and jump in <code>Ruby</code>.</p>
+
+<p><code>
+2.1.6 :002 &gt; string = " White spaces in me ".scan(/\w+/).join
+ =&gt; "Whitespacesinme" 
+2.1.6 :003 &gt; string = " White spaces in me".scan(/\w+/).join
+ =&gt; "Whitespacesinme" 
+2.1.6 :004 &gt; string = "White spaces in me ".scan(/\w+/).join
+ =&gt; "Whitespacesinme" 
+2.1.6 :005 &gt;
+</code></p>
+<h4> Comment 60809267 Dharmesh Rupani: </h4>@AmitPandya Thank you so much for pointing out additional key points of  .scan() method. Appreciated !!!<br>------------------------------------------------------------------ <br><h3> Answer 42274075 LvcasX1: </h3><p>You can try this:</p>
+
+<pre><code>"ab c d efg hi ".split.map(&amp;:strip)
+</code></pre>
+
+<p>in order to get this:</p>
+
+<pre><code>["ab, "c", "d", "efg", "hi"]
+</code></pre>
+
+<p>or if you want a single string, just use:</p>
+
+<pre><code>"ab c d efg hi ".split.join
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 76126368 Sandip Mane: </h3><p>If you want to remove duplicate spaces and keep single spaces intact, use:</p>
+<pre class="lang-rb prettyprint-override"><code>&quot;   Hello     World!   &quot;.sqeeze(&quot; &quot;).strip
+</code></pre>
+<p>This is way faster than <code>split(&quot; &quot;).join</code> and other alternatives.</p>

@@ -1,0 +1,188 @@
+ <h2> Title: Why are exclamation marks used in Ruby methods? </h2> <h3> Lennie, question_id: 612189 </h3>Score: 658, Tags: {ruby,methods,naming-conventions,immutability} <br><p>In Ruby some methods have a question mark (<code>?</code>) that ask a question like <code>include?</code> that ask if the object in question is included, this then returns a true/false.</p>
+
+<p>But why do some methods have exclamation marks (<code>!</code>) where others don't?</p>
+
+<p>What does it mean?</p>
+<h4> Comment 14876062 prusswan: </h4>synonym: bang, exclamation mark<br><h4> Comment 15563297 David J.: </h4>The accepted answer should be changed to <a href="http://stackoverflow.com/a/612653/109618">stackoverflow.com/a/612653/109618</a>. See <a href="http://www.wobblini.net/bang.txt" rel="nofollow noreferrer">wobblini.net/bang.txt</a> and <a href="http://www.ruby-forum.com/topic/176830#773946" rel="nofollow noreferrer">ruby-forum.com/topic/176830#773946</a> -- &quot;The bang sign means &quot;the bang version is more dangerous than its non bang counterpart; handle with care&quot;&quot; -Matz<br><h4> Comment 40088270 Damien: </h4>The bang method would be a great design choice if <b>only</b> and <b>all</b> bang methods were dangerous. Sadly they are not, and so it becomes a frustrating exercise in memorising what is and isn&#39;t mutable.<br>------------------------------------------------------------------ <br><h3> Answer 612196 Todd Gamblin: </h3><p>In general, methods that end in <code>!</code> indicate that the method will <strong>modify the object it's called on</strong>. Ruby calls these as "<strong>dangerous methods</strong>" because they change state that someone else might have a reference to. Here's a simple example for strings:</p>
+
+<pre><code>foo = "A STRING"  # a string called foo
+foo.downcase!     # modifies foo itself
+puts foo          # prints modified foo
+</code></pre>
+
+<p>This will output:</p>
+
+<pre><code>a string
+</code></pre>
+
+<p>In the standard libraries, there are a lot of places you'll see pairs of similarly named methods, one with the <code>!</code> and one without.  The ones without are called "safe methods", and they return a copy of the original with changes applied to <strong>the copy</strong>, with the callee unchanged.  Here's the same example without the <code>!</code>:</p>
+
+<pre><code>foo = "A STRING"    # a string called foo
+bar = foo.downcase  # doesn't modify foo; returns a modified string
+puts foo            # prints unchanged foo
+puts bar            # prints newly created bar
+</code></pre>
+
+<p>This outputs:</p>
+
+<pre><code>A STRING
+a string
+</code></pre>
+
+<p>Keep in mind this is just a convention, but a lot of Ruby classes follow it. It also helps you keep track of what's getting modified in your code.</p>
+<h4> Comment 9293620 ecoologic: </h4>bang is also used for methods that raise an exception when the method without does not, e.g.: <code>save</code> and <code>save!</code> in <code>ActiveRecord</code><br><h4> Comment 33010520 BookOfGreg: </h4>@tgamblin There are lots of methods in Ruby that mutate without bangs. There are even rare methods that do not mutate WITH a bang but do something surprising like raise errors or skip errors. Bangs are used to say this is the more unusual version of the method and I think this should be reflected in your answer since it is marked as correct.<br><h4> Comment 425610 Sarah Mei: </h4>Be very careful - many smaller libraries don&#39;t follow this convention. If strange things are happening, often replacing obj.whatever! with obj=obj.whatever! fixes it. Very frustrating.<br><h4> Comment 33010473 BookOfGreg: </h4>@AbhilashAK <a href="http://api.rubyonrails.org/classes/ActiveRecord/Persistence.html#method-i-save-21" rel="nofollow noreferrer">save!</a> raises an error if it cannot save. This is opposed to regular save returning true/false.<br><h4> Comment 425431 Andrew Grimm: </h4>There&#39;s also cases like exit versus exit! and (in rails) save versus save!<br><h4> Comment 31074145 Abhi: </h4>What Save! actually does in Rails?<br><h4> Comment 112853085 stevec: </h4>@ecoologic I arrived here after learning of that use of <code>!</code> from <a href="https://stackoverflow.com/a/20866572/5783745">here</a>. How can we read more about that use? (and it seems odd to use the same character for two totally different things? - I wonder why that design choice was made)<br><h4> Comment 112871497 ecoologic: </h4>ActiveRecord is a good example of cryptic behaviour (mutability), you need to call <code>valid?</code> (save does it) to have the errors filled.  The bang is also used for &quot;dangerous&quot; methods throwing exceptions like <code>save!</code>.   It&#39;s a loose convention we can&#39;t rely too much on it.  I suggest you&#39;re clear with the team what you mean the <code>!</code> for all projects.<br>------------------------------------------------------------------ <br><h3> Answer 612653 Brian Carper: </h3><p>The exclamation point means many things, and sometimes you can't tell a lot from it other than "this is dangerous, be careful".</p>
+
+<p>As others have said, in standard methods it's often used to indicate a method that causes an object to mutate itself, but not always.  Note that many standard methods change their receiver and don't have an exclamation point (<code>pop</code>, <code>shift</code>, <code>clear</code>), and some methods with exclamation points don't change their receiver (<code>exit!</code>).  See <a href="http://dablog.rubypal.com/2007/8/15/bang-methods-or-danger-will-rubyist" rel="noreferrer">this article</a> for example.</p>
+
+<p>Other libraries may use it differently.  In Rails an exclamation point often means that the method will throw an exception on failure rather than failing silently.</p>
+
+<p>It's a naming convention but many people use it in subtly different ways.  In your own code a good rule of thumbs is to use it whenever a method is doing something "dangerous", especially when two methods with the same name exist and one of them is more "dangerous" than the other.  "Dangerous" can mean nearly anything though.</p>
+------------------------------------------------------------------ <br><h3> Answer 612588 Steven Huwig: </h3><p>This naming convention is lifted from <a href="http://www.schemers.org/Documents/Standards/R5RS/" rel="noreferrer">Scheme</a>.</p>
+
+<blockquote>
+  <p>1.3.5  Naming conventions</p>
+  
+  <p>By convention, the names of procedures
+  that always return a boolean value
+  usually end in ``?''. Such procedures
+  are called predicates.</p>
+  
+  <p>By convention, the names of procedures
+  that store values into previously
+  allocated locations (see section 3.4)
+  usually end in ``!''. Such procedures
+  are called mutation procedures. By
+  convention, the value returned by a
+  mutation procedure is unspecified.</p>
+</blockquote>
+<h4> Comment 69335399 DavidSilveira: </h4>+1 to this answer since has a documentation that give reasonable explanations for the ! usage. Really good answer Steven<br>------------------------------------------------------------------ <br><h3> Answer 612197 Pesto: </h3><p>! typically means that the method acts upon the object instead of returning a result.  From the book <a href="http://www.ruby-doc.org/docs/ProgrammingRuby/html/tut_methods.html" rel="noreferrer">Programming Ruby</a>:</p>
+
+<blockquote>
+  <p>Methods that are "dangerous," or modify the receiver, might be named with a trailing "!".</p>
+</blockquote>
+------------------------------------------------------------------ <br><h3> Answer 21804631 BookOfGreg: </h3><p>It is most accurate to say that methods with a Bang! are the more <a href="https://www.ruby-forum.com/topic/176830#773946" rel="noreferrer">dangerous</a> or <a href="http://ruby-doc.org/core-2.1.0/Array.html#method-i-collect-21" rel="noreferrer">surprising</a> version. There are many methods that mutate without a Bang such as <a href="http://ruby-doc.org/core-2.1.0/Array.html#method-i-delete" rel="noreferrer"><code>.destroy</code></a> and in general methods only have bangs where a safer alternative exists in the core lib.</p>
+
+<p>For instance, on Array we have <code>.compact</code> and <code>.compact!</code>, both methods mutate the array, but <code>.compact!</code> returns nil instead of self if there are no nil's in the array, which is more surprising than just returning self.</p>
+
+<p>The only non-mutating method I've found with a bang is <code>Kernel</code>'s <a href="http://ruby-doc.org/core-2.1.0/Kernel.html#method-i-exit-21" rel="noreferrer"><code>.exit!</code></a> which is more surprising than <code>.exit</code> because you cannot catch <code>SystemExit</code> while the process is closing.</p>
+
+<p>Rails and ActiveRecord continues this trend in that it uses bang for more 'surprising' effects like <a href="https://stackoverflow.com/a/1761180/193785"><code>.create!</code></a> which raises errors on failure.</p>
+------------------------------------------------------------------ <br><h3> Answer 7355879 Edward Castano: </h3><p><a href="http://www.themomorohoax.com/2009/02/11/when-to-use-a-bang-exclamation-point-after-rails-methods" rel="nofollow noreferrer">From themomorohoax.com</a>:</p>
+<p>A bang can used in the below ways, in order of my personal preference.</p>
+<blockquote>
+<ol>
+<li><p>An active record method raises an error if the method does not do
+what it says it will.</p>
+</li>
+<li><p>An active record method saves the record or a method saves an
+object (e.g. strip!)</p>
+</li>
+<li><p>A method does something “extra”, like posts to someplace, or does
+some action.</p>
+</li>
+</ol>
+</blockquote>
+<p>The point is: only use a bang when you’ve really thought about whether
+it’s necessary, to save other developers the annoyance of having to
+check why you are using a bang.</p>
+<p>The bang provides two cues to other developers.</p>
+<blockquote>
+<ol>
+<li><p>that it’s not necessary to save the object after calling the
+method.</p>
+</li>
+<li><p>when you call the method, the db is going to be changed.</p>
+</li>
+</ol>
+</blockquote>
+------------------------------------------------------------------ <br><h3> Answer 18801459 Mirage: </h3><p>Simple explanation:</p>
+
+<pre><code>foo = "BEST DAY EVER" #assign a string to variable foo.
+
+=&gt; foo.downcase #call method downcase, this is without any exclamation.
+
+"best day ever"  #returns the result in downcase, but no change in value of foo.
+
+=&gt; foo #call the variable foo now.
+
+"BEST DAY EVER" #variable is unchanged.
+
+=&gt; foo.downcase! #call destructive version.
+
+=&gt; foo #call the variable foo now.
+
+"best day ever" #variable has been mutated in place.
+</code></pre>
+
+<p>But if you ever called a method <code>downcase!</code> in the explanation above, <code>foo</code> would change to downcase permanently. <code>downcase!</code> would not return a new string object but replace the string in place, totally changing the <code>foo</code> to downcase.
+I suggest you don't use <code>downcase!</code> unless it is totally necessary.</p>
+------------------------------------------------------------------ <br><h3> Answer 43188358 Charlie Wood: </h3><pre><code>!
+</code></pre>
+
+<p>I like to think of this as an explosive change that destroys all that has gone before it. Bang or exclamation mark means that you are making a permanent saved change in your code. </p>
+
+<p>If you use for example Ruby's method for global substitution<code>gsub!</code>the substitution you make is permanent. </p>
+
+<p>Another way you can imagine it, is opening a text file and doing find and replace, followed by saving. <code>!</code> does the same in your code. </p>
+
+<p>Another useful reminder if you come from the bash world is <code>sed -i</code> has this similar effect of making permanent saved change. </p>
+------------------------------------------------------------------ <br><h3> Answer 31598104 Charles: </h3><p>Bottom line: <code>!</code> methods just change the value of the object they are called upon, whereas a method without <code>!</code> returns a manipulated value without writing over the object the method was called upon. </p>
+
+<p>Only use <code>!</code> if you do not plan on needing the original value stored at the variable you called the method on. </p>
+
+<p>I prefer to do something like:</p>
+
+<pre><code>foo = "word"
+bar = foo.capitalize
+puts bar
+</code></pre>
+
+<p>OR</p>
+
+<pre><code>foo = "word"
+puts foo.capitalize
+</code></pre>
+
+<p>Instead of </p>
+
+<pre><code>foo = "word"
+foo.capitalize!
+puts foo
+</code></pre>
+
+<p>Just in case I would like to access the original value again.</p>
+<h4> Comment 65023931 Darwin: </h4>Because your answer was not helpful in any way. &quot;Bottom line: ! methods just change the value of the object they are called upon&quot; is just not true.<br><h4> Comment 65096855 Darwin: </h4>Heres a better argument for why your answers is plain wrong. Read Matz comment on bang &quot;!&quot;. <a href="https://www.ruby-forum.com/topic/176830#773946" rel="nofollow noreferrer">ruby-forum.com/topic/176830#773946</a>. Do you still feel that your  &quot;Bottom line: ! methods just change the value of the object they are called upon&quot; is true in any way what so ever?<br><h4> Comment 65159437 Charles: </h4>@Darwin: Completely true? No, and I see that now. &quot;In any way whatsoever?&quot; Yes. Modifying its argument, or the object upon which a <code>!</code> method is called, is obviously &quot;dangerous&quot; -- that goes without saying; any method that mutates any of its arguments is <i>dangerous</i> because you could lose data. I&#39;ll admit: I was taught that <code>!</code> modifies its object and I never really questioned that. So I thank you for this.<br><h4> Comment 65038800 Charles: </h4>@Darwin it <i>does</i> change the value of the object. <code>!</code> mutates the object rather than returning a modified copy.<br><h4> Comment 65054872 Darwin: </h4>So what do you think this does? <code>User.create!</code><br><h4> Comment 65087742 Charles: </h4>@Darwin in what context? ActiveRecord?<br><h4> Comment 65096699 Darwin: </h4>Yes, ActiveRecord.<br>------------------------------------------------------------------ <br><h3> Answer 44137987 Mittinti Ramana Murthy: </h3><p>Called "Destructive Methods" They tend to change the original copy of the object you are referring to.</p>
+
+<pre><code>numbers=[1,0,10,5,8]
+numbers.collect{|n| puts n*2} # would multiply each number by two
+numbers #returns the same original copy
+numbers.collect!{|n| puts n*2} # would multiply each number by two and destructs the original copy from the array
+numbers   # returns [nil,nil,nil,nil,nil]
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 74591099 Curiousone: </h3><p>My answer explains the significance of <code>Ruby</code> methods with exclamation marks/shebangs in the context of <code>Ruby on Rails</code> (RoR) model validations.</p>
+<p>Essentially, whenever developers define Model validations (<a href="https://guides.rubyonrails.org/active_record_validations.html#validation-helpers" rel="nofollow noreferrer">explained here</a>), their ultimate goal is to decline a database record change &amp; raise/throw the relevant exception(s) in case invalid data has been submitted to update the record in question.</p>
+<p>RoR <code>ActiveRecord</code> gem <a href="https://guides.rubyonrails.org/active_record_callbacks.html#running-callbacks:%7E:text=4%20Running%20Callbacks,valid%3F" rel="nofollow noreferrer">defines various model manipulation methods (Ruby on Rails guides.)</a>. Among the methods, the <code>valid?</code> method is the only one that triggers validation without database action/modification. The rest of the methods attempt to change the database.</p>
+<p>These methods trigger callbacks whenever they run. Some of the methods in the <a href="https://guides.rubyonrails.org/active_record_callbacks.html#running-callbacks:%7E:text=4%20Running%20Callbacks,valid%3F" rel="nofollow noreferrer">list</a> feature a sister method with a shebang. What is the difference between the two? It has to do with the form of callback returned whenever a record validation fails.</p>
+<p>Methods without the exclamation/shebang merely return a boolean false in the event of record validation failure while the methods with a shebang raise/throw an exception which can then be handled appropriately in code.</p>
+------------------------------------------------------------------ <br><h3> Answer 75360017 napster235: </h3><p>Just as a heads-up, since I experienced this myself.</p>
+<p>In Ruby, <code>!</code> mutates the object and returns it. Otherwise it will return <code>nil</code>.</p>
+<p>So, if you are doing some kind of operations on an array for example, and call the method <code>.compact!</code> and there is nothig to compact, it will return <code>nil</code>.</p>
+<p>Example:</p>
+<pre><code>arr = [1, 2, 3, nil]
+arr.compact!
+=&gt; [1, 2, 3]
+
+Run again arr.compact!
+=&gt; nil
+</code></pre>
+<p>It is better to explicitly return again the array <code>arr</code> if you need to use it down the line, otherwise you will get the <code>nil</code> value.</p>
+<p>Example:</p>
+<pre><code>arr = [1, 2, 3]
+arr.compact! =&gt; nil
+arr # to get the value of the array
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 77220281 shivani gupta: </h3><p>0</p>
+<p>exclamation marks (&quot;!&quot;) at the end of method names are a naming convention. They indicate that the method can be more dangerous, performs a destructive action, or can modify the object it's called on. It's a way to alert developers about the special behaviour of the method. The exclamation mark doesn't have a specific meaning in the Ruby language itself but is widely used in the community to imply potential side effects or modifications of the object.</p>
+<p>Example: def sort!(array) array.sort! end</p>
+<p>numbers = [3, 1, 2] sort!(numbers) puts numbers.inspect # Output: [1, 2, 3]</p>
+<p>the sort! method sorts the array in place and modifies the original numbers array. The exclamation mark indicates that this method changes the object it operates on.</p>

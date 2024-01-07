@@ -1,0 +1,262 @@
+ <h2> Title: String concatenation in Ruby </h2> <h3> dagda1, question_id: 377768 </h3>Score: 403, Tags: {ruby,string-concatenation} <br><p>I am looking for a more elegant way of concatenating strings in Ruby.</p>
+
+<p>I have the following line:</p>
+
+<pre><code>source = "#{ROOT_DIR}/" &lt;&lt; project &lt;&lt; "/App.config"
+</code></pre>
+
+<p>Is there a nicer way of doing this?</p>
+
+<p>And for that matter what is the difference between <code>&lt;&lt;</code> and <code>+</code>?</p>
+<h4> Comment 82379922 Taimoor Changaiz: </h4>&lt;&lt; this is more efficient way to do concatenation.<br><h4> Comment 19577199 esengineer: </h4>This question <a href="http://stackoverflow.com/questions/4684446/why-is-the-shovel-operator-preferred-over-plus-equals-when-building-a" title="why is the shovel operator preferred over plus equals when building a">stackoverflow.com/questions/4684446/&hellip;</a> is highly related.<br>------------------------------------------------------------------ <br><h3> Answer 377787 Keltia: </h3><p>You can do that in several ways:</p>
+
+<ol>
+<li>As you shown with <code>&lt;&lt;</code> but that is not the <em>usual</em> way</li>
+<li><p>With string interpolation</p>
+
+<pre><code>source = "#{ROOT_DIR}/#{project}/App.config"
+</code></pre></li>
+<li><p>with <code>+</code></p>
+
+<pre><code>source = "#{ROOT_DIR}/" + project + "/App.config"
+</code></pre></li>
+</ol>
+
+<p>The second method seems to be more efficient in term of memory/speed from what I've seen (not measured though). All three methods will throw an uninitialized constant error when ROOT_DIR is nil.</p>
+
+<p>When dealing with pathnames, you may want to use <code>File.join</code> to avoid messing up with pathname separator.</p>
+
+<p>In the end, it is a matter of taste.</p>
+<h4> Comment 213570 Grant Hutchins: </h4>Instead of using &lt;&lt; on the elements of an array, use Array#join, it&#39;s much faster.<br><h4> Comment 205530 PEZ: </h4>I&#39;m not very experienced with ruby. But generally in cases where you concatenate lots of strings you often can gain performance by appending the strings to an array and then at the end put the string together atomically. Then &lt;&lt; could be useful?<br><h4> Comment 205549 Keltia: </h4>You&#39;ll have to add memory an copy the longer string into it anyway. &lt;&lt; is more or less the same as + except that you can &lt;&lt; with a single character.<br>------------------------------------------------------------------ <br><h3> Answer 378258 Matt Burke: </h3><p>The <code>+</code> operator is the normal concatenation choice, and is probably the fastest way to concatenate strings.</p>
+
+<p>The difference between <code>+</code> and <code>&lt;&lt;</code> is that <code>&lt;&lt;</code> changes the object on its left hand side, and <code>+</code> doesn't.</p>
+
+<pre><code>irb(main):001:0&gt; s = 'a'
+=&gt; "a"
+irb(main):002:0&gt; s + 'b'
+=&gt; "ab"
+irb(main):003:0&gt; s
+=&gt; "a"
+irb(main):004:0&gt; s &lt;&lt; 'b'
+=&gt; "ab"
+irb(main):005:0&gt; s
+=&gt; "ab"
+</code></pre>
+<h4> Comment 14246071 Evil Trout: </h4>The + operator is definitely not the fastest way to concatenate strings. Every time you use it, it makes a copy, whereas &lt;&lt; concatenates in place and is much more performant.<br><h4> Comment 14318572 womble: </h4>Your jruby results are skewed against interpolation by the early-run JVM overload.  If you run the test suite several times (in the same process -- so wrap everything in say a <code>5.times do ... end</code> block) for each interpreter, you&#39;d end up with more accurate results.  My testing has shown interpolation is the fastest method, across all Ruby interpreters.  I would have expected <code>&lt;&lt;</code> to be the quickest, but that&#39;s why we benchmark.<br><h4> Comment 14288876 Matt Burke: </h4>For most uses, interpolation, <code>+</code> and <code>&lt;&lt;</code> are going to be about the same. If you&#39;re dealing with a lot of strings, or really big ones, then you might notice a difference. I was surprised by how similar they performed. <a href="https://gist.github.com/2895311" rel="nofollow noreferrer">gist.github.com/2895311</a><br><h4> Comment 57596089 Robin Coe: </h4>Not being too versed on Ruby, I&#39;m curious whether the mutation is performed on the stack or heap?  If on heap, even a mutation operation, which seems like it should be quicker, probably involves some form of malloc.  Without it, I&#39;d expect a buffer overflow.  Using the stack could be pretty fast but the resultant value is probably placed on the heap anyway, requiring a malloc operation.  In the end, I expect the memory pointer to be a new address, even if the variable reference makes it look like an in-place mutation.  So, really, is there a difference?<br>------------------------------------------------------------------ <br><h3> Answer 377823 georg: </h3><p>If you are just concatenating paths you can use Ruby's own File.join method.</p>
+
+<pre><code>source = File.join(ROOT_DIR, project, 'App.config')
+</code></pre>
+<h4> Comment 205564 PEZ: </h4>This seems to be the way to go since then ruby will take care of creating the correct string on system with different path separators.<br>------------------------------------------------------------------ <br><h3> Answer 28618941 Danny: </h3><p>from <a href="http://greyblake.com/blog/2012/09/02/ruby-perfomance-tricks/" rel="noreferrer">http://greyblake.com/blog/2012/09/02/ruby-perfomance-tricks/</a></p>
+
+<p>Using <code>&lt;&lt;</code> aka <code>concat</code> is far more efficient than <code>+=</code>, as the latter creates a temporal object and overrides the first object with the new object.</p>
+
+<pre><code>require 'benchmark'
+
+N = 1000
+BASIC_LENGTH = 10
+
+5.times do |factor|
+  length = BASIC_LENGTH * (10 ** factor)
+  puts "_" * 60 + "\nLENGTH: #{length}"
+
+  Benchmark.bm(10, '+= VS &lt;&lt;') do |x|
+    concat_report = x.report("+=")  do
+      str1 = ""
+      str2 = "s" * length
+      N.times { str1 += str2 }
+    end
+
+    modify_report = x.report("&lt;&lt;")  do
+      str1 = "s"
+      str2 = "s" * length
+      N.times { str1 &lt;&lt; str2 }
+    end
+
+    [concat_report / modify_report]
+  end
+end
+</code></pre>
+
+<p>output:</p>
+
+<pre><code>____________________________________________________________
+LENGTH: 10
+                 user     system      total        real
++=           0.000000   0.000000   0.000000 (  0.004671)
+&lt;&lt;           0.000000   0.000000   0.000000 (  0.000176)
++= VS &lt;&lt;          NaN        NaN        NaN ( 26.508796)
+____________________________________________________________
+LENGTH: 100
+                 user     system      total        real
++=           0.020000   0.000000   0.020000 (  0.022995)
+&lt;&lt;           0.000000   0.000000   0.000000 (  0.000226)
++= VS &lt;&lt;          Inf        NaN        NaN (101.845829)
+____________________________________________________________
+LENGTH: 1000
+                 user     system      total        real
++=           0.270000   0.120000   0.390000 (  0.390888)
+&lt;&lt;           0.000000   0.000000   0.000000 (  0.001730)
++= VS &lt;&lt;          Inf        Inf        NaN (225.920077)
+____________________________________________________________
+LENGTH: 10000
+                 user     system      total        real
++=           3.660000   1.570000   5.230000 (  5.233861)
+&lt;&lt;           0.000000   0.010000   0.010000 (  0.015099)
++= VS &lt;&lt;          Inf 157.000000        NaN (346.629692)
+____________________________________________________________
+LENGTH: 100000
+                 user     system      total        real
++=          31.270000  16.990000  48.260000 ( 48.328511)
+&lt;&lt;           0.050000   0.050000   0.100000 (  0.105993)
++= VS &lt;&lt;   625.400000 339.800000        NaN (455.961373)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 377799 Dejan Simic: </h3><p>Since this is a path I'd probably use array and join:</p>
+
+<pre><code>source = [ROOT_DIR, project, 'App.config'] * '/'
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 39507227 Adobe: </h3><p>Here's another benchmark inspired by <a href="https://gist.github.com/alno/1704455" rel="noreferrer">this gist</a>. It compares concatenation (<code>+</code>), appending (<code>&lt;&lt;</code>) and interpolation (<code>#{}</code>) for dynamic and predefined strings.</p>
+
+<pre class="lang-rb prettyprint-override"><code>require 'benchmark'
+
+# we will need the CAPTION and FORMAT constants:
+include Benchmark
+
+count = 100_000
+
+
+puts "Dynamic strings"
+
+Benchmark.benchmark(CAPTION, 7, FORMAT) do |bm|
+  bm.report("concat") { count.times { 11.to_s +  '/' +  12.to_s } }
+  bm.report("append") { count.times { 11.to_s &lt;&lt; '/' &lt;&lt; 12.to_s } }
+  bm.report("interp") { count.times { "#{11}/#{12}" } }
+end
+
+
+puts "\nPredefined strings"
+
+s11 = "11"
+s12 = "12"
+Benchmark.benchmark(CAPTION, 7, FORMAT) do |bm|
+  bm.report("concat") { count.times { s11 +  '/' +  s12 } }
+  bm.report("append") { count.times { s11 &lt;&lt; '/' &lt;&lt; s12 } }
+  bm.report("interp") { count.times { "#{s11}/#{s12}"   } }
+end
+</code></pre>
+
+<p>output:</p>
+
+<pre class="lang-none prettyprint-override"><code>Dynamic strings
+              user     system      total        real
+concat    0.050000   0.000000   0.050000 (  0.047770)
+append    0.040000   0.000000   0.040000 (  0.042724)
+interp    0.050000   0.000000   0.050000 (  0.051736)
+
+Predefined strings
+              user     system      total        real
+concat    0.030000   0.000000   0.030000 (  0.024888)
+append    0.020000   0.000000   0.020000 (  0.023373)
+interp    3.160000   0.160000   3.320000 (  3.311253)
+</code></pre>
+
+<p>Conclusion: interpolation in MRI is heavy.</p>
+<h4> Comment 86080492 Bibek Shrestha: </h4>Since strings are starting to be immutable now, I&#39;d love to see a new benchmark for this.<br>------------------------------------------------------------------ <br><h3> Answer 1962738 tig: </h3><p>I'd prefer using Pathname:</p>
+
+<pre><code>require 'pathname' # pathname is in stdlib
+Pathname(ROOT_DIR) + project + 'App.config'
+</code></pre>
+
+<p>about <code>&lt;&lt;</code> and <code>+</code> from ruby docs:</p>
+
+<p><code>+</code>: Returns a <strong>new</strong> String containing other_str concatenated to str</p>
+
+<p><code>&lt;&lt;</code>: Concatenates the given object to str. If the object is a Fixnum between 0 and 255, it is converted to a character before concatenation.</p>
+
+<p>so difference is in what becomes to first operand (<code>&lt;&lt;</code> makes changes in place, <code>+</code> returns new string so it is memory heavier) and what will be if first operand is Fixnum (<code>&lt;&lt;</code> will add as if it was character with code equal to that number, <code>+</code> will raise error)</p>
+<h4> Comment 104396542 lacostenycoder: </h4>also you need to call <code>(Pathname(ROOT_DIR) + project + &#39;App.config&#39;).to_s</code> if you want to return a string object.<br><h4> Comment 7882274 Kelvin: </h4>I just discovered that calling &#39;+&#39; on a Pathname can be dangerous because if the arg is an absolute path, the receiver path is ignored: <code>Pathname(&#39;&#47;home&#47;foo&#39;) + &#39;&#47;etc&#47;passwd&#39;  # =&gt; #&lt;Pathname:&#47;etc&#47;passwd&gt;</code>. This is by design, based on the rubydoc example. Seems that File.join is safer.<br>------------------------------------------------------------------ <br><h3> Answer 11802633 Marcio Mangar: </h3><p>Let me show to you all my experience with that.</p>
+
+<p>I had an query that returned 32k of records, for each record I called a method to format that database record into a formated string and than concatenate that into a String that at the end of all this process wil turn into a file in disk.</p>
+
+<p>My problem was that by the record goes, around 24k, the process of concatenating the String turned on a pain.</p>
+
+<p>I was doing that using the regular '+' operator.</p>
+
+<p>When I changed to the '&lt;&lt;' was like magic. Was really fast.</p>
+
+<p>So, I remembered my old times - sort of 1998 - when I was using Java and concatenating String using '+' and changed from String to StringBuffer (and now we, Java developer have the StringBuilder). </p>
+
+<p>I believe that the process of + / &lt;&lt; in Ruby world is the same as + / StringBuilder.append in the Java world. </p>
+
+<p>The first reallocate the entire object in memory and the other just point to a new address.</p>
+------------------------------------------------------------------ <br><h3> Answer 15257041 Imran Alavi: </h3><p>Here are more ways to do this:</p>
+
+<pre><code>"String1" + "String2"
+
+"#{String1} #{String2}"
+
+String1&lt;&lt;String2
+</code></pre>
+
+<p>And so on ... </p>
+------------------------------------------------------------------ <br><h3> Answer 17057382 Boris Stitnicky: </h3><p>Concatenation you say? How about <code>#concat</code> method then?</p>
+
+<pre><code>a = 'foo'
+a.object_id #=&gt; some number
+a.concat 'bar' #=&gt; foobar
+a.object_id #=&gt; same as before -- string a remains the same object
+</code></pre>
+
+<p>In all fairness, <code>concat</code> is aliased as <code>&lt;&lt;</code>.</p>
+<h4> Comment 24664256 Boris Stitnicky: </h4>There is one more way of glueing strings together not mentioned by others, and that is by mere juxtaposition: <code>&quot;foo&quot; &quot;bar&quot; &#39;baz&quot; #=&gt; &quot;foobarabaz&quot;</code><br><h4> Comment 105771352 Joshua Pinter: </h4>Note to others: That&#39;s not supposed to be a single quote, but a double one like the rest. Neat method!<br>------------------------------------------------------------------ <br><h3> Answer 52713889 Muhammad Zubair: </h3><p>You may use <code>+</code> or <code>&lt;&lt;</code> operator, but in ruby <code>.concat</code> function is the most preferable one, as it is much faster than other operators. You can use it like.</p>
+
+<pre><code>source = "#{ROOT_DIR}/".concat(project.concat("/App.config"))
+</code></pre>
+<h4> Comment 104396253 lacostenycoder: </h4>I think you have an extra <code>.</code> after your last <code>concat</code> no ?<br>------------------------------------------------------------------ <br><h3> Answer 54767983 Mark: </h3><p>You can also use <code>%</code> as follows:</p>
+
+<pre><code>source = "#{ROOT_DIR}/%s/App.config" % project
+</code></pre>
+
+<p>This approach works with <code>'</code> (single) quotation mark as well.</p>
+------------------------------------------------------------------ <br><h3> Answer 55409204 julianm: </h3><p>You can concatenate in string definition directly:</p>
+
+<pre><code>nombre_apellido = "#{customer['first_name']} #{customer['last_name']} #{order_id}"
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 54548644 Affan Khan: </h3><p>Situation matters, for example:</p>
+
+<pre><code># this will not work
+output = ''
+
+Users.all.each do |user|
+  output + "#{user.email}\n"
+end
+# the output will be ''
+puts output
+
+# this will do the job
+output = ''
+
+Users.all.each do |user|
+  output &lt;&lt; "#{user.email}\n"
+end
+# will get the desired output
+puts output
+</code></pre>
+
+<p>In the first example, concatenating with <code>+</code> operator will not update the <code>output</code> object,however, in the second example, the <code>&lt;&lt;</code> operator will update the <code>output</code> object with each iteration. So, for the above type of situation, <code>&lt;&lt;</code> is better.</p>
+------------------------------------------------------------------ <br><h3> Answer 59079791 lacostenycoder: </h3><p>For your particular case you could also use <code>Array#join</code> when constructing file path type of string:</p>
+
+<pre><code>string = [ROOT_DIR, project, 'App.config'].join('/')]
+</code></pre>
+
+<p>This has a pleasant side effect of automatically converting different types to string:</p>
+
+<pre><code>['foo', :bar, 1].join('/')
+=&gt;"foo/bar/1"
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 60549675 qr&#228;bn&#246;: </h3><p>For Puppet:</p>
+
+<pre><code>$username = 'lala'
+notify { "Hello ${username.capitalize}":
+    withpath =&gt; false,
+}
+</code></pre>

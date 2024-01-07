@@ -1,0 +1,290 @@
+ <h2> Title: How do I lowercase a string in Python? </h2> <h3> Benjamin Didur, question_id: 6797984 </h3>Score: 2526, Tags: {python,string,uppercase,lowercase} <br><p>Is there a way to convert a string to lowercase?</p>
+<pre><code>&quot;Kilometers&quot;  →  &quot;kilometers&quot;
+</code></pre>
+<hr />
+<p><sub>See <a href="https://stackoverflow.com/questions/9257094">How to change a string into uppercase?</a> for the opposite.</sub></p>
+------------------------------------------------------------------ <br><h3> Answer 6797990 Petar Ivanov: </h3><p>Use <a href="https://docs.python.org/library/stdtypes.html#str.lower" rel="noreferrer"><code>str.lower()</code></a>:</p>
+<pre><code>&quot;Kilometer&quot;.lower()
+</code></pre>
+<h4> Comment 115781082 Ekrem Din&#231;el: </h4>This only works well with ASCII characters, you may want to use <code>str.maketrans</code> and <code>str.translate</code> if you are not getting the expected string.<br><h4> Comment 126171766 lolesque: </h4>Not only ASCII, it works for many diacritics, for example <code>&#192;&#199;&#208;&#202;ĞİŃ&#211;ŒŘŠŤ&#218;Ż</code> but there is a problem for dotless i <code>&quot;ı&quot;.upper().lower()</code> becomes <code>i</code>, while upper dotted <code>İ</code> is conserved thanks to a <code>Combining dot above (0x307)</code>.<br>------------------------------------------------------------------ <br><h3> Answer 26175350 Vladimir Gorovoy: </h3><p>With Python 2, this doesn't work for non-English words in UTF-8. In this case <code>decode('utf-8')</code> can help:</p>
+
+<pre><code>&gt;&gt;&gt; s='Километр'
+&gt;&gt;&gt; print s.lower()
+Километр
+&gt;&gt;&gt; print s.decode('utf-8').lower()
+километр
+</code></pre>
+<h4> Comment 89937146 bballdave025: </h4>Perhaps we should be a bit more explicit by saying that the <code>decode(&#39;utf-8&#39;)</code> is not only unnecessary in Python 3, but causes an error. (<a href="https://stackoverflow.com/q/28583565/6505499">ref</a>). Example: <code>$python3;     &gt;&gt;&gt;s=&#39;Километр&#39;;   &gt;&gt;&gt;print (s.lower);   #result: километр   &gt;&gt;&gt;s.decode(&#39;utf-8&#39;).lower();   #result: ...AttributeError: &#39;str&#39; object has no attribute &#39;decode&#39;</code> We can see a second way to do this, referencing the excellent answer of @AaronHall.   <code>&gt;&gt;&gt;s.casefold()   #result: километр</code><br>------------------------------------------------------------------ <br><h3> Answer 31599276 Russia Must Remove Putin: </h3><p>The canonical Pythonic way of doing this is</p>
+<pre><code>&gt;&gt;&gt; 'Kilometers'.lower()
+'kilometers'
+</code></pre>
+<p>However, if the purpose is to do case insensitive matching, you should use case-folding:</p>
+<pre><code>&gt;&gt;&gt; 'Kilometers'.casefold()
+'kilometers'
+</code></pre>
+<p>Here's why:</p>
+<pre><code>&gt;&gt;&gt; &quot;Maße&quot;.casefold()
+'masse'
+&gt;&gt;&gt; &quot;Maße&quot;.lower()
+'maße'
+&gt;&gt;&gt; &quot;MASSE&quot; == &quot;Maße&quot;
+False
+&gt;&gt;&gt; &quot;MASSE&quot;.lower() == &quot;Maße&quot;.lower()
+False
+&gt;&gt;&gt; &quot;MASSE&quot;.casefold() == &quot;Maße&quot;.casefold()
+True
+</code></pre>
+<p>This is a str method in Python 3, but in Python 2, you'll want to look at the PyICU or py2casefold - <a href="https://stackoverflow.com/q/18271077/541136">several answers address this here</a>.</p>
+<h2>Unicode Python 3</h2>
+<p><a href="https://docs.python.org/3/howto/unicode.html" rel="noreferrer">Python 3</a> handles plain string literals as unicode:</p>
+<pre><code>&gt;&gt;&gt; string = 'Километр'
+&gt;&gt;&gt; string
+'Километр'
+&gt;&gt;&gt; string.lower()
+'километр'
+</code></pre>
+<h2>Python 2, plain string literals are bytes</h2>
+<p>In Python 2, the below, pasted into a shell, encodes the literal as a string of bytes, using <a href="https://docs.python.org/2/library/codecs.html#python-specific-encodings" rel="noreferrer"><code>utf-8</code></a>.</p>
+<p>And <code>lower</code> doesn't map any changes that bytes would be aware of, so we get the same string.</p>
+<pre><code>&gt;&gt;&gt; string = 'Километр'
+&gt;&gt;&gt; string
+'\xd0\x9a\xd0\xb8\xd0\xbb\xd0\xbe\xd0\xbc\xd0\xb5\xd1\x82\xd1\x80'
+&gt;&gt;&gt; string.lower()
+'\xd0\x9a\xd0\xb8\xd0\xbb\xd0\xbe\xd0\xbc\xd0\xb5\xd1\x82\xd1\x80'
+&gt;&gt;&gt; print string.lower()
+Километр
+</code></pre>
+<p>In scripts, Python will object to non-ascii (as of Python 2.5, and warning in Python 2.4) bytes being in a string with no encoding given, since the intended coding would be ambiguous. For more on that, see the Unicode how-to in the <a href="https://docs.python.org/2/howto/unicode.html#unicode-literals-in-python-source-code" rel="noreferrer">docs</a> and <a href="https://www.python.org/dev/peps/pep-0263/" rel="noreferrer">PEP 263</a></p>
+<h3>Use Unicode literals, not <code>str</code> literals</h3>
+<p>So we need a <code>unicode</code> string to handle this conversion, accomplished easily with a unicode string literal, which disambiguates with a <code>u</code> prefix (and note the <code>u</code> prefix also works in Python 3):</p>
+<pre><code>&gt;&gt;&gt; unicode_literal = u'Километр'
+&gt;&gt;&gt; print(unicode_literal.lower())
+километр
+</code></pre>
+<p>Note that the bytes are completely different from the <code>str</code> bytes - the escape character is <code>'\u'</code> followed by the 2-byte width, or 16 bit representation of these <code>unicode</code> letters:</p>
+<pre><code>&gt;&gt;&gt; unicode_literal
+u'\u041a\u0438\u043b\u043e\u043c\u0435\u0442\u0440'
+&gt;&gt;&gt; unicode_literal.lower()
+u'\u043a\u0438\u043b\u043e\u043c\u0435\u0442\u0440'
+</code></pre>
+<p>Now if we only have it in the form of a <code>str</code>, we need to convert it to <code>unicode</code>. Python's Unicode type is a universal encoding format that has many <a href="https://en.wikipedia.org/wiki/UTF-8#Advantages_and_disadvantages" rel="noreferrer">advantages</a> relative to most other encodings. We can either use the <code>unicode</code> constructor or <code>str.decode</code> method with the codec to convert the <code>str</code> to <code>unicode</code>:</p>
+<pre><code>&gt;&gt;&gt; unicode_from_string = unicode(string, 'utf-8') # &quot;encoding&quot; unicode from string
+&gt;&gt;&gt; print(unicode_from_string.lower())
+километр
+&gt;&gt;&gt; string_to_unicode = string.decode('utf-8') 
+&gt;&gt;&gt; print(string_to_unicode.lower())
+километр
+&gt;&gt;&gt; unicode_from_string == string_to_unicode == unicode_literal
+True
+</code></pre>
+<p>Both methods convert to the unicode type - and same as the unicode_literal.</p>
+<h2>Best Practice, use Unicode</h2>
+<p>It is recommended that you always <a href="https://docs.python.org/2/howto/unicode.html#tips-for-writing-unicode-aware-programs" rel="noreferrer">work with text in Unicode</a>.</p>
+<blockquote>
+<p>Software should only work with Unicode strings internally, converting to a particular encoding on output.</p>
+</blockquote>
+<h2>Can encode back when necessary</h2>
+<p>However, to get the lowercase back in type <code>str</code>, encode the python string to <code>utf-8</code> again:</p>
+<pre><code>&gt;&gt;&gt; print string
+Километр
+&gt;&gt;&gt; string
+'\xd0\x9a\xd0\xb8\xd0\xbb\xd0\xbe\xd0\xbc\xd0\xb5\xd1\x82\xd1\x80'
+&gt;&gt;&gt; string.decode('utf-8')
+u'\u041a\u0438\u043b\u043e\u043c\u0435\u0442\u0440'
+&gt;&gt;&gt; string.decode('utf-8').lower()
+u'\u043a\u0438\u043b\u043e\u043c\u0435\u0442\u0440'
+&gt;&gt;&gt; string.decode('utf-8').lower().encode('utf-8')
+'\xd0\xba\xd0\xb8\xd0\xbb\xd0\xbe\xd0\xbc\xd0\xb5\xd1\x82\xd1\x80'
+&gt;&gt;&gt; print string.decode('utf-8').lower().encode('utf-8')
+километр
+</code></pre>
+<p>So in Python 2, Unicode can encode into Python strings, and Python strings can decode into the Unicode type.</p>
+<h4> Comment 89937468 bballdave025: </h4>I have one note that doesn&#39;t necessarily apply to the OP&#39;s question, but which is important with portability (internationalization) when doing case insensitive matching. With case-insensitive matching, diacritics (accent marks) may become a concern. Example: <code>&gt;&gt;&gt; &quot;raison d&#39;&#234;tre&quot;.casefold(); &quot;raison d&#39;&#234;tre&quot;</code> Check out <a href="https://stackoverflow.com/a/2633310/6505499">this answer</a> about <code>unidecode</code><br>------------------------------------------------------------------ <br><h3> Answer 20055196 ergo: </h3><p>Also, you can overwrite some variables:</p>
+
+<pre><code>s = input('UPPER CASE')
+lower = s.lower()
+</code></pre>
+
+<p>If you use like this:</p>
+
+<pre><code>s = "Kilometer"
+print(s.lower())     - kilometer
+print(s)             - Kilometer
+</code></pre>
+
+<p>It will work just when called.</p>
+<h4> Comment 87539161 Munim Munna: </h4>Question is how to transform string to lowercase. How this answer got so many up-votes?<br><h4> Comment 90410614 vossmalte: </h4><code>s=s.lower()</code> is the way to go.<br><h4> Comment 115781133 Ekrem Din&#231;el: </h4>@m00lti Why <code>s</code>? What the variable name has to do with the question?<br><h4> Comment 120412742 ergo: </h4>@EkremDin&#231;el s like string, i think.<br><h4> Comment 127319991 vossmalte: </h4><code>s</code> like its used in the answer<br>------------------------------------------------------------------ <br><h3> Answer 53184012 U13-Forward: </h3><p>Don't try this, totally un-recommend, don't do this:</p>
+
+<pre><code>import string
+s='ABCD'
+print(''.join([string.ascii_lowercase[string.ascii_uppercase.index(i)] for i in s]))
+</code></pre>
+
+<p>Output:</p>
+
+<pre><code>abcd
+</code></pre>
+
+<p>Since no one wrote it yet you can use <code>swapcase</code> (so uppercase letters will become lowercase, and vice versa) (and this one you should use in cases where i just mentioned (convert upper to lower, lower to upper)):</p>
+
+<pre><code>s='ABCD'
+print(s.swapcase())
+</code></pre>
+
+<p>Output:</p>
+
+<pre><code>abcd
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 75457544 Andy Jazz: </h3><h2>lowercasing</h2>
+<p>This method not only converts all uppercase letters of the Latin alphabet into lowercase ones, but also shows how such logic is implemented. You can test this code in any online Python sandbox.</p>
+<pre><code>def turnIntoLowercase(string):
+    
+    lowercaseCharacters = ''
+    
+    abc = ['a','b','c','d','e','f','g','h','i','j','k','l','m', 
+           'n','o','p','q','r','s','t','u','v','w','x','y','z',
+           'A','B','C','D','E','F','G','H','I','J','K','L','M',
+           'N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
+  
+    for character in string:
+        if character not in abc:
+            lowercaseCharacters += character
+        elif abc.index(character) &lt;= 25:
+            lowercaseCharacters += character
+        else: 
+            lowercaseCharacters += abc[abc.index(character) - 26]
+    return lowercaseCharacters
+
+string = str(input(&quot;Enter your string, please: &quot; ))
+</code></pre>
+<hr />
+<pre><code>print(turnIntoLowercase(string = string))
+</code></pre>
+<h2>Performance check</h2>
+<p>Now, let's enter the following string (and press <kbd>Enter</kbd>) to make sure everything works as intended:</p>
+<pre><code># Enter your string, please: 
+
+&quot;PYTHON 3.11.2, 15TH FeB 2023&quot;
+</code></pre>
+<p>Result:</p>
+<pre><code>&quot;python 3.11.2, 15th feb 2023&quot;
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 75244066 krishnaacharyaa: </h3><p>There are several different ways in which this can be done.</p>
+<ol>
+<li>Using <code>.lower()</code> method</li>
+</ol>
+<pre><code>original_string = &quot;UPPERCASE&quot;
+lowercase_string = original_string.lower()
+print(lowercase_string)  # Output: &quot;uppercase&quot;
+</code></pre>
+<ol start="2">
+<li>Using <code>str.lower() </code></li>
+</ol>
+<pre><code>original_string = &quot;UPPERCASE&quot;
+lowercase_string = str.lower(original_string)
+print(lowercase_string)  # Output: &quot;uppercase&quot;
+</code></pre>
+<ol start="3">
+<li>Using combination of <code>str.translate()</code> and <code>str.maketrans()</code></li>
+</ol>
+<pre><code>original_string = &quot;UPPERCASE&quot;
+lowercase_string = original_string.translate(str.maketrans(string.ascii_uppercase, string.ascii_lowercase))
+print(lowercase_string)  # Output: &quot;uppercase&quot;
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 75539650 cottontail: </h3><p>If you want to convert a list of strings to lowercase, you can map <code>str.lower</code>:</p>
+<pre class="lang-py prettyprint-override"><code>list_of_strings = ['CamelCase', 'in', 'Python']
+list(map(str.lower, list_of_strings))            # ['camelcase', 'in', 'python']
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 75926746 Muhammad Ali: </h3><h2><strong>There are various ways of converting string into lowercase.</strong></h2>
+<p>use what suits you.</p>
+<h2>1- <code>.lower()</code> function.</h2>
+<p><strong>Syntax:</strong> <em>string.islower()</em></p>
+<p><strong>Properties:</strong></p>
+<ul>
+<li><strong>No Arguments:</strong> The <code>.lower()</code> method takes no arguments.</li>
+<li><strong>Checks Automatically:</strong> If no uppercase characters found in  given string, it returns the original string.</li>
+<li><strong>Ignores anythings other then then strings:</strong> It ignores the numbers, symbols, unique things etc between the strings.</li>
+</ul>
+<p><strong>Example: (no arguments taken)</strong></p>
+<p><div class="snippet" data-lang="js" data-hide="false" data-console="true" data-babel="false">
+<div class="snippet-code">
+<pre class="snippet-code-html lang-html prettyprint-override"><code>message = 'I LOVE Python'
+
+# convert message to lowercase
+print(message.lower())</code></pre>
+</div>
+</div>
+</p>
+<p><strong>Output:</strong></p>
+<blockquote>
+<p>i love python</p>
+</blockquote>
+<p><strong>Example: (ignores numbers)</strong></p>
+<p><div class="snippet" data-lang="js" data-hide="false" data-console="true" data-babel="false">
+<div class="snippet-code">
+<pre class="snippet-code-html lang-html prettyprint-override"><code># example string
+string = "THIS SHOULD BE LOWERCASE!"
+print(string.lower())
+
+# string with numbers
+# all alphabets should be lowercase
+string = "Th!s Sh0uLd B3 L0w3rCas3!"
+print(string.lower())</code></pre>
+</div>
+</div>
+</p>
+<blockquote>
+<p>this should be lowercase!
+th!s sh0uld b3 l0w3rcas3!</p>
+</blockquote>
+<p><strong>Unique usage:</strong> Use You can compare 2 strings</p>
+<p><div class="snippet" data-lang="js" data-hide="false" data-console="true" data-babel="false">
+<div class="snippet-code">
+<pre class="snippet-code-html lang-html prettyprint-override"><code># first string
+firstString = "I AM ALI!"
+
+# second string
+secondString = "i aM AlI!"
+
+if(firstString.lower() == secondString.lower()):
+    print("The strings are same.")
+else:
+    print("The strings are not same.")</code></pre>
+</div>
+</div>
+</p>
+<blockquote>
+<p>Output: The strings are same.</p>
+</blockquote>
+<h2>2- <code>SwapCase</code> Function</h2>
+<ul>
+<li>It will swap the wholecase.</li>
+</ul>
+<p><div class="snippet" data-lang="js" data-hide="false" data-console="true" data-babel="false">
+<div class="snippet-code">
+<pre class="snippet-code-html lang-html prettyprint-override"><code>s = 'IAMALI'
+print(s.swapcase())</code></pre>
+</div>
+</div>
+</p>
+<p>Output:</p>
+<blockquote>
+<p>iamali</p>
+</blockquote>
+<h2>3- <code>casefold()</code> function</h2>
+<ul>
+<li><strong>More Power Convertion:</strong>  the casefold() method is stronger and more aggressive, which means it will turn more characters into lower case and discover more matches.</li>
+</ul>
+<p><div class="snippet" data-lang="js" data-hide="false" data-console="true" data-babel="false">
+<div class="snippet-code">
+<pre class="snippet-code-html lang-html prettyprint-override"><code>s = 'IAmAli'
+print(s.casefold())</code></pre>
+</div>
+</div>
+</p>
+<p>Output:</p>
+<blockquote>
+<p>iamali</p>
+</blockquote>
+<p>Hope it helps.</p>
+<h4> Comment 136411061 Andj: </h4><code>str.casefold()</code> does not lowercase strings, if removes case distinctions, and for certain scripts the characters are uppercased rather than lowercased.<br>

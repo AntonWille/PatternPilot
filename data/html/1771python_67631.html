@@ -1,0 +1,755 @@
+ <h2> Title: How can I import a module dynamically given the full path? </h2> <h3> derfred, question_id: 67631 </h3>Score: 1771, Tags: {python,python-import,python-module} <br><p>How do I load a Python module given its full path?</p>
+<p>Note that the file can be anywhere in the filesystem where the user has access rights.</p>
+<hr />
+<p><sub><strong>See also:</strong> <a href="https://stackoverflow.com/questions/301134">How to import a module given its name as string?</a></sub></p>
+<h4> Comment 104641985 inger: </h4>Nice and simple question - and useful answers but they make me wonder what happened with the python mantra &quot;There is <i>one</i> <i>obvious</i> way&quot; to do it.. It doesn&#39;t seem like anything like a single or a simple and obvious answer to it.. Seems ridiculously hacky and version-dependent for such a fundamental operation (and it looks and more bloated in newer versions..).<br><h4> Comment 110708791 John Frazer: </h4>relevant XKCD <a href="https://xkcd.com/1987/" rel="nofollow noreferrer">xkcd.com/1987</a><br><h4> Comment 110708637 John Frazer: </h4>@inger <b>what happened with the python mantra &quot;There is one obvious way&quot; to do it [...] [not] a single or a simple and obvious answer to it [...] ridiculously hacky[...] more bloated in newer versions</b> Welcome to the terrible world of python package management. Python&#39;s <code>import</code>, <code>virtualenv</code>, <code>pip</code>, <code>setuptools</code> whatnot should all be thrown out and replaced with working code. I just tried to grok <code>virtualenv</code> or was it <code>pipenv</code> and had to work thru the equivalent of a Jumbo Jet manual. How that contrivance is paraded as The Solution to dealing with deps totally escapes me.<br><h4> Comment 116542438 Alex: </h4>And think that Java or even PHP (these days) have clear and simple way of splitting things in packages/namespaces and reuse it. It&#39;s a shock to see such pain in Python which adopted simplicity in every other aspect.<br><h4> Comment 115092160 Błażej Michalik: </h4>@JohnFrazer it&#39;s been made worse by constant nagging of people who couldn&#39;t be bothered to read 2 paragraphs of documentation. Your XKCD isn&#39;t really relevant, as it shows what these kinds of people can achieve when trying things until something works. Also, just because there&#39;s a new way doesn&#39;t mean there&#39;s now &quot;two obvious ways&quot;. The old way is obvious for some cases, the new way introduces ease of use to other. That&#39;s what happens when you actually care about DevX.<br><h4> Comment 131725747 Karl Knechtel: </h4>@MarkKCowan you <b>miss</b> having a preprocessor literally copy and paste other source files into the same &quot;translation unit&quot; and praying the result makes sense? To say nothing of the arcane <code>#ifndef</code> idiom? It&#39;s absolutely mind-boggling to me that there are so many people out there who will complain about Python while praising absolutely bizarre alternatives.<br><h4> Comment 126219473 Mark K Cowan: </h4>How I miss the obvious and intuitive semantics JS &quot;require&quot; and C/C++ &quot;#include&quot; when working with Python.<br><h4> Comment 132073186 Mark K Cowan: </h4>&quot;and it works very well.&quot; - hence why we have questions like this one lol, and the dozens about relative imports, and why they seem to resolve differently depending on how the program is launched / imported  As for the underscore-prefix for not exporting symbols - not very useful for preventing re-export of imports!  It&#39;s amazing how Python manages to un-solve so many problems that are solved in other languages.<br><h4> Comment 133728751 Tom McLean: </h4>The root of the module needs to be in <code>sys.path</code>. If its not in there, there are multiple ways to add it either dynamically or permanently depending on how you are launching your python code.  The best way is to not do this, make it a python package and install it to your virtual environment.<br><h4> Comment 131757143 Karl Knechtel: </h4>Python has a way of referencing symbols in one file from another. It is called <code>import</code>, and it was designed by the Python dev team and it works very well. By default, symbols with a leading underscore are not exposed; you can modify the behaviour using <code>__all__</code>. You can also <code>del</code> unneeded symbols at the end of the top-level code.<br><h4> Comment 131739791 Mark K Cowan: </h4>@KarlKnechtel I miss having &quot;some way of referencing symbols in one file from another&quot; that wasn&#39;t designed by a monkey on crack.  I also miss being able to choose what symbols to expose to other files vs Python&#39;s &quot;publish everything&quot;.<br><h4> Comment 123187967 user202729: </h4>There&#39;s <a href="https://stackoverflow.com/questions/5055042/whats-the-best-practice-using-a-settings-file-in-python?noredirect=1&amp;lq=1">parsing - What&#39;s the best practice using a settings file in Python? - Stack Overflow</a> -- but I don&#39;t find a good way to use Python configuration file.<br>------------------------------------------------------------------ <br><h3> Answer 67692 Sebastian Rittau: </h3><p>Let's have <code>MyClass</code> in <code>module.name</code> module defined at <code>/path/to/file.py</code>. Below is how we import <code>MyClass</code> from this module</p>
+<p>For Python 3.5+ use (<a href="https://docs.python.org/3/library/importlib.html#importing-a-source-file-directly" rel="noreferrer">docs</a>):</p>
+<pre><code>import importlib.util
+import sys
+spec = importlib.util.spec_from_file_location(&quot;module.name&quot;, &quot;/path/to/file.py&quot;)
+foo = importlib.util.module_from_spec(spec)
+sys.modules[&quot;module.name&quot;] = foo
+spec.loader.exec_module(foo)
+foo.MyClass()
+</code></pre>
+<p>For Python 3.3 and 3.4 use:</p>
+<pre><code>from importlib.machinery import SourceFileLoader
+
+foo = SourceFileLoader(&quot;module.name&quot;, &quot;/path/to/file.py&quot;).load_module()
+foo.MyClass()
+</code></pre>
+<p>(Although this has been deprecated in Python 3.4.)</p>
+<p>For Python 2 use:</p>
+<pre><code>import imp
+
+foo = imp.load_source('module.name', '/path/to/file.py')
+foo.MyClass()
+</code></pre>
+<p>There are equivalent convenience functions for compiled Python files and DLLs.</p>
+<p>See also <a href="http://bugs.python.org/issue21436" rel="noreferrer">http://bugs.python.org/issue21436</a>.</p>
+<h4> Comment 66705733 Mahesha999: </h4>may I know why <code>importlib.import_module</code> is not mentioned here?<br><h4> Comment 84128669 Sebastian Rittau: </h4>@setholopolus None of those is safe, if you use untrusted user input.<br><h4> Comment 103862409 Shai Alon: </h4>Python 2.7: TypeError: load_module() takes exactly 4 arguments<br><h4> Comment 99899000 Sebastian Rittau: </h4>@Lena It should and in my short test it did.<br><h4> Comment 1084400 Sridhar Ratnakumar: </h4>If I knew the namespace - &#39;module.name&#39; - I would already use <code>__import__</code>.<br><h4> Comment 10519574 Dan D.: </h4>@SridharRatnakumar the value of the first argument of <code>imp.load_source</code> only sets the <code>.__name__</code> of the returned module. it doesn&#39;t effect loading.<br><h4> Comment 62265603 rocky: </h4>@AXO and more to the point one wonders why something as simple and basic as this <i>has</i> to be so complicated. It isn&#39;t in many many other languages.<br><h4> Comment 23046504 Brandon Rhodes: </h4>@DanD. — the first argument of <code>imp.load_source()</code> determines the key of the new entry created in the <code>sys.modules</code> dictionary, so the first argument does indeed affect loading.<br><h4> Comment 66792176 Sebastian Rittau: </h4>@Mahesha999 Because importlib.import_module() does not allow you to import modules by filename, which is what the original question was about.<br><h4> Comment 70857776 Pedro Cattori: </h4>For Python 3.5+, if <code>&#47;path&#47;to&#47;file.py</code> imports a sibling implicitly (e.g. <code>import bar</code> to import <code>&#47;path&#47;to&#47;bar.py</code>), the solution yields <code>ModuleNotFoundError: No module named &#39;bar&#39;</code>. Any way to fix this?<br><h4> Comment 45793582 capybaralet: </h4>Is the idea that this is replicating: &quot;&quot;import module.name as foo&quot;&quot;, if your working directory was /path/to ??  Else, what is foo here??<br><h4> Comment 87806061 Sam Grondahl: </h4>This <i>almost</i> worked for me but when I&#39;m importing a module structured as a directory with an _<i>init_</i>.py I needed an additional line. See my answer below -- hope it helps somebody!<br><h4> Comment 89679445 mforbes: </h4>As mentioned by @SamGrondahl, these fail if the module has relative imports. His <a href="https://stackoverflow.com/a/50395128/1088938">answer</a> provides a solution for python 3.5+: Is there any similar solution for python 2.7?<br><h4> Comment 112480408 Myridium: </h4>What is <code>module.name</code>?? I&#39;m importing a file, or something from a file. It does not have a namespace.<br><h4> Comment 63976485 Paolo Celati: </h4>I&#39;m in Python 3.5.2 and I&#39;ve found it <b>only</b> works if the extension of the file is .py<br><h4> Comment 57450616 Sebastian Rittau: </h4>SourceFileLoader is not deprecated, but SourceFileLoader.load_module() is.<br><h4> Comment 70907706 Pedro Cattori: </h4>^I ended up asking this in a separate StackOverflow Question: <a href="http://stackoverflow.com/q/41861427/1490091">stackoverflow.com/q/41861427/1490091</a><br><h4> Comment 75804583 AlexLordThorsen: </h4><code>importlib.util.spec_from_file_location</code> won&#39;t import files that don&#39;t end in <code>.py</code> =(<br><h4> Comment 66140435 ZigZag: </h4>@Paolo Celati In Python 3.5+ You should use importlib.import_module(module_name).   Some like this.  sys,path.append(path_to_file) module = importlib.import_module(module_name)<br><h4> Comment 120817135 ジョージ: </h4>Since no one had mentioned <code>pydoc</code> yet -- here are my two cents: <a href="https://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path/68361215#68361215">pydoc::importfile()</a><br><h4> Comment 102102212 Andry: </h4>Beware of periods in a file name, because the latest version of the python <code>importlib</code> module still could not handle module file names with periods: <a href="https://bugs.python.org/issue38000" rel="nofollow noreferrer">bugs.python.org/issue38000</a><br><h4> Comment 102822106 Marcin Wojnarski: </h4>Interesting how the code gets LONGER and longer with every new version of Python. Not sure if this is really the &quot;pythonic way&quot; of developing a programming language :/ (same for other things, like print() etc.)<br><h4> Comment 107042333 drootang: </h4>Using the v3.5+ method described leads to pickling errors. An answer linked above by @mforbes <a href="https://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path/50395128#50395128">here</a> adds an additional step that appears to fix this: <code>sys.modules[spec.name] = foo</code><br><h4> Comment 110903953 Christoph90: </h4>Are they out of their minds establishing 3 different ways for the same thing in these different language versions???<br><h4> Comment 104616414 Marco Castanho: </h4>If the imported file contains any relative import these solutions fail <code>ImportError: attempted relative import with no known parent package</code><br><h4> Comment 105778877 Gulzar: </h4><code>module.name</code> is the module from which I run?<br><h4> Comment 118035195 Chris A: </h4>Isn&#39;t module.name always going to be the same as the name of the .py file?<br><h4> Comment 126162626 kevinarpe: </h4>If you need to import <code>class MyClass</code> into the current namespace (like I did during a dynamic Py2 vs Py3 import), try this: <code>MyClass = getattr(foo, &quot;MyClass&quot;)</code>  Discovered here: <a href="https://stackoverflow.com/a/41678146/257299">stackoverflow.com/a/41678146/257299</a><br><h4> Comment 125813855 djvg: </h4>The example in the docs is also quite clear: <a href="https://docs.python.org/3/library/importlib.html#importing-a-source-file-directly" rel="nofollow noreferrer">importing-a-source-file-directly</a><br><h4> Comment 134068774 zbyszek: </h4>To import a file which does not end .py:  <code>import importlib</code>  <code>NAME, PATH = &#39;coverage&#39;, &#39;&#47;usr&#47;bin&#47;coverage&#39;</code>  <code>loader = importlib.machinery.SourceFileLoader(NAME, PATH)</code>  <code>spec = importlib.util.spec_from_file_location(NAME, loader=loader)</code>  <code>module = importlib.util.module_from_spec(spec)</code>  <code>spec.loader.exec_module(module)</code>  Annoying as hell.<br><h4> Comment 120483018 YoussefDir: </h4>I just wanted a quick solution. So I changed the directory <code>cd &quot;folder&quot;</code> and then I was fine. Hope this helps someone.<br><h4> Comment 84136934 setholopolus: </h4>@SebastianRittau You&#39;re right I guess, because even if you imported a specific module by name they could have replaced it by their own module with the same name.<br><h4> Comment 87506934 Nathan majicvr.com: </h4>@SebastianRittau Then what is currently the best way for python 3.4?<br><h4> Comment 99861600 Lena: </h4>Should <code>spec.loader.exec_module(foo)</code> also ensure that the script is completely run? I have a set-up where I import a list of a variables (and purposely not a class), that all need to be valid and active within the script from which I&#39;m calling it. In contrast to the regular <code>import</code> statement, however, my variables cannot be further recalled.<br><h4> Comment 81867592 Cole Robertson: </h4>I&#39;m running <code>python 3.6.3</code> on <code>Sierra 10.12.6</code> and using option 1 (for python 3.5+). The code works, but when I run the line <code>foo.MyClass()</code> I get the error <code>AttributeError: module &#39;myFileName&#39; has no attribute &#39;MyClass&#39;</code>, where <code>myFileName</code> is the name of the python file I pass to the first arg of <code>importlib.util.spec_from_file_location(&quot;module.name&quot;, &quot;&#47;path&#47;to&#47;file.py&quot;)</code>. Yet when I comment out the line <code>foo.MyClass()</code> the script executes the imported script without issue. Would someone please explain what <code>foo.MyClass()</code> is doing in the suggested code?<br><h4> Comment 82468512 Sebastian Rittau: </h4>@ColeRobertson That line is just an example to show that you need to prefix any access of the module with <code>foo.</code> (or however you call that variable).<br><h4> Comment 82640429 JacksonHaenchen: </h4>It&#39;s mentioned that for Python 2, importlib should be used instead of lib, yet I see no example of using importlib to import a module at a path. Anyone have such an example?<br><h4> Comment 84052308 setholopolus: </h4>Is that top one safe? It seems a bit too close to just &quot;exec&quot;ing whatever the user tells you too. Wouldn&#39;t it be safer to add a directory to <code>sys.path</code>, and then ask for the specific module that you want?<br><h4> Comment 62196858 ncoghlan: </h4>Despite the use of &quot;import&quot; in the question, you probably want to use <code>runpy.run_path</code> for execution of Python code as a configuration format, rather than dynamically manipulating the import system.<br><h4> Comment 62706071 sorin: </h4>If you want a version of the code that works in all versions of Python check <a href="http://stackoverflow.com/a/37611448/99834">stackoverflow.com/a/37611448/99834</a><br><h4> Comment 55968488 d9k: </h4>See new (for december 2015) message in bug discussion (<a href="http://bugs.python.org/issue21436#msg255901" rel="nofollow noreferrer">bugs.python.org/issue21436#msg255901</a>): there a third new three-lines-long  way to load module in python 3.5!<br><h4> Comment 57143084 Ryne Everett: </h4>I&#39;m not seeing that <code>SourceFileLoader</code> is deprecated in the 3.4+ docs.<br>------------------------------------------------------------------ <br><h3> Answer 129374 Daryl Spitzer: </h3><p>The advantage of adding a path to sys.path (over using imp) is that it simplifies things when importing more than one module from a single package.  For example:</p>
+
+<pre><code>import sys
+# the mock-0.3.1 dir contains testcase.py, testutils.py &amp; mock.py
+sys.path.append('/foo/bar/mock-0.3.1')
+
+from testcase import TestCase
+from testutils import RunTests
+from mock import Mock, sentinel, patch
+</code></pre>
+<h4> Comment 46041493 Daryl Spitzer: </h4>:-)  Perhaps your question would be better suited as a StackOverflow question, not a comment on an answer.<br><h4> Comment 50424944 ComFreek: </h4>Beware of the fact that Python caches import statements. In the rare case that you have two different folders sharing a single class name (classX), the approach of adding a path to sys.path, importing classX, removing the path and repeating for the reamaining paths won&#39;t work. Python will always load the class from the first path from its cache. In my case I aimed at creating a plugin system where all plugins implement a specific classX. I ended up using <a href="http://stackoverflow.com/a/67692">SourceFileLoader</a>, note that its <a href="http://bugs.python.org/issue21436" rel="nofollow noreferrer">deprecation is controversial</a>.<br><h4> Comment 31737849 Phani: </h4>How do we use <code>sys.path.append</code> to point to a single python file instead of a directory?<br><h4> Comment 48075532 alexis: </h4>The python path can contain zip archives, &quot;eggs&quot; (a complex kind of zip archives), etc. Modules can be imported out of them. So the path elements are indeed <i>containers</i> of files, but they are not necessarily directories.<br><h4> Comment 98670569 Eli_B: </h4>Note this approach allows the imported module to import other modules from the same dir, which modules often do, while the accepted answer&#39;s approach does not (at least on 3.7). <code>importlib.import_module(mod_name)</code> can be used instead of the explicit import here if the module name isn&#39;t known at runtime I would add a <code>sys.path.pop()</code> in the end, though, assuming the imported code doesn&#39;t try to import more modules as it is used.<br><h4> Comment 85329707 ybull: </h4>I prefer this solution to the accepted one because it still works on Python 3.6 and because it only requires 2 simple lines of code to allow any number of modules to be found within another site directory. Our specific situation was on a web server where only a few core packages are installed centrally and this way CGI scripts created by users can import from their user-site directory. Thanks!<br><h4> Comment 47425928 m33k: </h4>To all people who were trying to include a file to their path... by definition &quot;the shell path is a colon delimited list of directories&quot;. I&#39;m relatively new to python, but the python path also follows the unix design principle from what I have seen. Please correct me if I am wrong.<br><h4> Comment 119915236 mikey: </h4>This is an excellent solution. Note that you can use a relative path in your <code>sys.path.append</code>, so with this answer if your working directory was <code>&#47;foo&#47;bar&#47;</code>, you could use <code>sys.path.append(&#39;.&#47;mock-0.3.1&#39;)</code><br><h4> Comment 33754826 Srivatsan: </h4>@Daryl Spitzer: How do we do it for just one python file<br><h4> Comment 46039879 NPN328: </h4>How do we use this for a single python file? And why have you been ignoring us for 7 years?<br><h4> Comment 97542441 Janaka Bandara: </h4>In my case the imported file had other (transitive) relative-path imports; combining the accepted answer (<code>importlib</code>) with this worked for me.<br>------------------------------------------------------------------ <br><h3> Answer 53311583 Miladiouss: </h3><p>To import your module, you need to add its directory to the environment variable, either temporarily or permanently.</p>
+<h1>Temporarily</h1>
+<pre><code>import sys
+sys.path.append(&quot;/path/to/my/modules/&quot;)
+import my_module
+</code></pre>
+<h1>Permanently</h1>
+<p>Adding the following line to your <code>.bashrc</code> (or alternative) file in Linux
+and excecute <code>source ~/.bashrc</code> (or alternative) in the terminal:</p>
+<pre><code>export PYTHONPATH=&quot;${PYTHONPATH}:/path/to/my/modules/&quot;
+</code></pre>
+<p>Credit/Source: <a href="https://stackoverflow.com/users/2312075/saarrrr">saarrrr</a>, <a href="https://stackoverflow.com/a/3402176/7428659">another Stack Exchange question</a></p>
+<h4> Comment 93564061 fordy: </h4>This &quot;temp&quot; solution is a great answer if you want to prod a project around in a jupyter notebook elsewhere.<br><h4> Comment 103933213 Miladiouss: </h4>@ShaiAlon You are adding paths, so no danger other than when you transfer codes from one computer to another, paths might get messed up. So, for package development, I only import local packages. Also, package names should be unique. If you are worried, use the temporary solution.<br><h4> Comment 103862439 Shai Alon: </h4>But... it&#39;s dangerous tampering with the path<br><h4> Comment 130260272 brewmanz: </h4>I had difficulty getting my Unit Tests to import, and your temp worked fine. I modified it to import from same directory as Unit Test with:  &gt;&gt;&gt; import os &gt;&gt;&gt; import sys &gt;&gt;&gt; sys.path.append(os.getcwd())<br>------------------------------------------------------------------ <br><h3> Answer 50395128 Sam Grondahl: </h3><p>If your top-level module is not a file but is packaged as a directory with __init__.py, then the accepted solution almost works, but not quite. In Python 3.5+ the following code is needed (note the added line that begins with 'sys.modules'):</p>
+
+<pre><code>MODULE_PATH = "/path/to/your/module/__init__.py"
+MODULE_NAME = "mymodule"
+import importlib
+import sys
+spec = importlib.util.spec_from_file_location(MODULE_NAME, MODULE_PATH)
+module = importlib.util.module_from_spec(spec)
+sys.modules[spec.name] = module 
+spec.loader.exec_module(module)
+</code></pre>
+
+<p>Without this line, when exec_module is executed, it tries to bind relative imports in your top level __init__.py to the top level module name -- in this case "mymodule". But "mymodule" isn't loaded yet so you'll get the error "SystemError: Parent module 'mymodule' not loaded, cannot perform relative import". So you need to bind the name before you load it. The reason for this is the fundamental invariant of the relative import system: "The invariant holding is that if you have sys.modules['spam'] and sys.modules['spam.foo'] (as you would after the above import), the latter must appear as the foo attribute of the former" <a href="https://docs.python.org/3/reference/import.html#submodules" rel="noreferrer">as discussed here</a>.</p>
+<h4> Comment 103008313 tebanep: </h4>Thanks a lot! This method enables relative imports between submodules. Great!<br><h4> Comment 105778844 Gulzar: </h4>but what is <code>mymodule</code>?<br><h4> Comment 114406597 Azmisov: </h4>Though unconventional, if your package entry point is something other than <code>__init__.py</code>, you can still import it as a package. Include <code>spec.submodule_search_locations = [os.path.dirname(MODULE_PATH)]</code> after creating the spec. You can also treat a <code>__init__.py</code> as a non-package (e.g. single module) by setting this value to <code>None</code><br><h4> Comment 104714970 Tim Ludwinski: </h4>This answer matches the documentation here: <a href="https://docs.python.org/3/library/importlib.html#importing-programmatically" rel="nofollow noreferrer">docs.python.org/3/library/&hellip;</a>.<br><h4> Comment 106578889 Idodo: </h4>@Gulzar, it is whatever name you&#39;d like to give your module, such that you can later do: &quot;from mymodule import myclass&quot;<br><h4> Comment 106584827 Gulzar: </h4>So... <code>&#47;path&#47;to&#47;your&#47;module&#47;</code> is actually <code>&#47;path&#47;to&#47;your&#47;PACKAGE&#47;</code>? and by <code>mymodule</code> you mean <code>myfile.py</code>?<br><h4> Comment 109514393 IAbstract: </h4>What is <code>mymodule</code> in relation to <code>&#47;path&#47;to&#47;your&#47;module&#47;__init__.py</code>?<br><h4> Comment 135642381 CutePoison: </h4>note, for idiots like. You have to refer to <b>file</b> and not a folder in <code>MODULE_PATH</code>. Took me quite a while to figure out<br>------------------------------------------------------------------ <br><h3> Answer 37339817 ncoghlan: </h3><p>It sounds like you don't want to specifically import the configuration file (which has a whole lot of side effects and additional complications involved). You just want to run it, and be able to access the resulting namespace. The standard library provides an API specifically for that in the form of <a href="https://docs.python.org/3/library/runpy.html#runpy.run_path" rel="noreferrer">runpy.run_path</a>:</p>
+<pre><code>from runpy import run_path
+settings = run_path(&quot;/path/to/file.py&quot;)
+</code></pre>
+<p>That interface is available in Python 2.7 and Python 3.2+.</p>
+<h4> Comment 113181143 ncoghlan: </h4>@Maggyero The command line never goes through <code>runpy.run_path</code>, but if a given path is a directory or zipfile, then it ends up delegating to <code>runpy.run_module</code> for the <code>__main__</code> execution. The duplicated logic for &quot;Is it a script, directory, or zipfile?&quot; isn&#39;t complicated enough to be worth delegating to Python code.<br><h4> Comment 113184464 G&#233;ry Ogam: </h4>Also by looking at the <a href="https://github.com/python/cpython/blob/v3.8.5/Modules/main.c#L280" rel="nofollow noreferrer">implementation</a> of the C function <code>pymain_run_module</code>, it seems that CPython delegates to the Python function <code>runpy._run_module_as_main</code> instead of <code>runpy.run_module</code>—though if I understood correctly the only difference is that the first function executes the code in the built-in <code>__main__</code> environment (cf. <a href="https://github.com/python/cpython/blob/v3.8.5/Lib/runpy.py#L191" rel="nofollow noreferrer">here</a>) while the second function executes it in a new environment?<br><h4> Comment 114106962 ncoghlan: </h4>@Maggyero Yep, that&#39;s the only difference. Originally it used the public function, but that turned out to interact badly with the interpreter&#39;s <code>-i</code> option (which drops you into an interactive shell in the original <code>__main__</code> module, so <code>-m</code> running in a new module was inconvenient)<br><h4> Comment 91491715 Stephen Ellwood: </h4>I like this method but when I get the result of run_path its a dictionary which I cannot seem to access?<br><h4> Comment 91559535 ncoghlan: </h4>What do you mean by &quot;cannot access&quot;? You can&#39;t import from it (that&#39;s why this is only a good option when import-style access isn&#39;t actually required), but the contents should be available via the regular dict API (<code>result[name]</code>, <code>result.get(&#39;name&#39;, default_value)</code>, etc)<br><h4> Comment 113184380 G&#233;ry Ogam: </h4>Thanks, I was not aware of this. In CPython, does the delegation to <code>runpy.run_module</code> for a given module name (<code>python -m name</code>) happen exactly <a href="https://github.com/python/cpython/blob/v3.8.5/Modules/main.c#L599" rel="nofollow noreferrer">here</a> and for a given directory or zip file path (<code>python path</code>) happen exactly <a href="https://github.com/python/cpython/blob/v3.8.5/Modules/main.c#L602" rel="nofollow noreferrer">here</a>?<br><h4> Comment 107479612 RuRo: </h4>This answer is way underrated. It&#39;s very short and simple! Even better, if you need a proper module namespace, you can do something like  <code>from runpy import run_path; from argparse import Namespace; mod = Namespace(**run_path(&#39;path&#47;to&#47;file.py&#39;))</code><br><h4> Comment 113013877 G&#233;ry Ogam: </h4>Hi Nick. In <a href="https://www.python.org/dev/peps/pep-0338/" rel="nofollow noreferrer">PEP 338</a>, you introduced only the function <code>runpy.run_module</code> and said that <code>python -m module_name</code> now delegates to it. 1. Did you write a similar PEP for the function <code>runpy.run_path</code>? 2. Does <code>python file_path.py</code> now delegate to <code>runpy.run_path</code>?<br><h4> Comment 113013931 G&#233;ry Ogam: </h4>Also, I have just opened a public question <a href="https://stackoverflow.com/q/63909243/2326961">here</a> about your <a href="https://www.python.org/dev/peps/pep-0366/" rel="nofollow noreferrer">PEP 366</a>. I am very interested by your thought on this.<br>------------------------------------------------------------------ <br><h3> Answer 67708 Chris Cherry: </h3><p>You can also do something like this and add the directory that the configuration file is sitting in to the Python load path, and then just do a normal import, assuming you know the name of the file in advance, in this case "config".</p>
+
+<p>Messy, but it works.</p>
+
+<pre><code>configfile = '~/config.py'
+
+import os
+import sys
+
+sys.path.append(os.path.dirname(os.path.expanduser(configfile)))
+
+import config
+</code></pre>
+<h4> Comment 103862689 Shai Alon: </h4>That is not dynamically.<br><h4> Comment 103862799 Shai Alon: </h4>I tried: config_file = &#39;setup-for-chats&#39;,     setup_file = get_setup_file(config_file + &quot;.py&quot;),     sys.path.append(os.path.dirname(os.path.expanduser(setup_fil&zwnj;&#8203;e))),     import config_file  &gt;&gt; &quot;ImportError: No module named config_file&quot;<br>------------------------------------------------------------------ <br><h3> Answer 43602557 Mad Physicist: </h3><p>I have come up with a slightly modified version of <a href="https://stackoverflow.com/a/67692/2988730">@SebastianRittau's wonderful answer</a> (for Python &gt; 3.4 I think), which will allow you to load a file with any extension as a module using <a href="https://docs.python.org/3/library/importlib.html#importlib.util.spec_from_loader" rel="noreferrer"><code>spec_from_loader</code></a> instead of <a href="https://docs.python.org/3/library/importlib.html#importlib.util.spec_from_file_location" rel="noreferrer"><code>spec_from_file_location</code></a>:</p>
+<pre><code>from importlib.util import spec_from_loader, module_from_spec
+from importlib.machinery import SourceFileLoader 
+
+spec = spec_from_loader(&quot;module.name&quot;, SourceFileLoader(&quot;module.name&quot;, &quot;/path/to/file.py&quot;))
+mod = module_from_spec(spec)
+spec.loader.exec_module(mod)
+</code></pre>
+<p>The advantage of encoding the path in an explicit <a href="https://docs.python.org/3/library/importlib.html#importlib.machinery.SourceFileLoader" rel="noreferrer"><code>SourceFileLoader</code></a> is that the <a href="https://docs.python.org/3/library/importlib.html#module-importlib.machinery" rel="noreferrer">machinery</a> will not try to figure out the type of the file from the extension. This means that you can load something like a <code>.txt</code> file using this method, but you could not do it with <code>spec_from_file_location</code> without specifying the loader because <code>.txt</code> is not in <a href="https://docs.python.org/3/library/importlib.html#importlib.machinery.SOURCE_SUFFIXES" rel="noreferrer"><code>importlib.machinery.SOURCE_SUFFIXES</code></a>.</p>
+<p>I've placed an implementation based on this, and <a href="https://stackoverflow.com/a/50395128/2988730">@SamGrondahl's useful modification</a> into my utility library, <a href="https://haggis.readthedocs.io/en/stable/" rel="noreferrer">haggis</a>. The function is called <a href="https://haggis.readthedocs.io/en/latest/api.html#haggis.load.load_module" rel="noreferrer"><code>haggis.load.load_module</code></a>. It adds a couple of neat tricks, like the ability to inject variables into the module namespace as it is loaded.</p>
+------------------------------------------------------------------ <br><h3> Answer 67693 zuber: </h3><p>You can use the</p>
+<pre><code>load_source(module_name, path_to_file)
+</code></pre>
+<p>method from the <a href="https://docs.python.org/library/imp.html" rel="nofollow noreferrer">imp module</a>.</p>
+<h4> Comment 60530281 t1m0: </h4>heads up that imp is deprecated now.<br><h4> Comment 56381780 HEKTO: </h4>... and <code>imp.load_dynamic(module_name, path_to_file)</code> for DLLs<br>------------------------------------------------------------------ <br><h3> Answer 67715 Wheat: </h3><p>Do you mean load or import?</p>
+<p>You can manipulate the <code>sys.path</code> list specify the path to your module, and then import your module. For example, given a module at:</p>
+<pre><code>/foo/bar.py
+</code></pre>
+<p>You could do:</p>
+<pre><code>import sys
+sys.path[0:0] = ['/foo'] # Puts the /foo directory at the start of your path
+import bar
+</code></pre>
+<h4> Comment 98722330 winklerrr: </h4><code>Explicit is better than implicit.</code> So why not <code>sys.path.insert(0, ...)</code> instead of <code>sys.path[0:0]</code>?<br><h4> Comment 46969429 Kevin Edwards: </h4><code>sys.path[0:0] = [&#39;&#47;foo&#39;]</code><br><h4> Comment 18304526 dom0: </h4>B/c sys.path[0] = xy overwrites the first path item while path[0:0] =xy is equivalent to path.insert(0, xy)<br><h4> Comment 104016922 Guimoute: </h4>@dom0 Just go with <code>sys.path.append(...)</code> then. It&#39;s clearer.<br><h4> Comment 28215149 jsh: </h4>hm the path.insert worked for me but the [0:0] trick did not.<br><h4> Comment 10955928 user618677: </h4>@Wheat Why sys.path[0:0] instead of sys.path[0]?<br>------------------------------------------------------------------ <br><h3> Answer 37611448 sorin: </h3><p>Here is some code that works in all Python versions, from 2.7-3.5 and probably even others.</p>
+<pre><code>config_file = &quot;/tmp/config.py&quot;
+with open(config_file) as f:
+    code = compile(f.read(), config_file, 'exec')
+    exec(code, globals(), locals())
+</code></pre>
+<p>I tested it. It may be ugly, but so far it is the only one that works in all versions.</p>
+<h4> Comment 81839606 Klik: </h4>This answer worked for me where <code>load_source</code> did not because it imports the script and provides the script access to the modules and globals at the time of importing.<br><h4> Comment 123187919 user202729: </h4>Note that the behavior of this answer is <b>different</b> from importing a module, as for a module (imported the normal way or not) the &quot;global&quot; scope of the code is <i>the module object</i>, while for this answer it&#39;s the globals scope of the called object. (although this answer can be modified to change the scope too, any dictionary can be passed in as <code>globals</code> and <code>locals</code>)<br>------------------------------------------------------------------ <br><h3> Answer 68361215 ジョージ: </h3><p>To add to <a href="https://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path/67692#67692">Sebastian Rittau</a>'s answer:
+At least for <a href="https://en.wikipedia.org/wiki/CPython" rel="noreferrer">CPython</a>, there's <a href="https://docs.python.org/3/library/pydoc.html" rel="noreferrer">pydoc</a>, and, while not officially declared, importing files is what it does:</p>
+<pre class="lang-py prettyprint-override"><code>from pydoc import importfile
+module = importfile('/path/to/module.py')
+</code></pre>
+<p><strong>PS.</strong> For the sake of completeness, there's a reference to the current implementation at the moment of writing: <a href="https://github.com/python/cpython/blob/9c3eaf88dc5d5bed80cc45936de06b7b3162bc6d/Lib/pydoc.py#L392" rel="noreferrer">pydoc.py</a>, and I'm pleased to say that in the vein of <a href="https://xkcd.com/1987/" rel="noreferrer">xkcd 1987</a> it uses neither of the implementations mentioned in <a href="https://bugs.python.org/issue21436" rel="noreferrer">issue 21436</a> -- at least, not verbatim.</p>
+<h4> Comment 130783105 mirekphd: </h4>This is arguably the simplest method and no dependencies are required. Tested under py3.8.<br><h4> Comment 134853511 ジョージ: </h4>@tobiasBora there are several ways to do that, added a comment to your question with one alternative; note that to fully imitate <code>from module import *</code> one would need to <i>filter</i> &quot;internal&quot; module content -- like names <a href="https://docs.python.org/3/tutorial/modules.html#more-on-modules" rel="nofollow noreferrer">starting with an underscrore</a>.<br><h4> Comment 134853767 ジョージ: </h4>@tobiasBora I do not remember when - but I believe some time after 2010 moderators started to get overwhelmed by the amount of relatively low quality questions and answers (and I absolutely do not mean your own question here, but rather some next to &quot;white noise&quot; ones), and that led to a fairly draconian shift in general policy, in particular giving up on <a href="https://stackoverflow.blog/2010/11/16/dr-strangedupe-or-how-i-learned-to-stop-worrying-and-love-duplication/">dups</a>. I disagree, but have no time to argue. Besides, I have not been in their shoes.<br><h4> Comment 135470966 wim: </h4>Interesting. This does not seem to be <a href="https://docs.python.org/3/library/pydoc.html" rel="nofollow noreferrer">documented</a>, I&#39;m not sure it&#39;s intended to be a public API..<br><h4> Comment 135478491 ジョージ: </h4>@wim May be not. But it&#39;s useful. And besides, there were formerly undocumented api endpoints in the past that became published later -- check e.g. <a href="https://docs.python.org/2.7/library/pipes.html#pipes.quote" rel="nofollow noreferrer">pipes.quote</a> story<br><h4> Comment 134853614 tobiasBora: </h4>Great! Since my question got closed (not sure why since linked answers did not answer my question as far as I could tell), maybe you can update this answer?<br><h4> Comment 131310038 Deadly Pointer: </h4>This is really good when writing disposable code, easy to remember.<br><h4> Comment 134853286 tobiasBora: </h4>Looks great, but is it possible to turn it into a global import? I asked a followup question here <a href="https://stackoverflow.com/questions/76481173/python-dynamically-load-library-in-global-path" title="python dynamically load library in global path">stackoverflow.com/questions/76481173/&hellip;</a><br>------------------------------------------------------------------ <br><h3> Answer 68628 Chris Calloway: </h3><p>You can do this using <code>__import__</code> and <code>chdir</code>:</p>
+<pre class="lang-py prettyprint-override"><code>def import_file(full_path_to_module):
+    try:
+        import os
+        module_dir, module_file = os.path.split(full_path_to_module)
+        module_name, module_ext = os.path.splitext(module_file)
+        save_cwd = os.getcwd()
+        os.chdir(module_dir)
+        module_obj = __import__(module_name)
+        module_obj.__file__ = full_path_to_module
+        globals()[module_name] = module_obj
+        os.chdir(save_cwd)
+    except Exception as e:
+        raise ImportError(e)
+    return module_obj
+
+
+import_file('/home/somebody/somemodule.py')
+</code></pre>
+<h4> Comment 24547758 Chris Johnson: </h4>Why write 14 lines of buggy code when this is already addressed by the standard library? You haven&#39;t done error checking on format or content of full_path_to_module or the os.whatever operations; and using a catch-all <code>except:</code> clause is rarely a good idea.<br><h4> Comment 48614012 Sushi271: </h4>@ChrisJohnson <code>this is already addressed by the standard library</code> yeah, but python has nasty habit of not being backward-compatible... as the checked answer says there&#39;re 2 different ways before and after 3.3. In that case I&#39;d rather like to write my own universal function than check version on the fly. And yes, maybe this code isn&#39;t too well error-protected, but it shows an idea (which is os.chdir(), I haven&#39;t though about it), basing on which I can write a better code. Hence +1.<br><h4> Comment 111715104 Pithikos: </h4>It would be cool if this actually returned the module.<br><h4> Comment 40635187 Kijewski: </h4>You should use more &quot;try-finally&quot;s in here. E.g. <code>save_cwd = os.getcwd()</code> <code>try: …</code> <code>finally: os.chdir(save_cwd)</code><br>------------------------------------------------------------------ <br><h3> Answer 58974141 Kumar KS: </h3><p>If we have scripts in the same project but in different directory means, we can solve this problem by the following method.</p>
+
+<p>In this situation <code>utils.py</code> is in <code>src/main/util/</code></p>
+
+<pre><code>import sys
+sys.path.append('./')
+
+import src.main.util.utils
+#or
+from src.main.util.utils import json_converter # json_converter is example method
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 67672 Matt: </h3><p>I believe you can use <a href="https://docs.python.org/2/library/imp.html#imp.find_module" rel="noreferrer"><code>imp.find_module()</code></a> and <a href="https://docs.python.org/2/library/imp.html#imp.load_module" rel="noreferrer"><code>imp.load_module()</code></a> to load the specified module.  You'll need to split the module name off of the path, i.e. if you wanted to load <code>/home/mypath/mymodule.py</code> you'd need to do:</p>
+
+<pre><code>imp.find_module('mymodule', '/home/mypath/')
+</code></pre>
+
+<p>...but that should get the job done.</p>
+------------------------------------------------------------------ <br><h3> Answer 25827116 bob_twinkles: </h3><p>You can use the <code>pkgutil</code> module (specifically the <a href="https://docs.python.org/3/library/pkgutil.html#pkgutil.walk_packages" rel="noreferrer"><code>walk_packages</code></a> method) to get a list of the packages in the current directory. From there it's trivial to use the <code>importlib</code> machinery to import the modules you want:</p>
+
+<pre><code>import pkgutil
+import importlib
+
+packages = pkgutil.walk_packages(path='.')
+for importer, name, is_package in packages:
+    mod = importlib.import_module(name)
+    # do whatever you want with module now, it's been imported!
+</code></pre>
+<h4> Comment 129499287 openCivilisation: </h4>I&#39;m running into this problem here that kind of relates - <a href="https://stackoverflow.com/questions/73329009/pkgutil-isnt-considering-an-absolute-path-properly" title="pkgutil isnt considering an absolute path properly">stackoverflow.com/questions/73329009/&hellip;</a><br>------------------------------------------------------------------ <br><h3> Answer 53651717 abhimanyu: </h3><p>Create Python module <em>test.py</em>:</p>
+<pre><code>import sys
+sys.path.append(&quot;&lt;project-path&gt;/lib/&quot;)
+from tes1 import Client1
+from tes2 import Client2
+import tes3
+</code></pre>
+<p>Create Python module <em>test_check.py</em>:</p>
+<pre><code>from test import Client1
+from test import Client2
+from test import test3
+</code></pre>
+<p>We can import the imported module from module.</p>
+------------------------------------------------------------------ <br><h3> Answer 58943466 fny: </h3><p>There's a <a href="https://pypi.org/project/thesmuggler/" rel="noreferrer">package</a> that's dedicated to this specifically:</p>
+
+<pre><code>from thesmuggler import smuggle
+
+# À la `import weapons`
+weapons = smuggle('weapons.py')
+
+# À la `from contraband import drugs, alcohol`
+drugs, alcohol = smuggle('drugs', 'alcohol', source='contraband.py')
+
+# À la `from contraband import drugs as dope, alcohol as booze`
+dope, booze = smuggle('drugs', 'alcohol', source='contraband.py')
+</code></pre>
+
+<p>It's tested across Python versions (Jython and PyPy too), but it might be overkill depending on the size of your project.</p>
+------------------------------------------------------------------ <br><h3> Answer 29589414 Redlegjed: </h3><p>This area of Python 3.4 seems to be extremely tortuous to understand! However with a bit of hacking using the code from Chris Calloway as a start I managed to get something working. Here's the basic function.</p>
+
+<pre><code>def import_module_from_file(full_path_to_module):
+    """
+    Import a module given the full path/filename of the .py file
+
+    Python 3.4
+
+    """
+
+    module = None
+
+    try:
+
+        # Get module name and path from full path
+        module_dir, module_file = os.path.split(full_path_to_module)
+        module_name, module_ext = os.path.splitext(module_file)
+
+        # Get module "spec" from filename
+        spec = importlib.util.spec_from_file_location(module_name,full_path_to_module)
+
+        module = spec.loader.load_module()
+
+    except Exception as ec:
+        # Simple error printing
+        # Insert "sophisticated" stuff here
+        print(ec)
+
+    finally:
+        return module
+</code></pre>
+
+<p>This appears to use non-deprecated modules from Python 3.4. I don't pretend to understand why, but it seems to work from within a program. I found Chris' solution worked on the command line but not from inside a program.</p>
+------------------------------------------------------------------ <br><h3> Answer 6284270 ubershmekel: </h3><p>I made a package that uses <code>imp</code> for you. I call it <code>import_file</code> and this is how it's used:</p>
+
+<pre><code>&gt;&gt;&gt;from import_file import import_file
+&gt;&gt;&gt;mylib = import_file('c:\\mylib.py')
+&gt;&gt;&gt;another = import_file('relative_subdir/another.py')
+</code></pre>
+
+<p>You can get it at:</p>
+
+<p><a href="http://pypi.python.org/pypi/import_file" rel="nofollow">http://pypi.python.org/pypi/import_file</a></p>
+
+<p>or at</p>
+
+<p><a href="http://code.google.com/p/import-file/" rel="nofollow">http://code.google.com/p/import-file/</a></p>
+<h4> Comment 17440847 ychaouche: </h4>os.chdir ? (minimal characters to approve comment).<br><h4> Comment 93963321 Frak: </h4>I&#39;ve spent all day troubleshooting an import bug in a pyinstaller generated exe. In the end this is the only thing that worked for me. Thank you so much for making this!<br>------------------------------------------------------------------ <br><h3> Answer 30605451 yoniLavi: </h3><p>I'm not saying that it is better, but for the sake of completeness, I wanted to suggest the <a href="https://docs.python.org/3/library/functions.html#exec" rel="nofollow noreferrer"><code>exec</code></a> function, available in both Python 2 and Python 3.</p>
+<p><code>exec</code> allows you to execute arbitrary code in either the global scope, or in an internal scope, provided as a dictionary.</p>
+<p>For example, if you have a module stored in <code>&quot;/path/to/module</code>&quot; with the function <code>foo()</code>, you could run it by doing the following:</p>
+<pre><code>module = dict()
+with open(&quot;/path/to/module&quot;) as f:
+    exec(f.read(), module)
+module['foo']()
+</code></pre>
+<p>This makes it a bit more explicit that you're loading code dynamically, and grants you some additional power, such as the ability to provide custom builtins.</p>
+<p>And if having access through attributes, instead of keys is important to you, you can design a custom dict class for the globals, that provides such access, e.g.:</p>
+<pre><code>class MyModuleClass(dict):
+    def __getattr__(self, name):
+        return self.__getitem__(name)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 32905959 Peter Zhu: </h3><p>To import a module from a given filename, you can temporarily extend the path, and restore the system path in the finally block <a href="http://effbot.org/zone/import-string.htm" rel="nofollow">reference:</a></p>
+
+<pre><code>filename = "directory/module.py"
+
+directory, module_name = os.path.split(filename)
+module_name = os.path.splitext(module_name)[0]
+
+path = list(sys.path)
+sys.path.insert(0, directory)
+try:
+    module = __import__(module_name)
+finally:
+    sys.path[:] = path # restore
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 50509034 Ataxias: </h3><p>A simple solution using <code>importlib</code> instead of the <code>imp</code> package (tested for Python 2.7, although it should work for Python 3 too):</p>
+
+<pre class="lang-python prettyprint-override"><code>import importlib
+
+dirname, basename = os.path.split(pyfilepath) # pyfilepath: '/my/path/mymodule.py'
+sys.path.append(dirname) # only directories should be added to PYTHONPATH
+module_name = os.path.splitext(basename)[0] # '/my/path/mymodule.py' --&gt; 'mymodule'
+module = importlib.import_module(module_name) # name space of defined module (otherwise we would literally look for "module_name")
+</code></pre>
+
+<p>Now you can directly use the namespace of the imported module, like this:</p>
+
+<pre><code>a = module.myvar
+b = module.myfunc(a)
+</code></pre>
+
+<p>The advantage of this solution is that <strong>we don't even need to know the actual name of the module we would like to import</strong>, in order to use it in our code. This is useful, e.g. in case the path of the module is a configurable argument.</p>
+<h4> Comment 89821385 bgusach: </h4>This way you are modifying the <code>sys.path</code>, which does not fit every use case.<br><h4> Comment 89864145 Ataxias: </h4>@bgusach This may be true, but it is also desirable in some cases (adding a path to sys.path simplifies things when importing more than one module from a single package). At any rate, if this not desirable, one can immediately afterwards do <code>sys.path.pop()</code><br>------------------------------------------------------------------ <br><h3> Answer 67705 user10370: </h3><p><strong>Import package modules at runtime (Python recipe)</strong> </p>
+
+<p><a href="http://code.activestate.com/recipes/223972/" rel="nofollow noreferrer">http://code.activestate.com/recipes/223972/</a></p>
+
+<pre><code>###################
+##                #
+## classloader.py #
+##                #
+###################
+
+import sys, types
+
+def _get_mod(modulePath):
+    try:
+        aMod = sys.modules[modulePath]
+        if not isinstance(aMod, types.ModuleType):
+            raise KeyError
+    except KeyError:
+        # The last [''] is very important!
+        aMod = __import__(modulePath, globals(), locals(), [''])
+        sys.modules[modulePath] = aMod
+    return aMod
+
+def _get_func(fullFuncName):
+    """Retrieve a function object from a full dotted-package name."""
+
+    # Parse out the path, module, and function
+    lastDot = fullFuncName.rfind(u".")
+    funcName = fullFuncName[lastDot + 1:]
+    modPath = fullFuncName[:lastDot]
+
+    aMod = _get_mod(modPath)
+    aFunc = getattr(aMod, funcName)
+
+    # Assert that the function is a *callable* attribute.
+    assert callable(aFunc), u"%s is not callable." % fullFuncName
+
+    # Return a reference to the function itself,
+    # not the results of the function.
+    return aFunc
+
+def _get_class(fullClassName, parentClass=None):
+    """Load a module and retrieve a class (NOT an instance).
+
+    If the parentClass is supplied, className must be of parentClass
+    or a subclass of parentClass (or None is returned).
+    """
+    aClass = _get_func(fullClassName)
+
+    # Assert that the class is a subclass of parentClass.
+    if parentClass is not None:
+        if not issubclass(aClass, parentClass):
+            raise TypeError(u"%s is not a subclass of %s" %
+                            (fullClassName, parentClass))
+
+    # Return a reference to the class itself, not an instantiated object.
+    return aClass
+
+
+######################
+##       Usage      ##
+######################
+
+class StorageManager: pass
+class StorageManagerMySQL(StorageManager): pass
+
+def storage_object(aFullClassName, allOptions={}):
+    aStoreClass = _get_class(aFullClassName, StorageManager)
+    return aStoreClass(allOptions)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 8721254 Hengjie: </h3><p>This should work</p>
+
+<pre><code>path = os.path.join('./path/to/folder/with/py/files', '*.py')
+for infile in glob.glob(path):
+    basename = os.path.basename(infile)
+    basename_without_extension = basename[:-3]
+
+    # http://docs.python.org/library/imp.html?highlight=imp#module-imp
+    imp.load_source(basename_without_extension, infile)
+</code></pre>
+<h4> Comment 18886615 ReneSac: </h4>A more general way to cut the extension out is: <code>name, ext = os.path.splitext(os.path.basename(infile))</code>. Your method works because the previous restriction to .py extension. Also, you should probably import the module to some variable/dictionary entry.<br>------------------------------------------------------------------ <br><h3> Answer 57843421 Andry: </h3><p>I have written my own global and portable import function, based on <code>importlib</code> module, for:</p>
+<ul>
+<li>Be able to import both modules as submodules and to import the content of a module to a parent module (or into a globals if has no parent module).</li>
+<li>Be able to import modules with a period characters in a file name.</li>
+<li>Be able to import modules with any extension.</li>
+<li>Be able to use a standalone name for a submodule instead of a file name without extension which is by default.</li>
+<li>Be able to define the import order based on previously imported module instead of dependent on <code>sys.path</code> or on a what ever search path storage.</li>
+</ul>
+<p>The examples directory structure:</p>
+<pre><code>&lt;root&gt;
+ |
+ +- test.py
+ |
+ +- testlib.py
+ |
+ +- /std1
+ |   |
+ |   +- testlib.std1.py
+ |
+ +- /std2
+ |   |
+ |   +- testlib.std2.py
+ |
+ +- /std3
+     |
+     +- testlib.std3.py
+</code></pre>
+<p>Inclusion dependency and order:</p>
+<pre><code>test.py
+  -&gt; testlib.py
+    -&gt; testlib.std1.py
+      -&gt; testlib.std2.py
+    -&gt; testlib.std3.py
+</code></pre>
+<p>Implementation:</p>
+<p>Latest changes store: <a href="https://github.com/andry81/tacklelib/tree/HEAD/python/tacklelib/tacklelib.py" rel="nofollow noreferrer">https://github.com/andry81/tacklelib/tree/HEAD/python/tacklelib/tacklelib.py</a></p>
+<p><strong>test.py</strong>:</p>
+<pre><code>import os, sys, inspect, copy
+
+SOURCE_FILE = os.path.abspath(inspect.getsourcefile(lambda:0)).replace('\\','/')
+SOURCE_DIR = os.path.dirname(SOURCE_FILE)
+
+print(&quot;test::SOURCE_FILE: &quot;, SOURCE_FILE)
+
+# portable import to the global space
+sys.path.append(TACKLELIB_ROOT) # TACKLELIB_ROOT - path to the library directory
+import tacklelib as tkl
+
+tkl.tkl_init(tkl)
+
+# cleanup
+del tkl # must be instead of `tkl = None`, otherwise the variable would be still persist
+sys.path.pop()
+
+tkl_import_module(SOURCE_DIR, 'testlib.py')
+
+print(globals().keys())
+
+testlib.base_test()
+testlib.testlib_std1.std1_test()
+testlib.testlib_std1.testlib_std2.std2_test()
+#testlib.testlib.std3.std3_test()                             # does not reachable directly ...
+getattr(globals()['testlib'], 'testlib.std3').std3_test()     # ... but reachable through the `globals` + `getattr`
+
+tkl_import_module(SOURCE_DIR, 'testlib.py', '.')
+
+print(globals().keys())
+
+base_test()
+testlib_std1.std1_test()
+testlib_std1.testlib_std2.std2_test()
+#testlib.std3.std3_test()                                     # does not reachable directly ...
+globals()['testlib.std3'].std3_test()                         # ... but reachable through the `globals` + `getattr`
+</code></pre>
+<p><strong>testlib.py</strong>:</p>
+<pre><code># optional for 3.4.x and higher
+#import os, inspect
+#
+#SOURCE_FILE = os.path.abspath(inspect.getsourcefile(lambda:0)).replace('\\','/')
+#SOURCE_DIR = os.path.dirname(SOURCE_FILE)
+
+print(&quot;1 testlib::SOURCE_FILE: &quot;, SOURCE_FILE)
+
+tkl_import_module(SOURCE_DIR + '/std1', 'testlib.std1.py', 'testlib_std1')
+
+# SOURCE_DIR is restored here
+print(&quot;2 testlib::SOURCE_FILE: &quot;, SOURCE_FILE)
+
+tkl_import_module(SOURCE_DIR + '/std3', 'testlib.std3.py')
+
+print(&quot;3 testlib::SOURCE_FILE: &quot;, SOURCE_FILE)
+
+def base_test():
+  print('base_test')
+</code></pre>
+<p><strong>testlib.std1.py</strong>:</p>
+<pre><code># optional for 3.4.x and higher
+#import os, inspect
+#
+#SOURCE_FILE = os.path.abspath(inspect.getsourcefile(lambda:0)).replace('\\','/')
+#SOURCE_DIR = os.path.dirname(SOURCE_FILE)
+
+print(&quot;testlib.std1::SOURCE_FILE: &quot;, SOURCE_FILE)
+
+tkl_import_module(SOURCE_DIR + '/../std2', 'testlib.std2.py', 'testlib_std2')
+
+def std1_test():
+  print('std1_test')
+</code></pre>
+<p><strong>testlib.std2.py</strong>:</p>
+<pre><code># optional for 3.4.x and higher
+#import os, inspect
+#
+#SOURCE_FILE = os.path.abspath(inspect.getsourcefile(lambda:0)).replace('\\','/')
+#SOURCE_DIR = os.path.dirname(SOURCE_FILE)
+
+print(&quot;testlib.std2::SOURCE_FILE: &quot;, SOURCE_FILE)
+
+def std2_test():
+  print('std2_test')
+</code></pre>
+<p><strong>testlib.std3.py</strong>:</p>
+<pre><code># optional for 3.4.x and higher
+#import os, inspect
+#
+#SOURCE_FILE = os.path.abspath(inspect.getsourcefile(lambda:0)).replace('\\','/')
+#SOURCE_DIR = os.path.dirname(SOURCE_FILE)
+
+print(&quot;testlib.std3::SOURCE_FILE: &quot;, SOURCE_FILE)
+
+def std3_test():
+  print('std3_test')
+</code></pre>
+<p><strong>Output</strong> (<code>3.7.4</code>):</p>
+<pre><code>test::SOURCE_FILE:  &lt;root&gt;/test01/test.py
+import : &lt;root&gt;/test01/testlib.py as testlib -&gt; []
+1 testlib::SOURCE_FILE:  &lt;root&gt;/test01/testlib.py
+import : &lt;root&gt;/test01/std1/testlib.std1.py as testlib_std1 -&gt; ['testlib']
+import : &lt;root&gt;/test01/std1/../std2/testlib.std2.py as testlib_std2 -&gt; ['testlib', 'testlib_std1']
+testlib.std2::SOURCE_FILE:  &lt;root&gt;/test01/std1/../std2/testlib.std2.py
+2 testlib::SOURCE_FILE:  &lt;root&gt;/test01/testlib.py
+import : &lt;root&gt;/test01/std3/testlib.std3.py as testlib.std3 -&gt; ['testlib']
+testlib.std3::SOURCE_FILE:  &lt;root&gt;/test01/std3/testlib.std3.py
+3 testlib::SOURCE_FILE:  &lt;root&gt;/test01/testlib.py
+dict_keys(['__name__', '__doc__', '__package__', '__loader__', '__spec__', '__annotations__', '__builtins__', '__file__', '__cached__', 'os', 'sys', 'inspect', 'copy', 'SOURCE_FILE', 'SOURCE_DIR', 'TackleGlobalImportModuleState', 'tkl_membercopy', 'tkl_merge_module', 'tkl_get_parent_imported_module_state', 'tkl_declare_global', 'tkl_import_module', 'TackleSourceModuleState', 'tkl_source_module', 'TackleLocalImportModuleState', 'testlib'])
+base_test
+std1_test
+std2_test
+std3_test
+import : &lt;root&gt;/test01/testlib.py as . -&gt; []
+1 testlib::SOURCE_FILE:  &lt;root&gt;/test01/testlib.py
+import : &lt;root&gt;/test01/std1/testlib.std1.py as testlib_std1 -&gt; ['testlib']
+import : &lt;root&gt;/test01/std1/../std2/testlib.std2.py as testlib_std2 -&gt; ['testlib', 'testlib_std1']
+testlib.std2::SOURCE_FILE:  &lt;root&gt;/test01/std1/../std2/testlib.std2.py
+2 testlib::SOURCE_FILE:  &lt;root&gt;/test01/testlib.py
+import : &lt;root&gt;/test01/std3/testlib.std3.py as testlib.std3 -&gt; ['testlib']
+testlib.std3::SOURCE_FILE:  &lt;root&gt;/test01/std3/testlib.std3.py
+3 testlib::SOURCE_FILE:  &lt;root&gt;/test01/testlib.py
+dict_keys(['__name__', '__doc__', '__package__', '__loader__', '__spec__', '__annotations__', '__builtins__', '__file__', '__cached__', 'os', 'sys', 'inspect', 'copy', 'SOURCE_FILE', 'SOURCE_DIR', 'TackleGlobalImportModuleState', 'tkl_membercopy', 'tkl_merge_module', 'tkl_get_parent_imported_module_state', 'tkl_declare_global', 'tkl_import_module', 'TackleSourceModuleState', 'tkl_source_module', 'TackleLocalImportModuleState', 'testlib', 'testlib_std1', 'testlib.std3', 'base_test'])
+base_test
+std1_test
+std2_test
+std3_test
+</code></pre>
+<p>Tested in Python <code>3.7.4</code>, <code>3.2.5</code>, <code>2.7.16</code></p>
+<p><strong>Pros</strong>:</p>
+<ul>
+<li>Can import both module as a submodule and can import content of a module to a parent module (or into a globals if has no parent module).</li>
+<li>Can import modules with periods in a file name.</li>
+<li>Can import any extension module from any extension module.</li>
+<li>Can use a standalone name for a submodule instead of a file name without extension which is by default (for example, <code>testlib.std.py</code> as <code>testlib</code>, <code>testlib.blabla.py</code> as <code>testlib_blabla</code> and so on).</li>
+<li>Does not depend on a <code>sys.path</code> or on a what ever search path storage.</li>
+<li>Does not require to save/restore global variables like <code>SOURCE_FILE</code> and <code>SOURCE_DIR</code> between calls to <code>tkl_import_module</code>.</li>
+<li>[for <code>3.4.x</code> and higher] Can mix the module namespaces in nested <code>tkl_import_module</code> calls (ex: <code>named-&gt;local-&gt;named</code> or <code>local-&gt;named-&gt;local</code> and so on).</li>
+<li>[for <code>3.4.x</code> and higher] Can auto export global variables/functions/classes from where being declared to all children modules imported through the <code>tkl_import_module</code> (through the <code>tkl_declare_global</code> function).</li>
+</ul>
+<p><strong>Cons</strong>:</p>
+<ul>
+<li>Does not support complete import:
+<ul>
+<li>Ignores enumerations and subclasses.</li>
+<li>Ignores builtins because each what type has to be copied exclusively.</li>
+<li>Ignore not trivially copiable classes.</li>
+<li>Avoids copying builtin modules including all packaged modules.</li>
+</ul>
+</li>
+<li>[for <code>3.3.x</code> and lower] Require to declare <code>tkl_import_module</code> in all modules which calls to <code>tkl_import_module</code> (code duplication)</li>
+</ul>
+<p><strong>Update 1,2</strong> (for <code>3.4.x</code> and higher only):</p>
+<p>In Python 3.4 and higher you can bypass the requirement to declare <code>tkl_import_module</code> in each module by declare <code>tkl_import_module</code> in a top level module and the function would inject itself to all children modules in a single call (it's a kind of self deploy import).</p>
+<p><strong>Update 3</strong>:</p>
+<p>Added function <code>tkl_source_module</code> as analog to bash <code>source</code> with support execution guard upon import (implemented through the module merge instead of import).</p>
+<p><strong>Update 4</strong>:</p>
+<p>Added function <code>tkl_declare_global</code> to auto export a module global variable to all children modules where a module global variable is not visible because is not a part of a child module.</p>
+<p><strong>Update 5</strong>:</p>
+<p>All functions has moved into the tacklelib library, see the link above.</p>
+------------------------------------------------------------------ <br><h3> Answer 26995106 user2760152: </h3><p>In Linux, adding a symbolic link in the directory your Python script is located works.</p>
+<p>I.e.:</p>
+<pre><code>ln -s /absolute/path/to/module/module.py /absolute/path/to/script/module.py
+</code></pre>
+<p>The Python interpreter will create <code>/absolute/path/to/script/module.pyc</code> and will update it if you change the contents of <code>/absolute/path/to/module/module.py</code>.</p>
+<p>Then include the following in file <em>mypythonscript.py</em>:</p>
+<pre><code>from module import *
+</code></pre>
+<h4> Comment 49800738 Gripp: </h4>This is the hack I used, and it has caused me some problems.  One of the more painful ones was that IDEA has an issue where it doesn&#39;t pickup altered code from within the link, but yet attempts to save what it thinks is there.  A race condition where the last to save is what sticks... I lost a decent amount of work because of this.<br><h4> Comment 77853760 user5359531: </h4>@Gripp not sure if I am understanding your issue, but I frequently (almost exclusively) edit my scripts on a remote server from my desktop via SFTP with a client like CyberDuck, and in that case as well it is a bad idea to try and edit the symlinked file, instead its much safer to edit the original file. You can catch some of these issues by using <code>git</code> and checking your <code>git status</code> to verify that your changes to the script are actually making it back to the source document and not getting lost in the ether.<br>------------------------------------------------------------------ <br><h3> Answer 48191370 David: </h3><p>This will allow imports of compiled (pyd) Python modules in 3.4:</p>
+<pre><code>import sys
+import importlib.machinery
+
+def load_module(name, filename):
+    # If the Loader finds the module name in this list it will use
+    # module_name.__file__ instead so we need to delete it here
+    if name in sys.modules:
+        del sys.modules[name]
+    loader = importlib.machinery.ExtensionFileLoader(name, filename)
+    module = loader.load_module()
+    locals()[name] = module
+    globals()[name] = module
+
+load_module('something', r'C:\Path\To\something.pyd')
+something.do_something()
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 48455971 Andrei Keino: </h3><p>A quite simple way: suppose you want import file with relative path ../../MyLibs/pyfunc.py</p>
+<pre><code>libPath = '../../MyLibs'
+import sys
+if not libPath in sys.path: sys.path.append(libPath)
+import pyfunc as pf
+</code></pre>
+<p>But if you make it without a guard you can finally get a very long path.</p>
+------------------------------------------------------------------ <br><h3> Answer 63332270 Benos: </h3><p>These are my two utility functions using only pathlib. It infers the module name from the path.</p>
+<p>By default, it recursively loads all Python files from folders and replaces <strong>init</strong>.py by the parent folder name. But you can also give a Path and/or a glob to select some specific files.</p>
+<pre><code>from pathlib import Path
+from importlib.util import spec_from_file_location, module_from_spec
+from typing import Optional
+
+
+def get_module_from_path(path: Path, relative_to: Optional[Path] = None):
+    if not relative_to:
+        relative_to = Path.cwd()
+
+    abs_path = path.absolute()
+    relative_path = abs_path.relative_to(relative_to.absolute())
+    if relative_path.name == &quot;__init__.py&quot;:
+        relative_path = relative_path.parent
+    module_name = &quot;.&quot;.join(relative_path.with_suffix(&quot;&quot;).parts)
+    mod = module_from_spec(spec_from_file_location(module_name, path))
+    return mod
+
+
+def get_modules_from_folder(folder: Optional[Path] = None, glob_str: str = &quot;*/**/*.py&quot;):
+    if not folder:
+        folder = Path(&quot;.&quot;)
+
+    mod_list = []
+    for file_path in sorted(folder.glob(glob_str)):
+        mod_list.append(get_module_from_path(file_path))
+
+    return mod_list
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 52236722 Michael Scott Asato Cuthbert: </h3><p>This answer is a supplement to <a href="https://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path/67692#67692">Sebastian Rittau's answer</a> responding to the comment: &quot;but what if you don't have the module name?&quot;  This is a quick and dirty way of getting the likely Python module name given a filename -- it just goes up the tree until it finds a directory without an <code>__init__.py</code> file and then turns it back into a filename.  For Python 3.4+ (uses pathlib), which makes sense since Python 2 people can use &quot;imp&quot; or other ways of doing relative imports:</p>
+<pre><code>import pathlib
+
+def likely_python_module(filename):
+    '''
+    Given a filename or Path, return the &quot;likely&quot; python module name.  That is, iterate
+    the parent directories until it doesn't contain an __init__.py file.
+
+    :rtype: str
+    '''
+    p = pathlib.Path(filename).resolve()
+    paths = []
+    if p.name != '__init__.py':
+        paths.append(p.stem)
+    while True:
+        p = p.parent
+        if not p:
+            break
+        if not p.is_dir():
+            break
+
+        inits = [f for f in p.iterdir() if f.name == '__init__.py']
+        if not inits:
+            break
+
+        paths.append(p.stem)
+
+    return '.'.join(reversed(paths))
+</code></pre>
+<p>There are certainly possibilities for improvement, and the optional <code>__init__.py</code> files might necessitate other changes, but if you have <code>__init__.py</code> in general, this does the trick.</p>
+------------------------------------------------------------------ <br><h3> Answer 66181002 Bryan Grace: </h3><p>Here's a way of loading files sorta like C, etc.</p>
+<pre><code>from importlib.machinery import SourceFileLoader
+import os
+
+def LOAD (MODULE_PATH):
+    if (MODULE_PATH [ 0 ] == &quot;/&quot;):
+        FULL_PATH = MODULE_PATH;
+    else:
+        DIR_PATH = os.path.dirname (os.path.realpath (__file__))
+        FULL_PATH = os.path.normpath (DIR_PATH + &quot;/&quot; + MODULE_PATH)
+
+    return SourceFileLoader (FULL_PATH, FULL_PATH).load_module ()
+</code></pre>
+<p>Implementations Where:</p>
+<pre><code>Y = LOAD (&quot;../Z.py&quot;)
+A = LOAD (&quot;./A.py&quot;)
+D = LOAD (&quot;./C/D.py&quot;)
+A_ = LOAD (&quot;/IMPORTS/A.py&quot;)
+
+Y.DEF ();
+A.DEF ();
+D.DEF ();
+A_.DEF ();
+</code></pre>
+<p>Where each of the files looks like this:</p>
+<pre><code>def DEF ():
+    print (&quot;A&quot;);
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 70797815 Jorge: </h3><p>You can use importfile from pydoc</p>
+<pre><code>from pydoc import importfile
+module = importfile('/full/path/to/module/module.py')
+name = module.myclass() # myclass is a class inside your python file
+</code></pre>
+<h4> Comment 125887147 Shihab: </h4>does the upper code means the same as this <code>import module</code> i mean it is can compile variables, functions and classes ?<br><h4> Comment 135470964 wim: </h4>It was already mentioned in another answer here <a href="https://stackoverflow.com/a/68361215/674039">stackoverflow.com/a/68361215/674039</a><br>------------------------------------------------------------------ <br><h3> Answer 77336501 Uri Goren: </h3><p>Assuming that your <code>MyClass</code> is in <code>MyClass.py</code>, you can use this one line to dynamically import it/</p>
+<pre><code>cls = `MyClass`
+MyClass = getattr(__import__(cls, globals(), locals(), [cls], 0), cls)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 77548807 Markus Hirsim&#228;ki: </h3><h3>Use this tool to add new relative/absolute paths to import from</h3>
+<p><code>$ pip install importmonkey</code> [<a href="https://github.com/hirsimaki-markus/importmonkey" rel="nofollow noreferrer">github</a>] [<a href="https://pypi.org/project/importmonkey/" rel="nofollow noreferrer">pip</a>] [<a href="https://github.com/hirsimaki-markus/importmonkey/blob/b57ffc7412eda20f8820e30bf27c2ccc309d389d/src/importmonkey/__init__.py#L25C49-L25C49" rel="nofollow noreferrer">docs</a>]</p>
+<pre class="lang-py prettyprint-override"><code># In test.py
+
+from importmonkey import add_path
+add_path(&quot;../relative/path&quot;)  # relative to current __file__
+add_path(&quot;/my/absolute/path/to/somewhere&quot;)  # absolute path
+import project
+
+# You can add as many paths as needed, absolute or relative, in any file.
+# Relative paths start from the current __file__ directory.
+# Normal unix path conventions work so you can use '..' and '.' and so on.
+# The paths you try to add are checked for validity etc. help(add_path) for details.
+
+</code></pre>
+<p>Disclosure of affiliation: I made importmonkey.</p>
+------------------------------------------------------------------ <br><h3> Answer 27127448 Zompa: </h3><p>The best way, I think, is from the official documentation (<a href="https://docs.python.org/3.2/library/imp.html#examples" rel="nofollow">29.1. imp — Access the import internals</a>):</p>
+
+<pre><code>import imp
+import sys
+
+def __import__(name, globals=None, locals=None, fromlist=None):
+    # Fast path: see if the module has already been imported.
+    try:
+        return sys.modules[name]
+    except KeyError:
+        pass
+
+    # If any of the following calls raises an exception,
+    # there's a problem we can't handle -- let the caller handle it.
+
+    fp, pathname, description = imp.find_module(name)
+
+    try:
+        return imp.load_module(name, fp, pathname, description)
+    finally:
+        # Since we may exit via an exception, close fp explicitly.
+        if fp:
+            fp.close()
+</code></pre>
+<h4> Comment 86577406 Micah Smith: </h4>This solution does not allow you to provide the path, which is what the question asks for.<br>------------------------------------------------------------------ <br><h3> Answer 66499112 Mhadhbi issam: </h3><p>I find this is a simple answer:</p>
+<pre><code>module = dict()
+
+code = &quot;&quot;&quot;
+import json
+
+def testhi() :
+    return json.dumps({&quot;key&quot; : &quot;value&quot;}, indent = 4 )
+&quot;&quot;&quot;
+
+exec(code, module)
+x = module['testhi']()
+print(x)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 69286913 Max Kleiner: </h3><p>Something special is to import a module with absolute path with Exec():
+(exec takes a code string or code object. While eval takes an expression.)</p>
+<pre><code>PYMODULE = 'C:\maXbox\mX47464\maxbox4\examples\histogram15.py';
+Execstring(LoadStringJ(PYMODULE));
+</code></pre>
+<p>And then get values or object with eval():</p>
+<pre><code>println('get module data: '+evalStr('pyplot.hist(x)'));
+</code></pre>
+<p>Load a module with exec is like an import with wildcard namespace:</p>
+<pre><code>Execstring('sys.path.append(r'+'&quot;'+PYMODULEPATH+'&quot;)');
+Execstring('from histogram import *'); 
+</code></pre>

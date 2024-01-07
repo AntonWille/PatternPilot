@@ -1,0 +1,207 @@
+ <h2> Title: Differences between Perl and PHP </h2> <h3> lok, question_id: 2534756 </h3>Score: 107, Tags: {php,perl} <br><p>I'm planning to learn Perl 5 and as I have only used PHP until now, I wanted to know a bit about how the languages differ from each other.</p>
+
+<p>As PHP started out as a set of "Perl hacks" it has obviously cloned some of Perls features.</p>
+
+<ul>
+<li><p>What are the main differences in the syntax? Is it true that with Perl you have more options and ways to express something?</p></li>
+<li><p>Why is Perl not used for dynamic websites very often anymore? What made PHP gain more popularity?</p></li>
+</ul>
+<h4> Comment 2534625 Joshua Partogi: </h4>What is the basis for Python and Ruby to be more modern?<br><h4> Comment 2535595 outis: </h4>@Ben: comparing syntax has limited utility. Comparing features can help in learning new languages.<br><h4> Comment 2535262 Ben Shelock: </h4>I don&#39;t think people should try to compare languages. It will only  lead to confusion.<br><h4> Comment 2534589 jholster: </h4>Being curious, I have to ask: if you can freely choose your second language after PHP, why Perl instead of more modern Python or Ruby?<br><h4> Comment 30064469 CodeAngel: </h4>I believe every language has its strength based on what the designers envisioned for it ; particularly based on a set of use cases. Therefore comparing languages is often bias and confusing<br><h4> Comment 44338996 Phil Goetz: </h4>I found the answers to this question very useful, and disagree with the notion that it isn&#39;t constructive.<br><h4> Comment 58694873 John Slegers: </h4>@jholster : I can&#39;t speak for the author of this question, but (coming from a PHP and JS background) I find Python and Ruby very difficult to read.<br>------------------------------------------------------------------ <br><h3> Answer 2535739 outis: </h3><p>Perl and PHP are more different than alike. Let's consider Perl 5, since Perl 6 has become its own language (Raku), rather than a new version of Perl. Each language continues to evolve, so some items in this list may become out of date; readers should rely on official documentation to learn the current features of each language.</p>
+<p>Some differences, grouped roughly by subject:</p>
+<ul>
+<li><p>Perl has native regular expression support, including regexp literals. PHP uses Perl's regexp functions as an extension.</p>
+</li>
+<li><p>A number of language features are supported at the language level in PHP, but are implemented as packages in Perl (such as generators and some OOP operators). Some of these are mentioned below.</p>
+</li>
+<li><p>Both support escape sequences in strings, and support some of the same sequences, but <a href="https://perldoc.perl.org/perlop#Quote-and-Quote-like-Operators" rel="noreferrer">Perl</a> and <a href="https://php.net/language.types.string#language.types.string.syntax.double" rel="noreferrer">PHP</a> also have some different escape sequences for the same functionality (such as Unicode codepoints) and escapes sequences that they don't share at all.</p>
+</li>
+<li><p>Perl has quite a few more <a href="https://perldoc.perl.org/perlop" rel="noreferrer">operators</a>, including <a href="https://perldoc.perl.org/perlop#Binding-Operators" rel="noreferrer">matching</a> (<code>=~</code>, <code>!~</code>), <a href="https://perldoc.perl.org/perlop#Quote-Like-Operators" rel="noreferrer">quote-like</a> (<code>qw</code>, <code>qx</code> &amp;c.), <a href="https://perldoc.perl.org/perlop#Multiplicative-Operators" rel="noreferrer">string repetition</a> (<code>x</code>) and <a href="https://perldoc.perl.org/perlop#Range-Operators" rel="noreferrer">range</a> (<code>..</code> and <code>...</code>). PHP has a few operators Perl doesn't, such as the <a href="https://php.net//language.operators.errorcontrol" rel="noreferrer">error suppression operator</a> (<code>@</code>), <a href="https://php.net/instanceof" rel="noreferrer"><code>instanceof</code></a> and <a href="https://en.wikipedia.org/wiki/Sigil_(computer_programming)" rel="noreferrer"><code>clone</code></a> (though Perl offers some of these via modules, such as <a href="https://metacpan.org/pod/UNIVERSAL#$obj-%3Eisa(-TYPE-)" rel="noreferrer"><code>Universal::isa</code></a>).</p>
+<ul>
+<li><a href="https://perldoc.perl.org/perlop#Exponentiation" rel="noreferrer">Exponentiation</a> (<code>**</code>) was not available in PHP before <a href="https://php.net/manual/en/migration56.new-features#migration56.new-features.exponentiation" rel="noreferrer">5.6</a>.</li>
+<li>The spaceship comparison operator (<code>&lt;=&gt;</code>) wasn't available in PHP until <a href="https://php.net/manual/en/migration70.new-features#migration70.new-features.spaceship-op" rel="noreferrer">7.0</a>. In Perl, <code>&lt;=&gt;</code> is for numeric comparison (<code>cmp</code> for string); in PHP, it handles any comparable values.</li>
+</ul>
+</li>
+<li><p>In PHP, <a href="https://php.net/new" rel="noreferrer"><code>new</code></a> is an operator. In Perl, it's the conventional name of an <a href="https://perldoc.perl.org/perltoot#Constructors-and-Instance-Methods" rel="noreferrer">object creation subroutine</a> defined in packages, nothing special as far as the language is concerned.</p>
+</li>
+<li><p>Perl logical operators return their arguments, while they <a href="https://php.net/language.operators.logical" rel="noreferrer">return booleans</a> in PHP. Try:</p>
+<pre><code> $foo = '' || 'bar';
+</code></pre>
+<p>in each language. In Perl, you can even do <code>$foo ||= 'default'</code> to set <code>$foo</code> to a value if it's not already set.</p>
+</li>
+<li><p>PHP 7.0 added a NULL-coalescing operator <a href="https://php.net/language.operators.comparison#language.operators.comparison.coalesce" rel="noreferrer"><code>??</code></a>, and 7.4 added NULL-coalescing assignment <code>??=</code>. These are similar to, but more limited than, Perl's <code>||</code>, because they only return the right side if the left is <code>NULL</code>, rather than any falsey value. Perl 5.10 added it's own NULL coalescing operator, <a href="https://perldoc.perl.org/perlop#Logical-Defined-Or" rel="noreferrer"><code>//</code></a>. (Unrelated, '//' begins a single-line comment in PHP.)</p>
+</li>
+<li><p>Perl <a href="https://perldoc.perl.org/perldata#Variable-names" rel="noreferrer">variable names</a> indicate built-in type, of which Perl has three, and the type specifier is part of the name (called a &quot;<a href="https://en.wikipedia.org/wiki/Sigil_(computer_programming)" rel="noreferrer">sigil</a>&quot;), so <code>$foo</code> is a different variable than <code>@foo</code> or <code>%foo</code>.</p>
+</li>
+<li><p>(related to the previous point) Perl has separate <a href="https://www.oreilly.com/library/view/mastering-perl/9780596527242/ch08.html" rel="noreferrer">symbol table</a> entries for scalars, arrays, hashes, code, file/directory handles and formats. Each has its own namespace.</p>
+</li>
+<li><p>Perl gives access to the <a href="https://perldoc.perl.org/perlmod#Symbol-Tables" rel="noreferrer">symbol table</a>, though manipulating it isn't for the faint of heart. In PHP, symbol table manipulation is limited to creating <a href="https://php.net/references" rel="noreferrer">references</a> and the <a href="https://php.net/extract" rel="noreferrer"><code>extract</code></a> function.</p>
+</li>
+<li><p>Note that &quot;references&quot; has a different meaning in PHP and Perl. In PHP, <a href="https://php.net/references" rel="noreferrer">references</a> are symbol table aliases. In Perl, <a href="https://perldoc.perl.org/perlref" rel="noreferrer">references</a> are smart pointers.</p>
+</li>
+<li><p>Perl has different types for integer-indexed collections (arrays) and string indexed collections (hashes). In PHP, they're the same type: an <a href="https://php.net/array" rel="noreferrer">associative array/ordered map</a>.</p>
+</li>
+<li><p>Perl arrays aren't sparse: setting an element with index larger than the current size of the array will create all intervening elements, though without initializing them (see <a href="https://perldoc.perl.org/perldata" rel="noreferrer">perldata</a> and <a href="https://perldoc.perl.org/perlfunc#exists-EXPR" rel="noreferrer"><code>exists</code></a>). PHP arrays are sparse; setting an element won't create intervening elements.</p>
+</li>
+<li><p>Perl supports hash and array <a href="https://perldoc.perl.org/perldata#Slices" rel="noreferrer">slices</a> natively, and slices are assignable, which has all sorts of <a href="https://stackoverflow.com/questions/1242040/how-can-i-join-two-hashes-in-perl-without-using-a-loop/1242125#1242125">uses</a>. In PHP, you use <a href="https://php.net/array_slice" rel="noreferrer"><code>array_slice</code></a> to extract a slice and <a href="https://php.net/array_splice" rel="noreferrer"><code>array_splice</code></a> to assign to a slice.</p>
+</li>
+<li><p>Perl interpolates <a href="https://perldoc.perl.org/perldata#Array-Interpolation" rel="noreferrer">arrays into strings</a> by joining all the elements with <code>$&quot;</code>. PHP interpolates arrays into strings by first <a href="https://php.net/language.types.string#language.types.string.casting" rel="noreferrer">converting the array to a string</a>, which always results in the value &quot;Array&quot;.</p>
+</li>
+<li><p>Perl automatically flattens lists (see <a href="https://perldoc.perl.org/perlsub" rel="noreferrer">perlsub</a>); for un-flattened data structures, use references.</p>
+<pre><code> @foo = qw(bar baz);
+ @qux = ('qux', @foo, 'quux'); # @qux is an array containing 4 strings
+ @bam = ('bug-AWWK!', \@foo, 'fum'); # @bam contains 3 elements: two strings and a array ref
+</code></pre>
+<p>PHP added support for <a href="https://php.net/functions.arguments#functions.variable-arg-list" rel="noreferrer">spreading in argument lists</a> (called &quot;argument unpacking&quot;) starting in 5.6, which must be done explicitly using <code>...</code>. In <a href="https://php.net/manual/en/migration74.new-features#migration74.new-features.core.unpack-inside-array" rel="noreferrer">7.4</a> a <a href="https://php.net/language.types.array#language.types.array.unpacking" rel="noreferrer">spread operator</a> (under the moniker &quot;array unpacking&quot;) was added, though only for integer indices. In <a href="https://php.net/manual/en/migration81.new-features#migration81.new-features.core.unpacking-string-keys" rel="noreferrer">8.1</a> this operation was extended to string indices.</p>
+</li>
+<li><p>Before 7.4, PHP didn't allow <a href="https://php.net/manual/en/migration74.new-features#migration74.new-features.core.numeric-literal-separator" rel="noreferrer">underscores</a> as digit separators in <a href="https://php.net//language.types.integer" rel="noreferrer">integer</a> and <a href="https://php.net/language.types.float" rel="noreferrer">floating point</a> literals.</p>
+</li>
+<li><p>You can leave out the <a href="https://php.net/language.types.array.php#language.types.array.syntax.modifying" rel="noreferrer">argument to the subscript operator</a> in PHP for a bit of magic. In Perl, you can't leave out the subscript.</p>
+</li>
+<li><p>Perl hashes are <a href="https://perldoc.perl.org/perlglossary#hash" rel="noreferrer">unordered</a>.</p>
+</li>
+<li><p>Perl has a large number of <a href="https://perldoc.perl.org/perlvar" rel="noreferrer">predefined and magic variables</a>. PHP's <a href="https://php.net/language.variables.predefined" rel="noreferrer">predefined variables</a> have quite a different purpose.</p>
+</li>
+<li><p>Perl has <a href="https://perldoc.perl.org/perlsyn#Statement-Modifiers" rel="noreferrer">statement modifiers</a>: some control statements can be placed at the end of a statement.</p>
+</li>
+<li><p>PHP added the <a href="https://php.net/control-structures.match" rel="noreferrer"><code>match</code></a> expression in <a href="https://php.net/manual/en/migration80.new-features#migration80.new-features.core.match" rel="noreferrer">8.0</a>.</p>
+</li>
+<li><p>Perl supports <a href="https://en.wikipedia.org/wiki/Scope_(programming)#Dynamic_scoping" rel="noreferrer">dynamic scoping</a> via the <code>local</code> keyword.</p>
+</li>
+<li><p>In addition, Perl has global, lexical (block), and package <a href="https://docstore.mik.ua/orelly/perl/prog3/ch04_08.htm" rel="noreferrer">scope</a>. PHP has global, function, object, class and namespace <a href="https://php.net/language.variables.scope" rel="noreferrer">scope</a>.</p>
+</li>
+<li><p>In Perl, variables are global by default. In PHP, variables in functions are local by default.</p>
+</li>
+<li><p>Perl supports explicit <a href="https://en.wikipedia.org/wiki/Tail_call" rel="noreferrer">tail calls</a> via the <a href="https://perldoc.perl.org/functions/goto" rel="noreferrer"><code>goto</code></a> function.</p>
+</li>
+<li><p>Where PHP uses the more common parameter list to declare function arguments, Perl has <a href="https://perldoc.perl.org/perlsub#Prototypes" rel="noreferrer">prototypes</a>.</p>
+<ul>
+<li>Prototypes are evaluated at compile time, and thus aren't checked in a number of situations (e.g. method calls).</li>
+<li>Prototypes offer more limited type checking for function arguments than PHP's <a href="https://php.net/language.oop5.typehinting" rel="noreferrer">type hinting</a>. As a result, prototypes are of more limited utility than type hinting.</li>
+<li>The differing approaches to parameters affect related features, such as variadic functions, default parameter values and named parameters.</li>
+</ul>
+</li>
+<li><p>Perl uses pass-by-reference (even though array arguments are flattened in argument lists, the elements are passed by reference). Note that, due in part to the particular meaning of &quot;reference&quot; in Perl (mentioned above), &quot;<a href="https://perldoc.perl.org/perlsub#Pass-by-Reference" rel="noreferrer">pass-by-reference</a>&quot; is used in the Perl documentation to mean something else (&quot;passing a reference&quot; would be more accurate) and is a way to avoid array and hash flattening in argument lists. PHP uses pass-by-value by default, though <a href="https://php.net/functions.arguments#functions.arguments.by-reference" rel="noreferrer">pass-by-reference</a> can be explicitly specified for individual parameters and the variadic parameter, if used. Note the value of a variable storing an object is a handle to it, which means objects can still be mutated when passed by value, though the original variable itself cannot be altered to hold a different value.</p>
+</li>
+<li><p>When it comes to type hints, PHP offers various static typing features not in Perl: argument, variable, return (including some <a href="https://php.net/manual/en/language.types.declarations#language.types.declarations.return-only" rel="noreferrer">return-only</a>) and nullable type declarations, and <a href="https://php.net/language.types.declarations#language.types.declarations.union" rel="noreferrer">union</a> (as of <a href="https://php.net/manual/en/migration80.new-features#migration80.new-features.core.union-types" rel="noreferrer">8.0</a>) and intersection (as of <a href="https://php.net/manual/en/migration81.new-features#migration81.new-features.core.intersection-types" rel="noreferrer">8.1</a>) type declarations. Most of these features have been added starting with 7.0.</p>
+</li>
+<li><p>In Perl, the last evaluated statement is returned as the value of a subroutine if the statement is an expression (i.e. it has a value), even if a return statement isn't used. If the last statement isn't an expression (i.e. doesn't have a value), such as a loop, the return value is unspecified (see <a href="https://perldoc.perl.org/perlsub" rel="noreferrer">perlsub</a>). In PHP, if there's no explicit return, the <a href="https://php.net/functions.returning-values" rel="noreferrer">return value is NULL</a>.</p>
+</li>
+<li><p>Perl has <a href="https://perldoc.perl.org/perlmod#BEGIN%2c-UNITCHECK%2c-CHECK%2c-INIT-and-END" rel="noreferrer">special code blocks</a> (<code>BEGIN</code>, <code>UNITCHECK</code>, <code>CHECK</code>, <code>INIT</code> and <code>END</code>) that are executed. Unlike PHP's <a href="https://php.net/ini.core#ini.auto-prepend-file" rel="noreferrer"><code>auto_prepend_file</code></a> and <a href="https://php.net/ini.core#ini.auto-append-file" rel="noreferrer"><code>auto_append_file</code></a>, there is no limit to the number of each type of code block. Also, the code blocks are defined within the scripts, whereas the PHP options are set in the server and per-directory config files.</p>
+</li>
+<li><p>In Perl, the semicolon <a href="https://perldoc.perl.org/perlsyn#Simple-Statements" rel="noreferrer">separates statements</a>. In PHP, it <a href="https://php.net/language.basic-syntax.instruction-separation" rel="noreferrer">terminates</a> them, excepting that a PHP close tag (&quot;?&gt;&quot;) can also terminate a statement.</p>
+</li>
+<li><p>The value of expressions in Perl is <a href="https://perldoc.perl.org/perldata#Context" rel="noreferrer">context sensitive</a>.</p>
+</li>
+<li><p>Negative subscripts in Perl are relative to the end of the array. <code>$bam[-1]</code> is the final element of the array. Negative subscripts in PHP are subscripts like any other.</p>
+</li>
+<li><p>In Perl 5, classes are based on packages and look nothing like classes in PHP (or most other languages). Perl 6 classes are closer to PHP classes, but still quite different. (Perl 6 is <a href="https://design.raku.org/Differences.html" rel="noreferrer">different</a> from Perl 5 in many other ways, but that's off topic.) Many of the differences between Perl 5 and PHP arise from the fact that most of the OO features are not built-in to Perl but based on hacks. For example, <code>$obj-&gt;method(@args)</code> gets translated to something like <code>(ref $obj)::method($obj, @args)</code>. Non-exhaustive list:</p>
+<ul>
+<li>PHP automatically provides the special variable <code>$this</code> in methods. Perl passes a reference to the object as the first argument to methods.</li>
+<li>Perl requires references to be <a href="https://perldoc.perl.org/functions/bless" rel="noreferrer">blessed</a> to create an object. Any reference can be blessed as an instance of a given class.</li>
+<li>In Perl, you can dynamically change inheritance via the packages <code>@ISA</code> variable.</li>
+<li>PHP supports <a href="https://php.net/language.oop5.anonymous" rel="noreferrer">anonymous classes</a> as of <a href="https://php.net/manual/en/migration70.new-features.php#migration70.new-features.anonymous-classes" rel="noreferrer">7.0</a>.</li>
+</ul>
+</li>
+<li><p>Annotations (called &quot;attributes&quot; in both) are available in both starting with PHP 8.0, but are a <a href="https://php.net/language.attributes.overview" rel="noreferrer">language feature in PHP</a> and a <a href="https://perldoc.perl.org/attributes" rel="noreferrer">module in Perl</a>.</p>
+</li>
+<li><p>PHP <a href="https://php.net/manual/en/migration81.new-features#migration81.new-features.core.enums" rel="noreferrer">8.1</a> added <a href="https://php.net/language.enumerations" rel="noreferrer">enums</a>. While some Perl modules offer similar features, it doesn't have <a href="https://stackoverflow.com/q/473666/90527">enums proper</a> (nor are they as useful, given how types are handled).</p>
+</li>
+<li><p>Perl supports <a href="https://perldoc.perl.org/overload" rel="noreferrer">operator overloading</a>.</p>
+</li>
+<li><p>Both use <code>#</code> to begin single line comments, but PHP also uses <code>//</code> (which is a NULL-coalescing operator in Perl, as previously mentioned).</p>
+</li>
+<li><p>Strictly speaking, Perl doesn't have multiline comments, but the <a href="https://perldoc.perl.org/perlpod" rel="noreferrer">POD</a> system can be used for the same affect.</p>
+</li>
+<li><p>Until PHP 5.3, PHP had terrible support for anonymous functions (the <code>create_function</code> function) and no support for closures.</p>
+</li>
+<li><p>PHP had nothing like Perl's packages until version 5.3, which introduced <a href="https://php.net/language.namespaces" rel="noreferrer">namespaces</a>.</p>
+</li>
+<li><p>Perl creates package aliases by defining constants, storing them in variables, manipulating the symbol table or using a package that does one of these. PHP creates <a href="https://php.net/language.namespaces.importing" rel="noreferrer">namespace aliases</a> with <code>use</code>.</p>
+</li>
+<li><p>Arguably, Perl's original built-in support for exceptions looks almost nothing like exceptions in other languages, so much so that they scarcely seem like exceptions. You evaluate a block and check the value of <code>$@</code> (<code>eval</code> instead of <code>try</code>, <a href="https://perldoc.perl.org/functions/die" rel="noreferrer"><code>die</code></a> instead of <code>throw</code>). The <a href="https://metacpan.org/pod/TryCatch" rel="noreferrer">TryCatch</a> and <a href="https://metacpan.org/pod/Try::Tiny" rel="noreferrer">Try::Tiny</a> modules support exceptions as you find them in other languages (as well as some other modules listed in <a href="https://metacpan.org/module/Error#SEE-ALSO" rel="noreferrer">Error's See Also</a> section). Perl 5.34.0 added the more standard <a href="https://perldoc.perl.org/perlsyn#Try-Catch-Exception-Handling" rel="noreferrer"><code>try</code>/<code>catch</code></a> syntax as an <a href="https://perldoc.perl.org/perlexperiment#try/catch-control-structure" rel="noreferrer">experiment</a>, which is not enabled by default.</p>
+</li>
+</ul>
+<p>One interesting thing that has been happening is the languages have gotten more similar in a few ways, though this is not the result of either language influencing the other but rather new features that have been introduced into many modern programming languages.</p>
+<p>PHP was inspired by Perl the same way <em>Phantom of the Paradise</em> was inspired by <em>Phantom of the Opera</em>, or <em>Strange Brew</em> was inspired by <em>Hamlet</em>. It's best to put the behavior specifics of PHP out of your mind when learning Perl, else you'll get tripped up.</p>
+<p>My brain hurts now, so I'm going to stop.</p>
+<h4> Comment 2542825 hobbs: </h4>This is a fantastic answer, and I feel bad making such a tiny nitpick on it, but you&#39;re only <i>mostly</i> right about Perl arrays. When you have <code>@array = qw(a b c)</code> and you do <code>$array[4] = &#39;e&#39;</code>, the contents of the array aren&#39;t exactly <code>(&#39;a&#39;, &#39;b&#39;, &#39;c&#39;, undef, &#39;e&#39;)</code>; they&#39;re <code>(&#39;a&#39;, &#39;b&#39;, &#39;c&#39;,</code> <i>nonexistent</i>, <code>&#39;e&#39;)</code>. That is, the <code>[3]</code> slot doesn&#39;t hold a pointer to a scalar which is undef; it holds nothing at all (and the <code>exists</code> operator tests for this). A small difference, but a difference. :)<br><h4> Comment 6936042 clt60: </h4>MAN, this is one of the BEST answers what I ever seen. Especially the part about the inspiration. Simply: cool and TRUE. ;)<br><h4> Comment 19991467 alexbusu: </h4>Shortest way to set up a value to <code>$foo</code> if it&#39;s not already set may be <code>isset($foo) || $foo=&#39;default&#39;;</code><br><h4> Comment 124233807 FantomX1: </h4>Maybe its not straightly obvious from the comment, but it is important so explicitly mentioning - in PHP arrays are basically not passed by reference, meaning if you change an array passed into a function, it wont be changed outside of that function but a local copy created. However, in perl by default, or better said always, arrays are passed by reference, as its the only feasible way there, so you have to always dereference it if you want to affect it only in the local scope =  using a copy of the passed array (perl differentiates non associative and associative arrays as arrays and hashes).<br><h4> Comment 124278625 FantomX1: </h4>Also an interesting curiosity in perl you can&#39;t use front conditions without curly brackets ({} ) eg you can&#39;t like <code>if $var echo&#47;print $var</code> as in php, only  as <code>print $var if $var</code> . You can use with curly brackets though ofc <code>if ($var) { print $var }</code> .<br>------------------------------------------------------------------ <br><h3> Answer 2535457 Your Common Sense: </h3><p>When PHP came to the scene, everyone was impressed with main differences from Perl:</p>
+<ol>
+<li>Input variables already in the global scope, no boring parsing.</li>
+<li>HTML embedding. Just <code>&lt;?php ... ?&gt;</code> anywhere. No boring templates.</li>
+<li>On-screen error messages. No boring error log peeks.</li>
+<li>Easy to learn. No boring book reading.</li>
+</ol>
+<p>As the time passed, everyone learned those were not benefits...</p>
+------------------------------------------------------------------ <br><h3> Answer 2534952 Duncan: </h3><p>I've noticed that most PHP vs. Perl pages seem to be of the </p>
+
+<blockquote>
+  <p>PHP is better than Perl because
+  &lt;insert lame reason here&gt;</p>
+</blockquote>
+
+<p>ilk, and rarely make reasonable comparisons.</p>
+
+<p>Syntax-wise, you will find PHP is often easier to understand than Perl, particularly when you have little experience. For example, trimming a string of leading and trailing whitespace in PHP is simply </p>
+
+<pre><code>$string = trim($string);
+</code></pre>
+
+<p>In Perl it is the somewhat more cryptic</p>
+
+<pre><code>$string =~ s/^\s+//;
+$string =~ s/\s+$//;
+</code></pre>
+
+<p>(I believe this is slightly more efficient than a single line capture and replace, and also a little more understandable.) However, even though PHP is often more English-like, it sometimes still shows its roots as a wrapper for low level C, for example, <code>strpbrk</code> and <code>strspn</code> are probably rarely used, because most PHP dabblers write their own equivalent functions for anything too esoteric, rather than spending time exploring the manual. I also wonder about programmers for whom English is a second language, as everybody is on equal footing with things such as Perl, having to learn it from scratch.</p>
+
+<p>I have already mentioned the manual. PHP has a fine online manual, and unfortunately it needs it. I still refer to it from time to time for things that should be simple, such as order of parameters or function naming convention. With Perl, you will probably find you are referring to the manual a <strong>lot</strong> as you get started and then one day you will have an <em>a-ha</em> moment and never need it again. Well, at least not until you're more advanced and realize that not only is there more than one way, there is probably a better way, somebody else has probably already done it that better way, and perhaps you should just visit CPAN.</p>
+
+<p>Perl does have a lot more options and ways to express things. This is not necessarily a good thing, although it allows code to be more readable if used wisely and at least one of the ways you are likely to be familiar with. There are certain styles and idioms that you will find yourself falling into, and I can heartily recommend reading <a href="https://rads.stackoverflow.com/amzn/click/com/0596001738" rel="noreferrer" rel="nofollow noreferrer">Perl Best Practices</a>
+ (sooner rather than later), along with <a href="https://rads.stackoverflow.com/amzn/click/com/0596003137" rel="noreferrer" rel="nofollow noreferrer">Perl Cookbook, Second Edition</a>
+ to get up to speed on solving common problems.</p>
+
+<p>I believe the reason Perl is used less often in shared hosting environments is that historically the perceived slowness of CGI and hosts' unwillingness to install <a href="http://en.wikipedia.org/wiki/Mod_perl" rel="noreferrer">mod_perl</a> due to security and configuration issues has made PHP a more attractive option. The cycle then continued, more people learned to use PHP because more hosts offered it, and more hosts offered it because that's what people wanted to use. The speed differences and security issues are rendered moot by <a href="http://en.wikipedia.org/wiki/FastCGI" rel="noreferrer">FastCGI</a> these days, and in most cases PHP is run out of FastCGI as well, rather than leaving it in the core of the web server.</p>
+
+<p>Whether or not this is the case or there are other reasons, PHP became popular and a myriad of applications have been written in it. For the majority of people who just want an entry-level website with a simple blog or photo gallery, PHP is all they need so that's what the hosts promote. There should be nothing stopping you from using Perl (or anything else you choose) if you want.</p>
+
+<p>At an enterprise level, I doubt you would find too much PHP in production (and please, no-one point at <em>Facebook</em> as a counter-example, I said <em>enterprise</em> level). </p>
+<h4> Comment 38647994 Francisco Zarabozo: </h4>Your Perl trim example could be much simpler: <code>$str =~ s&#47;^\s+|\s+$&#47;&#47;g;</code><br><h4> Comment 22133722 Myforwik: </h4>Your trim example doesn&#39;t make sense. Whats better 4 operators or remembering all of the inconsistent parameters and return values of all the PHP functions such as ereg ereg_replace eregi eregi_replace mb_ereg mb_ereg_replace mb_eregi mb_eregi_replace preg_match preg_match_all preg_replace str_replace str_ireplace strstr stristr strrchr strpos stripos strrpos strripos mb_strpos mb_strrpos<br><h4> Comment 2535809 Quentin: </h4>Happily, it is becoming easier to get hosting with FastCGI hosting which gives decent performance without the complications of mod_perl.<br><h4> Comment 57350646 Duncan: </h4>@Myforwik, my trim example was intended to demonstrate that Perl lacks obvious functions, which can be confusing for a beginner. Once you learn the syntax, yes, it is much easier than dealing with all the inconsistencies - I also made that point about needing the manual constantly.<br><h4> Comment 2535861 Duncan: </h4>@David Dorward: Okay. I was speaking in a historical sense, since FastCGI also gives better performance/security than mod_php. I&#39;ll edit that to try and make it a bit clearer.<br><h4> Comment 57350717 Duncan: </h4>@FranciscoZarabozo, The two-line example I gave consistently outperforms the one-liner in terms of speed. It&#39;s more than twice as fast in the left trim only case. Sometimes it is more performant to break up a regex; and also easier to read, especially for beginners.<br>------------------------------------------------------------------ <br><h3> Answer 2534795 Leon Timmermans: </h3><p>Perl is used plenty for websites, no less than Python and Ruby for example. That said, PHP is used way more often than any of those. I think the most important factors in that are PHP's ease of deployment and the ease to start with it.</p>
+
+<p>The differences in syntax are too many to sum up here, but generally it is true that it has more ways to express yourself (this is know as TIMTWOTDI, There Is More Than One Way To Do It).</p>
+------------------------------------------------------------------ <br><h3> Answer 2535182 crimson_penguin: </h3><p>My favorite thing about Perl is the way it handles arrays/lists. Here's an example of how you would make and use a Perl function (or "subroutine"), which makes use of this for arguments:</p>
+
+<pre><code>sub multiply
+{
+    my ($arg1, $arg2) = @_; # @_ is the array of arguments
+    return $arg1 * $arg2;
+}
+</code></pre>
+
+<p>In PHP you could do a similar thing with <code>list()</code>, but it's not quite the same; in Perl lists and arrays are actually treated the same (usually). You can also do things like:</p>
+
+<pre><code>$week_day_name = ("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")[$week_day_index];
+</code></pre>
+
+<p>And another difference that you MUST know about, is numerical/string comparison operators. In Perl, if you use <code>&lt;</code>, <code>&gt;</code>, <code>==</code>, <code>!=</code>, <code>&lt;=&gt;</code>, and so on, Perl converts both operands to numbers. If you want to convert as strings instead, you have to use <code>lt</code>, <code>gt</code>, <code>eq</code>, <code>ne</code>, <code>cmp</code> (the respective equivalents of the operators listed previously). Examples where this will really get you:</p>
+
+<pre><code>if ("a" == "b") { ... } # This is true.
+if ("a" == 0) { ... } # This is also true, for the same reason.
+</code></pre>
+<h4> Comment 2535544 Brad Gilbert: </h4>Arrays and lists are <i>usually</i> treated the same.<br><h4> Comment 2535575 crimson_penguin: </h4>Yes, true. I think I was going to say that, but forgot. Edited to reflect that.<br>------------------------------------------------------------------ <br><h3> Answer 6003605 clt60: </h3><p>I do not need add anything to outis's fantastic answer, i want only show the answer for you question: </p>
+
+<blockquote>
+  <p>Why is Perl not used for dynamic
+  websites very often anymore? What made
+  PHP gain more popularity than it?</p>
+</blockquote>
+
+<p>Please check first some "Job Trends" sites - and you can make the judgement alone.</p>
+
+<ul>
+<li><a href="http://www.indeed.com/jobtrends?q=perl,%20ruby,%20python,%20php" rel="nofollow">http://www.indeed.com/jobtrends?q=perl,%20ruby,%20python,%20php</a></li>
+</ul>
+
+
+
+<p>as you can see, perl is still a leader - but preferable for real applications not for toys. :)</p>
+<h4> Comment 19406930 Sorin Postelnicu: </h4>I think this comparison is also interesting: www.simplyhired.com/a/jobtrends/trend/q-Perl,+Python,+PHP,+R&zwnj;&#8203;uby,+Java,+C%23,+C<br><h4> Comment 51591671 r4.: </h4>Fixed broken link, PLEASE USE: <a href="http://www.simplyhired.com/search?q=Perl%2C%2BPython%2C%2BPHP%2C%2BRuby%2C%2BJava%2C%2BC%2523%2C%2BC" rel="nofollow noreferrer">simplyhired.com/&hellip;</a><br><h4> Comment 51591933 r4.: </h4>SH.com/a/jobtrends seems not exist. PLEASE USE: <a href="http://www.simplyhired.com/search?q=Perl%2C%2BPython%2C%2BPHP%2C%2BRuby" rel="nofollow noreferrer">simplyhired.com/search?q=Perl%2C%2BPython%2C%2BPHP%2C%2BRuby</a><br><h4> Comment 51595808 clt60: </h4>@r4.your links are not the same as the original (now broken) link. The original shows a <b>graph</b> (like the above), not some job-lists. Job listing-links are outside of the scope.<br>

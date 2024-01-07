@@ -1,0 +1,212 @@
+ <h2> Title: How to match all occurrences of a regular expression in Ruby </h2> <h3> Chris Bunch, question_id: 80357 </h3>Score: 654, Tags: {ruby,regex} <br><p>Is there a quick way to find every match of a regular expression in Ruby? I've looked through the Regex object in the Ruby STL and searched on Google to no avail.</p>
+<h4> Comment 66611304 Hugoagogo: </h4>I read this is how can I search a string for all regex patterns and was horribly confused...<br>------------------------------------------------------------------ <br><h3> Answer 80387 Jean: </h3><p>Using <a href="http://ruby-doc.org/core-1.9.3/String.html#method-i-scan" rel="noreferrer"><code>scan</code></a> should do the trick:</p>
+
+<pre><code>string.scan(/regex/)
+</code></pre>
+<h4> Comment 54303135 ryan2johnson9: </h4>Thanks @xfix, to get in a flat array <code>&#47;(?=(...))&#47;.flatten</code><br><h4> Comment 21700616 Anentropic: </h4>this seems like a Ruby WTF... why is this on String instead of Regexp with the other regexp stuff? It isn&#39;t even mentioned anywhere on the docs for Regexp<br><h4> Comment 10846765 Jean: </h4>Not it wouldn&#39;t be. /.../ is a normal greedy regexp. It won&#39;t backtrack on matched content. you could try to use a lazy regexp but even that probably won&#39;t be enough. have a look at the regexp doc <a href="http://www.ruby-doc.org/core-1.9.3/Regexp.html" rel="nofollow noreferrer">ruby-doc.org/core-1.9.3/Regexp.html</a> to correctly express your regexp :)<br><h4> Comment 21702702 Jean: </h4>I guess it&#39;s because it&#39;s defined and called on String not on Regex ... But it does actually  make sense. You can write a regular expression to capture all matches using Regex#match and iterate over captured groups. Here you write a partial match function and want it applied mutiple times on a given string, this is not the responsibility of Regexp. I suggest you check the implementation of scan for a better understanding: <a href="http://ruby-doc.org/core-1.9.3/String.html#method-i-scan" rel="nofollow noreferrer">ruby-doc.org/core-1.9.3/String.html#method-i-scan</a><br><h4> Comment 41746044 Kamila Borowska: </h4>@MichaelDickens: In this case, you can use <code>&#47;(?=(...))&#47;</code>.<br><h4> Comment 10719938 Michael Dickens: </h4>But what abut this case? &quot;match me!&quot;.scan(/.../) = [ &quot;mat&quot;, &quot;ch &quot; &quot;me!&quot; ], but all occurrences of /.../ would be [ &quot;mat&quot;, &quot;atc&quot;, &quot;tch&quot;, &quot;ch &quot;, ... ]<br><h4> Comment 87551079 Kamila Borowska: </h4>@DelongGao it makes the regex engine think that the match ending position is the starting position. Normally, matches cannot overlap, and to avoid this issue regex engine starts searching from the ending position of previous match.<br><h4> Comment 104671294 Christopher Kuttruff: </h4>@Konrad thanks so much for your elegant example.  Could you elaborate a bit more on lookahead usage here?  Particularly why it would advance by one character in the string for each match... i mean I know it would be an infinite response set of the first match if it didn&#39;t, but just wanna understand the empty prefix lookahead a bit better here.  Thanks!<br><h4> Comment 104681518 Kamila Borowska: </h4>@ChristopherKuttruff Most regex engines move forward by one character on empty matches. Otherwise you would have an infinite loop, which isn&#39;t particularly useful.<br><h4> Comment 88092013 Afsanefda: </h4>@Wiktor Stribiżew how about  using scan without  removing the delimiters ? for this you mentioned ? result = text.scan(/#{starts}(.*?)#{ends}/m)<br><h4> Comment 97075853 Cary Swoveland: </h4>Suppose <code>str = &quot;a1ab2cd3d&quot;</code> and we wish to find all digits that are preceded and followed by the same letter. We could use the regex <code>r = &#47;(?&lt;=(\p{Alpha}))\d(?=\1)&#47;</code>. Then <code>str.scan(r) #=&gt; [[&quot;a&quot;], [&quot;d&quot;]]</code>, which is not what is wanted but understandable because of the way <code>scan</code> treats capture groups. We can, however, obtain the desired result as follows: <code>str.gsub(r).to_a  #=&gt; [&quot;1&quot;, &quot;3&quot;]</code>. My point is that <code>scan</code> is not always the solution.<br><h4> Comment 87545581 Delong  Gao: </h4>thanks @xfix, this works perfectly for me, but do you mind explain why using a positive lookahead and capture group will do the trick here? Thanks!<br><h4> Comment 50565496 Jean: </h4>@justin, not that I know of<br><h4> Comment 43793282 hek2mgl: </h4>Seems like <code>scan</code> does not support back-referencing in the regex (unlike <code>match</code>)<br><h4> Comment 50547239 Justin: </h4>Is there something like scan that returns indices instead of values?<br><h4> Comment 36528360 Automatico: </h4>@Anentropic You could just make a method on regex yourself if you wanted to :) <code>class Regex \n def scan(string) \n string.scan(self) \n end \n end</code><br><h4> Comment 12559002 tchrist: </h4>@MichaelDickens There are ways of making Perl regexes do that, such that you can pull out all the overlapping matches, too, but insofar as I am aware, only Perl itself and PCRE support that sort of match operation.<br>------------------------------------------------------------------ <br><h3> Answer 35964234 sudo bangbang: </h3><p>To find all the matching strings, use String's <a href="http://ruby-doc.org/core-2.2.0/String.html#method-i-scan" rel="noreferrer"><code>scan</code></a> method.</p>
+
+<pre><code>str = "A 54mpl3 string w1th 7 numb3rs scatter36 ar0und"
+str.scan(/\d+/)
+#=&gt; ["54", "3", "1", "7", "3", "36", "0"]
+</code></pre>
+
+<p>If you want, <a href="http://ruby-doc.org/core-1.9.3/MatchData.html" rel="noreferrer"><code>MatchData</code></a>, which is the type of the object returned by the Regexp <code>match</code> method, use:</p>
+
+<pre><code>str.to_enum(:scan, /\d+/).map { Regexp.last_match }
+#=&gt; [#&lt;MatchData "54"&gt;, #&lt;MatchData "3"&gt;, #&lt;MatchData "1"&gt;, #&lt;MatchData "7"&gt;, #&lt;MatchData "3"&gt;, #&lt;MatchData "36"&gt;, #&lt;MatchData "0"&gt;]
+</code></pre>
+
+<p>The benefit of using <code>MatchData</code> is that you can use methods like <code>offset</code>:</p>
+
+<pre><code>match_datas = str.to_enum(:scan, /\d+/).map { Regexp.last_match }
+match_datas[0].offset(0)
+#=&gt; [2, 4]
+match_datas[1].offset(0)
+#=&gt; [7, 8]
+</code></pre>
+
+<p>See these questions if you'd like to know more:</p>
+
+<ul>
+<li>"<a href="https://stackoverflow.com/questions/6804557/how-do-i-get-the-match-data-for-all-occurrences-of-a-ruby-regular-expression-in?lq=1">How do I get the match data for all occurrences of a Ruby regular expression in a string?</a>"</li>
+<li>"<a href="https://stackoverflow.com/questions/19596382/ruby-regular-expression-matching-enumerator-with-named-capture-support?lq=1">Ruby regular expression matching enumerator with named capture support</a>"</li>
+<li>"<a href="https://stackoverflow.com/questions/17185943/how-to-find-out-the-starting-point-for-each-match-in-ruby?lq=1">How to find out the starting point for each match in ruby</a>"</li>
+</ul>
+
+<p>Reading about special variables <code>$&amp;</code>, <code>$'</code>, <code>$1</code>, <code>$2</code> in Ruby will be helpful too.</p>
+------------------------------------------------------------------ <br><h3> Answer 36751235 MVP: </h3><p>if you have a regexp with groups:</p>
+<pre><code>str=&quot;A 54mpl3 string w1th 7 numbers scatter3r ar0und&quot;
+re=/(\d+)[m-t]/
+</code></pre>
+<p>you can use String's <code>scan</code> method to find matching groups:</p>
+<pre><code>str.scan re
+#&gt; [[&quot;54&quot;], [&quot;1&quot;], [&quot;3&quot;]]
+</code></pre>
+<p>To find the matching pattern:</p>
+<pre><code>str.to_enum(:scan,re).map {$&amp;}
+#&gt; [&quot;54m&quot;, &quot;1t&quot;, &quot;3r&quot;]
+</code></pre>
+<p>Or the solution to have the complete matchdata:</p>
+<pre><code>str.to_enum(:scan,re).map{Regexp.last_match}
+#&gt; [#&lt;MatchData &quot;54m&quot; 1:&quot;54&quot;&gt;, #&lt;MatchData &quot;1t&quot; 1:&quot;1&quot;&gt;, #&lt;MatchData &quot;3r&quot; 1:&quot;3&quot;&gt;]
+
+str.to_enum(:scan,re).map {$~}
+#&gt; [#&lt;MatchData &quot;54m&quot; 1:&quot;54&quot;&gt;, #&lt;MatchData &quot;1t&quot; 1:&quot;1&quot;&gt;, #&lt;MatchData &quot;3r&quot; 1:&quot;3&quot;&gt;]
+</code></pre>
+<h4> Comment 108140813 the Tin Man: </h4><code>str.scan(&#47;\d+[m-t]&#47;) # =&gt; [&quot;54m&quot;, &quot;1t&quot;, &quot;3r&quot;]</code> is more idiomatic than <code>str.to_enum(:scan,re).map {$&amp;}</code><br><h4> Comment 108325007 MVP: </h4>Maybe you misunderstood. The regular expression of the example of a user I replied was: <code>&#47;(\d+)[m-t]&#47;</code> not <code>&#47;\d+[m-t]&#47;</code> To write: <code>re = &#47;(\d+)[m-t]&#47;; str.scan(re)</code> is same <code>str.scan(&#47;(\d+)[mt]&#47;)</code> but I get #&gt; <code>[[&quot;&quot; 54 &quot;], [&quot; 1 &quot;], [&quot; 3 &quot;]]</code> and not <code>&quot;54m&quot;, &quot;1t&quot;, &quot;3r&quot;]</code> The question was: if I have a regular expression with a group and want to capture all the patterns without changing the regular expression (leaving the group), how can I do it? In this sense, a possible solution, albeit a little cryptic and difficult to read, was: <code>str.to_enum(:scan,re).map {$&amp;}</code><br>------------------------------------------------------------------ <br><h3> Answer 60586543 Datt: </h3><p>You can use <code>string.scan(your_regex).flatten</code>. If your regex contains groups, it will return in a single plain array. </p>
+
+<pre><code>string = "A 54mpl3 string w1th 7 numbers scatter3r ar0und"
+your_regex = /(\d+)[m-t]/
+string.scan(your_regex).flatten
+=&gt; ["54", "1", "3"]
+</code></pre>
+
+<p>Regex can be a named group as well.</p>
+
+<pre><code>string = 'group_photo.jpg'
+regex = /\A(?&lt;name&gt;.*)\.(?&lt;ext&gt;.*)\z/
+string.scan(regex).flatten
+</code></pre>
+
+<p>You can also use <code>gsub</code>, it's just one more way if you want MatchData.</p>
+
+<pre><code>str.gsub(/\d/).map{ Regexp.last_match }
+</code></pre>
+<h4> Comment 108140233 the Tin Man: </h4>Remove the grouping from <code>your_regex = &#47;(\d+)[m-t]&#47;</code> and you won&#39;t need to use <code>flatten</code>. Your final example uses <code>last_match</code> which in this case is probably safe, but is a global and could possibly be overwritten if any regex was matched prior to calling <code>last_match</code>. Instead it&#39;s probably safer to use <code>string.match(regex).captures # =&gt; [&quot;group_photo&quot;, &quot;jpg&quot;]</code> or <code>string.scan(&#47;\d+&#47;) # =&gt; [&quot;54&quot;, &quot;3&quot;, &quot;1&quot;, &quot;7&quot;, &quot;3&quot;, &quot;0&quot;]</code> as shown in other answers, depending on the pattern and needs.<br>------------------------------------------------------------------ <br><h3> Answer 72266342 Victor Cordeiro Costa: </h3><p>If you have capture groups <code>()</code> inside the regex for other purposes, the proposed solutions with <code>String#scan</code> and <code>String#match</code> are problematic:</p>
+<ol>
+<li><code>String#scan</code> only get what is inside the <a href="https://docs.ruby-lang.org/en/2.4.0/syntax/refinements_rdoc.html" rel="nofollow noreferrer">capture groups</a>;</li>
+<li><code>String#match</code> only get the first match, rejecting all the others;</li>
+<li><code>String#matches</code> (proposed function) get all the matches.</li>
+</ol>
+<p>On this case, we need a solution to match the regex without considering the capture groups.</p>
+<h1><code>String#matches</code></h1>
+<p>With the <a href="https://docs.ruby-lang.org/en/2.4.0/syntax/refinements_rdoc.html" rel="nofollow noreferrer">Refinements</a> you can monkey patch the <code>String</code> class, implement the <code>String#matches</code> and this method will be available inside the scope of the class that is using the refinement. It is an incredible way to Monkey Patch classes on Ruby.</p>
+<h3>Setup</h3>
+<ul>
+<li><code>/lib/refinements/string_matches.rb</code></li>
+</ul>
+<pre class="lang-rb prettyprint-override"><code># This module add a String refinement to enable multiple String#match()s
+# 1. `String#scan` only get what is inside the capture groups (inside the parens)
+# 2. `String#match` only get the first match
+# 3. `String#matches` (proposed function) get all the matches
+module StringMatches
+  refine String do
+    def matches(regex)
+      scan(/(?&lt;matching&gt;#{regex})/).flatten
+    end
+  end
+end
+
+</code></pre>
+<p>Used: <a href="https://ruby-doc.org/core-2.4.3/Regexp.html" rel="nofollow noreferrer">named capture groups</a></p>
+<h3>Usage</h3>
+<ul>
+<li><code>rails c</code></li>
+</ul>
+<pre class="lang-rb prettyprint-override"><code>&gt; require 'refinements/string_matches'
+
+&gt; using StringMatches
+
+&gt; 'function(1, 2, 3) + function(4, 5, 6)'.matches(/function\((\d), (\d), (\d)\)/)
+=&gt; [&quot;function(1, 2, 3)&quot;, &quot;function(4, 5, 6)&quot;]
+
+&gt; 'function(1, 2, 3) + function(4, 5, 6)'.scan(/function\((\d), (\d), (\d)\)/)
+=&gt; [[&quot;1&quot;, &quot;2&quot;, &quot;3&quot;], [&quot;4&quot;, &quot;5&quot;, &quot;6&quot;]]
+
+&gt; 'function(1, 2, 3) + function(4, 5, 6)'.match(/function\((\d), (\d), (\d)\)/)[0]
+=&gt; &quot;function(1, 2, 3)&quot;
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 73542998 some_guy: </h3><h1>Return an array of <code>MatchData</code> objects</h1>
+<p><code>#scan</code> is very limited--only returns a simple array of strings!</p>
+<p>Far more powerful/flexible for us to get an array of <code>MatchData</code> objects.</p>
+<p>I'll provide two approaches (using same logic), one using a PORO and one using a monkey patch:</p>
+<h2>PORO:</h2>
+<pre><code>class MatchAll
+  def initialize(string, pattern)
+    raise ArgumentError, 'must pass a String' unless string.is_a?(String)
+
+    raise ArgumentError, 'must pass a Regexp pattern' unless pattern.is_a?(Regexp)
+
+    @string = string
+    @pattern = pattern
+    @matches = []
+  end
+
+  def match_all
+    recursive_match
+  end
+
+  private
+
+  def recursive_match(prev_match = nil)
+    index = prev_match.nil? ? 0 : prev_match.offset(0)[1]
+
+    matching_item = @string.match(@pattern, index)
+    return @matches unless matching_item.present?
+
+    @matches &lt;&lt; matching_item
+    recursive_match(matching_item)
+  end
+end
+</code></pre>
+<p><strong>USAGE:</strong></p>
+<pre><code>test_string = 'a green frog jumped on a green lilypad'
+
+MatchAll.new(test_string, /green/).match_all
+=&gt; [#&lt;MatchData &quot;green&quot;, #&lt;MatchData &quot;green&quot;]
+</code></pre>
+<hr />
+<h2>Monkey patch</h2>
+<p>I don't typically condone monkey-patching, but in this case:</p>
+<ul>
+<li>we're doing it the right way by &quot;quarantining&quot; our patch into its own module</li>
+<li>I prefer this approach because <code>'string'.match_all(/pattern/)</code> is more intuitive (and looks a lot nicer) than <code>MatchAll.new('string', /pattern/).match_all</code></li>
+</ul>
+<pre><code>module RubyCoreExtensions
+  module String
+    module MatchAll
+      def match_all(pattern)
+        raise ArgumentError, 'must pass a Regexp pattern' unless pattern.is_a?(Regexp)
+
+        recursive_match(pattern)
+      end
+
+      private
+
+      def recursive_match(pattern, matches = [], prev_match = nil)
+        index = prev_match.nil? ? 0 : prev_match.offset(0)[1]
+
+        matching_item = self.match(pattern, index)
+        return matches unless matching_item.present?
+
+        matches &lt;&lt; matching_item
+        recursive_match(pattern, matches, matching_item)
+      end
+    end
+  end
+end
+
+</code></pre>
+<p>I recommend creating a new file and putting the patch (assuming you're using Rails) there <code>/lib/ruby_core_extensions/string/match_all.rb</code></p>
+<p>To use our patch we need to make it available:</p>
+<pre><code># within application.rb
+require './lib/ruby_core_extensions/string/match_all.rb'
+</code></pre>
+<p>Then be sure to include it in the <code>String</code> class (you could put this wherever you want; but for example, right under the require statement we just wrote above. After you <code>include</code> it once, it will be available everywhere, even outside the class where you included it).</p>
+<pre><code>String.include RubyCoreExtensions::String::MatchAll
+</code></pre>
+<p><strong>USAGE: And now when you use <code>#match_all</code> you get results like:</strong></p>
+<pre><code>test_string = 'hello foo, what foo are you going to foo today?'
+
+test_string.match_all /foo/
+=&gt; [#&lt;MatchData &quot;foo&quot;, #&lt;MatchData &quot;foo&quot;, #&lt;MatchData &quot;foo&quot;]
+
+test_string.match_all /hello/
+=&gt; [#&lt;MatchData &quot;hello&quot;]
+
+test_string.match_all /none/
+=&gt; []
+</code></pre>
+<hr />
+<p>I find this particularly useful when I want to match multiple occurrences, and then get useful information about each occurrence, such as which index the occurrence starts and ends (e.g. <code>match.offset(0) =&gt; [first_index, last_index]</code>)</p>
+<h4> Comment 133121066 Siwei: </h4>why this answer makes it so complicated?  why not make it easy, just answer: <code>String#scan</code> ?<br>

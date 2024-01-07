@@ -1,0 +1,105 @@
+ <h2> Title: How to write to file in Ruby? </h2> <h3> ohana, question_id: 2777802 </h3>Score: 661, Tags: {ruby,file-io} <br><p>I need to read the data out of database and then save it in a text file.</p>
+
+<p>How can I do that in Ruby? Is there any file management system in Ruby?</p>
+------------------------------------------------------------------ <br><h3> Answer 2777863 Todd R: </h3><p>Are you looking for the following?</p>
+
+<pre><code>File.open(yourfile, 'w') { |file| file.write("your text") }
+</code></pre>
+<h4> Comment 24941014 Benjamin Oakes: </h4>Short and sweet: <code>File.write(&#39;filename&#39;, &#39;content&#39;)</code><br><h4> Comment 18481101 vish: </h4>Alternatively: f = File.open(&#39;name&#39;,&#39;w&#39;); f.write(&#39;text&#39;); f.close<br><h4> Comment 32839859 Thai: </h4>Even shorter and documented: <a href="http://www.ruby-doc.org/core-2.1.0/IO.html#method-c-write" rel="nofollow noreferrer"><code>IO.write(&#39;filename&#39;, &#39;content&#39;)</code></a><br><h4> Comment 17059211 B Seven: </h4><code>yourfile</code> is a variable that holds the name of the file to be written.<br><h4> Comment 20159463 nbarraille: </h4>@vish: I wouldn&#39;t recommend this solution as the file descriptor would be left open if <code>f.write</code> raises an Exception.<br><h4> Comment 16862473 Prem: </h4>It probably returning the number of characters affected. I need file object in return. Any ideas?<br><h4> Comment 45380703 mehulkar: </h4>@prem the method will return what the block returns. <code>File.open(&#39;yourfile&#39;, &#39;w&#39;) { |f| f.write(&#39;text&#39;); f }</code> will return a file object.<br><h4> Comment 46189450 Joshua Pinter: </h4>@BenjaminOakes Will this <b>append</b> to a file or just overwrite it?<br><h4> Comment 36798142 Benjamin Oakes: </h4>@jj_ it opens, writes, and closes for you.<br><h4> Comment 42378121 akostadinov: </h4>@prem, If you want a FD, then you have to <i>not</i> use a proc.<br><h4> Comment 36729193 red-o-alf: </h4>@BenjaminOakes @ thai do you still need to close the file this way?<br><h4> Comment 108886902 Nakilon: </h4>@JoshuaPinter, seems like it works for appending but I wonder if it&#39;s more atomic than <code>.puts</code> or it&#39;s the same.<br>------------------------------------------------------------------ <br><h3> Answer 19337403 S&#233;bastien Le Callonnec: </h3><p>You can use the short version:</p>
+
+<pre><code>File.write('/path/to/file', 'Some glorious content')
+</code></pre>
+
+<p>It returns the length written; see <a href="http://ruby-doc.org/core-1.9.3/IO.html#method-c-write" rel="noreferrer">::write</a> for more details and options.</p>
+
+<p>To append to the file, if it already exists, use:</p>
+
+<pre><code>File.write('/path/to/file', 'Some glorious content', mode: 'a')
+</code></pre>
+<h4> Comment 40534865 Freedom_Ben: </h4>FYI this does properly close the file when finished.<br><h4> Comment 35376501 Andrew Burns: </h4>FYI this shorthand method only works beginning with Ruby 1.9.3. There is, no such method in any earlier versions of 1.9 or 1.8.  In that case you must use the longer block method posted by @mvndaai<br><h4> Comment 48425688 mklement0: </h4>@JoshPinter: it overwrites.<br><h4> Comment 46189440 Joshua Pinter: </h4>Will this <b>append</b> to a file or just overwrite it?<br><h4> Comment 62358992 Dishcandanty: </h4>I think this is the best answer as well<br><h4> Comment 53004348 B Seven: </h4>This seems like the best answer ATM.<br><h4> Comment 43884288 nruth: </h4><a href="http://www.ruby-doc.org/core-1.9.3/IO.html#method-c-write" rel="nofollow noreferrer">IO class docs</a> say it does close the file<br><h4> Comment 94224270 Joshua Pinter: </h4>To add to my own comment 3 years later, you can pass <code>mode: &#39;a&#39;</code> as the third param and it will append to the file, if it exists. I updated the Answer with that example.<br>------------------------------------------------------------------ <br><h3> Answer 12903031 Tombart: </h3><p>This is preferred approach in most cases:</p>
+
+<pre><code> File.open(yourfile, 'w') { |file| file.write("your text") }
+</code></pre>
+
+<p>When a block is passed to <code>File.open</code>, the File object will be automatically closed when the block terminates. </p>
+
+<p>If you don't pass a block to <code>File.open</code>, you have to make sure that file is correctly closed and the content was written to file.</p>
+
+<pre><code>begin
+  file = File.open("/tmp/some_file", "w")
+  file.write("your text") 
+rescue IOError =&gt; e
+  #some error occur, dir not writable etc.
+ensure
+  file.close unless file.nil?
+end
+</code></pre>
+
+<p>You can find it in <a href="http://ruby-doc.org/core-2.0/File.html#method-c-new-label-Examples">documentation</a>:</p>
+
+<pre><code>static VALUE rb_io_s_open(int argc, VALUE *argv, VALUE klass)
+{
+    VALUE io = rb_class_new_instance(argc, argv, klass);
+    if (rb_block_given_p()) {
+        return rb_ensure(rb_yield, io, io_close, io);
+    }
+    return io;
+}
+</code></pre>
+<h4> Comment 48994411 Yeray Cabello: </h4>Just something ruby way-ish: nil is an object, so to check if a file is null, you ask the object itself instead of comparing (file.nil? instead of file == nil)<br><h4> Comment 20549192 wesgarrison: </h4>Yes, using the block syntax with { |file| .... } will close the file when the block closes.<br><h4> Comment 20587138 Tombart: </h4>Cool, thanks. I wasn&#39;t sure about that. Here&#39;s some more info about blocks and <code>File.open</code> <a href="http://blog.rubybestpractices.com/posts/rklemme/001-Using_blocks_for_Robustness.html" rel="nofollow noreferrer">blog.rubybestpractices.com/posts/rklemme/&hellip;</a> it&#39;s also mentioned in the official documentation<br><h4> Comment 64798311 Camille Goudeseune: </h4>Ruby way-ish: <code>!file</code><br><h4> Comment 49005733 Tombart: </h4>@JCabello sure, that&#39;s definitely more Ruby-like approach, thanks!<br><h4> Comment 50014383 Nasser: </h4>finally an answer that shows that one should also check for file status and how to handle it, and not just one liner that just shows the open call.<br>------------------------------------------------------------------ <br><h3> Answer 2777872 jdl: </h3><p>The Ruby <a href="http://ruby-doc.org/core/classes/File.html" rel="noreferrer">File class</a> will give you the ins and outs of <code>::new</code> and <code>::open</code> but its parent, the <a href="http://ruby-doc.org/core/classes/IO.html" rel="noreferrer">IO class</a>, gets into the depth of <code>#read</code> and <code>#write</code>.</p>
+<h4> Comment 31213873 Jeff: </h4>I find this ironic. The answer is very well documented... but now a year later, this question is the first hit on Google. When the question was asked, it may have seemed that the OP was dedicating little effort but now as far as Google is concerned, this is the best source.<br><h4> Comment 31294860 jdl: </h4>Probably because everything you really need to know is here. Mine is the &quot;teach a man to fish&quot; answer for those who want to read the finer details, and there are plenty of &quot;give a man a fish&quot; answers here as well for people who just want to cut-and-paste. It&#39;s not surprising that this combination ends up well ranked on Google.<br><h4> Comment 17379989 jdl: </h4>Thanks @Geoff. It&#39;s good to see new users cleaning up outdated questions and answers. Makes for a better site overall.<br><h4> Comment 100231395 Cary Swoveland: </h4>This does not answer the question. It merely points to the two classes that contain most of the methods for doing I/O, and makes no mention of the connection with the database. That would be fine as a comment, but hardly qualifies as an answer. I realise that the OP and the many readers who upvoted this answer disagree, and I frankly don&#39;t understand what they were thinking.<br><h4> Comment 97858500 user435779: </h4>So, in fairness, I work in a lot of different languages, which means I rarely get around to remembering the syntax for any specific one.  I&#39;ve googled this a few times, and I always scroll right <i>past</i> this answer, to the one below it, because when I google StackOverflow I&#39;m usually just looking for a dang fish. :p  Honestly tho it&#39;s good having both. Perhaps someday I will be doing enough Ruby all at once that I will care about the details.<br><h4> Comment 123326367 lvpx: </h4>I also upvoted this answer. The first thing that puzzled me when reading other answers was which one to use and when between File.write vs IO.write. This answer clarifies so much succintly. It show exactly where to look and what to look for.<br>------------------------------------------------------------------ <br><h3> Answer 19128960 mvndaai: </h3><p><a href="https://stackoverflow.com/users/677712/zanbri">Zambri</a>'s answer <a href="https://stackoverflow.com/questions/7911669/create-file-in-ruby/7915881#7915881">found here</a> is the best.</p>
+
+<pre><code>File.open("out.txt", '&lt;OPTION&gt;') {|f| f.write("write your stuff here") }
+</code></pre>
+
+<p>where your options for <code>&lt;OPTION&gt;</code> are:</p>
+
+<p><code>r</code> - Read only. The file must exist.</p>
+
+<p><code>w</code> - Create an empty file for writing.</p>
+
+<p><code>a</code> - Append to a file.The file is created if it does not exist.</p>
+
+<p><code>r+</code> - Open a file for update both reading and writing. The file must exist.</p>
+
+<p><code>w+</code> - Create an empty file for both reading and writing.</p>
+
+<p><code>a+</code> - Open a file for reading and appending. The file is created if it does not exist.</p>
+
+<p>In your case, <code>w</code> is preferable.</p>
+<h4> Comment 100239417 mvndaai: </h4>@CarySwoveland I actually agree with you. The real problem is that one of the two questions should have been marked as a duplicate a long time ago. I copied the answer because once I found the question zanbri had answered and the next few times when I needed the same info I came across this question first and had to figure out how to get to the other question. Eventually, I thought it would just be easier to have his answer here as well. I linked to his answer so hopefully, people would click over and give him an upvote as well.<br>------------------------------------------------------------------ <br><h3> Answer 30023986 l3x: </h3><p>For those of us that learn by example...</p>
+
+<p>Write text to a file like this:</p>
+
+<pre><code>IO.write('/tmp/msg.txt', 'hi')
+</code></pre>
+
+<p>BONUS INFO ...</p>
+
+<p>Read it back like this</p>
+
+<pre><code>IO.read('/tmp/msg.txt')
+</code></pre>
+
+<p>Frequently, I want to read a file into my clipboard ***</p>
+
+<pre><code>Clipboard.copy IO.read('/tmp/msg.txt')
+</code></pre>
+
+<p>And other times, I want to write what's in my clipboard to a file ***</p>
+
+<pre><code>IO.write('/tmp/msg.txt', Clipboard.paste)
+</code></pre>
+
+<p>*** Assumes you have the clipboard gem installed</p>
+
+<p>See: <a href="https://rubygems.org/gems/clipboard">https://rubygems.org/gems/clipboard</a> </p>
+<h4> Comment 68013831 fguillen: </h4>Beware the <code>IO.write</code> option <b>overwrite</b> the file content instead of append. Append with IO.write is a bit tedious.<br><h4> Comment 70615823 l3x: </h4>Not sure what you&#39;re talking about?  The IO.write command does not need that option to write to a file.  I would be careful to either save the file to the /tmp directory or the current directory; Otherwise, you might see a <code>Errno::ENOENT: No such file or directory @ rb_sysopen</code> message and the file created with a size of 0 bytes.<br>------------------------------------------------------------------ <br><h3> Answer 42169352 Marko Tunjic: </h3><p>To destroy the previous contents of the file, then write a new string to the file:</p>
+
+<pre class="lang-rb prettyprint-override"><code>open('myfile.txt', 'w') { |f| f &lt;&lt; "some text or data structures..." } 
+</code></pre>
+
+<p>To append to a file without overwriting its old contents:</p>
+
+<pre class="lang-rb prettyprint-override"><code>open('myfile.txt', "a") { |f| f &lt;&lt; 'I am appended string' } 
+</code></pre>

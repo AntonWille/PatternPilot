@@ -1,0 +1,196 @@
+ <h2> Title: Best way to iterate through a Perl array </h2> <h3> Jean, question_id: 10487316 </h3>Score: 111, Tags: {arrays,perl,iteration} <br><p>Which is the best implementation(in terms of speed and memory usage) for iterating through a Perl array? Is there any better way? (<code>@Array</code> need not be retained).</p>
+
+<h3>Implementation 1</h3>
+
+<pre><code>foreach (@Array)
+{
+      SubRoutine($_);
+}
+</code></pre>
+
+<h3>Implementation 2</h3>
+
+<pre><code>while($Element=shift(@Array))
+{
+      SubRoutine($Element);
+}
+</code></pre>
+
+<h3>Implementation 3</h3>
+
+<pre><code>while(scalar(@Array) !=0)
+{
+      $Element=shift(@Array);
+      SubRoutine($Element);
+}
+</code></pre>
+
+<h3>Implementation 4</h3>
+
+<pre><code>for my $i (0 .. $#Array)
+{
+      SubRoutine($Array[$i]);
+}
+</code></pre>
+
+<h3>Implementation 5</h3>
+
+<pre><code>map { SubRoutine($_) } @Array ;
+</code></pre>
+<h4> Comment 13554673 CodeClown42: </h4>@Sinan&#220;n&#252;r I empathize with your opinion (that there is only one way to add two numbers), <b>but</b> the analogy is not strong enough to use dismissively.  Obviously, there is more than one way, and the OP wants to understand what&#39;s a good idea and what isn&#39;t.<br><h4> Comment 13556683 user289086: </h4>Chapter 24 of the third edition of Programming Perl has a section on efficiency that is a good read.  It address the different types of efficiency such as time, programmer, maintainer.  The section starts off with the statement &quot;Note that optimizing for time may sometimes cost you in space or programmer efficiency (indicated by conflicting hints below).  Them&#39;s the breaks.&quot;<br><h4> Comment 13553676 Max Lybbert: </h4>Why would there be a &quot;best&quot;?  Especially given that we have no idea how you would measure one against another (is speed more important than memory use?  is <code>map</code> and acceptable answer?. etc.)<br><h4> Comment 13554326 Sinan &#220;n&#252;r: </h4>Two of the three you posted would make me go &quot;WTH?!&quot; unless there as additional surrounding context to make them sensible alternatives. In any case, this question is at the level of &quot;<i>What&#39;s the best way to add two numbers?</i>&quot; Most of the time, there is only one way. Then, there are those circumstances, where you need a different way. Voting to close.<br><h4> Comment 28236744 workwise: </h4>One 1 way to add two numbers? Not if you look into lower level calls / implementations.... think carry lookahead, carry save adders etc.<br><h4> Comment 123738372 lordadmira: </h4>One thing unstated so far.  99% of the time you want to code for <i>clarity</i> and <i>understandability</i> by the next guy who looks at it, not speed or cleverness.  If you make it clever, make sure to explain it well in the comments.  So <code>foreach my $thing (@array) { ...; }</code> is the way to go.<br>------------------------------------------------------------------ <br><h3> Answer 10490436 Sinan &#220;n&#252;r: </h3><p>If you only care about the elements of <code>@Array</code>, use:</p>
+
+<pre><code>for my $el (@Array) {
+# ...
+}
+</code></pre>
+
+<p>or </p>
+
+<p>If the indices matter, use:</p>
+
+<pre><code>for my $i (0 .. $#Array) {
+# ...
+}
+</code></pre>
+
+<p>Or, as of <code>perl</code> 5.12.1, you can use:</p>
+
+<pre><code>while (my ($i, $el) = each @Array) {
+# ...
+}
+</code></pre>
+
+<p>If you need both the element and its index in the body of the loop, <del>I would expect</del> using <code>each</code> <del>to be the fastest, but then</del> you'll be giving up compatibility with pre-5.12.1 <code>perl</code>s.</p>
+
+<p>Some other pattern than these might be appropriate under certain circumstances.</p>
+<h4> Comment 13561464 Sinan &#220;n&#252;r: </h4>And, to the best of my measurement ability, you are right. About 45% faster with <code>for</code> iterating over indices of an array, and 20% faster when iterating over the indices of an array reference (I do access <code>$array-&gt;[$i]</code> in the body), over using <code>each</code> in conjunction with <code>while</code>.<br><h4> Comment 13560845 ikegami: </h4>I would expect the <code>each</code> to be the slowest. It does all the work of the others minus an alias, plus a list assignment, two scalar copies and two scalar clearings.<br>------------------------------------------------------------------ <br><h3> Answer 10488311 ikegami: </h3><ul>
+<li><p>In terms of speed: #1 and #4, but not by much in most instances.</p>
+
+<p>You could write a benchmark to confirm, but I suspect you'll find #1 and #4 to be slightly faster because the iteration work is done in C instead of Perl, and no needless copying of the array elements occurs. (<code>$_</code> is <em>aliased</em> to the element in #1, but #2 and #3 actually <em>copy</em> the scalars from the array.)</p>
+
+<p>&#35;5 might be similar.</p></li>
+<li><p>In terms memory usage: They're all the same except for #5.</p>
+
+<p><code>for (@a)</code> is special-cased to avoid flattening the array. The loop iterates over the indexes of the array.</p></li>
+<li><p>In terms of readability: #1.</p></li>
+<li><p>In terms of flexibility: #1/#4 and #5.</p>
+
+<p>&#35;2 does not support elements that are false. #2 and #3 are destructive.</p></li>
+</ul>
+<h4> Comment 39528693 jaypal singh: </h4>Wow, you added truck loads of information in short and simple sentences.<br><h4> Comment 44914281 ikegami: </h4>#2 is good when you do queues (e.g. breadth-first searches): <code>my @todo = $root; while (@todo) { my $node = shift; ...; push @todo, ...; ...; }</code><br><h4> Comment 112343637 skeetastax: </h4>@ikegami True to your champion style - great answer :)<br><h4> Comment 95189828 Thorsten Sch&#246;ning: </h4>Doesn&#39;t implementation 4 create an intermediate array of indices, which might introduce a large amount of memory to be used? If so, sounds like one shouldn&#39;t use that approach. <a href="https://stackoverflow.com/questions/6440723/perl-array-of-integers-using-way-too-much-memory" title="perl array of integers using way too much memory">stackoverflow.com/questions/6440723/&hellip;</a> <a href="https://rt.cpan.org/Public/Bug/Display.html?id=115863" rel="nofollow noreferrer">rt.cpan.org/Public/Bug/Display.html?id=115863</a><br>------------------------------------------------------------------ <br><h3> Answer 10487578 JRFerguson: </h3><p>IMO, implementation #1 is typical and being short and idiomatic for Perl trumps the others for that alone.  A benchmark of the three choices might offer you insight into speed, at least.</p>
+------------------------------------------------------------------ <br><h3> Answer 48562149 G. Allen Morris III: </h3><p>The best way to decide questions like this to benchmark them:</p>
+
+<pre><code>use strict;
+use warnings;
+use Benchmark qw(:all);
+
+our @input_array = (0..1000);
+
+my $a = sub {
+    my @array = @{[ @input_array ]};
+    my $index = 0;
+    foreach my $element (@array) {
+       die unless $index == $element;
+       $index++;
+    }
+};
+
+my $b = sub {
+    my @array = @{[ @input_array ]};
+    my $index = 0;
+    while (defined(my $element = shift @array)) {
+       die unless $index == $element;
+       $index++;
+    }
+};
+
+my $c = sub {
+    my @array = @{[ @input_array ]};
+    my $index = 0;
+    while (scalar(@array) !=0) {
+       my $element = shift(@array);
+       die unless $index == $element;
+       $index++;
+    }
+};
+
+my $d = sub {
+    my @array = @{[ @input_array ]};
+    foreach my $index (0.. $#array) {
+       my $element = $array[$index];
+       die unless $index == $element;
+    }
+};
+
+my $e = sub {
+    my @array = @{[ @input_array ]};
+    for (my $index = 0; $index &lt;= $#array; $index++) {
+       my $element = $array[$index];
+       die unless $index == $element;
+    }
+};
+
+my $f = sub {
+    my @array = @{[ @input_array ]};
+    while (my ($index, $element) = each @array) {
+       die unless $index == $element;
+    }
+};
+
+my $count;
+timethese($count, {
+   '1' =&gt; $a,
+   '2' =&gt; $b,
+   '3' =&gt; $c,
+   '4' =&gt; $d,
+   '5' =&gt; $e,
+   '6' =&gt; $f,
+});
+</code></pre>
+
+<p>And running this on perl 5, version 24, subversion 1 (v5.24.1) built for x86_64-linux-gnu-thread-multi</p>
+
+<p>I get:</p>
+
+<pre><code>Benchmark: running 1, 2, 3, 4, 5, 6 for at least 3 CPU seconds...
+         1:  3 wallclock secs ( 3.16 usr +  0.00 sys =  3.16 CPU) @ 12560.13/s (n=39690)
+         2:  3 wallclock secs ( 3.18 usr +  0.00 sys =  3.18 CPU) @ 7828.30/s (n=24894)
+         3:  3 wallclock secs ( 3.23 usr +  0.00 sys =  3.23 CPU) @ 6763.47/s (n=21846)
+         4:  4 wallclock secs ( 3.15 usr +  0.00 sys =  3.15 CPU) @ 9596.83/s (n=30230)
+         5:  4 wallclock secs ( 3.20 usr +  0.00 sys =  3.20 CPU) @ 6826.88/s (n=21846)
+         6:  3 wallclock secs ( 3.12 usr +  0.00 sys =  3.12 CPU) @ 5653.53/s (n=17639)
+</code></pre>
+
+<p>So the 'foreach (@Array)' is about twice as fast as the others.  All the others are very similar.</p>
+
+<p>@ikegami also points out that there are quite a few differences in these implimentations other than speed.</p>
+<h4> Comment 104597775 josch: </h4>The comparison <code>$index &lt; $#array</code> should actually be <code>$index &lt;= $#array</code> because <code>$#array</code> is not the length of the array but the last index of it.<br>------------------------------------------------------------------ <br><h3> Answer 43113304 Sandeep_black: </h3><p>In single line to print the element or array. </p>
+
+<p>print $_ for (@array);</p>
+
+<p><strong>NOTE: remember that $_ is internally referring to the element of @array in loop. Any changes made in $_ will reflect in @array;</strong>
+ex. </p>
+
+<pre><code>my @array = qw( 1 2 3 );
+for (@array) {
+        $_ = $_ *2 ;
+}
+print "@array";
+</code></pre>
+
+<p>output: 2 4 6 </p>
+------------------------------------------------------------------ <br><h3> Answer 10487546 CodeClown42: </h3><p>1 is substantially different from 2 and 3, since it leaves the array in tact, whereas the other two leave it empty.</p>
+
+<p>I'd say #3 is pretty wacky and probably less efficient, so forget that.</p>
+
+<p>Which leaves you with #1 and #2, and they do not do the same thing, so one cannot be "better" than the other.  If the array is large and you don't need to keep it, <em>generally</em> scope will deal with it (<em>but see</em> <strong>NOTE</strong>), so <em>generally</em>, #1 is still the clearest and simplest method.  Shifting each element off will not speed anything up. Even if there is a need to free the array from the reference, I'd just go:</p>
+
+<pre><code>undef @Array;
+</code></pre>
+
+<p>when done.</p>
+
+<ul>
+<li><strong>NOTE</strong>: The subroutine containing the scope of the array actually keeps the array and re-uses the space next time. <em>Generally</em>, that should be fine (see comments).</li>
+</ul>
+<h4> Comment 13555260 ikegami: </h4>Demo; <code>perl -MDevel::Peek -e&#39;my @a; Dump(\@a,1); @a=qw( a b c ); Dump(\@a,1); @a=(); Dump(\@a,1); undef @a; Dump(\@a,1);&#39; 2&gt;&amp;1 | grep ARRAY</code><br><h4> Comment 13555207 ikegami: </h4><code>@Array = ();</code> does not free the underlying array. Not even going out of scope would do that. If you wanted to free the underlying array, you&#39;d have use <code>undef @Array;</code>.<br><h4> Comment 13555271 CodeClown42: </h4><b>WHAT???</b>  I had thought the whole point of GC was once a ref count == 0, the memory involved becomes recyclable.<br><h4> Comment 13555372 CodeClown42: </h4>@ikegami: I see the thing about <code>()</code> vs <code>undef</code>, but if going out of scope does not release the memory used by an array local to that scope, doesn&#39;t that make perl a leaking disaster?  That <i>can&#39;t</i> be true.<br><h4> Comment 13555697 ikegami: </h4>They don&#39;t leak either. The sub still owns them, and will reuse them the next time the sub is called. Optimised for speed.<br><h4> Comment 13555746 CodeClown42: </h4>Ah.  Well, that&#39;s good to know :).  I&#39;ll add a paragraph here.<br><h4> Comment 13558056 ArtMat: </h4>@goldilocks: think about this as about any cache, space for time trade ... but it would be nice if this behaviour could be controlled at least at build time or even better at compile/run-time, for example something like <code>use feature &#39;active_gc&#39;</code><br><h4> Comment 13560820 ikegami: </h4>@ArtM, Completely misnamed. GC is always active in Perl, and everything is collected the instant it is no longer referenced.<br><h4> Comment 13567940 ArtMat: </h4>@ikegami: yes, probably misnamed, but I would say the way GC is working now is a <i>lazy</i> one, like me, preferring not to put a book back on the shelf, but keeping it on the table because there are chances I&#39;ll need it soon, and it doesn&#39;t matter if the table looks like a dump :) (that&#39;s why I named it <i>active</i> as a counterpart of <i>lazy</i>) ... I hope the main idea is clear and it would be nice to have the chance to have a <i>clean table</i><br><h4> Comment 13568174 CodeClown42: </h4>@ArtM: I disagree.  It makes sense to keep the memory from a previous sub invocation as the cache for the next one, because <i>generally</i> sub invocations do pretty similar things each time, and the blocks required will be similar (hence, &quot;optimized for speed&quot;, which perl is not &quot;optimized for mem usage&quot;, lol, but the former is <i>generally</i> a much better trade-off than the later).  In cases where you see a potential exception to the rule, use <code>undef</code>.  But I would never set that as a default for the entire process.<br><h4> Comment 13568530 ArtMat: </h4>@goldilocks: I didn&#39;t say it&#39;s better or it should be a default, just to have the possibility to control this aspect if someone requires it<br><h4> Comment 13582816 Jean: </h4>Is there a distinction(in terms of performance) when using foreach and while ?<br><h4> Comment 13583317 ikegami: </h4>@alertjean, They don&#39;t do the same thing, so how can you measure difference in performance of foreach and while in general? The difference in performance of your specific foreach and while loops is explained in my answer.<br><h4> Comment 13587341 CodeClown42: </h4>@ArtM: I know you didn&#39;t say it should be a default...by &quot;I would never set that <i>as a default</i>&quot; I meant that it shouldn&#39;t be a global option (via <code>use some feature</code>) and that <i>no one should ever set that</i> globally.  There should not be an option to help you down that path.  Analogy: maybe a <code>use feature: make WORST choice by default</code> should be implemented ;).  Deal with potential exceptions, but don&#39;t make exceptions the rule.<br>

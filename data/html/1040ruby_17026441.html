@@ -1,0 +1,142 @@
+ <h2> Title: Ruby: How to install a specific version of a ruby gem? </h2> <h3> mjs, question_id: 17026441 </h3>Score: 1040, Tags: {ruby,rubygems} <br><p>Using the command-line <code>gem</code> tool, how can I install a specific version of a gem?</p>
+------------------------------------------------------------------ <br><h3> Answer 17026442 mjs: </h3><p>Use the <code>-v</code> flag:</p>
+
+<pre><code>$ gem install fog -v 1.8
+</code></pre>
+<h4> Comment 32220381 Dizzley: </h4>If, like me, you have previously installed a later version of your gem, then you must uninstall the later version with e.g. <code>gem uninstall fog</code>. It will ask you which version to uninstall if you have more than one.<br><h4> Comment 34009587 abbood: </h4>i have 3 versions of rake: <code>gem list | grep rake</code> = <code>rake (10.1.1, 10.1.0, 0.8.7)</code>.. i got a rails 2.3.5 project and another that&#39;s 3.0 that i&#39;m working on at the same time.. how do i use a specific version of rake for each project (ie on command line?)<br><h4> Comment 117284258 lacostenycoder: </h4>I probably search and find this once a year lol, that&#39;s how often I use it but great!<br><h4> Comment 96381142 Ciro Santilli OurBigBook.com: </h4>Worth noting that this does not seem to affect executable binaries. Uninstalling the previous version worked for binaries though.<br><h4> Comment 71020263 Koen.: </h4>@abbood <code>rake _10.1.1_ ...</code> should work, for whoever wants to know :)<br><h4> Comment 109546710 Don Branson: </h4>Once again, wishing I could do multiple upvotes. Maybe if they had to be separated by at least a year. :)<br>------------------------------------------------------------------ <br><h3> Answer 27563681 schmijos: </h3><p>Use the <code>--version</code> parameter (shortcut <code>-v</code>):</p>
+<pre><code>$ gem install rails -v 0.14.1
+…
+Successfully installed rails-0.14.1
+</code></pre>
+<hr />
+<p>You can also use version comparators like <code>&gt;=</code> or <code>~&gt;</code></p>
+<pre><code>$ gem install rails -v '~&gt; 0.14.0'
+…
+Successfully installed rails-0.14.4
+</code></pre>
+<hr />
+<p>With newer versions of <em>rubygems</em> you can tighten up your requirements:</p>
+<pre><code>$ gem install rails -v '~&gt; 0.14.0, &lt; 0.14.4'
+…
+Successfully installed rails-0.14.3
+</code></pre>
+<hr />
+<p>Since some time now you can also specify versions of multiple gems:</p>
+<pre><code>$ gem install rails:0.14.4 rubyzip:'&lt; 1'
+…
+Successfully installed rails-0.14.4
+Successfully installed rubyzip-0.9.9
+</code></pre>
+<p>But this doesn't work for more than one comparator per gem (yet).</p>
+<h4> Comment 118861154 Martin Dorey: </h4>Mael Stor&#39;s answer tells us that Joseph Coco&#39;s suggested two v arguments from six years earlier now works.<br><h4> Comment 50767308 Joseph Coco: </h4>This worked for ~&gt;, but what if you have &#39;&lt; 0.9, &gt;= 0.7&#39; type of situation? I tried applying two v arguments and it appears as though the first was ignored. Using the a comma separator wouldn&#39;t even parse. I ended up removing the greater than requirement and it happened to install an acceptable version, but having a formal solution would be nice.<br><h4> Comment 78369872 Dragas: </h4>What does version comparator <code>~&gt;</code> stand for?<br><h4> Comment 78375496 schmijos: </h4>It means that the last digit is allowed to grow (<a href="https://stackoverflow.com/questions/5170547/what-does-tilde-greater-than-mean-in-ruby-gem-dependencies" title="what does tilde greater than mean in ruby gem dependencies">stackoverflow.com/questions/5170547/&hellip;</a>)<br>------------------------------------------------------------------ <br><h3> Answer 22160327 Kokizzu: </h3><p>for Ruby 1.9+ use colon.</p>
+<pre><code>gem install sinatra:1.4.4 prawn:0.13.0
+</code></pre>
+<h4> Comment 37275202 Kokizzu: </h4>Ruby 1.8 is already end of support <a href="https://www.ruby-lang.org/en/news/2013/06/30/we-retire-1-8-7/" rel="nofollow noreferrer">ruby-lang.org/en/news/2013/06/30/we-retire-1-8-7</a><br><h4> Comment 36846746 Kokizzu: </h4>what gem (and what version) are you trying to install?<br><h4> Comment 36885404 Kokizzu: </h4>please tell me the output of <code>gem sources</code>, if it&#39;s empty, add a repo using this command: <code>gem sources -a https:&#47;&#47;rubygems.org&#47;</code><br><h4> Comment 36914137 kolypto: </h4>my <code>gem -v</code> shows <code>1.8.23</code> versus your <code>2.2.2</code>. Looks like this feature is new :)<br>------------------------------------------------------------------ <br><h3> Answer 41869224 Emjey: </h3><p>For installing
+<code>gem install gemname -v versionnumber</code></p>
+
+<p>For uninstall
+<code>gem uninstall gemname -v versionnumber</code></p>
+------------------------------------------------------------------ <br><h3> Answer 20890394 myconode: </h3><p>As others have noted, in general use the <code>-v</code> flag for the <code>gem install</code> command.</p>
+
+<p>If you're developing a gem locally, after cutting a gem from your gemspec:</p>
+
+<pre><code>$ gem install gemname-version.gem
+</code></pre>
+
+<p>Assuming version 0.8, it would look like this:</p>
+
+<pre><code>$ gem install gemname-0.8.gem
+</code></pre>
+<h4> Comment 63398608 CamHart: </h4>Great answer.  I suggest you add another code block for the flag &quot;-v&quot; option though.  As my eyes read the answer they immediately went to the code blocks and not the text surrounding it.  If others do the same they&#39;ll miss the &quot;-v&quot; portion.<br>------------------------------------------------------------------ <br><h3> Answer 64289372 Mael Stor: </h3><p>You can use the <code>-v</code> or <code>--version</code> flag. For example</p>
+<pre><code>gem install bitclock -v '&lt; 0.0.2'
+</code></pre>
+<p>To specify upper AND lower version boundaries you can specify the <code>--version</code> flag twice</p>
+<pre><code>gem install bitclock -v '&gt;= 0.0.1' -v '&lt; 0.0.2'
+</code></pre>
+<p>or use the syntax (for example)</p>
+<pre><code>gem install bitclock -v '&gt;= 0.0.1, &lt; 0.0.2'
+</code></pre>
+<p>The other way to do it is</p>
+<pre><code>gem install bitclock:'&gt;= 0.0.1'
+</code></pre>
+<p>but with the last option it is not possible to specify upper and lower bounderies simultaneously.</p>
+<p>[gem 3.0.3 and ruby 2.6.6]</p>
+<h4> Comment 114425311 bric3: </h4>How to make gem to <b>not upgrade dependencies</b>, <code>gem install &quot;asciidoctor:2.0.10&quot; &quot;asciidoctor-diagram:2.0.5&quot;</code>, always upgrade asciidoctor to a later version than 2.0.10, I&#39;ve tried to use the options <code>--minimal-deps</code> and <code>--conservative</code> ? I&#39;ve worked around this with <code>gem install --no-document --ignore-dependencies &quot;asciidoctor-diagram:2.0.5&quot;</code> but <code>asciidoctor-diagram</code> only has a single dep, how to handle that more elegantly.<br><h4> Comment 114485024 Mael Stor: </h4>@Brice I couldn&#39;t reproduce this behaviour with the command line <code>gem install &#39;asciidoctor:2.0.10&#39; &#39;asciidoctor-diagram:2.0.5&#39;</code>. It installs exactly these versions. Which gem version is reported when you type <code>gem --version</code>?<br><h4> Comment 114520887 bric3: </h4>It happens with <code>gem</code> 3.1.4, in the <code>registry.fedoraproject.org&#47;fedora-minimal</code> image. Using this command for example <code>docker run -it --rm registry.fedoraproject.org&#47;fedora-minimal bash -c &quot;microdnf install -y ruby; gem install &#39;asciidoctor:2.0.10&#39; &#39;asciidoctor-diagram:2.0.5&#39;&quot;</code>, I see that first asciidoctor 2.0.10 is installed, then asciidoctor 2.0.12.<br>------------------------------------------------------------------ <br><h3> Answer 24159788 kenorb: </h3><p><strong>Linux</strong></p>
+
+<p>To install different version of ruby, check the latest version of package using <code>apt</code> as below:</p>
+
+<pre><code>$ apt-cache madison ruby
+      ruby |    1:1.9.3 | http://ftp.uk.debian.org/debian/ wheezy/main amd64 Packages
+      ruby |        4.5 | http://ftp.uk.debian.org/debian/ squeeze/main amd64 Packages
+</code></pre>
+
+<p>Then install it:</p>
+
+<pre><code>$ sudo apt-get install ruby=1:1.9.3
+</code></pre>
+
+<p>To check what's the current version, run:</p>
+
+<pre><code>$ gem --version # Check for the current user.
+$ sudo gem --version # Check globally.
+</code></pre>
+
+<p>If the version is still old, you may try to switch the version to new by using ruby version manager (<code>rvm</code>) by:</p>
+
+<pre><code>rvm 1.9.3
+</code></pre>
+
+<p>Note: You may prefix it by <code>sudo</code> if <code>rvm</code> was installed globally. Or run <code>/usr/local/rvm/scripts/rvm</code> if your command <code>rvm</code> is not in your global <code>PATH</code>. If rvm installation process failed, see the troubleshooting section.</p>
+
+<hr>
+
+<p>Troubleshooting:</p>
+
+<ul>
+<li><p>If you still have the old version, you may try to install rvm (ruby version manager) via:</p>
+
+<pre><code>sudo apt-get install curl # Install curl first
+curl -sSL https://get.rvm.io | bash -s stable --ruby # Install only for the user.
+#or:# curl -sSL https://get.rvm.io | sudo bash -s stable --ruby # Install globally. 
+</code></pre>
+
+<p>then if installed locally (only for current user), load rvm via:</p>
+
+<pre><code>source /usr/local/rvm/scripts/rvm; rvm 1.9.3
+</code></pre>
+
+<p>if globally (for all users), then:</p>
+
+<pre><code>sudo bash -c "source /usr/local/rvm/scripts/rvm; rvm 1.9.3"
+</code></pre></li>
+<li><p>if you still having problem with the new ruby version, try to install it by rvm via:</p>
+
+<pre><code>source /usr/local/rvm/scripts/rvm &amp;&amp; rvm install ruby-1.9.3 # Locally.
+sudo bash -c "source /usr/local/rvm/scripts/rvm &amp;&amp; rvm install ruby-1.9.3" # Globally.
+</code></pre></li>
+<li><p>if you'd like to install some gems globally and you have rvm already installed, you may try:</p>
+
+<pre><code>rvmsudo gem install [gemname]
+</code></pre>
+
+<p>instead of:</p>
+
+<pre><code>  gem install [gemname] # or:
+  sudo gem install [gemname]
+</code></pre></li>
+</ul>
+
+<blockquote>
+  <p>Note: It's prefered to NOT use sudo to work with RVM gems. When you do
+  sudo you are running commands as root, another user in another shell
+  and hence all of the setup that RVM has done for you is ignored while
+  the command runs under sudo (such things as GEM_HOME, etc...). So to
+  reiterate, as soon as you 'sudo' you are running as the root system
+  user which will clear out your environment as well as any files it
+  creates are not able to be modified by your user and will result in
+  strange things happening.</p>
+</blockquote>
+------------------------------------------------------------------ <br><h3> Answer 74947955 Gayan Weerakutti: </h3><p>Prior to installing, you can check the available versions with the list command.</p>
+<pre><code>gem list ^[gemname]$ --remote --all
+gem install [gemname] -v [version]
+</code></pre>

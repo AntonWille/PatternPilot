@@ -1,0 +1,255 @@
+ <h2> Title: Match whitespace but not newlines </h2> <h3> JoelFan, question_id: 3469080 </h3>Score: 405, Tags: {regex,perl} <br><p>I sometimes want to match whitespace but not newline.</p>
+
+<p>So far I've been resorting to <code>[ \t]</code>.  Is there a less awkward way?</p>
+<h4> Comment 3619184 Eugene Yarmash: </h4>BTW, these characters are also &quot;whitespace&quot;: <code>[\r\f]</code>.<br><h4> Comment 10086565 Aran Mulholland: </h4>@eugeney is anyone still doing form feeds? (\f&#39;s)<br><h4> Comment 63867665 Borodin: </h4>@AranMulholland: Anyone who has a character-oriented printer. Most printers have a character mode as well as PostScript or whatever the Hewlett Packard interface is called, and to throw a page you send a form feed.<br>------------------------------------------------------------------ <br><h3> Answer 3469155 Greg Bacon: </h3><h1>Summary</h1>
+<ul>
+<li>Use <code>\h</code> to match horizontal whitespace, <a href="https://perldoc.perl.org/perl5100delta#Vertical-and-horizontal-whitespace,-and-linebreak" rel="noreferrer">in perl since v5.10.0</a> (released in 2007)</li>
+<li>For non-<a href="http://www.pcre.org/" rel="noreferrer">PCRE</a> engines, use a double-negative: <code>[^\S\r\n]</code></li>
+<li>Unicode properties: <code>\p{Blank}</code> or <code>\p{HorizSpace}</code></li>
+<li>Be direct, in ASCII: <code>[\t\f\cK ]</code></li>
+<li>Be direct, in Unicode (but don’t, really)</li>
+<li>Other applications of double-negatives and Unicode properties</li>
+</ul>
+<hr />
+<h2>Horizontal Whitespace</h2>
+<p>The <a href="https://perldoc.perl.org/perlre#Character-Classes-and-other-Special-Escapes" rel="noreferrer">“Character Classes and other Special Escapes” section of perlre</a> includes</p>
+<blockquote>
+<ul>
+<li><code>\h</code> Horizontal whitespace</li>
+<li><code>\H</code> Not horizontal whitespace</li>
+</ul>
+</blockquote>
+<hr />
+<h2>Double-Negative</h2>
+<p>If you might use your pattern with other engines, particularly ones that are not <a href="http://www.pcre.org/" rel="noreferrer">Perl-compatible</a> or otherwise don’t support <code>\h</code>, express it as a double-negative:</p>
+<pre><code>[^\S\r\n]
+</code></pre>
+<p>That is, not-not-whitespace (the capital <code>S</code> complements) or not-carriage-return or not-newline. Distributing the outer not (<em>i.e.</em>, the complementing <code>^</code> in the <a href="https://perldoc.perl.org/perlrecharclass#Bracketed-Character-Classes" rel="noreferrer">bracketed character class</a>) with <a href="http://en.wikipedia.org/wiki/De_Morgan%27s_laws" rel="noreferrer">De Morgan’s law</a>, this is equivalent to subtracting <code>\r</code> and <code>\n</code> from <code>\s</code>. Including both carriage return and newline in the pattern correctly handles all of Unix (LF), classic Mac OS (CR), and DOS-ish (CRLF) <a href="https://en.wikipedia.org/wiki/Newline#Representation" rel="noreferrer">newline conventions</a>.</p>
+<p>No need to take my word for it:</p>
+<pre><code>#! /usr/bin/env perl
+
+use strict;
+use warnings;
+
+my $ws_not_crlf = qr/[^\S\r\n]/;
+
+for (' ', '\f', '\t', '\r', '\n') {
+  my $qq = qq[&quot;$_&quot;];
+  printf &quot;%-4s =&gt; %s\n&quot;, $qq,
+    (eval $qq) =~ $ws_not_crlf ? &quot;match&quot; : &quot;no match&quot;;
+}
+</code></pre>
+<p>Output:</p>
+<pre>" "  => match
+"\f" => match
+"\t" => match
+"\r" => no match
+"\n" => no match</pre>
+<p>Note the exclusion of vertical tab, but this is <a href="http://search.cpan.org/dist/perl-5.18.0/pod/perldelta.pod#Vertical_tabs_are_now_whitespace" rel="noreferrer">addressed in v5.18</a>.</p>
+<p>Before objecting too harshly, the Perl documentation uses the same technique. A footnote in the <a href="https://perldoc.perl.org/perlrecharclass.html#Whitespace" rel="noreferrer">“Whitespace” section of perlrecharclass</a> reads</p>
+<blockquote>
+<p>Prior to Perl v5.18, <code>\s</code> did not match the vertical tab. <code>[^\S\cK]</code> (obscurely) matches what <code>\s</code> traditionally did.</p>
+</blockquote>
+<hr />
+<h2>Unicode Properties</h2>
+<p>The aforementioned <a href="https://perldoc.perl.org/perlre#Character-Classes-and-other-Special-Escapes" rel="noreferrer">perlre documentation on <code>\h</code> and <code>\H</code></a> references the <a href="https://perldoc.perl.org/perlunicode#Other-Properties" rel="noreferrer">perlunicode documentation</a> where we read about a family of useful Unicode properties.</p>
+<blockquote>
+<ul>
+<li><code>\p{Blank}</code>
+<ul>
+<li>This is the same as <code>\h</code> and <code>\p{HorizSpace}</code>: A character that changes the spacing horizontally.</li>
+</ul>
+</li>
+<li><code>\p{HorizSpace}</code>
+<ul>
+<li>This is the same as <code>\h</code> and <code>\p{Blank}</code>: a character that changes the spacing horizontally.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr />
+<h2>The Direct Approach: ASCII Edition</h2>
+<p>The <a href="https://perldoc.perl.org/perlrecharclass.html#Whitespace" rel="noreferrer">“Whitespace” section of perlrecharclass</a> also suggests other approaches that won’t offend grammar instructors’ opposition to double-negatives.</p>
+<p>Say what you want rather than what you don’t.</p>
+<p>Outside locale and Unicode rules or when the <a href="https://perldoc.perl.org/perlre#/a-(and-/aa)" rel="noreferrer"><code>/a</code> or <code>/aa</code> switch</a> is in effect, “<code>\s</code> matches <code>[\t\n\f\r ]</code> and, starting in Perl v5.18, the vertical tab, <code>\cK</code>.”</p>
+<p>To match whitespace but not newlines (broadly), discard <code>\r</code> and <code>\n</code> to leave</p>
+<pre><code>[\t\f\cK ]
+</code></pre>
+<hr />
+<h2>The Direct Approach: Unicode Edition</h2>
+<p>If your text is Unicode, use code similar to the sub below to construct a pattern from the table in the <a href="https://perldoc.perl.org/perlrecharclass.html#Whitespace" rel="noreferrer">“Whitespace” section of perlrecharclass</a>.</p>
+<pre><code>sub ws_not_nl {
+  local($_) = &lt;&lt;'EOTable';
+0x0009        CHARACTER TABULATION   h s
+0x000a              LINE FEED (LF)    vs
+0x000b             LINE TABULATION    vs  [1]
+0x000c              FORM FEED (FF)    vs
+0x000d        CARRIAGE RETURN (CR)    vs
+0x0020                       SPACE   h s
+0x0085             NEXT LINE (NEL)    vs  [2]
+0x00a0              NO-BREAK SPACE   h s  [2]
+0x1680            OGHAM SPACE MARK   h s
+0x2000                     EN QUAD   h s
+0x2001                     EM QUAD   h s
+0x2002                    EN SPACE   h s
+0x2003                    EM SPACE   h s
+0x2004          THREE-PER-EM SPACE   h s
+0x2005           FOUR-PER-EM SPACE   h s
+0x2006            SIX-PER-EM SPACE   h s
+0x2007                FIGURE SPACE   h s
+0x2008           PUNCTUATION SPACE   h s
+0x2009                  THIN SPACE   h s
+0x200a                  HAIR SPACE   h s
+0x2028              LINE SEPARATOR    vs
+0x2029         PARAGRAPH SEPARATOR    vs
+0x202f       NARROW NO-BREAK SPACE   h s
+0x205f   MEDIUM MATHEMATICAL SPACE   h s
+0x3000           IDEOGRAPHIC SPACE   h s
+EOTable
+
+  my $class;
+  while (/^0x([0-9a-f]{4})\s+([A-Z\s]+)/mg) {
+    my($hex,$name) = ($1,$2);
+    next if $name =~ /\b(?:CR|NL|NEL|SEPARATOR)\b/;
+    $class .= &quot;\\N{U+$hex}&quot;;
+  }
+
+  qr/[$class]/u;
+}
+</code></pre>
+<p>This above is for completeness. Use the Unicode properties rather than writing it out longhand.</p>
+<hr />
+<h2>Other Applications</h2>
+<p>The double-negative trick is also handy for matching alphabetic characters too. Remember that <code>\w</code> matches “word characters,” alphabetic characters <em>and</em> digits and underscore. We ugly-Americans sometimes want to write it as, say,</p>
+<pre><code>if (/[A-Za-z]+/) { ... }
+</code></pre>
+<p>but a double-negative character-class can respect the locale:</p>
+<pre><code>if (/[^\W\d_]+/) { ... }
+</code></pre>
+<p>Expressing “a word character but not digit or underscore” this way is a bit opaque. A POSIX character-class communicates the intent more directly</p>
+<pre><code>if (/[[:alpha:]]+/) { ... }
+</code></pre>
+<p>or with a Unicode property as <a href="https://stackoverflow.com/users/415428/szbalint">szbalint</a> suggested</p>
+<pre><code>if (/\p{Letter}+/) { ... }
+</code></pre>
+<p><a href="https://stackoverflow.com/users/3253673/pingui">Pingui</a> asked about nesting the double-negative character class to effectively modify the <code>\s</code> in</p>
+<pre><code>/(\+|0|\()[\d()\s-]{6,20}\d/g
+</code></pre>
+<p>The <a href="https://tio.run/##ZY7NCoJAFIX39yku6WIGE0f7WTT9EPQGtfNOQ6SZIIOMSovs2U0FN7X7OHyHc8rUFquua6oUq9rm91rCwK@bNbnJKgnQmCR9oBtIcDXucHs6Xo57CU5pc9Pb4LyeeZEiCxh5rWiJcRZTwjhVvnqv55H4UMKDjOMb/k122Iyyr9r4SmeyZBT/aSGOUziL3VDFbqTIzCR8ALQevmgNHjIQ4IXRYrlaT4AT8Al8AaLf5GyAMQHRdV8" rel="noreferrer">best I could come up with</a> is to use <code>|</code> for an alternative and move the <code>\s</code> to the other branch:</p>
+<pre><code>/(\+|0|\()(?:[\d()-]|[^\S\r\n]){6,20}\d/g
+</code></pre>
+<h4> Comment 3619784 ysth: </h4>@Qwertie: what&#39;s surprising?  Less awkward than what?<br><h4> Comment 3619760 Qwertie: </h4>Clever, but the behavior is very surprising, and I don&#39;t see how it&#39;s less awkward.<br><h4> Comment 108000301 aderchox: </h4>VSCode Find and Replace doesn&#39;t support \h probably because it&#39;s something other than PCRE, but this [nice] answer worked for me, thanks.<br><h4> Comment 99625579 Carson Ip: </h4>In Python, make sure you use this with <code>flags=re.UNICODE</code>.<br><h4> Comment 130722990 R. Wang: </h4>If anyone is using VBScript.regexp and is fed with a weird mix of spaces, you may wish to list out all spaces instead with <code>&#47;[\x09\x20\xA0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u20&zwnj;&#8203;06\u2007\u2008\u2009&zwnj;&#8203;\u200A\u202F\u205F\u&zwnj;&#8203;3000]&#47;</code> as the proposed solution which should work doesn&#39;t worked for me<br><h4> Comment 39526804 Pingui: </h4>How can I nest this expression within another one? E.g. replace &quot;<code>\s</code>&quot; with it in <code>&#47;(\+|0|\()[\d()\s-]{6,20}\d&#47;g</code>? Thx<br>------------------------------------------------------------------ <br><h3> Answer 25956935 Borodin: </h3>
+
+<p>Perl versions 5.10 and later support subsidiary vertical and horizontal character classes, <code>\v</code> and <code>\h</code>, as well as the generic whitespace character class <code>\s</code></p>
+
+<p>The cleanest solution is to use the <em>horizontal whitespace</em> character class <code>\h</code>. This will match tab and space from the ASCII set, non-breaking space from extended ASCII, or any of these Unicode characters</p>
+
+<pre class="lang-none prettyprint-override"><code>U+0009 CHARACTER TABULATION
+U+0020 SPACE
+U+00A0 NO-BREAK SPACE (not matched by \s)
+
+U+1680 OGHAM SPACE MARK
+U+2000 EN QUAD
+U+2001 EM QUAD
+U+2002 EN SPACE
+U+2003 EM SPACE
+U+2004 THREE-PER-EM SPACE
+U+2005 FOUR-PER-EM SPACE
+U+2006 SIX-PER-EM SPACE
+U+2007 FIGURE SPACE
+U+2008 PUNCTUATION SPACE
+U+2009 THIN SPACE
+U+200A HAIR SPACE
+U+202F NARROW NO-BREAK SPACE
+U+205F MEDIUM MATHEMATICAL SPACE
+U+3000 IDEOGRAPHIC SPACE
+</code></pre>
+
+<p>The <em>vertical space</em> pattern <code>\v</code> is less useful, but matches these characters</p>
+
+<pre class="lang-none prettyprint-override"><code>U+000A LINE FEED
+U+000B LINE TABULATION
+U+000C FORM FEED
+U+000D CARRIAGE RETURN
+U+0085 NEXT LINE (not matched by \s)
+
+U+2028 LINE SEPARATOR
+U+2029 PARAGRAPH SEPARATOR
+</code></pre>
+
+<p>There are seven vertical whitespace characters which match <code>\v</code> and eighteen horizontal ones which match <code>\h</code>. <code>\s</code> matches twenty-three characters</p>
+
+<p>All whitespace characters are either <em>vertical</em> or <em>horizontal</em> with no overlap, but they are not proper subsets because <code>\h</code> also matches U+00A0 NO-BREAK SPACE, and <code>\v</code> also matches U+0085 NEXT LINE, neither of which are matched by <code>\s</code></p>
+<h4> Comment 40653097 Borodin: </h4>@AvinashRaj: This question is about Perl, which certainly supports PCRE<br><h4> Comment 40647622 Avinash Raj: </h4><code>\h</code> works only on the languages which supports <code>PCRE</code> .<br><h4> Comment 58085979 Aleksandr Dubinsky: </h4>What makes Perl&#39;s <code>\h</code> slightly non-standard is its inclusion of <code>MONGOLIAN VOWEL SEPARATOR</code>. Unicode does not consider it whitespace. For that reason, Perl <code>\h</code> differs from POSIX <code>blank</code> (<code>[[:blank:]]</code> in Perl, <code>\p{Blank}</code> in Java) and Java 8 <code>\h</code>. Admittedly, it&#39;s an edge case.<br><h4> Comment 46198368 squidbe: </h4>Wanna mention that <code>\h</code> worked perfectly for my use case which was doing a find/replace in Notepad++ on 1 or more contiguous non-new-line spaces. Nothing else (simple) worked.<br><h4> Comment 58085463 Aleksandr Dubinsky: </h4>@Borodin POSIX <code>blank</code> should match <code>NO-BREAK SPACE</code> in any engine that supports Unicode regular expressions. It is defined in <a href="http://www.unicode.org/reports/tr18/#blank" rel="nofollow noreferrer">Annex C: Compatibility Properties of Unicode Regular Expressions</a><br><h4> Comment 44444181 Borodin: </h4>@AvinashRaj: Except that <code>[[:blank:]]</code> doesn&#39;t match no-break space -- <code>&amp;nbsp;</code> or <code>&quot;\xA0&quot;</code><br><h4> Comment 56240581 adib: </h4><a href="http://userguide.icu-project.org/strings/regexp" rel="nofollow noreferrer">ICU has` \h`</a> so this is pretty standard.<br><h4> Comment 58086020 Aleksandr Dubinsky: </h4>For more information on what Unicode considers whitespace (and what it doesn&#39;t), see the table in <a href="https://en.wikipedia.org/wiki/White-space_character" rel="nofollow noreferrer">en.wikipedia.org/wiki/White-space_character</a><br><h4> Comment 91070297 Marcus: </h4>Why do I get <code>Unrecognized escape \h passed through</code> when I try to use this?<br><h4> Comment 91070641 Marcus: </h4>I&#39;m on Perl 5.16.3, regarding <code>Unrecognized escape \h passed through</code>.  Why?<br><h4> Comment 58088725 Aleksandr Dubinsky: </h4>A table of which regex engines support <code>\h</code> and POSIX <code>blank</code>: <a href="http://www.regular-expressions.info/refcharclass.html" rel="nofollow noreferrer">regular-expressions.info/refcharclass.html</a><br><h4> Comment 63869260 Borodin: </h4>@AleksandrDubinsky: It looks like Perl has been fixed with regard to including <code>MONGOLIAN VOWEL SEPARATOR</code> in <code>\h</code>. See my revised solution above. I can&#39;t see it mentioned in any of the fixes so I can&#39;t offer a safe version number, but I will keep looking<br><h4> Comment 97550557 fstang: </h4>In atom editor, \h+ can match spaces correctly, but I cannot replace it with a comma for example somehow. Used [^\S\r\n]+ from the answer below eventually.<br><h4> Comment 124393371 john k: </h4><code>bad escape \h </code> on python :(<br><h4> Comment 43722473 Avinash Raj: </h4>@AleksandrDubinsky this blank POSIX notation <code>[[:blank:]]</code> will work on most of the languages.<br>------------------------------------------------------------------ <br><h3> Answer 17752989 Rory O&#39;Kane: </h3><p>A variation on <a href="https://stackoverflow.com/a/3469155/578288">Greg’s answer</a> that includes carriage returns too:</p>
+
+<pre><code>/[^\S\r\n]/
+</code></pre>
+
+<p>This regex is safer than <code>/[^\S\n]/</code> with no <code>\r</code>. My reasoning is that Windows uses <code>\r\n</code> for newlines, and Mac OS 9 used <code>\r</code>. You’re unlikely to find <code>\r</code> without <code>\n</code> nowadays, but if you do find it, it couldn’t mean anything but a newline. Thus, since <code>\r</code> can mean a newline, we should exclude it too.</p>
+<h4> Comment 107828643 Andre Elrico: </h4>looks like @Greg first had it &quot;wrong&quot; changed it and did not credit you. Thats why im upvoting here.<br><h4> Comment 32416881 Timo Huovinen: </h4>+1 <a href="http://stackoverflow.com/a/3469155/175071">Greg&#39;s solution</a> ended up corrupting my text, yours worked fine.<br><h4> Comment 32923985 mivk: </h4>You might be surprised at how many programs still use &quot;\r&quot; for line endings. It sometimes took me a while to figure out that my problem was that the file used these. Or that it used the MacRoman character encoding...<br>------------------------------------------------------------------ <br><h3> Answer 25001633 Aleksandr Dubinsky: </h3><p>What you are looking for is the POSIX <code>blank</code> character class. In Perl it is referenced as:</p>
+<pre><code>[[:blank:]]
+</code></pre>
+<p>in Java (don't forget to enable <code>UNICODE_CHARACTER_CLASS</code>):</p>
+<pre><code>\p{Blank}
+</code></pre>
+<p>Compared to the similar <code>\h</code>, POSIX <code>blank</code> is supported by a few more regex engines (<a href="http://www.regular-expressions.info/refcharclass.html" rel="noreferrer">reference</a>). A major benefit is that its definition is fixed in <a href="http://www.unicode.org/reports/tr18/#blank" rel="noreferrer">Annex C: Compatibility Properties of Unicode Regular Expressions</a> and standard across all regex flavors that support Unicode. (In Perl, for example, <code>\h</code> chooses to additionally include the <code>MONGOLIAN VOWEL SEPARATOR</code>.) However, an argument in favor of <code>\h</code> is that it always detects Unicode characters (even if the engines don't agree on which), while POSIX character classes are often by default ASCII-only (as in Java).</p>
+<p>But the problem is that even sticking to Unicode doesn't solve the issue 100%. Consider the following characters which are not considered whitespace in Unicode:</p>
+<ul>
+<li><p>U+180E MONGOLIAN VOWEL SEPARATOR</p>
+</li>
+<li><p>U+200B ZERO WIDTH SPACE</p>
+</li>
+<li><p>U+200C ZERO WIDTH NON-JOINER</p>
+</li>
+<li><p>U+200D ZERO WIDTH JOINER</p>
+</li>
+<li><p>U+2060 WORD JOINER</p>
+</li>
+<li><p>U+FEFF ZERO WIDTH NON-BREAKING SPACE</p>
+<p><sub>Taken from <a href="https://en.wikipedia.org/wiki/White-space_character" rel="noreferrer">https://en.wikipedia.org/wiki/White-space_character</a></sub></p>
+</li>
+</ul>
+<p>The aforementioned Mongolian vowel separator isn't included for what is probably a good reason. It, along with 200C and 200D, occur within words (AFAIK), and therefore breaks the cardinal rule that all other whitespace obeys: you can tokenize with it. They're more like modifiers. However, <code>ZERO WIDTH SPACE</code>, <code>WORD JOINER</code>, and <code>ZERO WIDTH NON-BREAKING SPACE</code> (if it used as other than a byte-order mark) fit the whitespace rule in my book. Therefore, I include them in my horizontal whitespace character class.</p>
+<p>In Java:</p>
+<pre><code>static public final String HORIZONTAL_WHITESPACE = &quot;[\\p{Blank}\\u200B\\u2060\\uFFEF]&quot;
+</code></pre>
+<h4> Comment 47811850 Valentin V: </h4>@AleksandrDubinsky, \p{Blank} is not supported in JavaScript, so definitely not &quot;standard to all regex flavors&quot; -1<br><h4> Comment 50746295 Timo: </h4>Most informative. I find it disturbing to know that a general and complete &quot;horizontal whitespace&quot; shorthand character class does not exist, and that horrors like <code>[\p{Blank}\u200b\u180e]</code> are required. Admittedly, it makes sense that a vowel separator is <i>not</i> considered a whitespace character, but why zero-width space is not in classes like <code>\s</code> and <code>\p{Blank}</code>, beats me.<br><h4> Comment 50746647 Timo: </h4>Follow-up: I read that both are considered &#39;boundary neutral&#39;, although that doesn&#39;t explain <i>why</i>.<br><h4> Comment 40637343 tchrist: </h4>You need to add the appropriate regexp compile flags to the Java compilation, and be running Java 7 or later. In any event, the question was not about Java or PCRE at all, so this is all immaterial.<br><h4> Comment 40640768 Aleksandr Dubinsky: </h4>@tchrist Thank you for pointing this out. I will update my answer. I disagree, though, that my answer is irrelevant. What is immaterial is the <code>perl</code> tag in the original question.<br>------------------------------------------------------------------ <br><h3> Answer 25955005 Avinash Raj: </h3><p>The below regex would match white spaces but not of a new line character.</p>
+
+<pre><code>(?:(?!\n)\s)
+</code></pre>
+
+<p><a href="http://regex101.com/r/sW9xU4/4" rel="noreferrer">DEMO</a></p>
+
+<p>If you want to add carriage return also then add <code>\r</code> with the <code>|</code> operator inside the negative lookahead.</p>
+
+<pre><code>(?:(?![\n\r])\s)
+</code></pre>
+
+<p><a href="http://regex101.com/r/sW9xU4/5" rel="noreferrer">DEMO</a></p>
+
+<p>Add <code>+</code> after the non-capturing group to match one or more white spaces.</p>
+
+<pre><code>(?:(?![\n\r])\s)+
+</code></pre>
+
+<p><a href="http://regex101.com/r/sW9xU4/7" rel="noreferrer">DEMO</a></p>
+
+<p>I don't know why you people failed to mention the POSIX character class <code>[[:blank:]]</code> which matches any horizontal whitespaces (<em>spaces and tabs</em>). This POSIX chracter class would work on BRE(<em>Basic REgular Expressions</em>), ERE(<em>Extended Regular Expression</em>), PCRE(<em>Perl Compatible Regular Expression</em>).</p>
+
+<p><a href="http://regex101.com/r/tF5fT5/10" rel="noreferrer">DEMO</a></p>
+------------------------------------------------------------------ <br><h3> Answer 70358029 Hasan Zafari: </h3><p>Put the regex below in the <em>find</em> section and select <em>Regular Expression</em> from &quot;Search Mode&quot;:</p>
+<pre><code>[^\S\r\n]+
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 77189369 brian d foy: </h3><p>You probably want <code>\h</code>, as others have pointed out. However, <a href="https://www.effectiveperlprogramming.com/2015/02/perl-v5-18-adds-character-class-set-operations/" rel="nofollow noreferrer">Perl v5.18 and later supports regex set operations</a> as part of its Unicode support. If you want most of something, it may easier to subtract out the few things you don't want.</p>
+<p>Suppose that you'll accept any whitespace except for exactly the newline. You don't care about carriage returns, form feeds, or vertical tabs. This regex set operation creates a character class by starting with all whitespace and removing the newline:</p>
+<pre><code>use v5.18; 
+/(?[ [\s] - [\n] ])/;
+</code></pre>
+<p>Here's another one. Suppose you want all the latin letters except for vowels. You could write that out with the omissions and hope you don't make a mistake:</p>
+<pre><code>/[b-df-hj-np-tv-z]/;
+</code></pre>
+<p>It's easier when the code cleanly shows what you are doing:</p>
+<pre><code>use v5.18; 
+/(?[ [a-z] - [aeiou] ])/;
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 23151217 saiprathapreddy.obula: </h3><p><code>m/ /g</code> just give space in <code>/ /</code>, and it will work. Or use <code>\S</code> — it will replace all the special characters like tab, newlines, spaces, and so on.</p>

@@ -1,0 +1,87 @@
+ <h2> Title: Equivalent of &quot;continue&quot; in Ruby </h2> <h3> Mark Szymanski, question_id: 4010039 </h3>Score: 755, Tags: {ruby,keyword,continue} <br><p>In C and many other languages, there is a <code>continue</code> keyword that, when used inside of a loop, jumps to the next iteration of the loop. Is there any equivalent of this <code>continue</code> keyword in Ruby?</p>
+<h4> Comment 28973738 yurisich: </h4>@dbr the duplicate you&#39;ve found was asked after this one.<br><h4> Comment 4297443 Matt Wonlaw: </h4>continue doesn&#39;t &quot;restart&quot; the loops but jumps to the next iteration of the loop.<br><h4> Comment 4298035 Mark Szymanski: </h4>@mlaw: I edited my question accordingly to prevent future confusion.<br>------------------------------------------------------------------ <br><h3> Answer 4010063 Ian Purton: </h3><p>Yes, it's called <code>next</code>.</p>
+
+<pre><code>for i in 0..5
+   if i &lt; 2
+     next
+   end
+   puts "Value of local variable is #{i}"
+end
+</code></pre>
+
+<p>This outputs the following:</p>
+
+<pre><code>Value of local variable is 2
+Value of local variable is 3
+Value of local variable is 4
+Value of local variable is 5
+ =&gt; 0..5 
+</code></pre>
+<h4> Comment 14948506 Colonel Panic: </h4>This is how I remember--Ruby respects Perl (<code>next</code>) above C (<code>continue</code>)<br><h4> Comment 114127743 Joshua Pinter: </h4>ProTip: Careful using it with <code>and</code> like <code>puts &quot;Skipping&quot; and next if i &lt; 2</code> because <code>puts</code> returns <code>nil</code>, which is &quot;falsey&quot;, and so <code>next</code> won&#39;t get called.<br>------------------------------------------------------------------ <br><h3> Answer 4010067 Nick Moore: </h3><p><code>next</code></p>
+
+<p>also, look at <code>redo</code> which redoes the <em>current</em> iteration.</p>
+<h4> Comment 20697558 matt walters: </h4>... cause ruby is rad like that.<br><h4> Comment 97582574 MarkDBlackwell: </h4>Ruby borrowed much from Perl, including Perl&#39;s <a href="https://perldoc.perl.org/functions/redo.html" rel="nofollow noreferrer"><code>redo</code></a> command (or its essence, anyway). For Ruby&#39;s interpretation, search for &quot;redo&quot; within <a href="https://ruby-doc.org/core-2.2.5/doc/syntax/control_expressions_rdoc.html" rel="nofollow noreferrer">this page</a>.<br>------------------------------------------------------------------ <br><h3> Answer 11194589 sberkley: </h3><p>Writing <a href="https://stackoverflow.com/a/4010063/261542"><em>Ian Purton's</em> answer</a> in a slightly more idiomatic way:</p>
+
+<pre><code>(1..5).each do |x|
+  next if x &lt; 2
+  puts x
+end
+</code></pre>
+
+<p>Prints:</p>
+
+<pre><code>  2
+  3
+  4
+  5
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 4010060 sepp2k: </h3><p>Inside for-loops and iterator methods like <code>each</code> and <code>map</code> the <code>next</code> keyword in ruby will have the effect of jumping to the next iteration of the loop (same as <code>continue</code> in C).</p>
+
+<p>However what it actually does is just to return from the current block. So you can use it with any method that takes a block - even if it has nothing to do with iteration.</p>
+<h4> Comment 4297364 Sigurd: </h4>as well as nice redo statement<br>------------------------------------------------------------------ <br><h3> Answer 4010951 19WAS85: </h3><p>Ruby has two other loop/iteration control keywords: <code>redo</code> and <code>retry</code>. 
+<a href="http://rubyquicktips.tumblr.com/post/1122838559/redo-vs-retry" rel="noreferrer">Read more about them, and the difference between them, at Ruby QuickTips</a>.</p>
+------------------------------------------------------------------ <br><h3> Answer 4010062 idursun: </h3><p>I think it is called <a href="http://ruby-doc.org/docs/ProgrammingRuby/html/tut_expressions.html">next</a>.</p>
+------------------------------------------------------------------ <br><h3> Answer 57249769 Rakesh Kumar: </h3><p>Use next, it will bypass that condition and rest of the code will work.
+Below i have provided the Full script and out put</p>
+
+<pre><code>class TestBreak
+  puts " Enter the nmber"
+  no= gets.to_i
+  for i in 1..no
+    if(i==5)
+      next
+    else 
+      puts i
+    end
+  end
+end
+
+obj=TestBreak.new()
+</code></pre>
+
+<p>Output:
+ Enter the nmber
+10</p>
+
+<p>1
+2
+3
+4
+6
+7
+8
+9
+10</p>
+------------------------------------------------------------------ <br><h3> Answer 74094252 eQ19: </h3><p>Use may use next conditionally</p>
+<pre class="lang-rb prettyprint-override"><code>before = 0
+&quot;0;1;2;3&quot;.split(&quot;;&quot;).each.with_index do |now, i|
+    next if i &lt; 1
+    puts &quot;before it was #{before}, now it is #{now}&quot;
+    before = now
+end
+</code></pre>
+<p>output:</p>
+<pre><code>before it was 0, now it is 1
+before it was 1, now it is 2
+before it was 2, now it is 3
+</code></pre>

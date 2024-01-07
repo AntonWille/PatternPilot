@@ -1,0 +1,194 @@
+ <h2> Title: How do I remove duplicate items from an array in Perl? </h2> <h3> David, question_id: 7651 </h3>Score: 173, Tags: {perl,arrays,unique,duplicates} <br><p>I have an array in Perl:</p>
+
+<pre><code>my @my_array = ("one","two","three","two","three");
+</code></pre>
+
+<p>How do I remove the duplicates from the array?</p>
+------------------------------------------------------------------ <br><h3> Answer 7657 Greg Hewgill: </h3><p>You can do something like this as demonstrated in <a href="http://perldoc.perl.org/perlfaq4.html#How-can-I-remove-duplicate-elements-from-a-list-or-array%3f" rel="noreferrer">perlfaq4</a>:</p>
+
+<pre><code>sub uniq {
+    my %seen;
+    grep !$seen{$_}++, @_;
+}
+
+my @array = qw(one two three two three);
+my @filtered = uniq(@array);
+
+print "@filtered\n";
+</code></pre>
+
+<p>Outputs:</p>
+
+<pre><code>one two three
+</code></pre>
+
+<p>If you want to use a module, try the <code>uniq</code> function from <a href="https://metacpan.org/pod/List::MoreUtils" rel="noreferrer"><code>List::MoreUtils</code></a></p>
+<h4> Comment 9999 szabgab: </h4>please don&#39;t use $a or $b in examples as they are the magic globals of sort()<br><h4> Comment 18066649 ikegami: </h4><code>sub uniq { my %seen; grep !$seen{$_}++, @_ }</code> is a better implementation since it preserves order at no cost. Or even better, use the one from List::MoreUtils.<br><h4> Comment 14678907 szabgab: </h4>@BrianVandenberg Welcome to the world of 1987 - when this was created - and almost 100% backword compbaility for perl - so it cannot be eliminated.<br><h4> Comment 2020059 ephemient: </h4>It&#39;s a <code>my</code> lexical in this scope, so it&#39;s fine.  That being said, possibly a more descriptive variable name could be chosen.<br><h4> Comment 11850098 vol7ron: </h4>@ephemient yes, but if you were to add sorting in this function then it would trump <code>$::a</code> and <code>$::b</code>, wouldn&#39;t it?<br><h4> Comment 14441072 Brian Vandenberg: </h4>@szabgab, if that&#39;s the case, that&#39;s an incredibly bad design decision for <code>sort</code> to use non-local variables.<br><h4> Comment 52444064 Tyler: </h4>@vol7tron means &quot;backward&quot; compatible, sorry it was bugging me ;-)<br><h4> Comment 114233193 Sundeep: </h4>Perl v5.26.0 onwards, <code>List::Util</code> has <code>uniq</code> , so MoreUtils wouldn&#39;t be needed<br><h4> Comment 132801463 Ωmega: </h4>Will this keep the order of selected items unchanged? Can be this method used for a sorted array to preserve the order?<br>------------------------------------------------------------------ <br><h3> Answer 7829 John Siracusa: </h3><p>The Perl documentation comes with a nice collection of FAQs.  Your question is frequently asked:</p>
+<pre><code>% perldoc -q duplicate
+</code></pre>
+<p>The answer, copy and pasted from the output of the command above, appears below:</p>
+<hr>
+Found in /usr/local/lib/perl5/5.10.0/pods/perlfaq4.pod
+<p><strong>How can I remove duplicate elements from a list or array?</strong>
+(contributed by brian d foy)</p>
+<p>Use a hash. When you think the words &quot;unique&quot; or &quot;duplicated&quot;, think
+&quot;hash keys&quot;.</p>
+<p>If you don't care about the order of the elements, you could just create the hash then extract the keys. It's not important how you create that hash: just that you use &quot;keys&quot; to get the unique elements.</p>
+<pre><code>   my %hash   = map { $_, 1 } @array;
+   # or a hash slice: @hash{ @array } = ();
+   # or a foreach: $hash{$_} = 1 foreach ( @array );
+
+   my @unique = keys %hash;
+</code></pre>
+<p>If you want to use a module, try the &quot;uniq&quot; function from
+&quot;List::MoreUtils&quot;. In list context it returns the unique elements, preserving their order in the list. In scalar context, it returns the number of unique elements.</p>
+<pre><code>   use List::MoreUtils qw(uniq);
+
+   my @unique = uniq( 1, 2, 3, 4, 4, 5, 6, 5, 7 ); # 1,2,3,4,5,6,7
+   my $unique = uniq( 1, 2, 3, 4, 4, 5, 6, 5, 7 ); # 7
+</code></pre>
+<p>You can also go through each element and skip the ones you've seen
+before. Use a hash to keep track. The first time the loop sees an
+element, that element has no key in %Seen. The &quot;next&quot; statement creates
+the key and immediately uses its value, which is &quot;undef&quot;, so the loop
+continues to the &quot;push&quot; and increments the value for that key. The next
+time the loop sees that same element, its key exists in the hash and
+the value for that key is true (since it's not 0 or &quot;undef&quot;), so the
+next skips that iteration and the loop goes to the next element.</p>
+<pre><code>   my @unique = ();
+   my %seen   = ();
+
+   foreach my $elem ( @array )
+   {
+     next if $seen{ $elem }++;
+     push @unique, $elem;
+   }
+</code></pre>
+<p>You can write this more briefly using a grep, which does the same thing.</p>
+<pre><code>   my %seen = ();
+   my @unique = grep { ! $seen{ $_ }++ } @array;
+</code></pre>
+<h4> Comment 69012 brian d foy: </h4>John iz in mah anzers stealing mah rep!<br><h4> Comment 98980 Brad Gilbert: </h4>I think you should get bonus points for actually looking the question up.<br><h4> Comment 38629375 Parthian Shot: </h4>I like that the best answer is 95% copy-paste and 3 sentences of OC. To be perfectly clear, this <b>is</b> the best answer; I just find that fact amusing.<br><h4> Comment 9993 szabgab: </h4><a href="http://perldoc.perl.org/perlfaq4.html#How-can-I-remove-duplicate-elements-from-a-list-or-array%3F" rel="nofollow noreferrer">perldoc.perl.org/&hellip;</a><br>------------------------------------------------------------------ <br><h3> Answer 36739 Ranguard: </h3><p>Install <a href="http://search.cpan.org/dist/List-MoreUtils/" rel="noreferrer">List::MoreUtils</a> from CPAN</p>
+
+<p>Then in your code:</p>
+
+<pre><code>use strict;
+use warnings;
+use List::MoreUtils qw(uniq);
+
+my @dup_list = qw(1 1 1 2 3 4 4);
+
+my @uniq_list = uniq(@dup_list);
+</code></pre>
+<h4> Comment 12424907 yPhil: </h4>The fact that List::MoreUtils is not bundled w/ perl kinda damages the portability of projects using it :( (I for one won&#39;t)<br><h4> Comment 29621567 incutonez: </h4>@Ranguard: <code>@dup_list</code> should be inside the <code>uniq</code> call, not <code>@dups</code><br><h4> Comment 114233179 Sundeep: </h4>Perl v5.26.0 onwards, <code>List::Util</code> has <code>uniq</code> , so MoreUtils wouldn&#39;t be needed<br><h4> Comment 76547015 Francisco Zarabozo: </h4>@yassinphilip CPAN is one of the things that make Perl as powerful and great as it can be. If you are writing your projects based only on core modules, you&#39;re putting a huge limit on your code, along with possibly pourly written code that attempts to do what some modules do much better just to avoid using them. Also, using core modules doesn&#39;t guarantee anything, as different Perl versions can add or remove core modules from the distribution, so portability is still depending on that.<br>------------------------------------------------------------------ <br><h3> Answer 7658 Xetius: </h3><p>My usual way of doing this is:</p>
+
+<pre><code>my %unique = ();
+foreach my $item (@myarray)
+{
+    $unique{$item} ++;
+}
+my @myuniquearray = keys %unique;
+</code></pre>
+
+<p>If you use a hash and add the items to the hash. You also have the bonus of knowing how many times each item appears in the list.</p>
+<h4> Comment 33081897 Nathan Fellman: </h4>This has the downside of not preserving the original order, if you need it.<br><h4> Comment 53206991 Onlyjob: </h4>It is better to use <a href="http://perldoc.perl.org/perldata.html#Slices" rel="nofollow noreferrer">slices</a> instead of <code>foreach</code> loop: <code>@unique{@myarray}=()</code><br>------------------------------------------------------------------ <br><h3> Answer 8071893 Hawk: </h3><p>Can be done with a simple Perl one-liner.</p>
+<pre><code>my @in=qw(1 3 4  6 2 4  3 2 6  3 2 3 4 4 3 2 5 5 32 3); #Sample data 
+my @out=keys %{{ map{$_=&gt;1}@in}}; # Perform PFM
+print join ' ', sort{$a&lt;=&gt;$b} @out;# Print data back out sorted and in order.
+</code></pre>
+<p>The PFM block does this:</p>
+<p>Data in <code>@in</code> is fed into <code>map</code>. <code>map</code> builds an anonymous hash.  <code>keys</code> are extracted from the hash and feed into <code>@out</code></p>
+------------------------------------------------------------------ <br><h3> Answer 43873983 Kamal Nayan: </h3><h1>Method 1: Use a hash</h1>
+
+<p>Logic: A hash can have only unique keys, so iterate over array, assign any value to each element of array, keeping element as key of that hash. Return keys of the hash, its your unique array.</p>
+
+<pre><code>my @unique = keys {map {$_ =&gt; 1} @array};
+</code></pre>
+
+<h1>Method 2: Extension of method 1 for reusability</h1>
+
+<p>Better to make a subroutine if we are supposed to use this functionality multiple times in our code.</p>
+
+<pre><code>sub get_unique {
+    my %seen;
+    grep !$seen{$_}++, @_;
+}
+my @unique = get_unique(@array);
+</code></pre>
+
+<h1>Method 3: Use module <code>List::MoreUtils</code></h1>
+
+<pre><code>use List::MoreUtils qw(uniq);
+my @unique = uniq(@array);
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 4004912 Sreedhar: </h3><p>The variable <code>@array</code> is the list with duplicate elements</p>
+<pre><code>%seen=();
+@unique = grep { ! $seen{$_} ++ } @array;
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 475071 Jay: </h3><p>That last one was pretty good. I'd just tweak it a bit:</p>
+
+<pre><code>my @arr;
+my @uniqarr;
+
+foreach my $var ( @arr ){
+  if ( ! grep( /$var/, @uniqarr ) ){
+     push( @uniqarr, $var );
+  }
+}
+</code></pre>
+
+<p>I think this is probably the most readable way to do it.</p>
+------------------------------------------------------------------ <br><h3> Answer 54000062 YenForYang: </h3><p>Previous answers pretty much summarize the possible ways of accomplishing this task.</p>
+
+<p>However, I suggest a modification for those who <em>don't</em> care about <em>counting</em> the duplicates, but <em>do</em> care about order.</p>
+
+<pre><code>my @record = qw( yeah I mean uh right right uh yeah so well right I maybe );
+my %record;
+print grep !$record{$_} &amp;&amp; ++$record{$_}, @record;
+</code></pre>
+
+<p>Note that the previously suggested <code>grep !$seen{$_}++ ...</code> increments <code>$seen{$_}</code> before negating, so the increment occurs regardless of whether it has already been <code>%seen</code> or not. The above, however, short-circuits when <code>$record{$_}</code> is true, leaving what's been heard once 'off the <code>%record</code>'.</p>
+
+<p>You could also go for this ridiculousness, which takes advantage of autovivification and existence of hash keys:</p>
+
+<pre><code>...
+grep !(exists $record{$_} || undef $record{$_}), @record;
+</code></pre>
+
+<p>That, however, might lead to some confusion.</p>
+
+<p>And if you care about neither order or duplicate count, you could for another hack using hash slices and the trick I just mentioned:</p>
+
+<pre><code>...
+undef @record{@record};
+keys %record; # your record, now probably scrambled but at least deduped
+</code></pre>
+<h4> Comment 98772962 stevesliva: </h4>For those comparing: <code>sub uniq{ my %seen; undef @seen{@_}; keys %seen; }</code>  Neat.<br>------------------------------------------------------------------ <br><h3> Answer 30448251 saschabeaumont: </h3><p>Try this, seems the uniq function needs a sorted list to work properly.</p>
+
+<pre><code>use strict;
+
+# Helper function to remove duplicates in a list.
+sub uniq {
+  my %seen;
+  grep !$seen{$_}++, @_;
+}
+
+my @teststrings = ("one", "two", "three", "one");
+
+my @filtered = uniq @teststrings;
+print "uniq: @filtered\n";
+my @sorted = sort @teststrings;
+print "sort: @sorted\n";
+my @sortedfiltered = uniq sort @teststrings;
+print "uniq sort : @sortedfiltered\n";
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 43114185 Sandeep_black: </h3><p>Using concept of unique hash keys :</p>
+
+<pre><code>my @array  = ("a","b","c","b","a","d","c","a","d");
+my %hash   = map { $_ =&gt; 1 } @array;
+my @unique = keys %hash;
+print "@unique","\n";
+</code></pre>
+
+<p>Output:
+a c b d </p>

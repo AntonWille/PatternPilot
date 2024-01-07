@@ -1,0 +1,303 @@
+ <h2> Title: How to find where gem files are installed </h2> <h3> ironsand, question_id: 19072070 </h3>Score: 411, Tags: {ruby,rubygems} <br><p>I can finds gems that are installed using <code>gem list</code>, but it doesn't show me where the gems are installed.</p>
+
+<p>How can I find where the gems are, and how can I know before installing a gem where it will be installed?</p>
+------------------------------------------------------------------ <br><h3> Answer 19072136 the Tin Man: </h3><p>Use <a href="http://guides.rubygems.org/command-reference/#gem-environment" rel="noreferrer"><code>gem environment</code></a> to find out about your gem environment:</p>
+<pre><code>RubyGems Environment:
+  - RUBYGEMS VERSION: 2.1.5
+  - RUBY VERSION: 2.0.0 (2013-06-27 patchlevel 247) [x86_64-darwin12.4.0]
+  - INSTALLATION DIRECTORY: /Users/ttm/.rbenv/versions/2.0.0-p247/lib/ruby/gems/2.0.0
+  - RUBY EXECUTABLE: /Users/ttm/.rbenv/versions/2.0.0-p247/bin/ruby
+  - EXECUTABLE DIRECTORY: /Users/ttm/.rbenv/versions/2.0.0-p247/bin
+  - SPEC CACHE DIRECTORY: /Users/ttm/.gem/specs
+  - RUBYGEMS PLATFORMS:
+    - ruby
+    - x86_64-darwin-12
+  - GEM PATHS:
+     - /Users/ttm/.rbenv/versions/2.0.0-p247/lib/ruby/gems/2.0.0
+     - /Users/ttm/.gem/ruby/2.0.0
+  - GEM CONFIGURATION:
+     - :update_sources =&gt; true
+     - :verbose =&gt; true
+     - :backtrace =&gt; false
+     - :bulk_threshold =&gt; 1000
+  - REMOTE SOURCES:
+     - https://rubygems.org/
+  - SHELL PATH:
+     - /Users/ttm/.rbenv/versions/2.0.0-p247/bin
+     - /Users/ttm/.rbenv/libexec
+     - /Users/ttm/.rbenv/plugins/ruby-build/bin
+     - /Users/ttm/perl5/perlbrew/bin
+     - /Users/ttm/perl5/perlbrew/perls/perl-5.18.1/bin
+     - /Users/ttm/.pyenv/shims
+     - /Users/ttm/.pyenv/bin
+     - /Users/ttm/.rbenv/shims
+     - /Users/ttm/.rbenv/bin
+     - /Users/ttm/bin
+     - /usr/local/mysql-5.6.12-osx10.7-x86_64/bin
+     - /Users/ttm/libsmi/bin
+     - /usr/local/bin
+     - /usr/bin
+     - /bin
+     - /usr/sbin
+     - /sbin
+     - /usr/local/bin
+</code></pre>
+<p>Notice the two sections for:</p>
+<ul>
+<li><code>INSTALLATION DIRECTORY</code></li>
+<li><code>GEM PATHS</code></li>
+</ul>
+<h4> Comment 76230798 zanderwar: </h4><code>gem env</code> for short<br><h4> Comment 28191704 ironsand: </h4>Thanks for your info! In my environment, it seems <code>GEM PATHS</code> are only used first one. Is that right?<br><h4> Comment 106116485 Matthew Setter: </h4>I&#39;d look in the <code>EXECUTABLE DIRECTORY</code>.<br><h4> Comment 106167317 the Tin Man: </h4>The <code>EXECUTABLE DIRECTORY</code> contains the CLI executable versions installed by the gems, but it&#39;s not the gems themselves.<br>------------------------------------------------------------------ <br><h3> Answer 31540740 Rustam Gasanov: </h3><p>I found it useful to get a location of the library file with:</p>
+
+<pre><code>gem which *gemname*
+</code></pre>
+<h4> Comment 57258918 antinome: </h4>This is a very nice simple method that doesn&#39;t require bundler (although I do love bundler :-).<br><h4> Comment 71465888 lacostenycoder: </h4>simplest answer, doesn&#39;t require rails, or bundler! NICE ONE!<br><h4> Comment 89098067 Cameron Kerr: </h4>I like this version because its useful for people doing logstash development (no bundler on my servers). Example is useful: <code>gem which &#39;logstash&#47;inputs&#47;tcp.rb&#39;</code><br><h4> Comment 105291000 GiriB: </h4>That will not always work. Works only when your gem exists as executable in your PATH directory.<br>------------------------------------------------------------------ <br><h3> Answer 27887572 ishanbakshi: </h3><p>After installing the gems, if you want to know where a particular gem is. Try typing:</p>
+<pre><code> gem list
+</code></pre>
+<p>You will be able to see the list of gems you have installed. Now use <code>bundle show</code> and name the gem you  want to know the path for, like this:</p>
+<pre><code> bundle show &lt;gemName&gt;
+</code></pre>
+<p>Or (as of younger versions of bundler):</p>
+<pre><code> bundle info &lt;gemName&gt;
+</code></pre>
+<h4> Comment 111043868 graceman9: </h4>[DEPRECATED] use <code>bundle info &lt;gemName&gt;</code> instead of <code>bundle show &lt;gemName&gt;</code><br><h4> Comment 80572510 Richie Thomas: </h4>I&#39;m not sure that this works in all directories.  I ran this command and got <code>Could not locate Gemfile or .bundle&#47; directory</code>.<br><h4> Comment 84926847 prograils: </h4>That&#39;s the best way because it shows the full path, (whereas <code>gem env</code>) shows only the parent folder for the <code>gems</code> folder: <code>&#47;home&#47;test&#47;.rbenv&#47;versions&#47;2.5.0&#47;lib&#47;ruby&#47;gems&#47;2.5.0</code>. There is a number of folders inside it and your gem may be located in almost any one of them - that&#39;s what <code>bundle show &lt;gemName&gt;</code> shows exactly (and <code>gem env</code>) does not.<br>------------------------------------------------------------------ <br><h3> Answer 28761313 cbliard: </h3><p>To complete other answers, the <a href="https://github.com/godfat/gem-path" rel="noreferrer">gem-path</a> gem can find the installation path of a particular gem.</p>
+
+<p>Installation:</p>
+
+<pre><code>gem install gem-path
+</code></pre>
+
+<p>Usage:</p>
+
+<pre><code>gem path rails
+=&gt; /home/cbliard/.rvm/gems/ruby-2.1.5/gems/rails-4.0.13
+gem path rails '&lt; 4'
+=&gt; /home/cbliard/.rvm/gems/ruby-2.1.5/gems/rails-3.2.21
+</code></pre>
+
+<p>This is really handy as you can use it to grep or edit files:</p>
+
+<pre><code>grep -R 'Internal server error' "$(gem path thin)"
+subl "$(gem path thin)"
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 19072090 Arup Rakshit: </h3><p>You can check it from your command prompt by running <code>gem help commands</code> and then selecting the proper command:</p>
+
+<pre><code>kirti@kirti-Aspire-5733Z:~$  gem help commands
+GEM commands are:
+
+    build                  Build a gem from a gemspec
+    cert                   Manage RubyGems certificates and signing settings
+    check                  Check a gem repository for added or missing files
+    cleanup                Clean up old versions of installed gems in the local
+                           repository
+    contents               Display the contents of the installed gems
+    dependency             Show the dependencies of an installed gem
+    environment            Display information about the RubyGems environment
+    fetch                  Download a gem and place it in the current directory
+    generate_index         Generates the index files for a gem server directory
+    help                   Provide help on the 'gem' command
+    install                Install a gem into the local repository
+    list                   Display gems whose name starts with STRING
+    lock                   Generate a lockdown list of gems
+    mirror                 Mirror all gem files (requires rubygems-mirror)
+    outdated               Display all gems that need updates
+    owner                  Manage gem owners on RubyGems.org.
+    pristine               Restores installed gems to pristine condition from
+                           files located in the gem cache
+    push                   Push a gem up to RubyGems.org
+    query                  Query gem information in local or remote repositories
+    rdoc                   Generates RDoc for pre-installed gems
+    regenerate_binstubs    Re run generation of executable wrappers for gems.
+    search                 Display all gems whose name contains STRING
+    server                 Documentation and gem repository HTTP server
+    sources                Manage the sources and cache file RubyGems uses to
+                           search for gems
+    specification          Display gem specification (in yaml)
+    stale                  List gems along with access times
+    uninstall              Uninstall gems from the local repository
+    unpack                 Unpack an installed gem to the current directory
+    update                 Update installed gems to the latest version
+    which                  Find the location of a library file you can require
+    yank                   Remove a specific gem version release from
+                           RubyGems.org
+
+For help on a particular command, use 'gem help COMMAND'.
+
+Commands may be abbreviated, so long as they are unambiguous.
+e.g. 'gem i rake' is short for 'gem install rake'.
+kirti@kirti-Aspire-5733Z:~$ 
+</code></pre>
+
+<p>Now from the above I can see the command <code>environment</code> is helpful. So I would do:</p>
+
+<pre><code>kirti@kirti-Aspire-5733Z:~$ gem help environment
+Usage: gem environment [arg] [options]
+
+
+  Common Options:
+    -h, --help                       Get help on this command
+    -V, --[no-]verbose               Set the verbose level of output
+    -q, --quiet                      Silence commands
+        --config-file FILE           Use this config file instead of default
+        --backtrace                  Show stack backtrace on errors
+        --debug                      Turn on Ruby debugging
+
+
+  Arguments:
+    packageversion  display the package version
+    gemdir          display the path where gems are installed
+    gempath         display path used to search for gems
+    version         display the gem format version
+    remotesources   display the remote gem servers
+    platform        display the supported gem platforms
+    &lt;omitted&gt;       display everything
+
+  Summary:
+    Display information about the RubyGems environment
+
+  Description:
+    The RubyGems environment can be controlled through command line arguments,
+    gemrc files, environment variables and built-in defaults.
+
+    Command line argument defaults and some RubyGems defaults can be set in a
+    ~/.gemrc file for individual users and a /etc/gemrc for all users. These
+    files are YAML files with the following YAML keys:
+
+      :sources: A YAML array of remote gem repositories to install gems from
+      :verbose: Verbosity of the gem command. false, true, and :really are the
+                levels
+      :update_sources: Enable/disable automatic updating of repository metadata
+      :backtrace: Print backtrace when RubyGems encounters an error
+      :gempath: The paths in which to look for gems
+      :disable_default_gem_server: Force specification of gem server host on
+    push
+      &lt;gem_command&gt;: A string containing arguments for the specified gem command
+
+    Example:
+
+      :verbose: false
+      install: --no-wrappers
+      update: --no-wrappers
+      :disable_default_gem_server: true
+
+    RubyGems' default local repository can be overridden with the GEM_PATH and
+    GEM_HOME environment variables. GEM_HOME sets the default repository to
+    install into. GEM_PATH allows multiple local repositories to be searched for
+    gems.
+
+    If you are behind a proxy server, RubyGems uses the HTTP_PROXY,
+    HTTP_PROXY_USER and HTTP_PROXY_PASS environment variables to discover the
+    proxy server.
+
+    If you would like to push gems to a private gem server the RUBYGEMS_HOST
+    environment variable can be set to the URI for that server.
+
+    If you are packaging RubyGems all of RubyGems' defaults are in
+    lib/rubygems/defaults.rb.  You may override these in
+    lib/rubygems/defaults/operating_system.rb
+kirti@kirti-Aspire-5733Z:~$ 
+</code></pre>
+
+<p>Finally to show you what you asked, I would do:</p>
+
+<pre><code>kirti@kirti-Aspire-5733Z:~$ gem environment gemdir
+/home/kirti/.rvm/gems/ruby-2.0.0-p0
+kirti@kirti-Aspire-5733Z:~$ gem environment gempath
+/home/kirti/.rvm/gems/ruby-2.0.0-p0:/home/kirti/.rvm/gems/ruby-2.0.0-p0@global
+kirti@kirti-Aspire-5733Z:~$ 
+</code></pre>
+<h4> Comment 28191561 ironsand: </h4>Thanks! I didn&#39;t know the <code>gem help commands</code>. And I should&#39;ve write that I&#39;m using rbenv.<br>------------------------------------------------------------------ <br><h3> Answer 48978158 Jerome Dalbert: </h3><p>You can trick <code>gem open</code> into displaying the gem path:</p>
+
+<pre><code>VISUAL=echo gem open gem-name
+</code></pre>
+
+<p>Example:</p>
+
+<pre><code>VISUAL=echo gem open rails
+=&gt; /usr/local/opt/asdf/installs/ruby/2.4.3/lib/ruby/gems/2.4.0/gems/rails-5.1.4
+</code></pre>
+
+<p>It just works, and no third party gem is necessary.</p>
+<h4> Comment 102386109 Steve: </h4>This is perfect!  It&#39;s a shame that this useful information is a side effect instead of an intentional command.  Note that you can also specify the &quot;editor&quot; with the <code>-e</code> option (<code>-e echo</code>), if it&#39;s easier than setting an environment variable.<br><h4> Comment 105263036 ARK: </h4>Beautiful! Just omit the last part and go into that directory in your editor and tear apart the gems ;-)<br>------------------------------------------------------------------ <br><h3> Answer 23234982 slayedbylucifer: </h3><p><code>gem env</code> works just like <code>gem environment</code>. Saves some typing.</p>
+
+<pre><code># gem env
+RubyGems Environment:
+  - RUBYGEMS VERSION: 2.0.14
+  - RUBY VERSION: 2.0.0 (2014-02-24 patchlevel 451) [i686-linux]
+  - INSTALLATION DIRECTORY: /usr/local/lib/ruby/gems/2.0.0
+  - RUBY EXECUTABLE: /usr/local/bin/ruby
+  - EXECUTABLE DIRECTORY: /usr/local/bin
+  - RUBYGEMS PLATFORMS:
+    - ruby
+    - x86-linux
+  - GEM PATHS:
+     - /usr/local/lib/ruby/gems/2.0.0
+     - /root/.gem/ruby/2.0.0
+  - GEM CONFIGURATION:
+     - :update_sources =&gt; true
+     - :verbose =&gt; true
+     - :backtrace =&gt; false
+     - :bulk_threshold =&gt; 1000
+  - REMOTE SOURCES:
+     - https://rubygems.org/
+</code></pre>
+<h4> Comment 99207216 the Tin Man: </h4>It&#39;s not &quot;works just like&quot;, it is the same command. <code>gem help commands</code> returns &quot;<i>Commands may be abbreviated, so long as they are unambiguous. e.g. &#39;gem i rake&#39; is short for &#39;gem install rake&#39;.</i>&quot; In other words, <code>gem environment</code>, <code>gem env</code> and <code>gem e</code> all work but <code>gem environment</code> is self-documenting for those who don&#39;t know what it&#39;s doing so we should use that for first-timers.<br>------------------------------------------------------------------ <br><h3> Answer 58087828 tanius: </h3><p>The <code>gem env</code> lists where gems <em>can</em> be installed, but this can be 10 or more locations. If you want to know where a particular gem <em>is</em> installed, you can execute:</p>
+
+<pre><code>gem list -d &lt;gemname&gt;
+</code></pre>
+
+<p>Example output:</p>
+
+<pre><code>tilt (2.0.9)
+    Author: Ryan Tomayko
+    Homepage: http://github.com/rtomayko/tilt/
+    License: MIT
+    Installed at: /opt/rubies/ruby-2.5.3/lib/ruby/gems/2.5.0
+
+    Generic interface to multiple Ruby template engines
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 59760212 ruslan: </h3><p>if you are using rvm tool you can run this command to print gem path:</p>
+
+<pre><code>rvm gemdir
+</code></pre>
+
+<p>OR</p>
+
+<pre><code>echo $GEM_HOME
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 61800079 user2966600: </h3><p>This works and gives you the installed at path for each gem.  This super helpful when trying to do multi-stage docker builds.. You can copy in the specific directory post-bundle install.</p>
+
+<p><code>bash-4.4# gem list -d</code></p>
+
+<p>Output:: </p>
+
+<pre><code>aasm (5.0.6)
+    Authors: Thorsten Boettger, Anil Maurya
+    Homepage: https://github.com/aasm/aasm
+    License: MIT
+    Installed at: /usr/local/bundle
+
+  State machine mixin for Ruby objects
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 74232455 A. KUMAR: </h3><p>One can go to <code>rails console</code> and do</p>
+<pre><code>Gem.bin_path('&lt;gem-name&gt;', '&lt;gem-executable-name&gt;')
+</code></pre>
+<p>It returns exact path to the gem file executable.</p>
+<p>Ref: <a href="https://www.rubydoc.info/github/rubygems/rubygems/Gem.bin_path" rel="nofollow noreferrer">https://www.rubydoc.info/github/rubygems/rubygems/Gem.bin_path</a></p>
+------------------------------------------------------------------ <br><h3> Answer 75907044 0xxxD: </h3><pre><code>gem info YourTargetName
+</code></pre>
+<p>for example :</p>
+<pre><code>gem info cocoapods-packager
+
+
+*** LOCAL GEMS ***
+
+cocoapods-packager (1.5.0)
+    Authors: Kyle Fuller, Boris Bügling
+    Homepage: https://github.com/CocoaPods/cocoapods-packager
+    License: MIT
+    Installed at: /Users/localName/.rbenv/versions/2.7.5/lib/ruby/gems/2.7.0
+
+CocoaPods plugin which allows you to generate a framework or static
+library from a podspec.
+</code></pre>

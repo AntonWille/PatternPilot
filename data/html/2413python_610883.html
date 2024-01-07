@@ -1,0 +1,265 @@
+ <h2> Title: How to check if an object has an attribute? </h2> <h3> Lucas Gabriel S&#225;nchez, question_id: 610883 </h3>Score: 2413, Tags: {python,class,object,attributes,attributeerror} <br><p>How do I check if an object has some attribute? For example:</p>
+<pre><code>&gt;&gt;&gt; a = SomeClass()
+&gt;&gt;&gt; a.property
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+AttributeError: SomeClass instance has no attribute 'property'
+</code></pre>
+<p>How do I tell if <code>a</code> has the attribute <code>property</code> before using it?</p>
+<h4> Comment 126013660 smci: </h4>Also, don&#39;t actually name your attribute &#39;property&#39; , because Python has <a href="https://docs.python.org/3/howto/descriptor.html#properties" rel="nofollow noreferrer"><code>property</code> decorator and builtin</a> too, and those are slightly different than normal attributes/methods.<br><h4> Comment 126013634 smci: </h4>When you say <i>&quot;tell if a has the attribute property before using it?&quot;</i> do you want a function returning a boolean (like <code>hasattr()</code> returns) or is it ok to throw an <code>AttributeError</code> exception?<br>------------------------------------------------------------------ <br><h3> Answer 610893 Jarret Hardie: </h3><p>Try <a href="https://docs.python.org/3/library/functions.html#hasattr" rel="noreferrer"><code>hasattr()</code></a>:</p>
+<pre><code>if hasattr(a, 'property'):
+    a.property
+</code></pre>
+<p>See <a href="https://stackoverflow.com/a/610923/117030">zweiterlinde's answer</a> below, who offers good advice about asking forgiveness! A very pythonic approach!</p>
+<p>The general practice in python is that, if the property is likely to be there most of the time, simply call it and either let the exception propagate, or trap it with a try/except block. This will likely be faster than <code>hasattr</code>. If the property is likely to not be there most of the time, or you're not sure, using <code>hasattr</code> will probably be faster than repeatedly falling into an exception block.</p>
+<h4> Comment 6369215 riviera: </h4>Seems to be working for checking for functions in namespace as well, e.g.:  <code>import string hasattr(string, &quot;lower&quot;)</code><br><h4> Comment 13324137 Jeff Tratner: </h4><code>hasattr</code> is exactly the same as using <code>try</code>/<code>except AttributeError</code>: the docstring of hasattr (in Python 2.7) says that it uses getattr hand catches exceptions.<br><h4> Comment 23139487 Martin Geisler: </h4>@JeffTratner: <code>hasattr</code> is unfortunately not <i>exactly</i> the same as a <code>try: ... except AttributeError:</code> in Python 2.x since <code>hasattr</code> will <b>catch all exception</b>. Please see <a href="http://stackoverflow.com/a/16186050/110204">my answer</a> for an example and a simple workaround.<br><h4> Comment 122256566 alper: </h4>can it be done for attribute for <code>self</code>? like <code>if not hasattr(self, &#39;property&#39;)</code> inside the <code>__init__()</code> of the object creation<br><h4> Comment 118327564 AnandShiva: </h4>hasattr does not work if your object is a &#39;dict&#39;. Use in operator or haskey method in those cases.<br><h4> Comment 131393086 nck: </h4>@alper yes, for example <code>hasattr(self, &#39;config&#39;)</code><br>------------------------------------------------------------------ <br><h3> Answer 610923 zweiterlinde: </h3><p>As <a href="https://stackoverflow.com/questions/610883/how-to-know-if-an-object-has-an-attribute-in-python/610893#610893">Jarret Hardie</a> answered, <code>hasattr</code> will do the trick.  I would like to add, though, that many in the Python community recommend a strategy of "easier to ask for forgiveness than permission" (EAFP) rather than "look before you leap" (LBYL).  See these references:</p>
+
+<p><a href="http://web.archive.org/web/20070929122422/http://mail.python.org/pipermail/python-list/2003-May/205182.html" rel="noreferrer">EAFP vs LBYL (was Re: A little disappointed so far)</a><br>
+<a href="https://web.archive.org/web/20180411011411/http://python.net/~goodger/projects/pycon/2007/idiomatic/handout.html#eafp-vs-lbyl" rel="noreferrer">EAFP vs. LBYL @Code Like a Pythonista: Idiomatic Python</a></p>
+
+<p>ie:</p>
+
+<pre><code>try:
+    doStuff(a.property)
+except AttributeError:
+    otherStuff()
+</code></pre>
+
+<p>... is preferred to:</p>
+
+<pre><code>if hasattr(a, 'property'):
+    doStuff(a.property)
+else:
+    otherStuff()
+</code></pre>
+<h4> Comment 4201351 Ethan Heilman: </h4>EAFP seems ... insane. HasAttr telegraphs to future maintance programmers that you are checking for a particular attribute. Getting an exception tells future programmers nothing and could lead someone down the rabbit hole.<br><h4> Comment 558845 jpalecek: </h4>But how do you check that it was the a.property that caused AttributeError, and not something in doStuff()? It seems you don&#39;t. I think it is really easier to ask for forgiveness, but many times, it&#39;s also incorrect.<br><h4> Comment 7217413 Max: </h4>@e5: you have a fair point in this case, but in many cases EAFP is the only correct option. For example, if you check the existence of a file and then open it, expecting that it will definitely exist, your code is incorrect: the file may be deleted or renamed between the check and the use. This is called a TOCTOU error (Time-Of-Check-To-Time-Of-Use) and besides causing crashes can also be a source of security vulnerabilities.<br><h4> Comment 28054799 Carl Meyer: </h4>Most of the ambiguity complaints here are simply because the sample code is poorly structured. The only thing inside the <code>try:</code> should be the attempted attribute access; there&#39;s no reason to wrap the execution of <code>doStuff</code> as well. There still is some potential for ambiguity though: if <code>property</code> is a computed property instead of a plain attribute, its implementation could raise <code>AttributeError</code> internally. This is why in almost all real situations like this, <code>getattr</code> is preferable to either <code>hasattr</code> or catching <code>AttributeError</code>.<br><h4> Comment 19553554 Peter M. Elias: </h4>@EthanHeilman it&#39;s only insane when there is ambiguity in the source of the exception, which can be avoided with good design in most cases. Well-layered structuring of logic within try / except / finally generally makes for more robust (less programmer error prone) logic than littering the code with preemptive if-checks for each piece of consuming code. Makes errors very explicit also, and allows consuming programmers the option of dealing with them directly.<br><h4> Comment 116605649 Ataxias: </h4>What if you only need to do something if an attribute exists, and otherwise do nothing? Would you do <code>try</code> - <code>except: pass</code> ? It is inefficient, but also bad style, because it isn&#39;t an actual exception or error you are dealing with here, it is the expected flow of the program for objects without a certain attribute.<br><h4> Comment 133060495 rooms: </h4>There&#39;s nothing wrong with <code>try: except: pass</code>.  Just put the code you want to execute if the attribute exists (and there is no exception) in the following <code>else</code> clause.  It is not bad style.<br>------------------------------------------------------------------ <br><h3> Answer 611708 Carl Meyer: </h3><p>You can use <code>hasattr()</code> or catch <code>AttributeError</code>, but if you really just want the value of the attribute with a default if it isn't there, the best option is just to use <a href="https://docs.python.org/library/functions.html#getattr" rel="noreferrer"><code>getattr()</code></a>:</p>
+
+<pre><code>getattr(a, 'property', 'default value')
+</code></pre>
+<h4> Comment 55782546 Carl Meyer: </h4>This is the best solution &quot;if you really just want the value of the attribute with a default.&quot; Although I believe this is what many people actually want when they say they want to detect whether an attribute is present, the OP actually asked for the latter, so it&#39;s reasonable for the direct answers to that question (hasattr, AttributeError) to be listed higher.<br><h4> Comment 19553393 Peter M. Elias: </h4>This solves both aforementioned problems: a) The ambiguity of the source of a possible AttributeError, b) Preserving the EAFP approach.<br><h4> Comment 28035673 fatuhoku: </h4>It&#39;s also 25% of the lines of code. Surely this has to be the best solution.<br><h4> Comment 120389004 Vexen Crabtree: </h4>Upvoted for mentioning &quot;default property&quot;. There have been times I needed this, but forgot about it!<br><h4> Comment 131911627 Gryu: </h4>It&#39;s much better than the accepted answer as for me in most cases, because hasattr usually used to check if attr exists and then check its value to avoid exception, and this helps to check value directly without &#39;if hasattr and check value&#39;<br>------------------------------------------------------------------ <br><h3> Answer 610907 batbrat: </h3><p>I think what you are looking for is <strong>hasattr</strong>. However, I'd recommend something like this if you want to detect <strong>python properties</strong>-</p>
+
+<pre><code>try:
+    getattr(someObject, 'someProperty')         
+except AttributeError:
+    print "Doesn't exist"
+else
+    print "Exists"
+</code></pre>
+
+<p>The disadvantage here is that attribute errors in the properties <code>__get__</code> code are also caught.</p>
+
+<p>Otherwise, do-</p>
+
+<pre><code>if hasattr(someObject, 'someProp'):
+    #Access someProp/ set someProp
+    pass
+</code></pre>
+
+<p>Docs:<a href="http://docs.python.org/library/functions.html" rel="noreferrer">http://docs.python.org/library/functions.html</a><br>
+<strong>Warning:</strong><br>
+The reason for my recommendation is that hasattr doesn't detect properties.<br>
+Link:<a href="http://mail.python.org/pipermail/python-dev/2005-December/058498.html" rel="noreferrer">http://mail.python.org/pipermail/python-dev/2005-December/058498.html</a></p>
+<h4> Comment 87076176 ShadowRanger: </h4><code>hasattr</code> detects properties in general just fine. It&#39;s just that it treats raising an exception in the <code>property</code>-wrapped function as meaning no such attribute exists; the linked Python mailing list post is about a property that raises an exception when you attempt to access it. For all practical purposes, said attribute doesn&#39;t exist, because it will never produce a value. Also, <code>hasattr</code> only suppresses exceptions in general on Py 3.1 and earlier; in 3.2+, it only suppresses (replacing with <code>False</code> return) <code>AttributeError</code>.<br>------------------------------------------------------------------ <br><h3> Answer 610922 Jordan Lewis: </h3><p>According to pydoc, hasattr(obj, prop) simply calls getattr(obj, prop) and catches exceptions. So, it is just as valid to wrap the attribute access with a try statement and catch AttributeError as it is to use hasattr() beforehand.</p>
+
+<pre><code>a = SomeClass()
+try:
+    return a.fake_prop
+except AttributeError:
+    return default_value
+</code></pre>
+<h4> Comment 23139596 Martin Geisler: </h4>+1. This is even <i>safer</i> than using <code>hasattr</code> when <code>SomeClass</code> overrides <code>__getattr__</code> since <code>hasattr</code> will catch <b>all</b> exceptions in Python 2.x, not just <code>AttributeError</code> like you would expect. This was fixed in Python 3.2 — please see <a href="http://stackoverflow.com/a/16186050/110204">my other answer</a> for a simple workaround.<br><h4> Comment 8519233 odinho - Velmont: </h4>Well hasattr actually <i>may be</i> optimized. E.g. with pypy.<br>------------------------------------------------------------------ <br><h3> Answer 39167034 Maico: </h3><p>I would like to suggest avoid this:</p>
+
+<pre><code>try:
+    doStuff(a.property)
+except AttributeError:
+    otherStuff()
+</code></pre>
+
+<p>The user @jpalecek mentioned it: If an <code>AttributeError</code> occurs inside <code>doStuff()</code>, you are lost.</p>
+
+<p>Maybe this approach is better:</p>
+
+<pre><code>try:
+    val = a.property
+except AttributeError:
+    otherStuff()
+else:
+    doStuff(val)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 62064463 F.M.F.: </h3><p><code>hasattr()</code> is the right answer. What I want to add is that <code>hasattr()</code> can be used well in conjunction with <a href="https://docs.python.org/3/reference/simple_stmts.html#grammar-token-assert-stmt" rel="noreferrer">assert</a> (to avoid unnecessary <code>if</code> statements and make the code more readable):</p>
+<pre><code>assert hasattr(a, 'property'), 'object lacks property' 
+print(a.property)
+</code></pre>
+<p>In case that the property is missing, the program will exit with an <code>AssertionError</code> and printing out the provided error message (<code>object lacks property</code> in this case).</p>
+<p>As stated in another <a href="https://stackoverflow.com/a/945135/4858818">answer on SO</a>:</p>
+<blockquote>
+<p>Asserts should be used to test conditions that should never happen.
+The purpose is to crash early in the case of a corrupt program state.</p>
+</blockquote>
+<p>Often this is the case when a property is missing and then <code>assert</code> is very appropriate.</p>
+<h4> Comment 109770121 Lucas Gabriel S&#225;nchez: </h4>This is helpfull but may not be always the case. Perhaps I wanted to test if the object has a property and then add it for the first time, or maybe I have to run different code for objects with that property. When the code can&#39;t continue the assert may be fine. But again, is not always the case. The important thing is the use of <code>hasattr</code> not the surrounding code.<br>------------------------------------------------------------------ <br><h3> Answer 68103426 Shashi: </h3><p>For objects other than dictonary:</p>
+<pre><code>if hasattr(a, 'property'):
+    a.property
+</code></pre>
+<p>For dictionary, <code>hasattr()</code> will not work.</p>
+<p>Many people are telling to use <code>has_key()</code> for dictionary, but it is depreciated.
+So for dictionary, you have to use <code>has_attr()</code></p>
+<pre><code>if a.has_attr('property'):
+    a['property']
+ 
+</code></pre>
+<p>Or you can also use</p>
+<pre><code>if 'property' in a:
+</code></pre>
+<h4> Comment 127421829 Martin Bonner supports Monica: </h4>For dict, use <code>if &#39;property&#39; in a:</code><br>------------------------------------------------------------------ <br><h3> Answer 44691795 nayak: </h3><p><strong>EDIT</strong>:This approach has serious limitation. It should work if the object is an <strong>iterable</strong> one. Please check the comments below.</p>
+
+<p>If you are using <strong>Python 3.6</strong> or higher like me there is a convenient alternative to check whether an object has a particular attribute:</p>
+
+<pre><code>if 'attr1' in obj1:
+    print("attr1 = {}".format(obj1["attr1"]))
+</code></pre>
+
+<p>However, I'm not sure which is the best approach right now. using <code>hasattr()</code>, using <code>getattr()</code> or using <code>in</code>. Comments are welcome.</p>
+<h4> Comment 80125682 Seth Difley: </h4><code>in</code> keyword works for checking iterable types. For example, <code>&#39;foo&#39; in None</code> throws the error <code>TypeError: argument of type &#39;NoneType&#39; is not iterable</code>. The fix is to check if the type is iterable before using <code>in</code>. After correcting for edge cases like non-iterable type, you&#39;re probably better off using <code>hasattr()</code> because it&#39;s designed to handle the edge cases.<br><h4> Comment 87076293 ShadowRanger: </h4>This has nothing to do with attribute access. I have no idea how it got upvoted. The only similarity it has to attribute access is if you are using <code>dict</code> as a &quot;lightweight object&quot;, similar to the design of JavaScript objects, but most normal classes will not support this in general (getting a variant on the error mentioned by @SethDifley).<br>------------------------------------------------------------------ <br><h3> Answer 41392643 Janarthanan Ramu: </h3><p>Hope you expecting hasattr(), but try to avoid hasattr() and please prefer getattr(). getattr() is faster than hasattr()</p>
+
+<p><strong>using hasattr():</strong></p>
+
+<pre><code> if hasattr(a, 'property'):
+     print a.property
+</code></pre>
+
+<p><strong>same here i am using getattr to get property if there is no property it return none</strong></p>
+
+<pre><code>   property = getattr(a,"property",None)
+    if property:
+        print property
+</code></pre>
+<h4> Comment 111619485 Janarthanan Ramu: </h4>@Groosha There are many things, to make it simple hasattr() internally have to call getattr() to perform their operation, so instead calling multiple method we can use direct getattr() check this <a href="https://docs.python.org/3/library/functions.html#hasattr" rel="nofollow noreferrer">docs.python.org/3/library/functions.html#hasattr</a><br><h4> Comment 120833538 user9538: </h4>But if the property does exist and its value is <code>False</code> you can end up with a false positive.<br><h4> Comment 111560697 Groosha: </h4><code>getattr() is faster than hasattr()</code>, could you please comment on this? Why faster?<br>------------------------------------------------------------------ <br><h3> Answer 56301580 Alec: </h3><p>Here's a very intuitive approach :</p>
+<pre><code>if 'property' in dir(a):
+    a.property
+</code></pre>
+<p>If a is a dictionary, you can check normally</p>
+<pre><code>if 'property' in a:
+    a.property
+</code></pre>
+<h4> Comment 129501950 MattSt: </h4>It&#39;s good to know that this is possible, but I suggest against using dir() and instead using hasattr(). The function dir() will not find meta-class supplied attributes. For more, check <a href="https://stackoverflow.com/questions/17723569/whats-the-difference-between-hasattr-and-attribute-in-dir" title="whats the difference between hasattr and attribute in dir">stackoverflow.com/questions/17723569/&hellip;</a>.<br>------------------------------------------------------------------ <br><h3> Answer 611122 nikow: </h3><p>Depending on the situation you can check with <code>isinstance</code> what kind of object you have, and then use the corresponding attributes. With the introduction of <a href="http://www.python.org/dev/peps/pep-3119/" rel="noreferrer">abstract base classes</a> in Python 2.6/3.0 this approach has also become much more powerful (basically ABCs allow for a more sophisticated way of duck typing).</p>
+
+<p>One situation were this is useful would be if two different objects have an attribute with the same name, but with different meaning. Using only <code>hasattr</code> might then lead to strange errors.</p>
+
+<p>One nice example is the distinction between iterators and iterables (see <a href="https://stackoverflow.com/questions/709084/how-to-tell-the-difference-between-an-iterator-and-an-iterable">this</a> question). The <code>__iter__</code> methods in an iterator and an iterable have the same name but are semantically quite different! So <code>hasattr</code> is useless, but <code>isinstance</code> together with ABC's provides a clean solution.</p>
+
+<p>However, I agree that in most situations the <code>hasattr</code> approach (described in other answers) is the most appropriate solution.</p>
+------------------------------------------------------------------ <br><h3> Answer 74461642 Super Kai - Kazuya Ito: </h3><p>You can use <a href="https://docs.python.org/3/library/functions.html#hasattr" rel="nofollow noreferrer"><strong>hasattr()</strong></a> to check if object or class has an attribute in Python.</p>
+<p>For example, there is <strong><code>Person</code> class</strong> as shown below:</p>
+<pre class="lang-py prettyprint-override"><code>class Person:
+    greeting = &quot;Hello&quot;
+
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def test(self):
+        print(&quot;Test&quot;)
+</code></pre>
+<p>Then, you can use <a href="https://docs.python.org/3/library/functions.html#hasattr" rel="nofollow noreferrer"><strong>hasattr()</strong></a> for <strong>object</strong> as shown below:</p>
+<pre class="lang-py prettyprint-override"><code>obj = Person(&quot;John&quot;, 27)
+obj.gender = &quot;Male&quot;
+print(&quot;greeting:&quot;, hasattr(obj, 'greeting'))
+print(&quot;name:&quot;, hasattr(obj, 'name'))
+print(&quot;age:&quot;, hasattr(obj, 'age'))
+print(&quot;gender:&quot;, hasattr(obj, 'gender'))
+print(&quot;test:&quot;, hasattr(obj, 'test'))
+print(&quot;__init__:&quot;, hasattr(obj, '__init__'))
+print(&quot;__str__:&quot;, hasattr(obj, '__str__'))
+print(&quot;__module__:&quot;, hasattr(obj, '__module__'))
+</code></pre>
+<p>Output:</p>
+<pre class="lang-none prettyprint-override"><code>greeting: True
+name: True
+age: True
+gender: True
+test: True
+__init__: True
+__str__: True
+__module__: True
+</code></pre>
+<p>And, you can also use <a href="https://docs.python.org/3/library/functions.html#hasattr" rel="nofollow noreferrer"><strong>hasattr()</strong></a> directly for <strong>class name</strong> as shown below:</p>
+<pre class="lang-py prettyprint-override"><code>print(&quot;greeting:&quot;, hasattr(Person, 'greeting'))
+print(&quot;name:&quot;, hasattr(Person, 'name'))
+print(&quot;age:&quot;, hasattr(Person, 'age'))
+print(&quot;gender:&quot;, hasattr(Person, 'gender'))
+print(&quot;test:&quot;, hasattr(Person, 'test'))
+print(&quot;__init__:&quot;, hasattr(Person, '__init__'))
+print(&quot;__str__:&quot;, hasattr(Person, '__str__'))
+print(&quot;__module__:&quot;, hasattr(Person, '__module__'))
+</code></pre>
+<p>Output:</p>
+<pre class="lang-none prettyprint-override"><code>greeting: True
+name: False
+age: False
+gender: False
+test: True
+__init__: True
+__str__: True
+__module__: True
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 55133137 Sean Christians: </h3><p>This is super simple, just use <code>dir(</code><i>object</i><code>)</code>
+<br>This will return a list of every available function and attribute of the object.</p>
+------------------------------------------------------------------ <br><h3> Answer 55079120 Devang Padhiyar: </h3><p>You can check whether <code>object</code> contains attribute by using <code>hasattr</code> builtin method.</p>
+
+<p>For an instance if your object is <code>a</code> and you want to check for attribute <code>stuff</code></p>
+
+<pre><code>&gt;&gt;&gt; class a:
+...     stuff = "something"
+... 
+&gt;&gt;&gt; hasattr(a,'stuff')
+True
+&gt;&gt;&gt; hasattr(a,'other_stuff')
+False
+</code></pre>
+
+<p>The method signature itself is <code>hasattr(object, name) -&gt; bool</code> which mean if <code>object</code> has <strong>attribute</strong> which is passed to second argument in <code>hasattr</code> than it gives boolean <code>True</code> or <code>False</code> according to the presence of <code>name</code> attribute in object.</p>
+<h4> Comment 124475960 Gabriel Staples: </h4>nit: <code>hasattr()</code> is a <i>function</i>, not a method. <a href="https://stackoverflow.com/a/70415890/4561887">See here.</a><br>------------------------------------------------------------------ <br><h3> Answer 57486913 JL Peyret: </h3><p>Another possible option, but it depends if what you mean by <em>before</em>:</p>
+
+<pre><code>undefined = object()
+
+class Widget:
+
+    def __init__(self):
+        self.bar = 1
+
+    def zoom(self):
+        print("zoom!")
+
+a = Widget()
+
+bar = getattr(a, "bar", undefined)
+if bar is not undefined:
+    print("bar:%s" % (bar))
+
+foo = getattr(a, "foo", undefined)
+if foo is not undefined:
+    print("foo:%s" % (foo))
+
+zoom = getattr(a, "zoom", undefined)
+if zoom is not undefined:
+    zoom()
+</code></pre>
+
+<p>output:</p>
+
+<pre><code>bar:1
+zoom!
+</code></pre>
+
+<p>This allows you to even check for None-valued attributes.</p>
+
+<p>But!  Be very careful you don't accidentally instantiate and compare <code>undefined</code> multiple places because the <code>is</code> will never work in that case.</p>
+
+<h3>Update:</h3>
+
+<p>because of what I was warning about in the above paragraph, having multiple undefineds that never match, I have recently slightly modified this pattern:</p>
+
+<p><code>undefined = NotImplemented</code></p>
+
+<p><code>NotImplemented</code>, not to be confused with <code>NotImplementedError</code>, is a built-in:  it semi-matches the intent of a JS <code>undefined</code> and you can reuse its definition everywhere and it will always match.  The drawbacks is that it is "truthy" in booleans and it can look weird in logs and stack traces (but you quickly get over it when you know it only appears in this context).</p>

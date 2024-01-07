@@ -1,0 +1,398 @@
+ <h2> Title: How to prettyprint a JSON file? </h2> <h3> Colleen, question_id: 12943819 </h3>Score: 1913, Tags: {python,json,formatting,pretty-print} <br><p>How do I pretty-print a JSON file in Python?</p>
+------------------------------------------------------------------ <br><h3> Answer 12944035 Blender: </h3><p>Use the <code>indent=</code> parameter of <a href="https://docs.python.org/3/library/json.html#json.dump" rel="noreferrer"><code>json.dump()</code></a> or <a href="https://docs.python.org/3/library/json.html#json.dumps" rel="noreferrer"><code>json.dumps()</code></a> to specify how many spaces to indent by:</p>
+<pre><code>&gt;&gt;&gt; import json
+&gt;&gt;&gt; your_json = '[&quot;foo&quot;, {&quot;bar&quot;: [&quot;baz&quot;, null, 1.0, 2]}]'
+&gt;&gt;&gt; parsed = json.loads(your_json)
+&gt;&gt;&gt; print(json.dumps(parsed, indent=4))
+[
+    &quot;foo&quot;,
+    {
+        &quot;bar&quot;: [
+            &quot;baz&quot;,
+            null,
+            1.0,
+            2
+        ]
+    }
+]
+</code></pre>
+<p>To parse a file, use <a href="https://docs.python.org/3/library/json.html#json.load" rel="noreferrer"><code>json.load()</code></a>:</p>
+<pre><code>with open('filename.txt', 'r') as handle:
+    parsed = json.load(handle)
+</code></pre>
+<h4> Comment 39096720 Peterino: </h4>For simple pretty-printing this also works without explicit parsing: <code>print json.dumps(your_json_string, indent=4)</code><br><h4> Comment 59737431 krs013: </h4>Without the indent, you just get a single line of ugly text, which is why I came here.<br><h4> Comment 62582277 Christophe Roussy: </h4>This is similar to JavaScript <code>var str = JSON.stringify(obj, null, 4);</code> as discussed here <a href="http://stackoverflow.com/questions/4810841/how-can-i-pretty-print-json-using-javascript" title="how can i pretty print json using javascript">stackoverflow.com/questions/4810841/&hellip;</a><br><h4> Comment 120584610 ACV: </h4>@Peterino, it is not working without explicit parsing. It prints an escaped line<br><h4> Comment 130357439 PascalVKooten: </h4>@PeterlitsZo did you find a way to use line wrap 80 for example not to make it look this silly?<br><h4> Comment 130365597 Peterlits Zo: </h4>@PascalVKooten Sorry but no. Do you think it will be good if I write a tool for it? I want to find a tool but I can&#39;t.<br><h4> Comment 130386227 PascalVKooten: </h4>Yea in my case I would really like a tool that would take a line length as option and then tries to fit more on one line. Kinda tricky though, because if you have <code>{&quot;a&quot;: 1, &quot;b&quot;: 2, &quot;c&quot;3}</code> maybe because it is so short it would still be better spread out over multiple lines?<br><h4> Comment 136541313 Shmack: </h4>How to do this when the objects are unserializable? Like just print its to string.<br><h4> Comment 125883813 Peterlits Zo: </h4>In JS tool prettier, it will not add &#39;line break&#39; if the line width less than 80. I am looking for it.<br>------------------------------------------------------------------ <br><h3> Answer 32228333 Gismo Ranas: </h3><p>You can do this on the command line:</p>
+<pre><code>python3 -m json.tool some.json
+</code></pre>
+<p>(as already mentioned in the commentaries to the question, thanks to @Kai Petzke for the python3 suggestion).</p>
+<p>Actually python is not my favourite tool as far as json processing on the command line is concerned. For simple pretty printing is ok, but if you want to manipulate the json it can become overcomplicated. You'd soon need to write a separate script-file, you could end up with maps whose keys are u&quot;some-key&quot; (python unicode), which makes selecting fields more difficult and doesn't really go in the direction of pretty-printing.</p>
+<p>You can also use <a href="https://stedolan.github.io/jq/" rel="noreferrer">jq</a>:</p>
+<pre><code>jq . some.json
+</code></pre>
+<p>and you get colors as a bonus (and way easier extendability).</p>
+<p>Addendum: There is some confusion in the comments about using jq to process large JSON files on the one hand, and having a very large jq program on the other.  For pretty-printing a file consisting of a single large JSON entity, the practical limitation is RAM.  For pretty-printing a 2GB file consisting of a single array of real-world data, the &quot;maximum resident set size&quot; required for pretty-printing was 5GB (whether using jq 1.5 or 1.6). Note also that jq can be used from within python after <code>pip install jq</code>.</p>
+<h4> Comment 62068183 Gismo Ranas: </h4>yeah, man, definitely, if you are writing jq filters with more than 10K lines of code I think you&#39;re trying something like going to mars with a bicycle.<br><h4> Comment 69341979 fatal_error: </h4>or just: <code>jq &#39;&#39; &lt; some.json</code><br><h4> Comment 62068069 Chris McKee: </h4>JQ is great but there is a max limit so its useless for large files. (i.e. blows up handling a 1.15mb file) <a href="https://github.com/stedolan/jq/issues/1041" rel="nofollow noreferrer">github.com/stedolan/jq/issues/1041</a><br><h4> Comment 95379439 Kai Petzke: </h4>Actually I strongly recommend using <code>python3 -m json.tool &lt;IN &gt;OUT</code>, as this keeps the original order of the fields in JSON dicts. The python interpreter version 2 sorts the fields in alphabetically ascending order, which often is not, what you want.<br><h4> Comment 114959450 Holger Jakobs: </h4>Unfortunately, python3 kills my non-ASCII characters, while jq handles them fine. Too bad python3 still cannot handle UTF-8 out of the box.<br><h4> Comment 62068450 Chris McKee: </h4>lol :D @gismo-ranas The json.tool version piped to a file works really really well on large files; and is stupidly fast. I like JQ but formatting anything beyond a small payload (which you could do in most text editors) is beyond its reach :) Random addition: <a href="http://www.json-generator.com/" rel="nofollow noreferrer">json-generator.com</a> is a neat tool to make test data<br><h4> Comment 96118460 Todd Owen: </h4>It&#39;s worth noting that <code>python -m json.tool</code> <i>does</i> work, though, and is better than nothing. I know it&#39;s 2019 already, but there are still plenty of systems around that don&#39;t have <code>python3</code> installed!<br><h4> Comment 108657647 Eric O. Lebigot: </h4>Also, note that there is no need for the shell file redirections: <code>python3 -m json.tool in_file [out_file]</code> works directly (I updated the answer).<br><h4> Comment 78941505 kbuilds: </h4>I don&#39;t think that Python&#39;s json lib will output the <code>u&quot;some-key&quot;</code> with the <code>u</code><br><h4> Comment 80624398 ipeacocks: </h4>Plus with <code>curl -s</code> option you can hide sometime useless speed statistic.<br>------------------------------------------------------------------ <br><h3> Answer 48111364 ikreb: </h3><p>After reading the data with the <code>json</code> standard library module, use the <a href="https://docs.python.org/3.9/library/pprint.html" rel="nofollow noreferrer">pprint</a> standard library module to display the parsed data. Example:</p>
+<pre><code>import json
+import pprint
+
+json_data = None
+with open('file_name.txt', 'r') as f:
+    data = f.read()
+    json_data = json.loads(data)
+
+# print json to screen with human-friendly formatting
+pprint.pprint(json_data, compact=True)
+
+# write json to file with human-friendly formatting
+pretty_json_str = pprint.pformat(json_data, compact=True).replace(&quot;'&quot;,'&quot;')
+
+with open('file_name.json', 'w') as f:
+    f.write(pretty_json_str)
+
+</code></pre>
+<p>The default <code>indent</code> is 1, so you may want to specify your own.</p>
+<p>By default, pprint will output lists like this:</p>
+<pre><code>'not compact': ['pprint',
+                'will',
+                'output',
+                'lists',
+                'like',
+                'this'],
+</code></pre>
+<p>And that is no better than <code>json.dump()</code> or <code>json.dumps()</code> with an <code>indent</code> specified.</p>
+<p><em>With</em> <code>compact=True</code>, pprint will output lists something like this:</p>
+<pre><code>'compact': ['pprint', 'with compact=True', 'will', 'output',
+            'lists', 'like', 'this'],
+</code></pre>
+<p>Note that you can specify where it will wrap with the <code>width</code> argument.</p>
+<p>It is necessary to replace 'single quotes' with 'double quotes' in the string returned by pprint.pformat(), because single quotes are not valid json. When you look at the file in your text editor, it may be unable to highlight the json properly.</p>
+<p>In any case, you may want to save it as valid json, so that you can as a human can simply read your json files comfortably, if it is not more important that they are formatted without spacing so they can be computer-processed with blinding speed.</p>
+<p>Ultimately, the output will look like this:</p>
+<pre><code>{'address': {'city': 'New York',
+             'postalCode': '10021-3100',
+             'state': 'NY',
+             'streetAddress': '21 2nd Street'},
+ 'age': 27,
+ 'children': [],
+ 'firstName': 'John',
+ 'isAlive': True,
+ 'lastName': 'Smith'}
+</code></pre>
+<h4> Comment 89195503 drevicko: </h4>Problem with this is that pprint will use single and double quotes interchangably, but json requires double quotes only, so your pprinted json may no longer parse as valid json.<br><h4> Comment 89473479 ikreb: </h4>Yes, but it&#39;s only to output a json file. Not to take the output and write it again in a file.<br><h4> Comment 132793893 Karl Knechtel: </h4>It&#39;s not my job as an editor to correct the technical details, but simply swapping single quotes for double quotes is <b>definitely not</b> sufficient to turn <code>pprint.pformat</code> output (just like <code>repr</code> output) into valid JSON, <b>even if</b> the data originally came from JSON. Trivial example: round-tripping the valid file contents <code>&quot;\&quot;&quot;</code> (representing, in JSON, a string containing a backslash) will produce <code>&quot;&quot;&quot;</code> (which is neither valid JSON nor a valid Python literal). Round-tripping the valid file contents <code>null</code> will produce a file containing <code>None</code>.<br><h4> Comment 130014146 Victor Schr&#246;der: </h4>This solution has so many issues I can&#39;t even start. There&#39;s zero guarantee to be valid JSON, in fact, very often it won&#39;t be valid at all. Not only it will mix up the quotes all over, but also <code>pprint</code> will output many string representations that only make sense to Python. <code>None</code>, <code>datetime</code>, all sorts of objects, even when they have well defined ways to be JSON serializable. Replacing the single to double quotes only makes it worse, it will potentially not even be valid Python anymore, all you need is a double quote in any string.<br><h4> Comment 123591876 erik258: </h4>question specifically says to pretty print a json file, not a python representation of a json file<br><h4> Comment 123913745 ikreb: </h4>@DanielFarrell You are right. Thanks. I updated my answer.<br>------------------------------------------------------------------ <br><h3> Answer 32246976 Shubham Chaudhary: </h3><p><a href="http://pygments.org/" rel="nofollow noreferrer">Pygmentize</a> is a powerful tool for coloring the output of terminal commands.</p>
+<p>Here is an example of using it to add syntax highlighting to the <code>json.tool</code> output:</p>
+<pre><code>echo '{&quot;foo&quot;: &quot;bar&quot;}' | python -m json.tool | pygmentize -l json
+</code></pre>
+<p>The result will look like:</p>
+<p><img src="https://i.stack.imgur.com/bpTen.png" alt="demo" /></p>
+<p>In <a href="https://stackoverflow.com/a/27501509/2670370">a previous Stack Overflow answer</a>, I show in detail how to install and use <code>pygmentize</code>.</p>
+<h4> Comment 83997013 Denis The Menace: </h4>In your example <code>-g</code> is not actually working ;) Since input comes from stdin, pygmentize is not able to make a good guess. You need to specify lexer explicitly: <code>echo &#39;{&quot;foo&quot;: &quot;bar&quot;}&#39; | python -m json.tool | pygmentize -l json</code><br><h4> Comment 84030088 Shubham Chaudhary: </h4>@DenisTheMenace It used to work in 2015 when I created this example image. It doesn&#39;t seem to be working now on my system as well.<br>------------------------------------------------------------------ <br><h3> Answer 37757378 zelusp: </h3><p>Use this function and don't sweat having to remember if your JSON is a <code>str</code> or <code>dict</code> again - just look at the pretty print:</p>
+
+<pre><code>import json
+
+def pp_json(json_thing, sort=True, indents=4):
+    if type(json_thing) is str:
+        print(json.dumps(json.loads(json_thing), sort_keys=sort, indent=indents))
+    else:
+        print(json.dumps(json_thing, sort_keys=sort, indent=indents))
+    return None
+
+pp_json(your_json_string_or_dict)
+</code></pre>
+<h4> Comment 132809401 zelusp: </h4>The people just want to inspect their JSON, my dude.<br><h4> Comment 132794348 Karl Knechtel: </h4>This seems like just putting a nice interface on existing answers and not really engaging with the substance of the question. The key point here is the use of the <code>indent</code> keyword parameter, which is already well covered. Aside from that, it&#39;s valid for a JSON document to represent a single string. Determining which processing to use with the input should be the programmer&#39;s responsiblity, from applying logical reasoning - while Python is designed to allow this kind of flexibility, doing explicit type checking and coercion is generally discouraged.<br><h4> Comment 134907747 Eamonn Kenny: </h4>This is by far the best solution! jq is great for command line, but this is the best programmatic solution. Should be the top answer now.<br>------------------------------------------------------------------ <br><h3> Answer 55599076 Nakamoto: </h3><p>Use pprint: <a href="https://docs.python.org/3.6/library/pprint.html" rel="noreferrer">https://docs.python.org/3.6/library/pprint.html</a></p>
+
+<pre class="lang-py prettyprint-override"><code>import pprint
+pprint.pprint(json)
+</code></pre>
+
+<p><code>print()</code> compared to <code>pprint.pprint()</code></p>
+
+<pre class="lang-py prettyprint-override"><code>print(json)
+{'feed': {'title': 'W3Schools Home Page', 'title_detail': {'type': 'text/plain', 'language': None, 'base': '', 'value': 'W3Schools Home Page'}, 'links': [{'rel': 'alternate', 'type': 'text/html', 'href': 'https://www.w3schools.com'}], 'link': 'https://www.w3schools.com', 'subtitle': 'Free web building tutorials', 'subtitle_detail': {'type': 'text/html', 'language': None, 'base': '', 'value': 'Free web building tutorials'}}, 'entries': [], 'bozo': 0, 'encoding': 'utf-8', 'version': 'rss20', 'namespaces': {}}
+
+pprint.pprint(json)
+{'bozo': 0,
+ 'encoding': 'utf-8',
+ 'entries': [],
+ 'feed': {'link': 'https://www.w3schools.com',
+          'links': [{'href': 'https://www.w3schools.com',
+                     'rel': 'alternate',
+                     'type': 'text/html'}],
+          'subtitle': 'Free web building tutorials',
+          'subtitle_detail': {'base': '',
+                              'language': None,
+                              'type': 'text/html',
+                              'value': 'Free web building tutorials'},
+          'title': 'W3Schools Home Page',
+          'title_detail': {'base': '',
+                           'language': None,
+                           'type': 'text/plain',
+                           'value': 'W3Schools Home Page'}},
+ 'namespaces': {},
+ 'version': 'rss20'}
+</code></pre>
+<h4> Comment 104340637 selurvedu: </h4><code>pprint</code> does not produce a valid JSON document.<br><h4> Comment 117583797 user743873: </h4>@CharlieParker I expect they meant that knowing you have a valid JSON document is pretty useful. Sure, you can use the <code>json</code> module to work with the data and dictionary keys work the same with double- or single-quoted strings, but some tools, e.g. <a href="https://getpostman.com" rel="nofollow noreferrer">Postman</a> and <a href="https://jsoneditoronline.org/" rel="nofollow noreferrer">JSON Editor Online</a>, both expect keys and values to be double-quoted (as per the JSON spec). In any case, <a href="https://www.json.org/" rel="nofollow noreferrer">json.org</a> specifies the use of double quotes, which <code>pprint</code> doesn&#39;t produce.  E.g. <code>pprint.pprint({&quot;name&quot;: &quot;Jane&quot;})</code> produces <code>{&#39;name&#39;: &#39;Jane&#39;}</code>.<br><h4> Comment 121166363 Daniel F: </h4>@CharlieParker an example would be the <code>&#39;language&#39;: None,</code> in the result above, which should be <code>&quot;language&quot;: null</code>. Note the <code>null</code> and the double quotes. What you do is pretty-printing a Python object.<br><h4> Comment 116913446 Charlie Parker: </h4>@selurvedu what does that mean and why does that matter?<br><h4> Comment 123556960 selurvedu: </h4>Yes, that&#39;s what I meant. Thanks for clarifying. :-)<br>------------------------------------------------------------------ <br><h3> Answer 43073030 V P: </h3><p>To be able to pretty print from the command line and be able to have control over the indentation etc. you can set up an alias similar to this:</p>
+
+<pre><code>alias jsonpp="python -c 'import sys, json; print json.dumps(json.load(sys.stdin), sort_keys=True, indent=2)'"
+</code></pre>
+
+<p>And then use the alias in one of these ways:</p>
+
+<pre><code>cat myfile.json | jsonpp
+jsonpp &lt; myfile.json
+</code></pre>
+<h4> Comment 132794414 Karl Knechtel: </h4>The <code>json</code> module provides <code>json.tool</code> explicitly to avoid the need for this kind of thing.<br>------------------------------------------------------------------ <br><h3> Answer 58344057 Pablo Emmanuel De Leo: </h3><pre><code>def saveJson(date,fileToSave):
+    with open(fileToSave, 'w+') as fileToSave:
+        json.dump(date, fileToSave, ensure_ascii=True, indent=4, sort_keys=True)
+</code></pre>
+
+<p>It works to display or save it to a file.</p>
+<h4> Comment 132794465 Karl Knechtel: </h4>This seems entirely redundant with the top answers.<br>------------------------------------------------------------------ <br><h3> Answer 74665196 ntg: </h3><p>TL;DR: many ways, also consider <code>print(yaml.dump(j, sort_keys=False))</code></p>
+<p>For most uses, indent should do it:</p>
+<pre><code>print(json.dumps(parsed, indent=2))
+</code></pre>
+<p>A Json structure is basically <a href="https://en.wikipedia.org/wiki/Tree_(graph_theory)" rel="noreferrer">tree structure</a>.
+While trying to find something fancier, I came across this nice paper depicting other forms of nice trees that might be interesting: <a href="https://blog.ouseful.info/2021/07/13/exploring-the-hierarchical-structure-of-dataframes-and-csv-data/" rel="noreferrer">https://blog.ouseful.info/2021/07/13/exploring-the-hierarchical-structure-of-dataframes-and-csv-data/</a>.</p>
+<p>It has some interactive trees and even comes with some code including this <a href="https://stackoverflow.com/questions/18873066/pretty-json-formatting-in-ipython-notebook/37124230#37124230">collapsing tree</a> from so:
+<a href="https://i.stack.imgur.com/YzcWOm.png" rel="noreferrer"><img src="https://i.stack.imgur.com/YzcWOm.png" alt="enter image description here" /></a></p>
+<p>Other samples include using <a href="https://plotly.com/python/treemaps/" rel="noreferrer">plotly</a> Here is the code example from plotly:</p>
+<pre><code>import plotly.express as px
+fig = px.treemap(
+    names = [&quot;Eve&quot;,&quot;Cain&quot;, &quot;Seth&quot;, &quot;Enos&quot;, &quot;Noam&quot;, &quot;Abel&quot;, &quot;Awan&quot;, &quot;Enoch&quot;, &quot;Azura&quot;],
+    parents = [&quot;&quot;, &quot;Eve&quot;, &quot;Eve&quot;, &quot;Seth&quot;, &quot;Seth&quot;, &quot;Eve&quot;, &quot;Eve&quot;, &quot;Awan&quot;, &quot;Eve&quot;]
+)
+fig.update_traces(root_color=&quot;lightgrey&quot;)
+fig.update_layout(margin = dict(t=50, l=25, r=25, b=25))
+fig.show()
+</code></pre>
+<p><a href="https://i.stack.imgur.com/EvOl1m.png" rel="noreferrer"><img src="https://i.stack.imgur.com/EvOl1m.png" alt="enter image description here" /></a>
+<a href="https://i.stack.imgur.com/6Ig6im.png" rel="noreferrer"><img src="https://i.stack.imgur.com/6Ig6im.png" alt="enter image description here" /></a></p>
+<p>And using <a href="https://pypi.org/project/treelib/" rel="noreferrer">treelib</a>. On that note, <a href="https://gist.github.com/psychemedia/7cf7cf56f3178126df4e7a29d8621623" rel="noreferrer">This github</a> also provides nice visualizations. Here is one example using treelib:</p>
+<pre><code>#%pip install treelib
+from treelib import Tree
+
+country_tree = Tree()
+# Create a root node
+country_tree.create_node(&quot;Country&quot;, &quot;countries&quot;)
+
+# Group by country
+for country, regions in wards_df.head(5).groupby([&quot;CTRY17NM&quot;, &quot;CTRY17CD&quot;]):
+    # Generate a node for each country
+    country_tree.create_node(country[0], country[1], parent=&quot;countries&quot;)
+    # Group by region
+    for region, las in regions.groupby([&quot;GOR10NM&quot;, &quot;GOR10CD&quot;]):
+        # Generate a node for each region
+        country_tree.create_node(region[0], region[1], parent=country[1])
+        # Group by local authority
+        for la, wards in las.groupby(['LAD17NM', 'LAD17CD']):
+            # Create a node for each local authority
+            country_tree.create_node(la[0], la[1], parent=region[1])
+            for ward, _ in wards.groupby(['WD17NM', 'WD17CD']):
+                # Create a leaf node for each ward
+                country_tree.create_node(ward[0], ward[1], parent=la[1])
+
+# Output the hierarchical data
+country_tree.show()
+</code></pre>
+<p><a href="https://i.stack.imgur.com/KUwcwm.png" rel="noreferrer"><img src="https://i.stack.imgur.com/KUwcwm.png" alt="enter image description here" /></a></p>
+<p>I have, based on this, created a function to convert json to a tree:</p>
+<pre><code>from treelib import Node, Tree, node
+
+def create_node(tree, s, counter_byref, verbose, parent_id=None):
+    node_id = counter_byref[0]
+    if verbose:
+        print(f&quot;tree.create_node({s}, {node_id}, parent={parent_id})&quot;)
+    tree.create_node(s, node_id, parent=parent_id)
+    counter_byref[0] += 1
+    return node_id
+
+def to_compact_string(o):
+    if type(o) == dict:
+        if len(o)&gt;1:
+            raise Exception()
+        k,v =next(iter(o.items()))
+        return f'{k}:{to_compact_string(v)}'
+    elif type(o) == list:
+        if len(o)&gt;1:
+            raise Exception()
+        return f'[{to_compact_string(next(iter(o)))}]'
+    else:
+        return str(o)
+
+def to_compact(tree, o, counter_byref, verbose, parent_id):
+    try:
+        s = to_compact_string(o)
+        if verbose:
+            print(f&quot;# to_compact({o}) ==&gt; [{s}]&quot;)
+        create_node(tree, s, counter_byref, verbose, parent_id=parent_id)
+        return True
+    except:
+        return False
+
+def json_2_tree(o , parent_id=None, tree=None, counter_byref=[0], verbose=False, compact_single_dict=False, listsNodeSymbol='+'):
+    if tree is None:
+        tree = Tree()
+        parent_id = create_node(tree, '+', counter_byref, verbose)
+    if compact_single_dict and to_compact(tree, o, counter_byref, verbose, parent_id):
+        # no need to do more, inserted as a single node
+        pass
+    elif type(o) == dict:
+        for k,v in o.items():
+            if compact_single_dict and to_compact(tree, {k:v}, counter_byref, verbose, parent_id):
+                # no need to do more, inserted as a single node
+                continue
+            key_nd_id = create_node(tree, str(k), counter_byref, verbose, parent_id=parent_id)
+            if verbose:
+                print(f&quot;# json_2_tree({v})&quot;)
+            json_2_tree(v , parent_id=key_nd_id, tree=tree, counter_byref=counter_byref, verbose=verbose, listsNodeSymbol=listsNodeSymbol, compact_single_dict=compact_single_dict)
+    elif type(o) == list:
+        if listsNodeSymbol is not None:
+            parent_id = create_node(tree, listsNodeSymbol, counter_byref, verbose, parent_id=parent_id)
+        for i in o:
+            if compact_single_dict and to_compact(tree, i, counter_byref, verbose, parent_id):
+                # no need to do more, inserted as a single node
+                continue
+            if verbose:
+                print(f&quot;# json_2_tree({i})&quot;)
+            json_2_tree(i , parent_id=parent_id, tree=tree, counter_byref=counter_byref, verbose=verbose,listsNodeSymbol=listsNodeSymbol, compact_single_dict=compact_single_dict)
+    else: #node
+        create_node(tree, str(o), counter_byref, verbose, parent_id=parent_id)
+    return tree
+</code></pre>
+<p>Then for example:</p>
+<pre><code>import json
+j = json.loads('{&quot;2&quot;: 3, &quot;4&quot;: [5, 6], &quot;7&quot;: {&quot;8&quot;: 9}}')
+json_2_tree(j ,verbose=False,listsNodeSymbol='+' ).show()  
+</code></pre>
+<p>gives:</p>
+<pre><code>+
+├── 2
+│   └── 3
+├── 4
+│   └── +
+│       ├── 5
+│       └── 6
+└── 7
+    └── 8
+        └── 9
+</code></pre>
+<p>While</p>
+<pre><code>json_2_tree(j ,listsNodeSymbol=None, verbose=False ).show()  
+</code></pre>
+<pre><code>+
+├── 2
+│   └── 3
+├── 4
+│   ├── 5
+│   └── 6
+└── 7
+    └── 8
+        └── 9
+</code></pre>
+<p>And</p>
+<pre><code>json_2_tree(j ,compact_single_dict=True,listsNodeSymbol=None).show() 
+</code></pre>
+<pre><code>+
+├── 2:3
+├── 4
+│   ├── 5
+│   └── 6
+└── 7:8:9
+</code></pre>
+<p>As you see, there are different trees one can make depending on how explicit vs. compact he wants to be.
+One of my favorites, and one of the most compact ones might be using <a href="https://pyyaml.org/wiki/PyYAMLDocumentation" rel="noreferrer">yaml</a>:</p>
+<pre><code>import yaml
+j = json.loads('{&quot;2&quot;: &quot;3&quot;, &quot;4&quot;: [&quot;5&quot;, &quot;6&quot;], &quot;7&quot;: {&quot;8&quot;: &quot;9&quot;}}')
+print(yaml.dump(j, sort_keys=False))
+</code></pre>
+<p>Gives <strong>the compact and unambiguous</strong>:</p>
+<pre><code>'2': '3'
+'4':
+- '5'
+- '6'
+'7':
+  '8': '9'
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 58195522 Travis Clarke: </h3><p>You could try <a href="https://github.com/clarketm/pprintjson" rel="noreferrer"><strong>pprintjson</strong></a>.</p>
+
+<hr>
+
+<h3>Installation</h3>
+
+<pre class="lang-sh prettyprint-override"><code>$ pip3 install pprintjson
+</code></pre>
+
+<h3>Usage</h3>
+
+<p>Pretty print JSON from a file using the pprintjson CLI.</p>
+
+<pre class="lang-sh prettyprint-override"><code>$ pprintjson "./path/to/file.json"
+</code></pre>
+
+<p>Pretty print JSON from a stdin using the pprintjson CLI.</p>
+
+<pre class="lang-sh prettyprint-override"><code>$ echo '{ "a": 1, "b": "string", "c": true }' | pprintjson
+</code></pre>
+
+<p>Pretty print JSON from a string using the pprintjson CLI.</p>
+
+<pre class="lang-sh prettyprint-override"><code>$ pprintjson -c '{ "a": 1, "b": "string", "c": true }'
+</code></pre>
+
+<p>Pretty print JSON from a string with an indent of 1.</p>
+
+<pre class="lang-sh prettyprint-override"><code>$ pprintjson -c '{ "a": 1, "b": "string", "c": true }' -i 1
+</code></pre>
+
+<p>Pretty print JSON from a string and save output to a file output.json.</p>
+
+<pre class="lang-sh prettyprint-override"><code>$ pprintjson -c '{ "a": 1, "b": "string", "c": true }' -o ./output.json
+</code></pre>
+
+<h3>Output</h3>
+
+<p><a href="https://i.stack.imgur.com/vsdBU.png" rel="noreferrer"><img src="https://i.stack.imgur.com/vsdBU.png" alt="enter image description here"></a></p>
+<h4> Comment 116913743 Charlie Parker: </h4>how is your soln different from <code>import pprint pprint.pprint(json)</code>?<br><h4> Comment 119780597 TheTechRobo the Nerd: </h4>@CharlieParker I think it produces a valid json document, as opposed to pprint which uses single-quotes instead of double-quotes<br>------------------------------------------------------------------ <br><h3> Answer 48397041 David Liu: </h3><p>Here's a simple example of pretty printing JSON to the console in a nice way in Python, without requiring the JSON to be on your computer as a local file: </p>
+
+<pre><code>import pprint
+import json 
+from urllib.request import urlopen # (Only used to get this example)
+
+# Getting a JSON example for this example 
+r = urlopen("https://mdn.github.io/fetch-examples/fetch-json/products.json")
+text = r.read() 
+
+# To print it
+pprint.pprint(json.loads(text))
+</code></pre>
+<h4> Comment 83782324 Mr. T: </h4>I get the following error message in Python 3: &quot;TypeError: the JSON object must be str, not &#39;bytes&#39;&quot;<br><h4> Comment 132794501 Karl Knechtel: </h4>&quot;without requiring the JSON to be on your computer as a local file: &quot; - the question explicitly asked about a file, though. While it could potentially be useful to others to show how to grab the data from an Internet source, that is a <b>separate problem</b> pertaining to a <b>separate question</b>. (If someone had <i>asked</i> how to download a JSON file and pretty-print it, that would have been closed for lack of focus; it&#39;s blatantly two questions in one.) As it happens, that other question is already <b>very</b> well covered.<br>------------------------------------------------------------------ <br><h3> Answer 75034362 unofficialdxnny: </h3><p>A very simple way is using rich. with this method you can also highlight the <code>json</code></p>
+<p>This method reads data from a json file called <code>config.json</code></p>
+<pre><code>from rich import print_json
+
+setup_type = open('config.json')
+data = json.load(setup_type)
+print_json(data=data)
+</code></pre>
+<p>The Final Output will look like this.
+<a href="https://i.stack.imgur.com/iZDT2.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/iZDT2.png" alt="enter image description here" /></a></p>
+<h4> Comment 133608916 Swirle13: </h4>Could you provide what the output would look like?<br><h4> Comment 133682642 unofficialdxnny: </h4>Ive edited the answer to inclue the output image.<br>------------------------------------------------------------------ <br><h3> Answer 55862699 p3quod: </h3><p>I think that's better to parse the json before, to avoid errors:</p>
+
+<pre><code>def format_response(response):
+    try:
+        parsed = json.loads(response.text)
+    except JSONDecodeError:
+        return response.text
+    return json.dumps(parsed, ensure_ascii=True, indent=4)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 64812853 user 923227: </h3><p>I had a similar requirement to dump the contents of json file for logging, something quick and easy:</p>
+<pre><code>print(json.dumps(json.load(open(os.path.join('&lt;myPath&gt;', '&lt;myjson&gt;'), &quot;r&quot;)), indent = 4 ))
+</code></pre>
+<p>if you use it often then put it in a function:</p>
+<pre><code>def pp_json_file(path, file):
+    print(json.dumps(json.load(open(os.path.join(path, file), &quot;r&quot;)), indent = 4))
+</code></pre>
+<h4> Comment 132794476 Karl Knechtel: </h4>What does this really add over the top answers? A particular interface?<br>------------------------------------------------------------------ <br><h3> Answer 60973706 Francisco Perdomo: </h3><p>It's far from perfect, but it does the job.</p>
+
+<pre><code>data = data.replace(',"',',\n"')
+</code></pre>
+
+<p>you can improve it, add indenting and so on, but if you just want to be able to read a cleaner json, this is the way to go.</p>
+<h4> Comment 132794579 Karl Knechtel: </h4>This doesn&#39;t even remotely address the problem. Even in the best case, the output will look nothing like what OP presumably wanted.<br><h4> Comment 119083752 AjayKumarBasuthkar: </h4>AttributeError: &#39;dict&#39; object has no attribute &#39;replace&#39;<br><h4> Comment 125641128 TheTechRobo the Nerd: </h4>Won&#39;t this screw up the file if you have a comma in a string?<br>

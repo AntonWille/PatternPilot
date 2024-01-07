@@ -1,0 +1,471 @@
+ <h2> Title: How do I change the size of figures drawn with Matplotlib? </h2> <h3> tatwright, question_id: 332289 </h3>Score: 3186, Tags: {python,pandas,matplotlib,seaborn,figsize} <br><p>How do I change the size of figure drawn with Matplotlib?</p>
+<h4> Comment 131650769 Trenton McKinney: </h4>These questions are similar and may be of interest <a href="https://stackoverflow.com/q/14708695/7758804">Specify figure size in centimeter in matplotlib</a> and <a href="https://stackoverflow.com/q/13714454/7758804">Specifying and saving a figure with exact size in pixels</a><br>------------------------------------------------------------------ <br><h3> Answer 638443 Jouni K. Sepp&#228;nen: </h3><p><a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.figure.html" rel="noreferrer"><code>figure</code></a> tells you the call signature:</p>
+<pre><code>from matplotlib.pyplot import figure
+
+figure(figsize=(8, 6), dpi=80)
+</code></pre>
+<p><code>figure(figsize=(1,1))</code> would create an inch-by-inch image, which would be 80-by-80 pixels unless you also give a different dpi argument.</p>
+------------------------------------------------------------------ <br><h3> Answer 4306340 Pete: </h3><p>If you've already got the figure created, you can use <a href="https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure.set_size_inches" rel="noreferrer"><code>figure.set_size_inches</code></a> to adjust the figure size:</p>
+<pre><code>fig = matplotlib.pyplot.gcf()
+fig.set_size_inches(18.5, 10.5)
+fig.savefig('test2png.png', dpi=100)
+</code></pre>
+<p>To propagate the size change to an existing GUI window, add <code>forward=True</code>:</p>
+<pre><code>fig.set_size_inches(18.5, 10.5, forward=True)
+</code></pre>
+<p>Additionally as <a href="https://stackoverflow.com/users/599139/erik-shilts">Erik Shilts</a> mentioned in the comments you can also use <a href="https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure.set_dpi" rel="noreferrer"><code>figure.set_dpi</code></a> to &quot;[s]et the resolution of the figure in dots-per-inch&quot;</p>
+<pre><code>fig.set_dpi(100)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 332311 tatwright: </h3><blockquote>
+<p><strong>Deprecation note:</strong><br />
+As per the <a href="https://matplotlib.org/2.0.2/faq/usage_faq.html#matplotlib-pyplot-and-pylab-how-are-they-related" rel="noreferrer">official Matplotlib guide</a>, usage of the <code>pylab</code> module is no longer recommended. Please consider using the <code>matplotlib.pyplot</code> module instead, as described by <a href="https://stackoverflow.com/a/41717533">this other answer</a>.</p>
+</blockquote>
+<p>The following seems to work:</p>
+<pre><code>from pylab import rcParams
+rcParams['figure.figsize'] = 5, 10
+</code></pre>
+<p>This makes the figure's width 5 inches, and its height 10 <b>inches</b>.</p>
+<p>The Figure class then uses this as the default value for one of its arguments.</p>
+------------------------------------------------------------------ <br><h3> Answer 41717533 G M: </h3><h3>Using plt.rcParams</h3>
+<p>There is also this workaround in case you want to change the size without using the figure environment. So in case you are using <a href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.figure.html" rel="noreferrer"><code>plt.plot()</code></a> for example, you can set a tuple with width and height.</p>
+<pre><code>import matplotlib.pyplot as plt
+plt.rcParams[&quot;figure.figsize&quot;] = (20,3)
+</code></pre>
+<p>This is very useful when you plot inline (e.g., with <a href="https://en.wikipedia.org/wiki/IPython#Notebook" rel="noreferrer">IPython Notebook</a>). As <a href="https://stackoverflow.com/questions/332289/how-do-you-change-the-size-of-figures-drawn-with-matplotlib#comment87590438_41717533">asmaier noticed</a>, it is preferable to not put this statement in the same cell of the imports statements.</p>
+<p>To reset the global figure size back to default for subsequent plots:</p>
+<pre><code>plt.rcParams[&quot;figure.figsize&quot;] = plt.rcParamsDefault[&quot;figure.figsize&quot;]
+</code></pre>
+<h3>Conversion to cm</h3>
+<p>The <code>figsize</code> tuple accepts inches, so if you want to set it in centimetres you have to divide them by 2.54. Have a look at <a href="https://stackoverflow.com/questions/14708695/specify-figure-size-in-centimeter-in-matplotlib">this question</a>.</p>
+------------------------------------------------------------------ <br><h3> Answer 39770939 Kris: </h3><p>In case you're looking for a way to change the figure size in <strong>Pandas</strong>, you could do:</p>
+<pre><code>df['some_column'].plot(figsize=(10, 5))
+</code></pre>
+<p>where <code>df</code> is a Pandas dataframe. Or, to use an existing figure or axes:</p>
+<pre><code>fig, ax = plt.subplots(figsize=(10, 5))
+df['some_column'].plot(ax=ax)
+</code></pre>
+<p>If you want to change the default settings, you could do the following:</p>
+<pre><code>import matplotlib
+
+matplotlib.rc('figure', figsize=(10, 5))
+</code></pre>
+<p>For more details, check out the docs: <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.html" rel="noreferrer"><code>pd.DataFrame.plot</code></a>.</p>
+------------------------------------------------------------------ <br><h3> Answer 334462 jfs: </h3><p>The first link in Google for <code>'matplotlib figure size'</code> is <a href="http://www.scipy.org/Cookbook/Matplotlib/AdjustingImageSize" rel="nofollow noreferrer">AdjustingImageSize</a> (<a href="https://webcache.googleusercontent.com/search?q=cache:5oqjjm8c8UMJ:https://scipy.github.io/old-wiki/pages/Cookbook/Matplotlib/AdjustingImageSize.html+&amp;cd=2&amp;hl=en&amp;ct=clnk&amp;gl=fr" rel="nofollow noreferrer">Google cache of the page</a>).</p>
+<p>Here's a test script from the above page. It creates <code>test[1-3].png</code> files of different sizes of the same image:</p>
+<pre><code>#!/usr/bin/env python
+&quot;&quot;&quot;
+This is a small demo file that helps teach how to adjust figure sizes
+for matplotlib
+
+&quot;&quot;&quot;
+
+import matplotlib
+print &quot;using MPL version:&quot;, matplotlib.__version__
+matplotlib.use(&quot;WXAgg&quot;) # do this before pylab so you don'tget the default back end.
+
+import pylab
+import numpy as np
+
+# Generate and plot some simple data:
+x = np.arange(0, 2*np.pi, 0.1)
+y = np.sin(x)
+
+pylab.plot(x,y)
+F = pylab.gcf()
+
+# Now check everything with the defaults:
+DPI = F.get_dpi()
+print &quot;DPI:&quot;, DPI
+DefaultSize = F.get_size_inches()
+print &quot;Default size in Inches&quot;, DefaultSize
+print &quot;Which should result in a %i x %i Image&quot;%(DPI*DefaultSize[0], DPI*DefaultSize[1])
+# the default is 100dpi for savefig:
+F.savefig(&quot;test1.png&quot;)
+# this gives me a 797 x 566 pixel image, which is about 100 DPI
+
+# Now make the image twice as big, while keeping the fonts and all the
+# same size
+F.set_size_inches( (DefaultSize[0]*2, DefaultSize[1]*2) )
+Size = F.get_size_inches()
+print &quot;Size in Inches&quot;, Size
+F.savefig(&quot;test2.png&quot;)
+# this results in a 1595x1132 image
+
+# Now make the image twice as big, making all the fonts and lines
+# bigger too.
+
+F.set_size_inches( DefaultSize )# resetthe size
+Size = F.get_size_inches()
+print &quot;Size in Inches&quot;, Size
+F.savefig(&quot;test3.png&quot;, dpi = (200)) # change the dpi
+# this also results in a 1595x1132 image, but the fonts are larger.
+</code></pre>
+<p>Output:</p>
+<pre class="lang-none prettyprint-override"><code>using MPL version: 0.98.1
+DPI: 80
+Default size in Inches [ 8.  6.]
+Which should result in a 640 x 480 Image
+Size in Inches [ 16.  12.]
+Size in Inches [ 16.  12.]
+</code></pre>
+<p>Two notes:</p>
+<ol>
+<li><p>The module comments and the actual output differ.</p>
+</li>
+<li><p><a href="https://stackoverflow.com/questions/335896/how-to-complete-this-python-function-to-save-in-the-same-folder#336001">This answer</a> allows easily to combine all three images in one image file to see the difference in sizes.</p>
+</li>
+</ol>
+------------------------------------------------------------------ <br><h3> Answer 22399608 Renaud: </h3><p>Adjust the <code>figsize=</code> parameter in <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.figure.html" rel="noreferrer"><code>matplotlib.pyplot.figure</code></a>, which is similar to this <a href="https://stackoverflow.com/a/638443/7758804">answer</a>, but uses the standard <code>plt</code> import alias, and doesn't directly import <code>figure</code> from the <code>pyplot</code> namespace.</p>
+<pre><code>import numpy as np
+import matplotlib.pyplot as plt
+
+N = 50
+np.random.seed(2022)  # creates a repetitive sample data
+x = np.random.rand(N)
+y = np.random.rand(N)
+area = np.pi * (15 * np.random.rand(N))**2
+
+fig = plt.figure(figsize=(10, 10))
+plt.scatter(x, y, s=area, alpha=0.5)
+plt.show()
+</code></pre>
+<h3>Without <code>fig = plt.figure(figsize=(10, 10))</code></h3>
+<p><a href="https://i.stack.imgur.com/Bv7bO.png" rel="noreferrer"><img src="https://i.stack.imgur.com/Bv7bO.png" alt="enter image description here" /></a></p>
+<h3>With <code>fig = plt.figure(figsize=(10, 10))</code></h3>
+<p><a href="https://i.stack.imgur.com/spJQR.png" rel="noreferrer"><img src="https://i.stack.imgur.com/spJQR.png" alt="enter image description here" /></a></p>
+------------------------------------------------------------------ <br><h3> Answer 47018826 River: </h3><p>You can simply use (from <a href="https://matplotlib.org/api/_as_gen/matplotlib.figure.Figure.html" rel="noreferrer">matplotlib.figure.Figure</a>):</p>
+
+<pre><code>fig.set_size_inches(width,height)
+</code></pre>
+
+<p>As of Matplotlib 2.0.0, changes to your canvas will be visible immediately, as the <code>forward</code> keyword <a href="https://matplotlib.org/api/_as_gen/matplotlib.figure.Figure.html?highlight=set%20size%20inches#matplotlib.figure.Figure.set_size_inches" rel="noreferrer">defaults to <code>True</code></a>.</p>
+
+<p>If you want to just <a href="https://matplotlib.org/api/_as_gen/matplotlib.figure.Figure.html?highlight=set%20size%20inches#matplotlib.figure.Figure.set_figheight" rel="noreferrer">change the width <strong>or</strong> height</a> instead of both, you can use </p>
+
+<p><code>fig.set_figwidth(val)</code> or <code>fig.set_figheight(val)</code></p>
+
+<p>These will also immediately update your canvas, but only in Matplotlib 2.2.0 and newer.</p>
+
+<h3>For Older Versions</h3>
+
+<p>You need to specify <code>forward=True</code> explicitly in order to live-update your canvas in versions older than what is specified above. Note that the <code>set_figwidth</code> and <code>set_figheight</code> functions don’t support the <code>forward</code> parameter in versions older than Matplotlib 1.5.0.</p>
+------------------------------------------------------------------ <br><h3> Answer 23903662 Blairg23: </h3><p>This works well for me:</p>
+<pre class="lang-py prettyprint-override"><code>from matplotlib import pyplot as plt
+
+F = plt.gcf()
+Size = F.get_size_inches()
+F.set_size_inches(Size[0]*2, Size[1]*2, forward=True) # Set forward to True to resize window along with plot in figure.
+plt.show() # Or plt.imshow(z_array) if using an animation, where z_array is a matrix or NumPy array
+</code></pre>
+<p>This forum post might also help: <em><a href="http://matplotlib.1069221.n5.nabble.com/Resizing-figure-windows-td11424.html" rel="nofollow noreferrer">Resizing figure windows</a></em></p>
+------------------------------------------------------------------ <br><h3> Answer 64767170 Ciro Santilli OurBigBook.com: </h3><p><strong>Comparison of different approaches to set exact image sizes in pixels</strong></p>
+<p>This answer will focus on:</p>
+<ul>
+<li><code>savefig</code>: how to save to a file, not just show on screen</li>
+<li>setting the size in pixels</li>
+</ul>
+<p>Here is a quick comparison of some of the approaches I've tried with images showing what the give.</p>
+<p>Summary of current status: things are messy, and I am not sure if it is a fundamental limitation, or if the use case just didn't get enough attention from developers. I couldn't easily find an upstream discussion about this.</p>
+<p><strong>Baseline example without trying to set the image dimensions</strong></p>
+<p>Just to have a comparison point:</p>
+<h3>base.py</h3>
+<pre><code>#!/usr/bin/env python3
+
+import sys
+
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+
+fig, ax = plt.subplots()
+print('fig.dpi = {}'.format(fig.dpi))
+print('fig.get_size_inches() = ' + str(fig.get_size_inches())
+t = np.arange(-10., 10., 1.)
+plt.plot(t, t, '.')
+plt.plot(t, t**2, '.')
+ax.text(0., 60., 'Hello', fontdict=dict(size=25))
+plt.savefig('base.png', format='png')
+</code></pre>
+<p>Run:</p>
+<pre class="lang-none prettyprint-override"><code>./base.py
+identify base.png
+</code></pre>
+<p>Outputs:</p>
+<pre class="lang-none prettyprint-override"><code>fig.dpi = 100.0
+fig.get_size_inches() = [6.4 4.8]
+base.png PNG 640x480 640x480+0+0 8-bit sRGB 13064B 0.000u 0:00.000
+</code></pre>
+<p><a href="https://i.stack.imgur.com/jtD8D.png" rel="noreferrer"><img src="https://i.stack.imgur.com/jtD8D.png" alt="Enter image description here" /></a></p>
+<p><strong>My best approach so far: <code>plt.savefig(dpi=h/fig.get_size_inches()[1]</code> height-only control</strong></p>
+<p>I think this is what I'll go with most of the time, as it is simple and scales:</p>
+<h3>get_size.py</h3>
+<pre><code>#!/usr/bin/env python3
+
+import sys
+
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+
+height = int(sys.argv[1])
+fig, ax = plt.subplots()
+t = np.arange(-10., 10., 1.)
+plt.plot(t, t, '.')
+plt.plot(t, t**2, '.')
+ax.text(0., 60., 'Hello', fontdict=dict(size=25))
+plt.savefig(
+    'get_size.png',
+    format='png',
+    dpi=height/fig.get_size_inches()[1]
+)
+</code></pre>
+<p>Run:</p>
+<pre class="lang-none prettyprint-override"><code>./get_size.py 431
+</code></pre>
+<p>Outputs:</p>
+<pre class="lang-none prettyprint-override"><code>get_size.png PNG 574x431 574x431+0+0 8-bit sRGB 10058B 0.000u 0:00.000
+</code></pre>
+<p><a href="https://i.stack.imgur.com/KdCdo.png" rel="noreferrer"><img src="https://i.stack.imgur.com/KdCdo.png" alt="Enter image description here" /></a></p>
+<p>and</p>
+<pre class="lang-none prettyprint-override"><code>./get_size.py 1293
+</code></pre>
+<p>Outputs:</p>
+<pre class="lang-none prettyprint-override"><code>main.png PNG 1724x1293 1724x1293+0+0 8-bit sRGB 46709B 0.000u 0:00.000
+</code></pre>
+<p><a href="https://i.stack.imgur.com/sitTs.png" rel="noreferrer"><img src="https://i.stack.imgur.com/sitTs.png" alt="Enter image description here" /></a></p>
+<p>I tend to set just the height because I'm usually most concerned about how much vertical space the image is going to take up in the middle of my text.</p>
+<p><strong><code>plt.savefig(bbox_inches='tight'</code> changes image size</strong></p>
+<p>I always feel that there is too much white space around images, and tended to add <code>bbox_inches='tight'</code> from:
+<a href="https://stackoverflow.com/questions/11837979/removing-white-space-around-a-saved-image-in-matplotlib">Removing white space around a saved image</a></p>
+<p>However, that works by cropping the image, and you won't get the desired sizes with it.</p>
+<p>Instead, this other approach proposed in the same question seems to work well:</p>
+<pre><code>plt.tight_layout(pad=1)
+plt.savefig(...
+</code></pre>
+<p>which gives the exact desired height for height equals 431:</p>
+<p><a href="https://i.stack.imgur.com/tX75f.png" rel="noreferrer"><img src="https://i.stack.imgur.com/tX75f.png" alt="Enter image description here" /></a></p>
+<p><strong>Fixed height, <code>set_aspect</code>, automatically sized width and small margins</strong></p>
+<p>Ermmm, <code>set_aspect</code> messes things up again and prevents <code>plt.tight_layout</code> from actually removing the margins... this is an important use case that I don't have a great solution for yet.</p>
+<p>Asked at: <a href="https://stackoverflow.com/questions/64642855/how-to-obtain-a-fixed-height-in-pixels-fixed-data-x-y-aspect-ratio-and-automati">How to obtain a fixed height in pixels, fixed data x/y aspect ratio and automatically remove remove horizontal whitespace margin in Matplotlib?</a></p>
+<p><strong><code>plt.savefig(dpi=h/fig.get_size_inches()[1]</code> + width control</strong></p>
+<p>If you really need a specific width in addition to height, this seems to work OK:</p>
+<h3>width.py</h3>
+<pre><code>#!/usr/bin/env python3
+
+import sys
+
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+
+h = int(sys.argv[1])
+w = int(sys.argv[2])
+fig, ax = plt.subplots()
+wi, hi = fig.get_size_inches()
+fig.set_size_inches(hi*(w/h), hi)
+t = np.arange(-10., 10., 1.)
+plt.plot(t, t, '.')
+plt.plot(t, t**2, '.')
+ax.text(0., 60., 'Hello', fontdict=dict(size=25))
+plt.savefig(
+    'width.png',
+    format='png',
+    dpi=h/hi
+)
+</code></pre>
+<p>Run:</p>
+<pre class="lang-none prettyprint-override"><code>./width.py 431 869
+</code></pre>
+<p>Output:</p>
+<pre class="lang-none prettyprint-override"><code>width.png PNG 869x431 869x431+0+0 8-bit sRGB 10965B 0.000u 0:00.000
+</code></pre>
+<p><a href="https://i.stack.imgur.com/udybG.png" rel="noreferrer"><img src="https://i.stack.imgur.com/udybG.png" alt="Enter image description here" /></a></p>
+<p>and for a small width:</p>
+<pre class="lang-none prettyprint-override"><code>./width.py 431 869
+</code></pre>
+<p>Output:</p>
+<pre class="lang-none prettyprint-override"><code>width.png PNG 211x431 211x431+0+0 8-bit sRGB 6949B 0.000u 0:00.000
+</code></pre>
+<p><a href="https://i.stack.imgur.com/Xbq1g.png" rel="noreferrer"><img src="https://i.stack.imgur.com/Xbq1g.png" alt="Enter image description here" /></a></p>
+<p>So it does seem that fonts are scaling correctly, we just get some trouble for very small widths with labels getting cut off, e.g. the <code>100</code> on the top left.</p>
+<p>I managed to work around those with <a href="https://stackoverflow.com/questions/11837979/removing-white-space-around-a-saved-image-in-matplotlib/57498238#57498238">Removing white space around a saved image</a></p>
+<pre><code>plt.tight_layout(pad=1)
+</code></pre>
+<p>which gives:</p>
+<pre class="lang-none prettyprint-override"><code>width.png PNG 211x431 211x431+0+0 8-bit sRGB 7134B 0.000u 0:00.000
+</code></pre>
+<p><a href="https://i.stack.imgur.com/D3Adb.png" rel="noreferrer"><img src="https://i.stack.imgur.com/D3Adb.png" alt="Enter image description here" /></a></p>
+<p>From this, we also see that <code>tight_layout</code> removes a lot of the empty space at the top of the image, so I just generally always use it.</p>
+<p><strong>Fixed magic base height, <code>dpi</code> on <code>fig.set_size_inches</code> and <code>plt.savefig(dpi=</code> scaling</strong></p>
+<p>I believe that this is equivalent to the approach mentioned at: <a href="https://stackoverflow.com/a/13714720/895245">https://stackoverflow.com/a/13714720/895245</a></p>
+<h3>magic.py</h3>
+<pre><code>#!/usr/bin/env python3
+
+import sys
+
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+
+magic_height = 300
+w = int(sys.argv[1])
+h = int(sys.argv[2])
+dpi = 80
+fig, ax = plt.subplots(dpi=dpi)
+fig.set_size_inches(magic_height*w/(h*dpi), magic_height/dpi)
+t = np.arange(-10., 10., 1.)
+plt.plot(t, t, '.')
+plt.plot(t, t**2, '.')
+ax.text(0., 60., 'Hello', fontdict=dict(size=25))
+plt.savefig(
+    'magic.png',
+    format='png',
+    dpi=h/magic_height*dpi,
+)
+</code></pre>
+<p>Run:</p>
+<pre class="lang-none prettyprint-override"><code>./magic.py 431 231
+</code></pre>
+<p>Outputs:</p>
+<pre class="lang-none prettyprint-override"><code>magic.png PNG 431x231 431x231+0+0 8-bit sRGB 7923B 0.000u 0:00.000
+</code></pre>
+<p><a href="https://i.stack.imgur.com/cnTUV.png" rel="noreferrer"><img src="https://i.stack.imgur.com/cnTUV.png" alt="Enter image description here" /></a></p>
+<p>And to see if it scales nicely:</p>
+<pre class="lang-none prettyprint-override"><code>./magic.py 1291 693
+</code></pre>
+<p>Outputs:</p>
+<pre class="lang-none prettyprint-override"><code>magic.png PNG 1291x693 1291x693+0+0 8-bit sRGB 25013B 0.000u 0:00.000
+</code></pre>
+<p><a href="https://i.stack.imgur.com/I5xN6.png" rel="noreferrer"><img src="https://i.stack.imgur.com/I5xN6.png" alt="Enter image description here" /></a></p>
+<p>So we see that this approach also does work well. The only problem I have with it is that you have to set that <code>magic_height</code> parameter or equivalent.</p>
+<p><strong>Fixed DPI + <code>set_size_inches</code></strong></p>
+<p>This approach gave a slightly wrong pixel size, and it makes it is hard to scale everything seamlessly.</p>
+<h3>set_size_inches.py</h3>
+<pre><code>#!/usr/bin/env python3
+
+import sys
+
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+
+w = int(sys.argv[1])
+h = int(sys.argv[2])
+fig, ax = plt.subplots()
+fig.set_size_inches(w/fig.dpi, h/fig.dpi)
+t = np.arange(-10., 10., 1.)
+plt.plot(t, t, '.')
+plt.plot(t, t**2, '.')
+ax.text(
+    0,
+    60.,
+    'Hello',
+    # Keep font size fixed independently of DPI.
+    # https://stackoverflow.com/questions/39395616/matplotlib-change-figsize-but-keep-fontsize-constant
+    fontdict=dict(size=10*h/fig.dpi),
+)
+plt.savefig(
+    'set_size_inches.png',
+    format='png',
+)
+</code></pre>
+<p>Run:</p>
+<pre class="lang-none prettyprint-override"><code>./set_size_inches.py 431 231
+</code></pre>
+<p>Outputs:</p>
+<pre class="lang-none prettyprint-override"><code>set_size_inches.png PNG 430x231 430x231+0+0 8-bit sRGB 8078B 0.000u 0:00.000
+</code></pre>
+<p>So the height is slightly off, and the image:</p>
+<p><a href="https://i.stack.imgur.com/2rC6e.png" rel="noreferrer"><img src="https://i.stack.imgur.com/2rC6e.png" alt="Enter image description here" /></a></p>
+<p>The pixel sizes are also correct if I make it 3 times larger:</p>
+<pre class="lang-none prettyprint-override"><code>./set_size_inches.py 1291 693
+</code></pre>
+<p>Outputs:</p>
+<pre class="lang-none prettyprint-override"><code>set_size_inches.png PNG 1291x693 1291x693+0+0 8-bit sRGB 19798B 0.000u 0:00.000
+</code></pre>
+<p><a href="https://i.stack.imgur.com/dWsRG.png" rel="noreferrer"><img src="https://i.stack.imgur.com/dWsRG.png" alt="Enter image description here" /></a></p>
+<p>We understand from this however that for this approach to scale nicely, you need to make every DPI-dependant setting proportional to the size in inches.</p>
+<p>In the previous example, we only made the &quot;Hello&quot; text proportional, and it did retain its height between 60 and 80 as we'd expect. But everything for which we didn't do that, looks tiny, including:</p>
+<ul>
+<li>line width of axes</li>
+<li>tick labels</li>
+<li>point markers</li>
+</ul>
+<p><strong>SVG</strong></p>
+<p>I could not find how to set it for SVG images, my approaches only worked for PNG, e.g.:</p>
+<h3>get_size_svg.py</h3>
+<pre><code>#!/usr/bin/env python3
+
+import sys
+
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+
+height = int(sys.argv[1])
+fig, ax = plt.subplots()
+t = np.arange(-10., 10., 1.)
+plt.plot(t, t, '.')
+plt.plot(t, t**2, '.')
+ax.text(0., 60., 'Hello', fontdict=dict(size=25))
+plt.savefig(
+    'get_size_svg.svg',
+    format='svg',
+    dpi=height/fig.get_size_inches()[1]
+)
+</code></pre>
+<p>Run:</p>
+<pre class="lang-none prettyprint-override"><code>./get_size_svg.py 431
+</code></pre>
+<p>And the generated output contains:</p>
+<pre class="lang-xml prettyprint-override"><code>&lt;svg height=&quot;345.6pt&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 460.8 345.6&quot; width=&quot;460.8pt&quot;
+</code></pre>
+<p>And identify says:</p>
+<pre class="lang-none prettyprint-override"><code>get_size_svg.svg SVG 614x461 614x461+0+0 8-bit sRGB 17094B 0.000u 0:00.000
+</code></pre>
+<p>And if I open it in Chromium 86 the browser debug tools mouse image hover confirm that height as 460.79.</p>
+<p>But of course, since SVG is a vector format, everything should in theory scale, so you can just convert to any fixed sized format without loss of resolution, e.g.:</p>
+<pre class="lang-none prettyprint-override"><code>inkscape -h 431 get_size_svg.svg -b FFF -e get_size_svg.png
+</code></pre>
+<p>gives the exact height:</p>
+<p><a href="https://i.stack.imgur.com/i4kHL.png" rel="noreferrer"><img src="https://i.stack.imgur.com/i4kHL.png" alt="Enter image description here" /></a></p>
+<p>I use <a href="https://en.wikipedia.org/wiki/Inkscape" rel="noreferrer">Inkscape</a> instead of <a href="https://en.wikipedia.org/wiki/ImageMagick" rel="noreferrer">ImageMagick</a>'s <code>convert</code> here because you need to mess with <code>-density</code> as well to get sharp SVG resizes with ImageMagick:</p>
+<ul>
+<li><a href="https://superuser.com/questions/598849/imagemagick-convert-how-to-produce-sharp-resized-png-files-from-svg-files/1602059#1602059">https://superuser.com/questions/598849/imagemagick-convert-how-to-produce-sharp-resized-png-files-from-svg-files/1602059#1602059</a></li>
+<li><a href="https://stackoverflow.com/questions/9853325/how-to-convert-a-svg-to-a-png-with-imagemagick">How to convert a SVG to a PNG with ImageMagick?</a></li>
+</ul>
+<p>And setting <code>&lt;img height=&quot;&quot;</code> on the HTML should also just work for the browser.</p>
+<p>It was tested on matplotlib 3.2.2.</p>
+------------------------------------------------------------------ <br><h3> Answer 59108174 loved.by.Jesus: </h3><p>Generalizing and simplifying <a href="https://stackoverflow.com/questions/332289/how-do-you-change-the-size-of-figures-drawn-with-matplotlib/26650785#26650785">psihodelia's answer</a>:</p>
+<p>If you want to change the current size of the figure by a factor <code>sizefactor</code>:</p>
+<pre><code>import matplotlib.pyplot as plt
+
+# Here goes your code
+
+fig_size = plt.gcf().get_size_inches() # Get current size
+sizefactor = 0.8 # Set a zoom factor
+# Modify the current size by the factor
+plt.gcf().set_size_inches(sizefactor * fig_size) 
+</code></pre>
+<p>After changing the current size, it might occur that you have to fine tune the <em>subplot layout</em>. You can do that in the figure window GUI, or by means of the command <a href="https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.subplots_adjust.html" rel="nofollow noreferrer">subplots_adjust</a></p>
+<p>For example,</p>
+<pre><code>plt.subplots_adjust(left=0.16, bottom=0.19, top=0.82)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 26601247 wilywampa: </h3><p>This resizes the figure immediately even after the figure has been drawn (at least using Qt4Agg/TkAgg - but not Mac OS X - with Matplotlib 1.4.0):</p>
+<pre><code>matplotlib.pyplot.get_current_fig_manager().resize(width_px, height_px)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 75628710 codeananda: </h3><p>I usually care more about the relative sizes of height/width rather than the actual values in inches. So, I use <a href="https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.figaspect" rel="nofollow noreferrer"><code>plt.figaspect()</code></a> to set the aspect ratio.</p>
+<pre class="lang-py prettyprint-override"><code># Make the image 3x as wide as it is tall
+fix, ax = plt.subplots(figsize=plt.figaspect(1/3))
+plt.title(&quot;I'm 3x as wide as I am tall&quot;)
+plt.show()
+</code></pre>
+<p><a href="https://i.stack.imgur.com/o7GOY.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/o7GOY.png" alt="enter image description here" /></a></p>
+------------------------------------------------------------------ <br><h3> Answer 64490245 Luguecos: </h3><p>I always use the following pattern:</p>
+<pre><code>x_inches = 150*(1/25.4)     # [mm]*constant
+y_inches = x_inches*(0.8)
+dpi = 96
+
+fig = plt.figure(1, figsize = (x_inches,y_inches), dpi = dpi, constrained_layout = True)
+</code></pre>
+<p>With this example you are able to set figure dimensions in inches or in millimetres. When setting <code>constrained_layout</code> to <code>True</code>, plots fill your figure without borders.</p>

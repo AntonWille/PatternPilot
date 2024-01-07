@@ -1,0 +1,246 @@
+ <h2> Title: Text processing - Python vs Perl performance </h2> <h3> ihightower, question_id: 12793562 </h3>Score: 79, Tags: {python,regex,performance,perl,text-processing} <br><p>Here is my Perl and Python script to do some simple text processing from about 21 log files, each about 300&nbsp;KB to 1&nbsp;MB (maximum) x 5 times repeated (total of 125 files, due to the <em>log</em> repeated 5 times).</p>
+
+<p><strong>Python Code</strong> (code modified to use compiled <code>re</code> and using <code>re.I</code>)</p>
+
+<pre><code>#!/usr/bin/python
+
+import re
+import fileinput
+
+exists_re = re.compile(r'^(.*?) INFO.*Such a record already exists', re.I)
+location_re = re.compile(r'^AwbLocation (.*?) insert into', re.I)
+
+for line in fileinput.input():
+    fn = fileinput.filename()
+    currline = line.rstrip()
+
+    mprev = exists_re.search(currline)
+
+    if(mprev):
+        xlogtime = mprev.group(1)
+
+    mcurr = location_re.search(currline)
+
+    if(mcurr):
+        print fn, xlogtime, mcurr.group(1)
+</code></pre>
+
+<p><strong>Perl Code</strong></p>
+
+<pre><code>#!/usr/bin/perl
+
+while (&lt;&gt;) {
+    chomp;
+
+    if (m/^(.*?) INFO.*Such a record already exists/i) {
+        $xlogtime = $1;
+    }
+
+    if (m/^AwbLocation (.*?) insert into/i) {
+        print "$ARGV $xlogtime $1\n";
+    }
+}
+</code></pre>
+
+<p>And, on my PC both code generates exactly the same result file of 10,790 lines. And, here is the timing done on Cygwin's Perl and Python implementations.</p>
+
+<pre><code>User@UserHP /cygdrive/d/tmp/Clipboard
+# time /tmp/scripts/python/afs/process_file.py *log* *log* *log* *log* *log* &gt;
+summarypy.log
+
+real    0m8.185s
+user    0m8.018s
+sys     0m0.092s
+
+User@UserHP /cygdrive/d/tmp/Clipboard
+# time /tmp/scripts/python/afs/process_file.pl *log* *log* *log* *log* *log* &gt;
+summarypl.log
+
+real    0m1.481s
+user    0m1.294s
+sys     0m0.124s
+</code></pre>
+
+<p>Originally, it took 10.2 seconds using Python and only 1.9 secs using Perl for this simple text processing.</p>
+
+<p><strong>(UPDATE) but, after the compiled <code>re</code> version of Python, it now takes 8.2 seconds in Python and 1.5 seconds in Perl. Still Perl is much faster.</strong></p>
+
+<p>Is there a way to improve the speed of Python at all OR it is obvious that Perl will be the speedy one for simple text processing.</p>
+
+<p>By the way this was not the only test I did for simple text processing... And, each different way I make the source code, always always Perl wins by a large margin. And, not once did Python performed better for simple <code>m/regex/</code> match and print stuff.</p>
+
+<blockquote>
+  <p>Please do not suggest to use C, C++, Assembly, other flavours of
+  Python, etc.</p>
+  
+  <p>I am looking for a solution using Standard Python with its built-in
+  modules compared against Standard Perl (not even using the modules).
+  Boy, I wish to use Python for all my tasks due to its readability, but
+  to give up speed, I don't think so.</p>
+  
+  <p>So, please suggest how can the code be improved to have comparable
+  results with Perl.</p>
+</blockquote>
+
+<p><strong>UPDATE: 2012-10-18</strong></p>
+
+<p>As other users suggested, Perl has its place and Python has its.</p>
+
+<p>So, for this question, one can safely conclude that for simple regex match on each line for hundreds or thousands of text files and writing the results to a file (or printing to screen), <strong>Perl will always, always WIN in performance for this job. It as simple as that.</strong></p>
+
+<p>Please note that when I say Perl wins in performance... only standard Perl and Python is compared... not resorting to some obscure modules (obscure for a normal user like me) and also not calling C, C++, assembly libraries from Python or Perl. We don't have time to learn all these extra steps and installation for a simple text matching job.</p>
+
+<p>So, Perl rocks for text processing and regex.</p>
+
+<p>Python has its place to rock in other places.</p>
+
+<p><strong>Update 2013-05-29:</strong> An excellent article that does similar comparison <a href="https://stuffivelearned.org/doku.php?id=programming:general:phpvspythonvsperl" rel="noreferrer">is here</a>. Perl again wins for simple text matching... And for more details, read the article.</p>
+<h4> Comment 17297573 ikegami: </h4>Are the patterns only compiled once in Python (as they are in Perl)?<br><h4> Comment 17300320 ikegami: </h4>@pepr, Perl will process all files.<br><h4> Comment 17300801 ikegami: </h4>You can probably speed both versions up a tiny bit by using <code>&#47;s</code>.<br><h4> Comment 17302071 Schwern: </h4>I&#39;d run the Python code through a <a href="http://docs.python.org/library/profile.html" rel="nofollow noreferrer">profiler</a> to discover where its spending its time.  You might also try using <a href="https://github.com/jakm/python-pcre" rel="nofollow noreferrer">PCRE (Perl Compatible Regular Expressions)</a> rather than the Python built in regexes (here&#39;s <a href="https://github.com/awahlig/python-pcre" rel="nofollow noreferrer">another implementation</a>) and see if that does better.<br><h4> Comment 17350739 pepr: </h4>&quot;Closed as too localized&quot; seems too funny and subjective to me.<br><h4> Comment 17298049 ikegami: </h4>I wonder if the difference is in the time spent backtracking in lines that don&#39;t match.<br><h4> Comment 17443529 Leon Timmermans: </h4>I&#39;ve seen benchmarsk before that sugggest that Perl&#39;s regexp implementation is just that much faster than Pythons. Otherwise they should be of comparable speed.<br><h4> Comment 30901576 Dane White: </h4>Repeated function lookup in Python can take a surprising amount of time during long loops. So you should use exists_re = re.compile(...).search, and then call exists_re(currline) in your loop (and something similar for location_re). You should also move fn = fileinput.filename() outside the loop that does your line iterations, although to do that, you&#39;d probably want to stop using fileinput. Since both of your regex match the line start, you might also try switching to re.match instead of re.search.<br><h4> Comment 38593608 nawfal: </h4>In case somebody wants to see, <a href="https://stuffivelearned.org/doku.php?id=programming:general:phpvspythonvsperl" rel="nofollow noreferrer">some results here</a><br><h4> Comment 45319892 PYPL: </h4>you should check it once more since python has now updated to 2.8.9 from 2.4.4<br><h4> Comment 49945646 coder.in.me: </h4>I read that re2 implemented by Google is better. I tried it but no improvement: re (4.5 sec), re2 (4.5 sec), perl (0.8 sec)<br><h4> Comment 53929406 TheAmigo: </h4>You could probably speed up both versions by using elsif... Unless both of those regexes can match the same line.<br><h4> Comment 58615624 Davide Brunato: </h4>In Python, when you perform a pattern matching with the start of the string (<code>r&quot;^...&quot;</code>) don&#39;t use <code>pattern.search()</code> method, use <code>pattern.match</code> method instead, that is a bit faster.<br><h4> Comment 17298172 ihightower: </h4>i have edited the code to compile the re and use re.I. Benchmarking again and have updated the results in my question.<br><h4> Comment 17299747 pepr: </h4>It would be also good to know the versions of Perl and of Python (the x for 2.x). The <code>line.rstrip()</code> is not neccessary.<br><h4> Comment 17299887 pepr: </h4>@ihightower: What are the exact arguments passed to the script? Are they really <code>*log* *log* *log* *log* *log*</code>? If yes, are you sure that Perl does not extract only unique filenames? (Thus processing actually less files...)<br><h4> Comment 17297591 ikegami: </h4>Are the two programs equivalent? I don&#39;t see anything like /i in the Python version.<br><h4> Comment 17297865 nneonneo: </h4>They&#39;re not totally equivalent (<code>(?i)</code> or <code>re.I</code> should be added for Python), but very close.<br>------------------------------------------------------------------ <br><h3> Answer 12793712 Josh Wright: </h3><p>This is exactly the sort of stuff that Perl was designed to do, so it doesn't surprise me that it's faster.</p>
+
+<p>One easy optimization in your Python code would be to precompile those regexes, so they aren't getting recompiled each time.</p>
+
+<pre><code>exists_re = re.compile(r'^(.*?) INFO.*Such a record already exists')
+location_re = re.compile(r'^AwbLocation (.*?) insert into')
+</code></pre>
+
+<p>And then in your loop:</p>
+
+<pre><code>mprev = exists_re.search(currline)
+</code></pre>
+
+<p>and</p>
+
+<pre><code>mcurr = location_re.search(currline)
+</code></pre>
+
+<p>That by itself won't magically bring your Python script in line with your Perl script, but repeatedly calling re in a loop without compiling first is bad practice in Python.</p>
+<h4> Comment 17297959 user395760: </h4>@nneonneo I&#39;ve heard that numerous times and I&#39;ve seen the lines in the <code>re</code> source code which do the caching. But somehow I&#39;ve never seen a benchmark that puts the two in the same order of magnitude, but several benchmarks (including a quick and dirty one I did a second ago) which put the pre-compiling option at several times faster.<br><h4> Comment 17297991 nneonneo: </h4>Interesting. Well, it&#39;s definitely good practice to precompile regexes, but I didn&#39;t really pay attention to the performance gap. Care to share the numbers?<br><h4> Comment 17297768 nneonneo: </h4><code>re</code> caches recently-used regexes, so this is probably not a huge issue.<br>------------------------------------------------------------------ <br><h3> Answer 12795477 ikegami: </h3><p>Hypothesis: Perl spends less time backtracking in lines that don't match due to optimisations it has that Python doesn't.</p>
+
+<p>What do you get by replacing</p>
+
+<pre><code>^(.*?) INFO.*Such a record already exists
+</code></pre>
+
+<p>with</p>
+
+<pre><code>^((?:(?! INFO).)*?) INFO.*Such a record already 
+</code></pre>
+
+<p>or</p>
+
+<pre><code>^(?&gt;(.*?) INFO).*Such a record already exists
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 12794442 Don O&#39;Donnell: </h3><p>Function calls are a bit expensive in terms of time in Python. And yet you have a loop invariant function call to get the file name inside the loop:</p>
+
+<pre><code>fn = fileinput.filename()
+</code></pre>
+
+<p>Move this line above the <code>for</code> loop and you should see some improvement to your Python timing. Probably not enough to beat out Perl though.</p>
+<h4> Comment 17299589 pepr: </h4>+1 for the good eye, but... Well, but the filename changes. It is not a loop invariant. Anyway, it may be faster not to use the <code>fileinput</code> module and add another, outer loop through the filenames. Then the filename would be the invariant.<br><h4> Comment 17301261 dan1111: </h4>An interesting point, but this has to be miniscule compared to the processing time of two regexes.<br>------------------------------------------------------------------ <br><h3> Answer 12793641 jrd1: </h3><p>In general, <strong>all artificial benchmarks are evil.</strong> However, everything else being equal (algorithmic approach), you can make improvements on a relative basis. However, it should be noted that I don't use Perl, so I can't argue in its favor. That being said, with Python you can try using <a href="http://www.cosc.canterbury.ac.nz/~greg/python/Pyrex/" rel="nofollow">Pyrex</a> or <a href="http://cython.org/" rel="nofollow">Cython</a> to improve performance. Or, if you are adventurous, you can try converting the Python code into C++ via <a href="http://code.google.com/p/shedskin/" rel="nofollow">ShedSkin</a> (which works for most of the core language, and some - but not all, of the core modules).</p>
+
+<p>Nevertheless, you can follow some of the tips posted here:</p>
+
+<p><a href="http://wiki.python.org/moin/PythonSpeed/PerformanceTips" rel="nofollow">http://wiki.python.org/moin/PythonSpeed/PerformanceTips</a></p>
+<h4> Comment 17299637 dan1111: </h4>-1. What is &quot;evil&quot; about this?  It is a simple exercise that illustrates a significant performance difference between the two langauges.  How exactly are you supposed to compare the performance of two tools if not with a test like this?  Write your entire program in both languages so that it is not &quot;artificial&quot;?  Sure, there are pitfalls to benchmarking, but you have generalized that to a very dumb rule.<br><h4> Comment 17298358 ihightower: </h4>i understand all artificial benchmarks could be evil. But, the text processing is a simple one and this is what I do normally day in day out. So, if python cannot improve the speed at using some basic syntax with in the original python installation... (just as i do with perl)... I will have to resort to perl for my text processing tasks.. and to process the 100s or 100000s of files that I have to process... and one will have to admit that python is slow for simple text processing as given in my code. But, boy do i wish to use python for its clean syntax, but with lag of speed.. don&#39;t think so.<br><h4> Comment 17299482 pepr: </h4>Regular expresions in Python are supplied via the module. Regular expressions in Perl has the built-in syntax and can be compiled as inlines (no function-call overhead cost). Text processing need not to be that simple. Anyway, use better tool for each task. My personal experience is that a bit more complex Perl programs are much more difficult to read and maintain in future.<br><h4> Comment 17298237 ihightower: </h4>i am neither an expert perl or python programmer. I use perl and python in such a way from what I read from an ordinary beginner to intermediate level book. If I care to have the real performance, certainly I will use your suggestions and even use assembly (if i ever learn it). Using what is readily available with in perl or python and its modules should be the only suggestion I expect to improve the code for performance. I don&#39;t expect to use some other magic buzzwords and spend the time to learn the rest. Please suggest pure solution that exists with in the nromal python installation.<br>------------------------------------------------------------------ <br><h3> Answer 12796175 pepr: </h3><p>I expect Perl be faster. Just being curious, can you try the following?</p>
+
+<pre><code>#!/usr/bin/python
+
+import re
+import glob
+import sys
+import os
+
+exists_re = re.compile(r'^(.*?) INFO.*Such a record already exists', re.I)
+location_re = re.compile(r'^AwbLocation (.*?) insert into', re.I)
+
+for mask in sys.argv[1:]:
+    for fname in glob.glob(mask):
+        if os.path.isfile(fname):
+            f = open(fname)
+            for line in f:
+                mex = exists_re.search(line)
+                if mex:
+                    xlogtime = mex.group(1)
+
+                mloc = location_re.search(line)
+                if mloc:
+                    print fname, xlogtime, mloc.group(1)
+            f.close()
+</code></pre>
+
+<p><strong>Update</strong> as reaction to <em>"it is too complex"</em>.</p>
+
+<p>Of course it looks more complex than the Perl version. The Perl was built around the regular expressions. This way, you can hardly find interpreted language that is faster in regular expressions. The Perl syntax...</p>
+
+<pre><code>while (&lt;&gt;) {
+    ...
+}
+</code></pre>
+
+<p>... also hides a lot of things that have to be done somehow in a more general language. On the other hand, it is quite easy to make the Python code more readable if you move the unreadable part out:</p>
+
+<pre><code>#!/usr/bin/python
+
+import re
+import glob
+import sys
+import os
+
+def input_files():
+    '''The generator loops through the files defined by masks from cmd.'''
+    for mask in sys.argv[1:]:
+        for fname in glob.glob(mask):
+            if os.path.isfile(fname):
+                yield fname
+
+
+exists_re = re.compile(r'^(.*?) INFO.*Such a record already exists', re.I)
+location_re = re.compile(r'^AwbLocation (.*?) insert into', re.I)
+
+for fname in input_files():
+    with open(fname) as f:        # Now the f.close() is done automatically
+        for line in f:
+            mex = exists_re.search(line)
+            if mex:
+                xlogtime = mex.group(1)
+
+            mloc = location_re.search(line)
+            if mloc:
+                print fname, xlogtime, mloc.group(1)
+</code></pre>
+
+<p>Here the <code>def input_files()</code> could be placed elsewhere (say in another module), or it can be reused. It is possible to mimic even the Perl's <code>while (&lt;&gt;) {...}</code> easily, even though not the same way syntactically:</p>
+
+<pre><code>#!/usr/bin/python
+
+import re
+import glob
+import sys
+import os
+
+def input_lines():
+    '''The generator loops through the lines of the files defined by masks from cmd.'''
+    for mask in sys.argv[1:]:
+        for fname in glob.glob(mask):
+            if os.path.isfile(fname):
+                with open(fname) as f: # now the f.close() is done automatically
+                    for line in f:
+                        yield fname, line
+
+exists_re = re.compile(r'^(.*?) INFO.*Such a record already exists', re.I)
+location_re = re.compile(r'^AwbLocation (.*?) insert into', re.I)
+
+for fname, line in input_lines():
+    mex = exists_re.search(line)
+    if mex:
+        xlogtime = mex.group(1)
+
+    mloc = location_re.search(line)
+    if mloc:
+        print fname, xlogtime, mloc.group(1)
+</code></pre>
+
+<p>Then the last <code>for</code> may look as easy (in principle) as the Perl's <code>while (&lt;&gt;) {...}</code>. Such <em>readability enhancements</em> are more difficult in Perl.</p>
+
+<p>Anyway, it will not make the Python program faster. Perl will be faster again here. Perl <em>is</em> a file/text cruncher. But--in my opinion--Python is a better programming language for more general purposes.</p>
+<h4> Comment 17305157 Craig Ringer: </h4>@ihightower Please post your attempted edit as a new answer instead.<br><h4> Comment 17305418 ihightower: </h4>@pepr i have posted my results as separate answer. now the code runs in 6.1 secs (2 sec improvement from earlier) compared to perl&#39;s 1.8 secs. pls read my answer for more info.<br><h4> Comment 17311673 pepr: </h4>@ihightower: Using the <code>with</code> construct it would be one line shorter. It is true that the nested <code>for</code> looks terrible. However, they say what exactly is done: 1) get the command-line arguments, 2) expand each argument as a glob mask, 3) if it is a file name, open it and process its lines.<br><h4> Comment 30408341 ihightower: </h4>As Text Processing is sooo universal, then why Python won&#39;t just make a builtin-in Standard Module that is so generic that it can be applied to almost all cases.. it can then improve its performance for normal users like the vast majority of people... for e.g. import TextTool or something, then have some standard stuff that will improve the performance of the Text Processing.<br>

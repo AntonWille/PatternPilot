@@ -1,0 +1,57 @@
+ <h2> Title: Ruby, Difference between exec, system and %x() or Backticks </h2> <h3> Mr. Black, question_id: 6338908 </h3>Score: 426, Tags: {ruby,exec} <br><p>What is the difference between the following Ruby methods?</p>
+
+<p><code>exec</code>, <code>system</code> and <code>%x()</code> or <em>Backticks</em></p>
+
+<p>I know they are used to execute terminal commands programmatically via Ruby, but I'd like to know why there are three different ways to do this.</p>
+<h4> Comment 14663081 Michael Kohl: </h4>Since someone just dug up this old thread, &quot;Working With Unix Processes&quot; is an excellent book for Rubyists interested in the topic: <a href="http://workingwithunixprocesses.com/" rel="nofollow noreferrer">workingwithunixprocesses.com</a><br><h4> Comment 34734256 Simon Perepelitsa: </h4>There is a great Ruby Quicktips article on that topic: <a href="http://rubyquicktips.com/post/5862861056/execute-shell-commands" rel="nofollow noreferrer">Execute shell commands</a>.<br><h4> Comment 34734276 zetetic: </h4>These commands, and many others, are explained quite well in the docs: <a href="http://www.ruby-doc.org/core/Kernel.html#method-i-exec" rel="nofollow noreferrer">exec</a> <a href="http://www.ruby-doc.org/core/Kernel.html#method-i-system" rel="nofollow noreferrer">system</a> <a href="http://www.ruby-doc.org/core/Kernel.html#method-i-60" rel="nofollow noreferrer">backticks</a><br><h4> Comment 40770721 Dennis: </h4>I&#39;m surprised none of the answers mention <a href="http://apidock.com/ruby/FileUtils/sh" rel="nofollow noreferrer"><code>sh</code></a>.<br><h4> Comment 68215777 Simon B.: </h4>@Dennis sh wraps a shell (likely $SHELL) around whatever you&#39;re running.  Somebody please explain when this is useful / necessary :)<br><h4> Comment 40891738 Mr. Black: </h4>@Dennis When I was raising this question ruby 1.9.3* not released.<br>------------------------------------------------------------------ <br><h3> Answer 18623297 Konrad Reiche: </h3><p><strong>system</strong></p>
+<p>The <a href="http://www.ruby-doc.org/core/Kernel.html#method-i-system" rel="noreferrer"><code>system</code></a> method calls a system program. You have to provide the command as a string argument to  this method. For example:</p>
+<pre><code>&gt;&gt; system(&quot;date&quot;)
+Wed Sep 4 22:03:44 CEST 2013
+=&gt; true
+</code></pre>
+<p>The invoked program will use the current <code>STDIN</code>, <code>STDOUT</code> and <code>STDERR</code> objects of your Ruby program. In fact, the actual return value is either <code>true</code>, <code>false</code> or <code>nil</code>. In the example the date was printed through the IO object of <code>STDIN</code>. The method will return <code>true</code> if the process exited with a zero status, <code>false</code> if the process exited with a non-zero status and <code>nil</code> if the execution failed.</p>
+<p>As of Ruby 2.6, passing <code>exception: true</code> will raise an exception instead of returning <code>false</code> or <code>nil</code>:</p>
+<pre><code>&gt;&gt; system('invalid')
+=&gt; nil
+
+&gt;&gt; system('invalid', exception: true)
+Traceback (most recent call last):
+...
+Errno::ENOENT (No such file or directory - invalid)
+</code></pre>
+<p>Another side effect is that the global variable <code>$?</code> is set to a <a href="http://www.ruby-doc.org/core/Process/Status.html" rel="noreferrer"><code>Process::Status</code></a> object. This object will contain information about the  call itself, including the process identifier (PID) of the invoked process and the exit status.</p>
+<pre><code>&gt;&gt; system(&quot;date&quot;)
+Wed Sep 4 22:11:02 CEST 2013
+=&gt; true
+&gt;&gt; $?
+=&gt; #&lt;Process::Status: pid 15470 exit 0&gt;
+</code></pre>
+<p><strong>Backticks</strong></p>
+<p><a href="http://www.ruby-doc.org/core/Kernel.html#method-i-60" rel="noreferrer">Backticks</a> (``) call a system program and return its output. As opposed to the first approach, the command is not provided through a string, but by putting it inside a backticks pair.</p>
+<pre><code>&gt;&gt; `date`
+=&gt; Wed Sep 4 22:22:51 CEST 2013   
+</code></pre>
+<p>The global variable <code>$?</code> is set through the backticks, too. With backticks you can also make use string interpolation.</p>
+<p><strong>%x()</strong></p>
+<p>Using <code>%x</code> is an alternative to the backticks style. It will return the output, too. Like its relatives <code>%w</code> and <code>%q</code> (among others), any delimiter will suffice as long as bracket-style delimiters match. This means <code>%x(date)</code>, <code>%x{date}</code> and <code>%x-date-</code> are all synonyms. Like backticks <code>%x</code> can make use of string interpolation.</p>
+<p><strong>exec</strong></p>
+<p>By using <a href="http://www.ruby-doc.org/core/Kernel.html#method-i-exec" rel="noreferrer"><code>Kernel#exec</code></a> the current process (your Ruby script) is replaced with the process invoked through <code>exec</code>. The method can take a string as argument. In this case the string will be subject to shell expansion. When using more than one argument, then the first one is used to execute a program and the following are provided as arguments to the program to be invoked.</p>
+<p><strong>Open3.popen3</strong></p>
+<p>Sometimes the required information is written to standard input or standard error and you need to get control over those as well. Here <a href="http://ruby-doc.org/stdlib-2.3.1/libdoc/open3/rdoc/Open3.html#method-c-popen3" rel="noreferrer"><code>Open3.popen3</code></a> comes in handy:</p>
+<pre><code>require 'open3'
+
+Open3.popen3(&quot;curl http://example.com&quot;) do |stdin, stdout, stderr, thread|
+   pid = thread.pid
+   puts stdout.read.chomp
+end
+</code></pre>
+<h4> Comment 35193594 cboettig: </h4>And for more fine-grained control of how the call handles <code>STDIN</code>, <code>STDOUT</code>, <code>STDERR</code>, consider <code>Open3.popen3</code> instead; e.g. see <a href="http://stackoverflow.com/a/10922097/258662">stackoverflow.com/a/10922097/258662</a><br><h4> Comment 98277397 adg: </h4>Thank you for mentioning that backticks support string interpolation which solved my problem.<br>------------------------------------------------------------------ <br><h3> Answer 31572431 Ian: </h3><p>Here's a flowchart based on <a href="https://stackoverflow.com/a/7263556/2063546">this answer</a>.  See also, <a href="https://stackoverflow.com/a/1402389/2063546">using <code>script</code> to emulate a terminal</a>.</p>
+
+<p><a href="https://i.stack.imgur.com/1Vuvp.png" rel="noreferrer"><img src="https://i.stack.imgur.com/1Vuvp.png" alt="enter image description here"></a></p>
+
+
+<h4> Comment 116343775 user2490003: </h4>Typical StackOverflow - everyone is critical but honestly this flow chart is so handy and helped me immensely. Thanks.<br><h4> Comment 66665883 Nakilon: </h4>This is not so simple. In my case it &quot;was OK (and need) to block until the process complete&quot; to then use popen3 to check the STDOUT/STDERR outputs.<br><h4> Comment 67034570 Ian: </h4>You can always cause a non-blocking call to (effectively) block by wrapping it in a while loop.  You can&#39;t make a blocking call into a non-blocking call so easily.<br>------------------------------------------------------------------ <br><h3> Answer 6338954 William Pursell: </h3><p>They do different things.  <code>exec</code> replaces the current process with the new process and <b>never returns</b>.  <code>system</code> invokes another process and <b>returns its exit value</b> to the current process.  Using backticks invokes another process and <b>returns the output</b> of that process to the current process.</p>
+------------------------------------------------------------------ <br><h3> Answer 73742716 Tara: </h3><p>In my case worked this.</p>
+<pre class="lang-rb prettyprint-override"><code>output = `nmap localhost`
+</code></pre>
+<p>This one saves your output to the variable, so the answer is use `` instead of system.</p>

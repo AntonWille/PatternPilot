@@ -1,0 +1,350 @@
+ <h2> Title: How to remove an element from a list by index </h2> <h3> Joan Venge, question_id: 627435 </h3>Score: 2247, Tags: {python,list,indexing} <br><p>How do I remove an element from a list <strong>by index</strong>?</p>
+<p>I found <code>list.remove()</code>, but this slowly scans the list for an item <strong>by value</strong>.</p>
+<h4> Comment 52758383 jfs: </h4>@smci: Python list is array-based:  to delete an item in the middle, you have to move all items on the right to remove the gap that is why it is <code>O(n)</code> in time operation. <code>deque()</code> provides efficient operations on both ends but it does not provide O(1) insertions/lookups/deletions in the middle.<br><h4> Comment 59015744 smci: </h4>@J.F.Sebastian: of course. I merely noted that <i>the language spec does not define this</i>, it&#39;s an implementation issue. (I was surprised to find that it didn&#39;t.)<br><h4> Comment 52793634 smci: </h4>@J.F.Sebastian: cPython implementation, yes, thanks for correcting me. Strictly the <a href="https://docs.python.org/2/reference/index.html" rel="nofollow noreferrer">language spec</a> doesn&#39;t specify how to implement list, alternative implementations could choose to use a linked-list.<br><h4> Comment 78531013 smci: </h4>@NickT: I&#39;m merely cautioning to distinguish when something is implementation-defined due to not being defined in the language spec. It was exactly that sort of assumption that caused major grief with hash instability (between platforms) back in 2.x. Obviously most rational implementations of Python&#39;s list would never choose linked-list since we want the basic operations to be O(1). That&#39;s all.<br><h4> Comment 88010564 Peter Mortensen: </h4>Related: <i><a href="https://stackoverflow.com/questions/11520492">Difference between del, remove and pop on lists</a></i><br><h4> Comment 58821799 jfs: </h4>@smci: no practical Python implementation would use <code>O(n)</code> index access <code>a[i]</code> (due to linked-lists). Note: array-based implementation provides <code>O(1)</code> index access.<br><h4> Comment 78368313 Nick T: </h4>@smci if you&#39;re targeting that broadly, I&#39;m not sure how you can hope to optimize anything.<br>------------------------------------------------------------------ <br><h3> Answer 627453 unbeknown: </h3><p>Use <code>del</code> and specify the index of the element you want to delete:</p>
+
+<pre><code>&gt;&gt;&gt; a = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+&gt;&gt;&gt; del a[-1]
+&gt;&gt;&gt; a
+[0, 1, 2, 3, 4, 5, 6, 7, 8]
+</code></pre>
+
+<p>Also supports slices:</p>
+
+<pre><code>&gt;&gt;&gt; del a[2:4]
+&gt;&gt;&gt; a
+[0, 1, 4, 5, 6, 7, 8, 9]
+</code></pre>
+
+<p><a href="http://docs.python.org/tutorial/datastructures.html#the-del-statement" rel="noreferrer">Here</a> is the section from the tutorial.</p>
+<h4> Comment 440171 unbeknown: </h4>pop() returns the element you want to remove. del just deletes is.<br><h4> Comment 440051 Joan Venge: </h4>Thanks, what&#39;s the difference between pop and del?<br><h4> Comment 440059 Brian R. Bondy: </h4>del is overloaded.  For example del a deletes the whole list<br><h4> Comment 440064 Brian R. Bondy: </h4>another example del a[2:4], deletes elements 2 and 3<br><h4> Comment 27538637 glglgl: </h4>I cannot see a proof of &quot;linked list&quot; there. Look at <a href="http://svn.python.org/projects/python/trunk/Objects/listobject.c" rel="nofollow noreferrer">svn.python.org/projects/python/trunk/Objects/listobject.c</a> how <code>PyList_GetItem()</code> essentially returns <code>((PyListObject *)op) -&gt; ob_item[i];</code> - the <code>i</code>th element of an array.<br><h4> Comment 27499086 glglgl: </h4>@smci By directly going to that index. The length is known (as it is noted somewhere inside the list), and I just go to the <code>l-1</code>th reference contained in the list (which lies in memory as an array).<br><h4> Comment 27538606 glglgl: </h4>@smci This is not a proof. You are comparing the IDs of the contained elements. This has nothing to do with the way the data is stored in the list.<br><h4> Comment 65263826 gota: </h4>In Python 3.x this does not seem to work TypeError: &#39;range&#39; object doesn&#39;t support item deletion. How to do this?<br><h4> Comment 67498323 Jadiel de Armas: </h4>@Nuno Calaim: Instead of doing a = range(10), do the following: a = list(range(10)).  Then try deleting. It will work.<br><h4> Comment 52962225 Valentine Bondar: </h4>I don&#39;t think you can specify a range of indexes with pop()<br><h4> Comment 27499221 smci: </h4>cPython stores lists as linked-lists: <a href="http://docs.python.org/2/c-api/list.html" rel="nofollow noreferrer">docs.python.org/2/c-api/list.html</a> , to allow them to be heteregeneous. Not as arrays.<br><h4> Comment 27498957 glglgl: </h4>@smci In what way does <code>del a[-1]</code> imply a list traversal?<br><h4> Comment 122329699 Charlie Parker: </h4>in summary, do I use <code>del</code> or <code>pop</code> to modify and delete that element with no weird errors?<br><h4> Comment 108968860 Murtuza Vadharia: </h4>what is time complexity for del operation ? if there&#39;s set of indices which have index values, and elements of respective index are to be removed from the list, is there efficient way or do we need to iterate over all index and then use delete operation that many times? @BrianR.Bondy<br><h4> Comment 27499073 smci: </h4>@glglgl How else could you get list element a[-1] without walking the list from a?<br><h4> Comment 27499200 smci: </h4>No, very dangerous! You can&#39;t assume (c)Python stores lists as a contiguous array. You can verify this by declaring <code>y = [1,2,3,4,5,6]</code> then <code>y.insert(3,&quot;a boring string&quot;)</code> then examine their ids: <code>[ &quot;%0x&quot; % id(yy) for yy in y ]</code>. They&#39;re non-contiguous.<br><h4> Comment 26484757 smci: </h4><code>del a[-1]</code> implies a list traversal. <code>a.pop()</code> explicitly says it does one.<br>------------------------------------------------------------------ <br><h3> Answer 627441 Jarret Hardie: </h3><p>You probably want <code>pop</code>:</p>
+
+<pre><code>a = ['a', 'b', 'c', 'd']
+a.pop(1)
+
+# now a is ['a', 'c', 'd']
+</code></pre>
+
+<p>By default, <code>pop</code> without any arguments removes the last item:</p>
+
+<pre><code>a = ['a', 'b', 'c', 'd']
+a.pop()
+
+# now a is ['a', 'b', 'c']
+</code></pre>
+<h4> Comment 57921736 Bob Stein: </h4>By the way, <code>pop()</code> returns whatever element it removed.<br><h4> Comment 115191614 Seb: </h4>This answer is incorrect. <code>pop()</code> returns the value removed from the array, not the array without the value you wanted to remove as shown in the code&#39;s comments. I believe that it doesn&#39;t answer the original question, as it was not asked how to extract a value from an array but to remove it.<br><h4> Comment 117442934 b4ux1t3: </h4>@Seb, You&#39;re correct in that it returns the value you delete, but there&#39;s no requirement in the question saying the list had to be regenerated or returned. Since <code>pop</code> mutates the list in place, it fulfills the requirements set forth by the question exactly, albeit with a superfluous return value. I&#39;d even argue that pop is more correct than the accepted answer, since <code>del</code> is a keyword that&#39;s linked pretty closely to the memory management of the running program, compared to <code>list.pop</code>, which is a feature of the list object in Python.<br><h4> Comment 79971004 Davis Herring: </h4>@S.Lott: It uses the end by default because it&#39;s O(1) there; it&#39;s O(n) at the beginning.<br><h4> Comment 122329700 Charlie Parker: </h4>in summary, do I use <code>del</code> or <code>pop</code> to modify and delete that element with no weird errors?<br><h4> Comment 122329713 Charlie Parker: </h4>why don&#39;t you like <code>del</code> Im curious.<br>------------------------------------------------------------------ <br><h3> Answer 24352671 Raghav RV: </h3><p>Like others mentioned pop and del are <em>the</em> efficient ways to remove an item of given index. Yet just for the sake of completion (since the same thing can be done via many ways in Python):</p>
+
+<p><strong>Using slices (this does not do in place removal of item from original list):</strong></p>
+
+<p>(Also this will be the least efficient method when working with Python list, but this could be useful (but not efficient, I reiterate) when working with user defined objects that do not support pop, yet do define a <code>__getitem__</code> ):</p>
+
+<pre><code>&gt;&gt;&gt; a = [1, 2, 3, 4, 5, 6]
+&gt;&gt;&gt; index = 3 # Only positive index
+
+&gt;&gt;&gt; a = a[:index] + a[index+1 :]
+# a is now [1, 2, 3, 5, 6]
+</code></pre>
+
+<p><strong>Note:</strong> Please note that this method does not modify the list in place like <code>pop</code> and <code>del</code>. It instead makes two copies of lists (one from the start until the index but without it (<code>a[:index]</code>) and one after the index till the last element (<code>a[index+1:]</code>)) and creates a new list object by adding both. This is then reassigned to the list variable (<code>a</code>). The old list object is hence dereferenced and hence garbage collected (provided the original list object is not referenced by any variable other than a).</p>
+
+<p>This makes this method very inefficient and it can also produce undesirable side effects (especially when other variables point to the original list object which remains un-modified).</p>
+
+<p>Thanks to @MarkDickinson for pointing this out ...</p>
+
+<p><a href="https://stackoverflow.com/a/509295/3244627">This</a> Stack Overflow answer explains the concept of slicing.</p>
+
+<p>Also note that this works only with positive indices.</p>
+
+<p>While using with objects, the <code>__getitem__</code> method must have been defined and more importantly the <strong><code>__add__</code></strong> method must have been defined to return an object containing items from both the operands.</p>
+
+<p>In essence, this works with any object whose class definition is like:</p>
+
+<pre><code>class foo(object):
+    def __init__(self, items):
+        self.items = items
+
+    def __getitem__(self, index):
+        return foo(self.items[index])
+
+    def __add__(self, right):
+        return foo( self.items + right.items )
+</code></pre>
+
+<p>This works with <code>list</code> which defines <code>__getitem__</code> and <code>__add__</code> methods.</p>
+
+<p><strong>Comparison of the three ways in terms of efficiency:</strong></p>
+
+<p>Assume the following is predefined:</p>
+
+<pre><code>a = range(10)
+index = 3
+</code></pre>
+
+<p><strong>The <code>del object[index]</code> method:</strong></p>
+
+<p>By far the most efficient method. It works will all objects that define a <code>__del__</code> method.</p>
+
+<p>The disassembly is as follows:</p>
+
+<p>Code:</p>
+
+<pre><code>def del_method():
+    global a
+    global index
+    del a[index]
+</code></pre>
+
+<p>Disassembly:</p>
+
+<pre><code> 10    0 LOAD_GLOBAL     0 (a)
+       3 LOAD_GLOBAL     1 (index)
+       6 DELETE_SUBSCR   # This is the line that deletes the item
+       7 LOAD_CONST      0 (None)
+      10 RETURN_VALUE
+None
+</code></pre>
+
+<p><strong><code>pop</code> method:</strong></p>
+
+<p>It is less efficient than the del method and is used when you need to get the deleted item.</p>
+
+<p>Code:</p>
+
+<pre><code>def pop_method():
+    global a
+    global index
+    a.pop(index)
+</code></pre>
+
+<p>Disassembly:</p>
+
+<pre><code> 17     0 LOAD_GLOBAL     0 (a)
+        3 LOAD_ATTR       1 (pop)
+        6 LOAD_GLOBAL     2 (index)
+        9 CALL_FUNCTION   1
+       12 POP_TOP
+       13 LOAD_CONST      0 (None)
+       16 RETURN_VALUE
+</code></pre>
+
+<p><strong>The slice and add method.</strong></p>
+
+<p>The least efficient.</p>
+
+<p>Code:</p>
+
+<pre><code>def slice_method():
+    global a
+    global index
+    a = a[:index] + a[index+1:]
+</code></pre>
+
+<p>Disassembly:</p>
+
+<pre><code> 24     0 LOAD_GLOBAL    0 (a)
+        3 LOAD_GLOBAL    1 (index)
+        6 SLICE+2
+        7 LOAD_GLOBAL    0 (a)
+       10 LOAD_GLOBAL    1 (index)
+       13 LOAD_CONST     1 (1)
+       16 BINARY_ADD
+       17 SLICE+1
+       18 BINARY_ADD
+       19 STORE_GLOBAL   0 (a)
+       22 LOAD_CONST     0 (None)
+       25 RETURN_VALUE
+None
+</code></pre>
+
+<p>Note: In all three disassembles ignore the last two lines which basically are <code>return None</code>. Also the first two lines are loading the global values <code>a</code> and <code>index</code>.</p>
+<h4> Comment 43530984 Caleb: </h4>Maybe the answer wasn&#39;t entirely on topic, but the indexing method is useful if you need to omit an item from an immutable object, such as a tuple. pop() and del() will not work in that case.<br><h4> Comment 59276659 user3085931: </h4>@rvraghav93 out of all presented methods during the entire post, the <code>a = a[:index] + a[index+1 :]</code>-trick was the savest, when it comes to huge lists. All the other methods ended up in a deadlock. So thank you very much<br><h4> Comment 37653082 Mark Dickinson: </h4>Your slicing method does not remove an element from a list:  instead it creates a <i>new</i> list object containing all but the ith entry from the original list.  The original list is left unmodified.<br><h4> Comment 74720811 Yohan Obadia: </h4>Indeed Mark, you are grumpy. This answer is the one I prefered because it was really pedagogical. I learned most from this answer and the desassembly details that were provided and the impact on performanc. Plus the slicing method, yes, create another object, but now it is specified and sometimes that is also what you need.<br><h4> Comment 37653853 Raghav RV: </h4>@MarkDickinson Have edited the answer to clarify the same ... Please let me know if it looks good now ?<br><h4> Comment 37668027 Mark Dickinson: </h4>Yep, that&#39;s a bit better.  Forgive me for being grumpy, but I guess what I&#39;m trying to say is that I don&#39;t see the value of this answer: you give two methods that have already been adequately covered by other answers, and a third method (slicing) that&#39;s irrelevant because it doesn&#39;t actually solve the problem the OP asked about.<br><h4> Comment 129402514 Karl Knechtel: </h4>&quot;This makes this method very inefficient and it can also produce undesirable side effects (especially when other variables point to the original list object which remains un-modified).&quot; This is <b>often very desirable</b>. It&#39;s also the <b>opposite</b> of a &quot;side effect&quot;: running the code gives you a new value, leaving the prior state untouched and returning the result. Side effects are when you communicate by modifying an existing thing, by definition.<br>------------------------------------------------------------------ <br><h3> Answer 45625190 Neil: </h3><p>This depends on what you want to do.</p>
+
+<p>If you want to return the element you removed, use <code>pop()</code>:</p>
+
+<pre><code>&gt;&gt;&gt; l = [1, 2, 3, 4, 5]
+&gt;&gt;&gt; l.pop(2)
+3
+&gt;&gt;&gt; l
+[1, 2, 4, 5]
+</code></pre>
+
+<p>However, if you just want to delete an element, use <code>del</code>:</p>
+
+<pre><code>&gt;&gt;&gt; l = [1, 2, 3, 4, 5]
+&gt;&gt;&gt; del l[2]
+&gt;&gt;&gt; l
+[1, 2, 4, 5]
+</code></pre>
+
+<p>Additionally, <code>del</code> allows you to use slices (e.g. <code>del[2:]</code>).</p>
+------------------------------------------------------------------ <br><h3> Answer 51489672 xiaojia zhang: </h3><p>If you want to remove elements at specific positions in a list, like the 2nd, 3rd and 7th elements, you can't use</p>
+<pre><code>del my_list[2]
+del my_list[3]
+del my_list[7]
+</code></pre>
+<p>Since after you delete the second element, the third element you delete actually is the fourth element in the original list. You can filter the 2nd, 3rd and 7th elements in the original list and get a new list, like below:</p>
+<pre><code>new_list = [j for i, j in enumerate(my_list) if i not in [2, 3, 7]]
+</code></pre>
+<h4> Comment 122715736 joanis: </h4>You can still call <code>del</code> repeatedly, as long as you do it from the largest index first, like in nspo&#39;s answer.<br><h4> Comment 111497552 Magnus: </h4>Fits my need. I need to go through a list and delete some of them. So with this method I will just save in another list the indexes of the elements I want to remove, and then at the end I will use the method you gave to remove them all at once.<br>------------------------------------------------------------------ <br><h3> Answer 19466364 boatcoder: </h3><p><a href="https://docs.python.org/library/stdtypes.html#mutable-sequence-types"><code>pop</code></a> is also useful to remove and keep an item from a list.  Where <code>del</code> actually trashes the item.</p>
+
+<pre><code>&gt;&gt;&gt; x = [1, 2, 3, 4]
+
+&gt;&gt;&gt; p = x.pop(1)
+&gt;&gt;&gt; p
+    2
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 57574535 nspo: </h3><p>It has already been mentioned how to remove a single element from a list and which advantages the different methods have. Note, however, that removing <strong>multiple</strong> elements has some potential for errors:</p>
+
+<pre><code>&gt;&gt;&gt; l = [0,1,2,3,4,5,6,7,8,9]
+&gt;&gt;&gt; indices=[3,7]
+&gt;&gt;&gt; for i in indices:
+...     del l[i]
+... 
+&gt;&gt;&gt; l
+[0, 1, 2, 4, 5, 6, 7, 9]
+</code></pre>
+
+<p>Elements 3 and 8 (not 3 and 7) of the original list have been removed (as the list was shortened during the loop), which might not have been the intention. If you want to safely remove multiple indices you should instead delete the elements with highest index first, e.g. like this:</p>
+
+<pre><code>&gt;&gt;&gt; l = [0,1,2,3,4,5,6,7,8,9]
+&gt;&gt;&gt; indices=[3,7]
+&gt;&gt;&gt; for i in sorted(indices, reverse=True):
+...     del l[i]
+... 
+&gt;&gt;&gt; l
+[0, 1, 2, 4, 5, 6, 8, 9]
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 44353373 lloydyu24: </h3><p>Use the <a href="https://docs.python.org/3/tutorial/datastructures.html#the-del-statement" rel="noreferrer"><code>del</code></a> statement:</p>
+<pre><code>del listName[-N]
+</code></pre>
+<p>For example, if you want to remove the last 3 items, your code should be:</p>
+<pre><code>del listName[-3:]
+</code></pre>
+<p>For example, if you want to remove the last 8 items, your code should be:</p>
+<pre><code>del listName[-8:]
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 47011673 Andreas Chatzivasileiadis: </h3><p>Yet another way to remove an element(s) from a list by index.</p>
+
+<pre><code>a = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+# remove the element at index 3
+a[3:4] = []
+# a is now [0, 1, 2, 4, 5, 6, 7, 8, 9]
+
+# remove the elements from index 3 to index 6
+a[3:7] = []
+# a is now [0, 1, 2, 7, 8, 9]
+</code></pre>
+
+<p>a[x:y] points to the elements from index <code>x</code> to <code>y-1</code>. When we declare that portion of the list as an empty list (<code>[]</code>), those elements are removed.</p>
+------------------------------------------------------------------ <br><h3> Answer 32948546 Mayur Koshti: </h3><p>Generally, I am using the following method:</p>
+
+<pre><code>&gt;&gt;&gt; myList = [10,20,30,40,50]
+&gt;&gt;&gt; rmovIndxNo = 3
+&gt;&gt;&gt; del myList[rmovIndxNo]
+&gt;&gt;&gt; myList
+[10, 20, 30, 50]
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 42250335 SollyBunny: </h3><p>You could just search for the item you want to delete. It is really simple.
+Example:</p>
+
+<pre><code>    letters = ["a", "b", "c", "d", "e"]
+    letters.remove(letters[1])
+    print(*letters) # Used with a * to make it unpack you don't have to (Python 3.x or newer)
+</code></pre>
+
+<p>Output: a c d e</p>
+<h4> Comment 90987733 tommy.carstensen: </h4>I like this solution, but of course it assumes your list does not have duplicates.<br>------------------------------------------------------------------ <br><h3> Answer 43964437 Jitesh Mohite: </h3><p>Use the following code to remove element from the list: </p>
+
+<pre><code>list = [1, 2, 3, 4]
+list.remove(1)
+print(list)
+
+output = [2, 3, 4]
+</code></pre>
+
+<p>If you want to remove index element data from the list use:</p>
+
+<pre><code>list = [1, 2, 3, 4]
+list.remove(list[2])
+print(list)
+output : [1, 2, 4]
+</code></pre>
+<h4> Comment 94024912 Anthon: </h4>This is not removing by index, but removing by matching value. That might be valuable information for some people visiting here, but doesn&#39;t try to answer OPs question at all.<br><h4> Comment 90987737 tommy.carstensen: </h4>Comes with the caveat that your list cannot contain duplicates.<br>------------------------------------------------------------------ <br><h3> Answer 38066478 litepresence: </h3><p>As previously mentioned, best practice is del(); or pop() if you need to know the value.</p>
+
+<p>An alternate solution is to re-stack only those elements you want:</p>
+
+<pre><code>    a = ['a', 'b', 'c', 'd'] 
+
+    def remove_element(list_,index_):
+        clipboard = []
+        for i in range(len(list_)):
+            if i is not index_:
+                clipboard.append(list_[i])
+        return clipboard
+
+    print(remove_element(a,2))
+
+    &gt;&gt; ['a', 'b', 'd']
+</code></pre>
+
+<p>eta: hmm... will not work on negative index values, will ponder and update</p>
+
+<p>I suppose </p>
+
+<pre><code>if index_&lt;0:index_=len(list_)+index_
+</code></pre>
+
+<p>would patch it... but suddenly this idea seems very brittle. Interesting thought experiment though.  Seems there should be a 'proper' way to do this with append() / list comprehension.  </p>
+
+<p><em>pondering</em></p>
+<h4> Comment 94025005 Anthon: </h4>Which version of Python has a function <code>del()</code>? For that function you provide the list as the first argument to that function and then the index, or the index first and then the list? Does it return the list argument without the item, or does it do the deleting in place. I know about the <code>del</code> statement, but not about a function with the same name.<br>------------------------------------------------------------------ <br><h3> Answer 46410224 Jo Ja: </h3><p><strong>l</strong> - list of values; we have to remove indexes from <strong>inds2rem</strong> list.</p>
+
+<pre><code>l = range(20)
+inds2rem = [2,5,1,7]
+map(lambda x: l.pop(x), sorted(inds2rem, key = lambda x:-x))
+
+&gt;&gt;&gt; l
+[0, 3, 4, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+</code></pre>
+<h4> Comment 88215117 Hitesh: </h4>not working, the answer is <code>&lt;map at 0x7f4d54109a58&gt;</code>. and l is range(0,20)<br>------------------------------------------------------------------ <br><h3> Answer 41347010 Mo Ali: </h3><p>It doesn't sound like you're working with a list of lists, so I'll keep this short.  You want to use pop since it will remove elements not elements that are lists, you should use del for that.  To call the last element in python it's "-1"</p>
+
+<pre><code>&gt;&gt;&gt; test = ['item1', 'item2']
+&gt;&gt;&gt; test.pop(-1)
+'item2'
+&gt;&gt;&gt; test
+['item1']
+</code></pre>
+<h4> Comment 94025304 Anthon: </h4><code>pop()</code> and <code>del</code> both remove an element at the provided index, independent of whether that element is itself a list or not. <code>a = [1, [2, 3], 4]; del a[1]; b = [1, [2, 3], 4]; b.pop(1); assert a == b</code><br>------------------------------------------------------------------ <br><h3> Answer 52463498 U13-Forward: </h3><p>Or if multiple indexes should be removed:</p>
+
+<pre><code>print([v for i,v in enumerate(your_list) if i not in list_of_unwanted_indexes])
+</code></pre>
+
+<p>Of course then could also do:</p>
+
+<pre><code>print([v for i,v in enumerate(your_list) if i != unwanted_index])
+</code></pre>
+<h4> Comment 94025189 Anthon: </h4>Why don&#39;t you just sort the list of indices in reverse order and then delete them one by one? That way you don&#39;t have to make a new list.<br>------------------------------------------------------------------ <br><h3> Answer 41114019 Aashutosh jha: </h3><p>You can use either del or pop to remove element from list based on index.  Pop will print member it is removing from list, while list delete that member without printing it.</p>
+
+<pre><code>&gt;&gt;&gt; a=[1,2,3,4,5]
+&gt;&gt;&gt; del a[1]
+&gt;&gt;&gt; a
+[1, 3, 4, 5]
+&gt;&gt;&gt; a.pop(1)
+ 3
+&gt;&gt;&gt; a
+[1, 4, 5]
+&gt;&gt;&gt; 
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 35122409 pyman: </h3><p>One can either use del or pop, but I prefer del, since you can specify index and slices, giving the user more control over the data.</p>
+
+<p>For example, starting with the list shown, one can remove its last element with <code>del</code> as a slice, and then one can remove the last element from the result using <code>pop</code>.</p>
+
+<pre><code>&gt;&gt;&gt; l = [1,2,3,4,5]
+&gt;&gt;&gt; del l[-1:]
+&gt;&gt;&gt; l
+[1, 2, 3, 4]
+&gt;&gt;&gt; l.pop(-1)
+4
+&gt;&gt;&gt; l
+[1, 2, 3]
+</code></pre>

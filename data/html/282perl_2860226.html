@@ -1,0 +1,256 @@
+ <h2> Title: How can I check if a Perl array contains a particular value? </h2> <h3> Mel, question_id: 2860226 </h3>Score: 282, Tags: {perl,arrays,comparison} <br><p>I am trying to figure out a way of checking for the existence of a value in an array without iterating through the array.</p>
+
+<p>I am reading a file for a parameter.  I have a long list of parameters I do not want to deal with. I placed these unwanted parameters in an array <code>@badparams</code>.</p>
+
+<p>I want to read a new parameter and if it does not exist in <code>@badparams</code>, process it. If it does exist in <code>@badparams</code>, go to the next read.</p>
+<h4> Comment 2905649 Grant McLean: </h4>For the record (and this may be totally inapplicable to your situation) it is generally a better idea to identify &#39;good values&#39; and ignore the rest rather than trying to weed out known &#39;bad values&#39;.  The question you need to ask is whether it&#39;s possible there may be some bad values you don&#39;t know about yet.<br><h4> Comment 2905445 Ether: </h4><a href="http://perldoc.perl.org/functions/grep.html" rel="nofollow noreferrer">perldoc -f grep</a><br><h4> Comment 2904503 Cascabel: </h4>For the record, the answer does depend on your situation. It sounds like you want to make repeated lookups, so using a hash as jkramer suggests is good. If you only wanted to make one lookup, you might as well just iterate. (And in some cases you might want to binary search instead of using a hash!)<br><h4> Comment 134603549 U. Windl: </h4>Use black magic to find out whether an item is in an array without inspecting the array! <b>As the question is, there is no answer possible!</b> &quot;I am trying to figure out a way of checking for the existence of a value in an array without iterating through the array.&quot;<br><h4> Comment 134603566 U. Windl: </h4>Probably you want <code>%badparams</code>, not <code>@badparams</code>.<br><h4> Comment 136924455 Jim Balter: </h4>&quot;As the question is, there is no answer possible!&quot; -- not true ... if they create a hash whose keys are the values in the array then they don&#39;t have to iterate through the array. &quot;Probably you want %badparams, not @badparams&quot; -- since the OP has @badparams, they can create %badparams from it.<br>------------------------------------------------------------------ <br><h3> Answer 6475315 Aaron T Harris: </h3><p>Best general purpose - Especially short arrays (1000 items or less) and coders that are unsure of what optimizations best suit their needs.</p>
+
+<pre><code># $value can be any regex. be safe
+if ( grep( /^$value$/, @array ) ) {
+  print "found it";
+}
+</code></pre>
+
+<p>It has been mentioned that grep passes through all values even if the first value in the array matches.  This is true, however <b>grep is still extremely fast for most cases</b>.  If you're talking about short arrays (less than 1000 items) then most algorithms are going to be pretty fast anyway.  If you're talking about very long arrays (1,000,000 items) grep is acceptably quick regardless of whether the item is the first or the middle or last in the array.</p>
+
+<p><b>Optimization Cases for longer arrays:</b></p>
+
+<p><b>If your array is sorted</b>, use a "binary search".</p>
+
+<p>If the <b>same array is repeatedly searched</b> many times, copy it into a hash first and then check the hash.  If memory is a concern, then move each item from the array into the hash. More memory efficient but destroys the original array.</p>
+
+<p>If <b>same values are searched repeatedly</b> within the array, lazily build a cache. (as each item is searched, first check if the search result was stored in a persisted hash. if the search result is not found in the hash, then search the array and put the result in the persisted hash so that next time we'll find it in the hash and skip the search).</p>
+
+<p>Note: these optimizations will only be faster when dealing with long arrays.  Don't over optimize.</p>
+<h4> Comment 29285585 Grzegorz Rożniecki: </h4>@DennisWilliamson ...and <a href="https://metacpan.org/pod/release/RJBS/perl-5.18.0/pod/perldelta.pod#The-smartmatch-family-of-features-are-now-experimental" rel="nofollow noreferrer">in 5.18 it&#39;s considered experimantal</a>.<br><h4> Comment 23261105 Dennis Williamson: </h4>Double tilde was introduced in Perl 5.10<br><h4> Comment 80421309 yahermann: </h4>Do not use if (&quot;value&quot; ~~ @array).  ~~ is an experimental feature called Smartmatch.  The experiment appears to be deemed a failure and will be removed or modified in a future version of Perl.<br><h4> Comment 30155538 Vector Gorgoth: </h4>Avoid smartmatch in production code. It&#39;s unstable/experimental pending further notice.<br><h4> Comment 102584191 Slaven Rezic: </h4>Using <code>&#47;^$value$&#47;</code> is problematic if you are not sure about the contents of <code>$value</code> --- if there are regexp meta characters (e.g. just an open parenthesis), then the call will likely fail. Either write it <code>&#47;^\Q$value\E$&#47;</code>, or avoid the regexp completely, using an <code>eq</code> (which is unfortunately slightly less readable): <code>grep { $_ eq $value } ...</code>.<br><h4> Comment 30972859 giordano: </h4>I find it also more readable but <a href="http://www.perlmonks.org/?node=How%20can%20I%20tell%20whether%20a%20list%20or%20array%20contains%20a%20certain%20element%3F" rel="nofollow noreferrer">Do not use</a> says that it is not efficient and checks every element even if it is the first.<br><h4> Comment 102584209 Slaven Rezic: </h4>In theory, using <code>List::Util::any</code> (available in perls since 5.20, otherwise upgrade it from CPAN) should be faster than using <code>grep</code> (and is equally readable), as it needs only half of the operations in average.<br><h4> Comment 45271271 Stalinko: </h4>Using perl 5.8.8 and it throws error: syntax error at script.pl line 646, near &quot;$series_id ~&quot;<br><h4> Comment 22661144 BHS: </h4>I find this more readable than the hash method. The only time the hash method would seem to make sense would be when you need to check for multiple values.<br>------------------------------------------------------------------ <br><h3> Answer 2860242 jkramer: </h3><p>Simply turn the array into a hash:</p>
+
+<pre><code>my %params = map { $_ =&gt; 1 } @badparams;
+
+if(exists($params{$someparam})) { ... }
+</code></pre>
+
+<p>You can also add more (unique) params to the list:</p>
+
+<pre><code>$params{$newparam} = 1;
+</code></pre>
+
+<p>And later get a list of (unique) params back:</p>
+
+<pre><code>@badparams = keys %params;
+</code></pre>
+<h4> Comment 12104259 Kenny Wyland: </h4>For the record, this code still does iterate through the array. The map{} call simply makes that iteration very easy to type.<br><h4> Comment 19258985 Aaron T Harris: </h4>I&#39;d only do this if your values in @badparams are pseudo-static and you plan to do a lot of checks against the map.  I would not recommend this for a single check.<br><h4> Comment 21899768 andrewrjones: </h4>@RobWells no, it will work fine. The next time it see&#39;s the same value, it will just overwrite the entry in the hash, which in this case sets it to <code>1</code> again.<br><h4> Comment 21108498 Rob Wells: </h4>Won&#39;t this go bang for an array with multiple items with the same value?<br>------------------------------------------------------------------ <br><h3> Answer 20570606 Bitmap: </h3><p>You can use smartmatch feature in <em>Perl 5.10</em> as follows:</p>
+
+<p>For literal value lookup doing below will do the trick.</p>
+
+<pre><code>if ( "value" ~~ @array ) 
+</code></pre>
+
+<p>For scalar lookup, doing below will work as above.</p>
+
+<pre><code>if ($val ~~ @array)
+</code></pre>
+
+<p>For inline array doing below, will work as above.</p>
+
+<pre><code>if ( $var ~~ ['bar', 'value', 'foo'] ) 
+</code></pre>
+
+<p>In <em>Perl 5.18</em> smartmatch is flagged as experimental therefore you need to turn off the warnings by turning on <a href="https://metacpan.org/pod/experimental">experimental</a> pragma by adding below to your script/module:</p>
+
+<pre><code>use experimental 'smartmatch';
+</code></pre>
+
+<p>Alternatively if you want to avoid the use of smartmatch - then as Aaron said use:</p>
+
+<pre><code>if ( grep( /^$value$/, @array ) ) {
+  #TODO:
+}
+</code></pre>
+<h4> Comment 44466413 Maze: </h4><b>Warning:</b> you might want to avoid this one, since the operator has apparently different behavior in different versions, and has in the meantime been <a href="https://metacpan.org/pod/release/RJBS/perl-5.17.11/pod/perldelta.pod#Incompatible-Changes" rel="nofollow noreferrer">marked as experimental</a>. So unless you have full control over your perl version (and who has that) you should probably avoid it.<br><h4> Comment 37300921 Igor Skochinsky: </h4>This is nice but seems to be new to Perl 5.10. Took some time before I figured out why I&#39;m getting syntax errors.<br><h4> Comment 57038697 lepe: </h4>I like <a href="http://blogs.perl.org/users/mike_b/2013/06/a-little-nicer-way-to-use-smartmatch-on-perl-518.html" rel="nofollow noreferrer">this explanation</a> about why setting <code>use experimental &#39;smartmatch&#39;</code> is recommended. As I have control of my perl version (internal system), I use the <code>no warnings &#39;experimental::smartmatch&#39;;</code> statement.<br><h4> Comment 128493863 Aquaholic: </h4>PLEASE Avoid using this <code>if ( &quot;value&quot; ~~ @array ) </code> .  It is experimental, and often skips/misses out many matches. It produces random match results on the same data set, when run at multiple times. I almost lost my job when I used it on critical client data :-((<br>------------------------------------------------------------------ <br><h3> Answer 16690762 mascip: </h3><p><a href="http://blogs.perl.org/users/mascip/2013/05/the-clearest-ways-to-check-if-a-list-contains.html">This blog post</a> discusses the best answers to this question.</p>
+
+<p>As a short summary, if you can install CPAN modules then the most readable solutions are:</p>
+
+<pre><code>any(@ingredients) eq 'flour';
+</code></pre>
+
+<p>or</p>
+
+<pre><code>@ingredients-&gt;contains('flour');
+</code></pre>
+
+<p>However, a more common idiom is: </p>
+
+<pre><code>any { $_ eq 'flour' } @ingredients
+</code></pre>
+
+<p>But please don't use the <code>first()</code> function! It doesn't express the intent of your code at all. Don't use the <code>~~</code> "Smart match" operator: it is broken. And don't use <code>grep()</code> nor the solution with a hash: they iterate through the whole list.</p>
+
+<p><code>any()</code> will stop as soon as it finds your value.</p>
+
+<p>Check out the blog post for more details.</p>
+<h4> Comment 53424874 Onlyjob: </h4><i><a href="http://perldoc.perl.org/List/Util.html#any" rel="nofollow noreferrer">any</a></i> needs <code>use List::Util qw(any);</code>. <code>List::Util</code> is in <a href="http://perldoc.perl.org/index-modules-L.html" rel="nofollow noreferrer">Core modules</a>.<br><h4> Comment 119158304 ninjaconcombre: </h4>For the sake of clarification, contains is not either builtins either provided by CPAN, the blog just show how to implement it.<br>------------------------------------------------------------------ <br><h3> Answer 43873180 Kamal Nayan: </h3><h1>Method 1: grep (may careful while value is expected to be a regex).</h1>
+<p>Try to avoid using <code>grep</code>, if looking at resources.</p>
+<pre><code>if ( grep( /^$value$/, @badparams ) ) {
+  print &quot;found&quot;;
+}
+</code></pre>
+<h1>Method 2: Linear Search</h1>
+<pre><code>for (@badparams) {
+    if ($_ eq $value) {
+       print &quot;found&quot;;
+       last;
+    }
+}
+</code></pre>
+<h1>Method 3: Use a hash</h1>
+<pre><code>my %hash = map {$_ =&gt; 1} @badparams;
+print &quot;found&quot; if (exists $hash{$value});
+</code></pre>
+<h1>Method 4: smartmatch</h1>
+<p>(added in Perl 5.10, marked is experimental in Perl 5.18).</p>
+<pre><code>use experimental 'smartmatch';  # for perl 5.18
+print &quot;found&quot; if ($value ~~ @badparams);
+</code></pre>
+<h1>Method 5: Use the module <code>List::MoreUtils</code></h1>
+<pre><code>use List::MoreUtils qw(any);
+@badparams = (1,2,3);
+$value = 1;
+print &quot;found&quot; if any {$_ == $value} @badparams;
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 13939491 Grzegorz Rożniecki: </h3><p><a href="https://stackoverflow.com/a/13516423/708434">@eakssjo's benchmark</a> is broken - measures creating hashes in loop vs creating regexes in loop. Fixed version (plus I've added <code>List::Util::first</code> and <code>List::MoreUtils::any</code>):</p>
+
+<pre><code>use List::Util qw(first);
+use List::MoreUtils qw(any);
+use Benchmark;
+
+my @list = ( 1..10_000 );
+my $hit = 5_000;
+my $hit_regex = qr/^$hit$/; # precompute regex
+my %params;
+$params{$_} = 1 for @list;  # precompute hash
+timethese(
+    100_000, {
+        'any' =&gt; sub {
+            die unless ( any { $hit_regex } @list );
+        },
+        'first' =&gt; sub {
+            die unless ( first { $hit_regex } @list );
+        },
+        'grep' =&gt; sub {
+            die unless ( grep { $hit_regex } @list );
+        },
+        'hash' =&gt; sub {
+            die unless ( $params{$hit} );
+        },
+    });
+</code></pre>
+
+<p>And result (it's for 100_000 iterations, ten times more than in @eakssjo's answer):</p>
+
+<pre><code>Benchmark: timing 100000 iterations of any, first, grep, hash...
+       any:  0 wallclock secs ( 0.67 usr +  0.00 sys =  0.67 CPU) @ 149253.73/s (n=100000)
+     first:  1 wallclock secs ( 0.63 usr +  0.01 sys =  0.64 CPU) @ 156250.00/s (n=100000)
+      grep: 42 wallclock secs (41.95 usr +  0.08 sys = 42.03 CPU) @ 2379.25/s (n=100000)
+      hash:  0 wallclock secs ( 0.01 usr +  0.00 sys =  0.01 CPU) @ 10000000.00/s (n=100000)
+            (warning: too few iterations for a reliable count)
+</code></pre>
+<h4> Comment 20211415 fishinear: </h4>If you want to test for multiple elements, then creating the hash in advance saves you time. But if you just want to know whether it contains a single element, then you don&#39;t have the hash already. Therefore, creating the hash should be part of the computing time. Even more so for the regular expression: you need a new regexp for each element you look for.<br><h4> Comment 56526833 Grzegorz Rożniecki: </h4>@fishinear True, but if you&#39;re only interested in one check, not multiple checks, then obviously it&#39;s microoptimization to even wonder about which method is quicker because those microseconds don&#39;t matter. <i>If</i> you&#39;d want to redo this check, hash is the way to go, cause cost of creating hash once is small enough to be ignored then. Above benchmarks measure <i>only</i> different ways of testing, not including any setup. Yes, this may be invalid in your use case, but again - if you&#39;re doing only single check you should use whatever is most readable to you and your mates.<br>------------------------------------------------------------------ <br><h3> Answer 13516423 aksel: </h3><p>Even though it's convenient to use, it seems like the convert-to-hash solution costs quite a lot of performance, which was an issue for me.</p>
+
+<pre><code>#!/usr/bin/perl
+use Benchmark;
+my @list;
+for (1..10_000) {
+    push @list, $_;
+}
+
+timethese(10000, {
+  'grep'    =&gt; sub {
+            if ( grep(/^5000$/o, @list) ) {
+                # code
+            }
+        },
+  'hash'    =&gt; sub {
+            my %params = map { $_ =&gt; 1 } @list;
+            if ( exists($params{5000}) ) {
+                # code
+            }
+        },
+});
+</code></pre>
+
+<p>Output of benchmark test:</p>
+
+<pre><code>Benchmark: timing 10000 iterations of grep, hash...
+          grep:  8 wallclock secs ( 7.95 usr +  0.00 sys =  7.95 CPU) @ 1257.86/s (n=10000)
+          hash: 50 wallclock secs (49.68 usr +  0.01 sys = 49.69 CPU) @ 201.25/s (n=10000)
+</code></pre>
+<h4> Comment 18883861 RobEarl: </h4>Using <a href="http://perldoc.perl.org/List/Util.html" rel="nofollow noreferrer"><code>List::Util::first</code></a> is faster as it stops iterating when it finds a match.<br><h4> Comment 19540143 aksel: </h4>@Xaerxess: In my case I wanted to do <i>one</i> lookup, so I think it&#39;s fair to count both hash/regex creation and the lookup/grep. It the task would be to do many lookups, I guess your solution is better.<br><h4> Comment 19542659 Grzegorz Rożniecki: </h4>If you want to do only one iteration, the difference is indistinguishable between any of methods you choose, so any benchmark is wrong since it&#39;s an evil microoptimization in this case.<br><h4> Comment 19220294 Grzegorz Rożniecki: </h4>-1 Your benchmark has defects, <code>grep</code> is <b>significantly</b> slower than creating hash and doing lookup, since former is O(n) and latter O(1). Just do the hash creation only once (outside the loop) and precompute regex to measure methods only (<a href="http://stackoverflow.com/a/13939491/708434">see my answer</a>).<br><h4> Comment 35796354 Apoc: </h4>The regex is compiled only once, as it has the flag &#39;o&#39;.<br><h4> Comment 21409220 Jonathon: </h4>Well of course it takes longer to convert an array to a hash and do a single lookup, than to do a single lookup in that array.<br>------------------------------------------------------------------ <br><h3> Answer 49022149 Rohan: </h3><p>@files is an existing array</p>
+
+<pre><code>my @new_values =  grep(/^2[\d].[\d][A-za-z]?/,@files);
+
+print join("\n", @new_values);
+
+print "\n";
+</code></pre>
+
+<p>/^2[\d].[\d][A-za-z]?/ = vaues starting from 2 here you can put any regular expression</p>
+------------------------------------------------------------------ <br><h3> Answer 2860384 David M: </h3><p>You certainly want a hash here.  Place the bad parameters as keys in the hash, then decide whether a particular parameter exists in the hash.</p>
+
+<pre><code>our %bad_params = map { $_ =&gt; 1 } qw(badparam1 badparam2 badparam3)
+
+if ($bad_params{$new_param}) {
+  print "That is a bad parameter\n";
+}
+</code></pre>
+
+<p>If you are really interested in doing it with an array, look at <code>List::Util</code> or <code>List::MoreUtils</code></p>
+------------------------------------------------------------------ <br><h3> Answer 62955912 Taras Heichenko: </h3><p>If you need to know the amount of every element in array besides existing of that element you may use</p>
+<pre><code>my %bad_param_lookup;
+@bad_param_lookup{ @bad_params } = ( 1 ) x @bad_params;
+%bad_param_lookup = map { $_ =&gt; $bad_param_lookup{$_}++} @bad_params;
+</code></pre>
+<p>and then for every $i that is in @bad_params, $bad_param_lookup{$i} contains amount of $i in @bad_params</p>
+------------------------------------------------------------------ <br><h3> Answer 23791021 Serge: </h3><pre><code>my @badparams = (1,2,5,7,'a','zzz');
+
+my $badparams = join('|',@badparams);   # '|' or any other character not present in params
+
+foreach my $par (4,5,6,7,'a','z','zzz')
+{
+    if ($badparams =~ /\b$par\b/)
+    {
+        print "$par is present\n";
+    }
+    else
+    {
+        print "$par is not present\n";
+    }
+}
+</code></pre>
+
+<p>You may want to check for numerical leading spaces consistancy</p>
+------------------------------------------------------------------ <br><h3> Answer 2860945 Axeman: </h3><p>There are two ways you can do this. You can use the throw the values into a hash for a lookup table, as suggested by the other posts. ( I'll add just another idiom. )</p>
+
+<pre><code>my %bad_param_lookup;
+@bad_param_lookup{ @bad_params } = ( 1 ) x @bad_params;
+</code></pre>
+
+<p>But if it's data of mostly word characters and not too many meta, you can dump it into a regex alternation: </p>
+
+<pre><code>use English qw&lt;$LIST_SEPARATOR&gt;;
+
+my $regex_str = do { 
+    local $LIST_SEPARATOR = '|';
+    "(?:@bad_params)";
+ };
+
+ # $front_delim and $back_delim being any characters that come before and after. 
+ my $regex = qr/$front_delim$regex_str$back_delim/;
+</code></pre>
+
+<p>This solution would have to be tuned for the types of "bad values" you're looking for. And again, it might be totally inappropriate for certain types of strings, so <em>caveat emptor</em>.</p>
+<h4> Comment 2906814 Greg Bacon: </h4>You can also write <code>@bad_param_lookup{@bad_params} = ()</code>, but you&#39;d need to use <code>exists</code> to test membership.<br>------------------------------------------------------------------ <br><h3> Answer 77309615 Helmut Grohne: </h3><p>When smartmatch is available (still marked experimental) please use that (see other answers). When it is not an exact membership test without extra dependencies seems to be missing from the answers thus far, so here it is:</p>
+<pre><code>grep { $_ eq $value } @array
+</code></pre>
+<p>If you insist on using regular expressions, the safe way would be</p>
+<pre><code>grep /^\Q$value\E$/, @array
+</code></pre>

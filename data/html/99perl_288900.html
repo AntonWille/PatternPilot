@@ -1,0 +1,106 @@
+ <h2> Title: How can I convert a string to a number in Perl? </h2> <h3> Anton, question_id: 288900 </h3>Score: 99, Tags: {string,perl,floating-point} <br><p>I have a string which holds a decimal value in it and I need to convert that string into a floating point variable. So an example of the string I have is "5.45" and I want a floating point equivalent so I can add .1 to it. I have searched around the internet, but I only see how to convert a string to an integer.</p>
+<h4> Comment 59144693 JGurtz: </h4>The question needs further detail. Is the string only composed of numerals? Alphanumeric? Ok if alphas are stripped? Is there a specific purpose for the resulting number?<br>------------------------------------------------------------------ <br><h3> Answer 288907 Alnitak: </h3><p>You don't need to convert it at all:</p>
+
+<pre><code>% perl -e 'print "5.45" + 0.1;'
+5.55
+</code></pre>
+<h4> Comment 12327766 Alnitak: </h4>@OrangeDog the OP edited the question (some months after this answer was posted) - the original question actually had floating point numbers in it.<br><h4> Comment 36628739 Ramy: </h4>what about comparisons when the string has a comma in it?<br><h4> Comment 36628856 Ramy: </h4><code>[rabdelaz@Linux_Desktop:~&#47;workspace&#47;akatest_5]$perl -e &#39;print &quot;nope\n&quot; unless &quot;1,000&quot; &gt; 10;&#39; nope [rabdelaz@Linux_Desktop:~&#47;workspace&#47;akatest_5]$perl -e &#39;print &quot;nope\n&quot; if &quot;1,000&quot; &gt; 10;&#39;</code><br>------------------------------------------------------------------ <br><h3> Answer 8539065 porquero: </h3><p>This is a simple solution:</p>
+
+<p>Example 1</p>
+
+<pre><code>my $var1 = "123abc";
+print $var1 + 0;
+</code></pre>
+
+<p>Result</p>
+
+<pre><code>123
+</code></pre>
+
+<p>Example 2</p>
+
+<pre><code>my $var2 = "abc123";
+print $var2 + 0;
+</code></pre>
+
+<p>Result</p>
+
+<pre><code>0
+</code></pre>
+<h4> Comment 23655623 Cougar: </h4>AFAIU this is the only answer to what was asked<br><h4> Comment 67368967 Rodrigo De Almeida Siqueira: </h4>Beware when adding zero to a string. If the string starts with &quot;inf&quot; or with &quot;nan&quot;, the value will not be zero. E.g. my $var2 = &quot;info123&quot;; print $var2 + 0: Result will be: Inf<br><h4> Comment 68103163 stevesliva: </h4>I was doing a <code>foreach my $i (&#39;00&#39;..&#39;15&#39;)</code> and needed to remove the leading zeros in some places.  This <code>0+</code> casting to a number also achieves that.<br><h4> Comment 114462831 KevinHJ: </h4>Apparently this doesn&#39;t work with hex strings: &#39;0x14C&#39; + 0 results in 0 (arrggg)<br>------------------------------------------------------------------ <br><h3> Answer 289135 brian d foy: </h3><p>Perl is a context-based language. It doesn't do its work according to the data you give it. Instead, it figures out how to treat the data based on the operators you use and the context in which you use them. If you do numbers sorts of things, you get numbers:</p>
+
+<pre><code># numeric addition with strings:
+my $sum = '5.45' + '0.01'; # 5.46
+</code></pre>
+
+<p>If you do strings sorts of things, you get strings:</p>
+
+<pre><code># string replication with numbers:
+my $string = ( 45/2 ) x 4; # "22.522.522.522.5"
+</code></pre>
+
+<p>Perl mostly figures out what to do and it's mostly right. Another way of saying the same thing is that Perl cares more about the verbs than it does the nouns.</p>
+
+<p>Are you trying to do something and it isn't working?</p>
+<h4> Comment 19675141 brian d foy: </h4>I&#39;m not multiplying numbers. The <code>x</code> is the string replication operator.<br><h4> Comment 21266670 Vickster: </h4>Shouldn&#39;t it be <code>my $string = ( 45&#47;2 ) x 3; # &quot;22.522.522.5&quot;</code> with 45 instead of 44? Otherwise I don&#39;t get where the &#39;.5&#39;s come from in the result...<br><h4> Comment 18655430 gideon: </h4>Forgive my lack of knowledge here but I don&#39;t quite get your second example. You&#39;re dividing two numbers, then multiplying them, how/why does this result in a string?<br>------------------------------------------------------------------ <br><h3> Answer 2835835 Norm: </h3><p>Google lead me here while searching on the same question phill asked (sorting floats) so I figured it would be worth posting the answer despite the thread being kind of old.  I'm new to perl and am still getting my head wrapped around it but brian d foy's statement "Perl cares more about the verbs than it does the nouns." above really hits the nail on the head.  You don't need to convert the strings to floats before applying the sort.  You need to tell the sort to sort the values as numbers and not strings.
+i.e.</p>
+
+<pre><code>my @foo = ('1.2', '3.4', '2.1', '4.6');
+my @foo_sort = sort {$a &lt;=&gt; $b} @foo;
+</code></pre>
+
+<p>See <a href="http://perldoc.perl.org/functions/sort.html" rel="noreferrer">http://perldoc.perl.org/functions/sort.html</a> for more details on sort</p>
+------------------------------------------------------------------ <br><h3> Answer 3568565 mccutchm: </h3><p>As I understand it <a href="http://perldoc.perl.org/functions/int.html" rel="noreferrer">int()</a> is not intended as a 'cast' function for designating data type it's simply being (ab)used here to define the context as an arithmetic one.  I've (ab)used (0+$val) in the past to ensure that $val is treated as a number.</p>
+<h4> Comment 107613773 Sapphire_Brick: </h4><i>yes, <code>int()</code> is being &quot;(ab)used&quot;; got it.</i><br>------------------------------------------------------------------ <br><h3> Answer 17637567 indexless: </h3><pre><code>$var += 0
+</code></pre>
+
+<p>probably what you want. Be warned however, if $var is string could not be converted to numeric, you'll get the error, and $var <strong>will be reset to 0</strong>:</p>
+
+<pre><code>my $var = 'abc123';
+print "var = $var\n";
+$var += 0;
+print "var = $var\n";
+</code></pre>
+
+<p>logs</p>
+
+<pre><code>var = abc123
+Argument "abc123" isn't numeric in addition (+) at test.pl line 7.
+var = 0
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 288967 Rini: </h3><p>Perl really only has three types: scalars, arrays, and hashes.  And even that distinction is arguable.  ;)  The way each variable is treated depends on what you do with it:</p>
+
+<pre><code>% perl -e "print 5.4 . 3.4;"
+5.43.4
+
+
+% perl -e "print '5.4' + '3.4';"
+8.8
+</code></pre>
+<h4> Comment 138029 brian d foy: </h4>Perl has many more types than, but for single values, it&#39;s just a single value.<br>------------------------------------------------------------------ <br><h3> Answer 12143471 Steffen Moeller: </h3><p>In comparisons it makes a difference if a scalar is a number of a string. And it is not always decidable. I can report a case where perl retrieved a float in "scientific" notation and used that same a few lines below in a comparison:</p>
+
+<pre><code>use strict;
+....
+next unless $line =~ /and your result is:\s*(.*)/;
+my $val = $1;
+if ($val &lt; 0.001) {
+   print "this is small\n";
+}
+</code></pre>
+
+<p>And here <code>$val</code> was not interpreted as numeric for e.g. <code>"2e-77"</code> retrieved from <code>$line</code>. Adding 0 (or 0.0 for good ole C programmers) helped.</p>
+------------------------------------------------------------------ <br><h3> Answer 17951618 SzG: </h3><p>Perl is weakly typed and context based. Many scalars can be treated both as strings and numbers, depending on the operators you use.
+<code>$a = 7*6; $b = 7x6; print "$a $b\n";</code>
+<br>You get <code>42 777777</code>.</p>
+
+<p>There is a subtle difference, however. When you read numeric data from a text file into a data structure, and then view it with <code>Data::Dumper</code>, you'll notice that your numbers are quoted. Perl treats them internally as strings.
+<br>Read:<code>$my_hash{$1} = $2 if /(.+)=(.+)\n/;</code>.
+<br>Dump:<code>'foo' => '42'</code></p>
+
+<p>If you want unquoted numbers in the dump:
+<br>Read:<code>$my_hash{$1} = $2+0 if /(.+)=(.+)\n/;</code>.
+<br>Dump:<code>'foo' => 42</code></p>
+
+<p>After <code>$2+0</code> Perl notices that you've treated $2 as a number, because you used a numeric operator. </p>
+
+<p>I noticed this whilst trying to compare two hashes with <code>Data::Dumper</code>.</p>

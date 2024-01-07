@@ -1,0 +1,336 @@
+ <h2> Title: How to redirect to a 404 in Rails? </h2> <h3> Yuval Karmi, question_id: 2385799 </h3>Score: 517, Tags: {ruby-on-rails,ruby,http,http-status-code-404} <br><p>I'd like to 'fake' a 404 page in Rails. In PHP, I would just send a header with the error code as such:</p>
+
+<pre><code>header("HTTP/1.0 404 Not Found");
+</code></pre>
+
+<p>How is that done with Rails?</p>
+------------------------------------------------------------------ <br><h3> Answer 4983354 Steven Soroka: </h3><p>Don't render 404 yourself, there's no reason to; Rails has this functionality built in already. If you want to show a 404 page, create a <code>render_404</code> method (or <code>not_found</code> as I called it) in <code>ApplicationController</code> like this: </p>
+
+<pre><code>def not_found
+  raise ActionController::RoutingError.new('Not Found')
+end
+</code></pre>
+
+<p>Rails also handles <code>AbstractController::ActionNotFound</code>, and <code>ActiveRecord::RecordNotFound</code> the same way.</p>
+
+<p>This does two things better: </p>
+
+<p>1) It uses Rails' built in <code>rescue_from</code> handler to render the 404 page, and
+2) it interrupts the execution of your code, letting you do nice things like:</p>
+
+<pre><code>  user = User.find_by_email(params[:email]) or not_found
+  user.do_something!
+</code></pre>
+
+<p>without having to write ugly conditional statements.</p>
+
+<p>As a bonus, it's also super easy to handle in tests.  For example, in an rspec integration test:</p>
+
+<pre><code># RSpec 1
+
+lambda {
+  visit '/something/you/want/to/404'
+}.should raise_error(ActionController::RoutingError)
+
+# RSpec 2+
+
+expect {
+  get '/something/you/want/to/404'
+}.to raise_error(ActionController::RoutingError)
+</code></pre>
+
+<p>And minitest:</p>
+
+<pre><code>assert_raises(ActionController::RoutingError) do 
+  get '/something/you/want/to/404'
+end
+</code></pre>
+
+<p>OR refer more info from <a href="https://rubyinrails.com/2018/02/26/rails-render-404-not-found-from-controller-action/" rel="noreferrer">Rails render 404 not found from a controller action</a></p>
+<h4> Comment 17377822 Kulgar: </h4>I just love short, efficient, cool and beautiful answer! You own your +252 vote.<br><h4> Comment 12238158 Boris Barroso: </h4>Do not use  render_404 and return if params[:something].blank?<br><h4> Comment 14518424 gjvis: </h4>This approach also lets you use the ActiveRecord bang finders (find!, find_by_...!, etc.), which all raise an ActiveRecord::RecordNotFound exception if no record is found (triggering the rescue_from handler).<br><h4> Comment 20524239 Peter Ehrlich: </h4>Seems like <code>ActionController::RecordNotFound</code> is the better option?<br><h4> Comment 29431465 ryanttb: </h4>The code worked great but the test didn&#39;t until I realized I was using RSpec 2 which has different syntax: <code>expect { visit &#39;&#47;something&#47;you&#47;want&#47;to&#47;404&#39; }.to raise_error(ActionController::RoutingError)</code> /via <a href="http://stackoverflow.com/a/1722839/993890">stackoverflow.com/a/1722839/993890</a><br><h4> Comment 9273583 ablemike: </h4>There is a reason to do it yourself. If your application hijacks all of the routes from the root. It&#39;s bad design, but sometimes un-avoidable.<br><h4> Comment 45167467 David Morales: </h4>Now it&#39;s better practice to use fail: <code>fail ActiveRecord::RecordNotFound, &#39;Not Found&#39;</code><br><h4> Comment 37994403 bonyiii: </h4>If you just want to emulate the default behaviour <code>raise ActiveRecord::RecordNotFound</code><br><h4> Comment 26414705 radiospiel: </h4>Assuming this answer is the Railsy way: I hate how Rails cannot stick to one paradigm: so you raise an exception to get a 404, but you stick to render :status for everything else, say a 401 or 403? This just doesn&#39;t make sense.<br><h4> Comment 41530000 Robin Clowers: </h4>Is this still true? At least in development, I get an error page when my controller throws ActiveRecord::RecordNotFound.<br><h4> Comment 15538463 Glenn: </h4>This raises a 500 Internal Server Error for me, not a 404. What am I missing?<br><h4> Comment 25390986 mrbrdo: </h4>this isn&#39;t good, it returns error 500 and shows up in airbrake/rollbar.<br><h4> Comment 17840867 Hidden: </h4>Being a Rails newb I found this doesn&#39;t fire if I use a generic .find(), but does work if I do .find_by_id() for example.<br><h4> Comment 18966166 Ross: </h4>This returns a 404 to the client, but logs a 500. Is there an easy way to log a 404?<br><h4> Comment 99648829 alex: </h4>Remember, if you want to see this working on a development environment, you have to &#39;change config.consider_all_requests_local&#39; to &#39;false&#39; on &#39;config/environments/development.rb&#39;<br><h4> Comment 40329847 Nuno Costa: </h4>I&#39;ve merged the multiple answers in one Gist: <a href="https://gist.github.com/nunommc/ee3c2596b1acbce50818" rel="nofollow noreferrer">gist.github.com/nunommc/ee3c2596b1acbce50818</a><br><h4> Comment 70537389 egyamado: </h4>Thanks for your answer. The app I work with use <code>friendly_id</code> gem. Using find and find_by would not work. Instead use <code>exists?</code> method. This gist shows how to <a href="https://gist.github.com/AhmedNadar/b450fd65eda9c4afb8e04e28f1348af6" rel="nofollow noreferrer">gist.github.com/AhmedNadar/b450fd65eda9c4afb8e04e28f1348af6</a><br><h4> Comment 85642124 maguri: </h4>Rails redirect to <b>404</b> if <code>find</code> raise <b>ActiveRecord::RecordNotFound</b><br><h4> Comment 56735156 Confused Vorlon: </h4>I&#39;m testing with regular rails tests (not rspec). The following works:   <code>assert_raise ActiveRecord::RecordNotFound do 			get :download, :id =&gt; 999 		end</code>  Strangely though, if I <code>assert_response :missing</code>then that fails. I get the message <code>&#39;expected response to be a &lt;missing&gt;, but was &lt;200&gt;</code>.  In actual use, I do get a 404.<br><h4> Comment 61574217 Michael Brawn: </h4>You can also have  <code># RSpec 2+  expect {   get &#39;&#47;something&#47;you&#47;want&#47;to&#47;404&#39; }.to raise_error(ActionController::RoutingError).with_message(&#39;No&zwnj;&#8203;t Found&#39;) </code> if you want to make sure you&#39;re getting the Not Found message<br><h4> Comment 8649208 Steven Soroka: </h4>In test/unit, I believe it&#39;s something like:       assert_raises(ActionController::RoutingError) do       get &#39;/something/you/want/to/404&#39;     end<br><h4> Comment 20014839 thekingoftruth: </h4>Not sure if this has anything to do with it, but rails has a bug related to not handling missing templates properly: <a href="https://github.com/rails/rails/issues/4127" rel="nofollow noreferrer">github.com/rails/rails/issues/4127</a><br><h4> Comment 23175119 Subimage: </h4>Not sure I like this, as in testing, I generally like to do something like... get :blah; assert_response :not_found;<br>------------------------------------------------------------------ <br><h3> Answer 2385821 Simone Carletti: </h3><h2>HTTP 404 Status</h2>
+<p>To return a 404 header, just use the <code>:status</code> option for the render method.</p>
+<pre><code>def action
+  # here the code
+
+  render :status =&gt; 404
+end
+</code></pre>
+<p>If you want to render the standard 404 page you can extract the feature in a method.</p>
+<pre><code>def render_404
+  respond_to do |format|
+    format.html { render :file =&gt; &quot;#{Rails.root}/public/404.html&quot;, :layout =&gt; false, :status =&gt; :not_found }
+    format.xml  { head :not_found }
+    format.any  { head :not_found }
+  end
+end
+</code></pre>
+<p>and call it in your action</p>
+<pre><code>def action
+  # here the code
+
+  render_404
+end
+</code></pre>
+<p>If you want the action to render the error page and stop, simply use a return statement.</p>
+<pre><code>def action
+  render_404 and return if params[:something].blank?
+
+  # here the code that will never be executed
+end
+</code></pre>
+<h2>ActiveRecord and HTTP 404</h2>
+<p>Also remember that Rails rescues some ActiveRecord errors, such as the <code>ActiveRecord::RecordNotFound</code> displaying the 404 error page.</p>
+<p>It means you don't need to rescue this action yourself</p>
+<pre><code>def show
+  user = User.find(params[:id])
+end
+</code></pre>
+<p><code>User.find</code> raises an <code>ActiveRecord::RecordNotFound</code> when the user doesn't exist. This is a very powerful feature. Look at the following code</p>
+<pre><code>def show
+  user = User.find_by_email(params[:email]) or raise(&quot;not found&quot;)
+  # ...
+end
+</code></pre>
+<p>You can simplify it by delegating to Rails the check. Simply use the bang version.</p>
+<pre><code>def show
+  user = User.find_by_email!(params[:email])
+  # ...
+end
+</code></pre>
+<h4> Comment 7728255 jcalvert: </h4>There&#39;s a big problem with this solution; it will still run the code in the template. So if you have a simple, restful structure and someone enters an ID that doesn&#39;t exist, your template will be looking for the object which doesn&#39;t exist.<br><h4> Comment 7809298 Pablo Marambio: </h4>As mentioned before, this is not the correct answer. Try Steven&#39;s.<br><h4> Comment 52833166 Gui vieira: </h4>The bang version DOES stop the code execution, so it&#39;s the more effective solution IMHO.<br><h4> Comment 9625363 Simone Carletti: </h4>I updated the answer with more examples and a note about ActiveRecord.<br><h4> Comment 24077789 film42: </h4>Or Something like &quot;return response_404 unless @user&quot;<br><h4> Comment 8434565 Yuval Karmi: </h4>Changed the selected answer to reflect the better practice. Thanks for the comments, guys!<br><h4> Comment 9347951 richardsun: </h4>Voted up, because the &quot;render :file ... :status =&gt; :not_found&quot; line is very helpful for the corner case where I handle another exception, but want to serve a 404 header.<br><h4> Comment 60799704 mwfearnley: </h4>Unless I&#39;m mistaken, it looks like @jcalvert&#39;s upvoted comment is no longer applicable, given the information about the bang! version.<br><h4> Comment 11796367 NotDan: </h4>Also should tell rails not to render the layout: &quot;render :layout=&gt;false, :file=&gt;blah...&quot;<br><h4> Comment 41837583 AKovtunov: </h4>It&#39;s prettier &quot;render status: 404&quot;<br>------------------------------------------------------------------ <br><h3> Answer 7099193 Jaime Bellmyer: </h3><p>The newly Selected answer submitted by Steven Soroka is close, but not complete.  The test itself hides the fact that this is not returning a true 404 - it's returning a status of 200 - "success".  The original answer was closer, but attempted to render the layout as if no failure had occurred.  This fixes everything:</p>
+
+<pre><code>render :text =&gt; 'Not Found', :status =&gt; '404'
+</code></pre>
+
+<p>Here's a typical test set of mine for something I expect to return 404, using RSpec and Shoulda matchers:</p>
+
+<pre><code>describe "user view" do
+  before do
+    get :show, :id =&gt; 'nonsense'
+  end
+
+  it { should_not assign_to :user }
+
+  it { should respond_with :not_found }
+  it { should respond_with_content_type :html }
+
+  it { should_not render_template :show }
+  it { should_not render_with_layout }
+
+  it { should_not set_the_flash }
+end
+</code></pre>
+
+<p>This healthy paranoia allowed me to spot the content-type mismatch when everything else looked peachy :) I check for all these elements: assigned variables, response code, response content type, template rendered, layout rendered, flash messages.</p>
+
+<p>I'll skip the content type check on applications that are strictly html...sometimes. After all, "a skeptic checks ALL the drawers" :)</p>
+
+<p><a href="http://dilbert.com/strips/comic/1998-01-20/" rel="noreferrer">http://dilbert.com/strips/comic/1998-01-20/</a></p>
+
+<p>FYI: I don't recommend testing for things that are happening in the controller, ie "should_raise". What you care about is the output.  My tests above allowed me to try various solutions, and the tests remain the same whether the solution is raising an exception, special rendering, etc.</p>
+<h4> Comment 22280368 xentek: </h4>really like this answer, especially with regards to the testing of the output and not the methods called in the controller…<br><h4> Comment 31210682 Lasse Bunk: </h4>Rails has built-in 404 status: <code>render :text =&gt; &#39;Not Found&#39;, :status =&gt; :not_found</code>.<br><h4> Comment 38955007 Javid Jamae: </h4>@JaimeBellmyer - I&#39;m certain it does <i>not</i> return a 200 when you&#39;re in a deployed (i.e. staging / prod) environment. I do this in several applications and it works as described in the accepted solution. Perhaps what you&#39;re referring to is that it returns a 200 when it renders the debug screen in development where you probably have the <code>config.consider_all_requests_local</code> parameter set to true in your <code>environments&#47;development.rb</code> file. If you raise an error, as described in the accepted solution, in staging/production, you will definitely get a 404, not a 200.<br>------------------------------------------------------------------ <br><h3> Answer 28028303 Paulo Fidalgo: </h3><p>You could also use the render file:</p>
+
+<pre><code>render file: "#{Rails.root}/public/404.html", layout: false, status: 404
+</code></pre>
+
+<p>Where you can choose to use the layout or not.</p>
+
+<p>Another option is to use the Exceptions to control it:</p>
+
+<pre><code>raise ActiveRecord::RecordNotFound, "Record not found."
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 22355911 Augustin Riedinger: </h3><p>The selected answer doesn't work in Rails 3.1+ as the error handler was moved to a middleware (see <a href="https://github.com/rails/rails/issues/671">github issue</a>).</p>
+
+<p>Here's the solution I found which I'm pretty happy with.</p>
+
+<p>In <code>ApplicationController</code>:</p>
+
+<pre><code>  unless Rails.application.config.consider_all_requests_local
+    rescue_from Exception, with: :handle_exception
+  end
+
+  def not_found
+    raise ActionController::RoutingError.new('Not Found')
+  end
+
+  def handle_exception(exception=nil)
+    if exception
+      logger = Logger.new(STDOUT)
+      logger.debug "Exception Message: #{exception.message} \n"
+      logger.debug "Exception Class: #{exception.class} \n"
+      logger.debug "Exception Backtrace: \n"
+      logger.debug exception.backtrace.join("\n")
+      if [ActionController::RoutingError, ActionController::UnknownController, ActionController::UnknownAction].include?(exception.class)
+        return render_404
+      else
+        return render_500
+      end
+    end
+  end
+
+  def render_404
+    respond_to do |format|
+      format.html { render template: 'errors/not_found', layout: 'layouts/application', status: 404 }
+      format.all { render nothing: true, status: 404 }
+    end
+  end
+
+  def render_500
+    respond_to do |format|
+      format.html { render template: 'errors/internal_server_error', layout: 'layouts/application', status: 500 }
+      format.all { render nothing: true, status: 500}
+    end
+  end
+</code></pre>
+
+<p>and in <code>application.rb</code>:</p>
+
+<pre><code>config.after_initialize do |app|
+  app.routes.append{ match '*a', :to =&gt; 'application#not_found' } unless config.consider_all_requests_local
+end
+</code></pre>
+
+<p>And in my resources (show, edit, update, delete):</p>
+
+<pre><code>@resource = Resource.find(params[:id]) or not_found
+</code></pre>
+
+<p>This could certainly be improved, but at least, I have different views for not_found and internal_error without overriding core Rails functions. </p>
+<h4> Comment 35218390 Marek Př&#237;hoda: </h4>this is a very nice solution; however, you dont need the <code>|| not_found</code> part, just call <code>find!</code> (notice the bang) and it will throw ActiveRecord::RecordNotFound when the resource cannot be retrieved. Also, add ActiveRecord::RecordNotFound to the array in the if condition.<br><h4> Comment 65180604 Dr.Strangelove: </h4>I would rescue <code>StandardError</code> and not <code>Exception</code>, just in case. Actually I&#39;ll leave standard 500 static page and not use custom <code>render_500</code> at all, meaning I&#39;ll explicitly <code>rescue_from</code> array of errors related to 404<br>------------------------------------------------------------------ <br><h3> Answer 22795635 Caner: </h3><p>these will help you...</p>
+
+<p><strong>Application Controller</strong>   </p>
+
+<pre><code>class ApplicationController &lt; ActionController::Base
+  protect_from_forgery
+  unless Rails.application.config.consider_all_requests_local             
+    rescue_from ActionController::RoutingError, ActionController::UnknownController, ::AbstractController::ActionNotFound, ActiveRecord::RecordNotFound, with: lambda { |exception| render_error 404, exception }
+  end
+
+  private
+    def render_error(status, exception)
+      Rails.logger.error status.to_s + " " + exception.message.to_s
+      Rails.logger.error exception.backtrace.join("\n") 
+      respond_to do |format|
+        format.html { render template: "errors/error_#{status}",status: status }
+        format.all { render nothing: true, status: status }
+      end
+    end
+end
+</code></pre>
+
+<p><strong>Errors controller</strong></p>
+
+<pre><code>class ErrorsController &lt; ApplicationController
+  def error_404
+    @not_found_path = params[:not_found]
+  end
+end
+</code></pre>
+
+<p><strong>views/errors/error_404.html.haml</strong></p>
+
+<pre><code>.site
+  .services-page 
+    .error-template
+      %h1
+        Oops!
+      %h2
+        404 Not Found
+      .error-details
+        Sorry, an error has occured, Requested page not found!
+        You tried to access '#{@not_found_path}', which is not a valid page.
+      .error-actions
+        %a.button_simple_orange.btn.btn-primary.btn-lg{href: root_path}
+          %span.glyphicon.glyphicon-home
+          Take Me Home
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 57649359 Arkadiusz Mazur: </h3><pre><code>routes.rb
+  get '*unmatched_route', to: 'main#not_found'
+
+main_controller.rb
+  def not_found
+    render :file =&gt; "#{Rails.root}/public/404.html", :status =&gt; 404, :layout =&gt; false
+  end
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 33459884 Ahmed Reza: </h3><pre><code>&lt;%= render file: 'public/404', status: 404, formats: [:html] %&gt;
+</code></pre>
+
+<p>just add this to the page you want to render to the 404 error page and you are done.</p>
+------------------------------------------------------------------ <br><h3> Answer 53144921 Petercopter: </h3><p>I wanted to throw a 'normal' 404 for any logged in user that isn't an admin, so I ended up writing something like this in Rails 5:</p>
+
+<pre><code>class AdminController &lt; ApplicationController
+  before_action :blackhole_admin
+
+  private
+
+  def blackhole_admin
+    return if current_user.admin?
+
+    raise ActionController::RoutingError, 'Not Found'
+  rescue ActionController::RoutingError
+    render file: "#{Rails.root}/public/404", layout: false, status: :not_found
+  end
+end
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 65706397 Mark G.: </h3><p>Raising <code>ActionController::RoutingError('not found')</code> has always felt a little bit strange to me - in the case of an unauthenticated user, this error does not reflect reality - the route was found, the user is just not authenticated.</p>
+<p>I happened across <a href="https://guides.rubyonrails.org/configuring.html" rel="nofollow noreferrer"><code>config.action_dispatch.rescue_responses</code></a> and I think in some cases this is a more elegant solution to the stated problem:</p>
+<pre class="lang-rb prettyprint-override"><code># application.rb
+config.action_dispatch.rescue_responses = {
+  'UnauthenticatedError' =&gt; :not_found
+}
+
+# my_controller.rb
+before_action :verify_user_authentication
+
+def verify_user_authentication
+  raise UnauthenticatedError if !user_authenticated?
+end
+</code></pre>
+<p>What's nice about this approach is:</p>
+<ol>
+<li>It hooks into the existing error handling middleware like a normal <code>ActionController::RoutingError</code>, but you get a more meaningful error message in dev environments</li>
+<li>It will correctly set the status to whatever you specify in the rescue_responses hash (in this case 404 - not_found)</li>
+<li>You don't have to write a <code>not_found</code> method that needs to be available everywhere.</li>
+</ol>
+------------------------------------------------------------------ <br><h3> Answer 23069986 Marek Př&#237;hoda: </h3><p>To test the error handling, you can do something like this:</p>
+
+<pre><code>feature ErrorHandling do
+  before do
+    Rails.application.config.consider_all_requests_local = false
+    Rails.application.config.action_dispatch.show_exceptions = true
+  end
+
+  scenario 'renders not_found template' do
+    visit '/blah'
+    expect(page).to have_content "The page you were looking for doesn't exist."
+  end
+end
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 31623975 Houen: </h3><p>If you want to handle different 404s in different ways, consider catching them in your controllers. This will allow you to do things like tracking the number of 404s generated by different user groups, have support interact with users to find out what went wrong / what part of the user experience might need tweaking, do A/B testing, etc.</p>
+
+<p>I have here placed the base logic in ApplicationController, but it can also be placed in more specific controllers, to have special logic only for one controller.</p>
+
+<p>The reason I am using an if with ENV['RESCUE_404'], is so I can test the raising of AR::RecordNotFound in isolation. In tests, I can set this ENV var to false, and my rescue_from would not fire. This way I can test the raising separate from the conditional 404 logic.</p>
+
+<pre><code>class ApplicationController &lt; ActionController::Base
+
+  rescue_from ActiveRecord::RecordNotFound, with: :conditional_404_redirect if ENV['RESCUE_404']
+
+private
+
+  def conditional_404_redirect
+    track_404(@current_user)
+    if @current_user.present?
+      redirect_to_user_home          
+    else
+      redirect_to_front
+    end
+  end
+
+end
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 77285159 Mohammad Humza: </h3><pre><code>def error_404
+ render_not_found
+end
+</code></pre>
+<h4> Comment 136249830 Nico Haase: </h4>Please add some explanation to your answer such that others can learn from it<br>

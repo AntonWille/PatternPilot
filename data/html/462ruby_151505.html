@@ -1,0 +1,184 @@
+ <h2> Title: Difference between a class and a module </h2> <h3> Josh Moore, question_id: 151505 </h3>Score: 462, Tags: {ruby,class,module} <br><p>I came from Java, and now I am working more with Ruby. </p>
+
+<p>One language feature I am not familiar with is the <code>module</code>. I am wondering what exactly is a <code>module</code> and when do you use one, and why use a <code>module</code> over a <code>class</code>?</p>
+<h4> Comment 31174575 shin: </h4><a href="https://i.stack.imgur.com/QC8xj.png" rel="nofollow noreferrer">This diagram may help</a>.<br>------------------------------------------------------------------ <br><h3> Answer 9778021 Sergii Shevchyk: </h3><pre class="lang-none prettyprint-override"><code>╔═══════════════╦═══════════════════════════╦═════════════════════════════════╗
+║               ║ class                     ║ module                          ║
+╠═══════════════╬═══════════════════════════╬═════════════════════════════════╣
+║ instantiation ║ can be instantiated       ║ can *not* be instantiated       ║
+╟───────────────╫───────────────────────────╫─────────────────────────────────╢
+║ usage         ║ object creation           ║ mixin facility. provide         ║
+║               ║                           ║   a namespace.                  ║
+╟───────────────╫───────────────────────────╫─────────────────────────────────╢
+║ superclass    ║ module                    ║ object                          ║
+╟───────────────╫───────────────────────────╫─────────────────────────────────╢
+║ methods       ║ class methods and         ║ module methods and              ║
+║               ║   instance methods        ║   instance methods              ║
+╟───────────────╫───────────────────────────╫─────────────────────────────────╢
+║ inheritance   ║ inherits behaviour and can║ No inheritance                  ║
+║               ║   be base for inheritance ║                                 ║
+╟───────────────╫───────────────────────────╫─────────────────────────────────╢
+║ inclusion     ║ cannot be included        ║ can be included in classes and  ║
+║               ║                           ║   modules by using the include  ║
+║               ║                           ║   command (includes all         ║
+║               ║                           ║   instance methods as instance  ║
+║               ║                           ║   methods in a class/module)    ║
+╟───────────────╫───────────────────────────╫─────────────────────────────────╢
+║ extension     ║ can not extend with       ║ module can extend instance by   ║
+║               ║   extend command          ║   using extend command (extends ║
+║               ║   (only with inheritance) ║   given instance with singleton ║
+║               ║                           ║   methods from module)          ║
+╚═══════════════╩═══════════════════════════╩═════════════════════════════════╝
+</code></pre>
+<h4> Comment 53804175 devius: </h4>How can a module &quot;not be instantiated&quot; and yet have instance methods?<br><h4> Comment 17464981 Aashish P: </h4>I got the hierarchy, Class -&gt; Module -&gt; Object -&gt; BasicObject. Cool!!<br><h4> Comment 71224632 Daniel: </h4>@devius as <code>iamnotmaynard</code> already commented on another answer: Modules can add instance methods to the including class.<br><h4> Comment 39178424 kaleidic: </h4>Why does &quot;module consists of&quot; omit variables, when classes and modules both support class variables? See accepted answer to <a href="http://stackoverflow.com/questions/5690458/create-module-variables-in-ruby" title="create module variables in ruby">stackoverflow.com/questions/5690458/&hellip;</a><br><h4> Comment 58794712 rajuGT: </h4>@devius Even I&#39;m new to ruby from Java background. I guess it is kind of <b>Abstract class</b> <code>public abstract class Test {} </code><br><h4> Comment 49110992 Donato: </h4>A lot of diagrams in all these answers. A little running example: <a href="http://rubyfiddle.com/riddles/06081" rel="nofollow noreferrer">rubyfiddle.com/riddles/06081</a><br>------------------------------------------------------------------ <br><h3> Answer 151774 scottru: </h3><p>The first answer is good and gives some structural answers, but another approach is to think about what you're doing. Modules are about providing methods that you can use across multiple classes - think about them as "libraries" (as you would see in a Rails app). Classes are about objects; modules are about functions.</p>
+
+<p>For example, authentication and authorization systems are good examples of modules. Authentication systems work across multiple app-level classes (users are authenticated, sessions manage authentication, lots of other classes will act differently based on the auth state), so authentication systems act as shared APIs. </p>
+
+<p>You might also use a module when you have shared methods across multiple apps (again, the library model is good here). </p>
+<h4> Comment 19846848 Jorge Israel Pe&#241;a: </h4>@Caffeine not really because Ruby modules actually include implementations, whereas interfaces in Java are abstract<br><h4> Comment 29862845 Automatico: </h4>I&#39;s more like abstract classes with method implementation.<br><h4> Comment 24611675 Karoly Horvath: </h4>No, Modules and Java Packages/JARs are completely different beasts.<br><h4> Comment 14224854 Saad Rehman Shah: </h4>Is the module same as Interfaces in java?<br><h4> Comment 46365254 michaelok: </h4>Actually, @Chole hits upon one of the nice things about modules: Namespacing. So while Modules are not a direct equivalent to packages in Java, it can be used to achieve something similar: <a href="http://blog.rubybestpractices.com/posts/gregory/037-issue-8-uses-for-modules.html" rel="nofollow noreferrer">blog.rubybestpractices.com/posts/gregory/&hellip;</a><br><h4> Comment 64418134 Franklin Yu: </h4>@JorgeIsraelPe&#241;a In Java 8, an interface can involve <a href="https://docs.oracle.com/javase/tutorial/java/IandI/defaultmethods.html" rel="nofollow noreferrer">default implementation</a>, which behave similar to how <a href="http://ruby-doc.org/core-2.3.1/Enumerable.html" rel="nofollow noreferrer"><code>Enumerable</code></a> module behave: require some method (<code>:each</code> in this case), then provide some other method based on the required one. This seems like a common demand of programmers from both languages.<br><h4> Comment 23770382 Chloe: </h4>Ahh! I see! Modules are Packages or JARs and Classes are Classes!<br><h4> Comment 47487557 neverendingqs: </h4>I usually think of modules as sprinkling aspect-oriented programming into your code.<br>------------------------------------------------------------------ <br><h3> Answer 18134471 Linan: </h3><p>I'm surprised anyone hasn't said this yet.</p>
+
+<p>Since the asker came from a Java background (and so did I), here's an analogy that helps.</p>
+
+<p>Classes are simply like Java classes.</p>
+
+<p>Modules are like Java static classes. Think about <code>Math</code> class in Java. You don't instantiate it, and you reuse the methods in the static class (eg. <code>Math.random()</code>). </p>
+<h4> Comment 28541569 Reinstate Monica -- notmaynard: </h4>But modules can also add instance methods to the including class, while static classes in Java cannot.<br><h4> Comment 48076398 scottburton11: </h4>This isn&#39;t entirely true; modules don&#39;t have static methods, they just have methods. Modules can &quot;extend themselves&quot; (the syntax is actually <code>extend self</code>), making their methods available to their <code>self</code>&#39;s metaclass. This makes it possible to dispatch a method like <code>random()</code> on a <code>Math</code> module. But by their nature, a module&#39;s methods cannot be called on the module&#39;s own <code>self</code>. This has to do with Ruby&#39;s notion of <code>self</code>, its metaclasses, and how method lookup works. Check out &quot;Metaprogramming Ruby&quot; - Paolo Perlotta for details.<br><h4> Comment 41286695 Damon Drake: </h4>This statement is also true coming from a heavy C# background.<br><h4> Comment 95235780 Andre Figueiredo: </h4>How this answer has so many votes? btw that was said in better words 1mo before: <a href="https://stackoverflow.com/a/17027346/986862">stackoverflow.com/a/17027346/986862</a><br><h4> Comment 76174128 divideByZero: </h4>I&#39;d say modules are more similar to interfaces with methods in them(Java 8 interfaces with default impl) but can&#39;t inherit one from another unlike java interfaces<br>------------------------------------------------------------------ <br><h3> Answer 151534 hurcane: </h3><p>Basically, the module cannot be instantiated. When a class includes a module, a proxy superclass is generated that provides access to all the module methods as well as the class methods.</p>
+
+<p>A module can be included by multiple classes. Modules cannot be inherited, but this "mixin" model provides a useful type of "multiple inheritrance". OO purists will disagree with that statement, but don't let purity get in the way of getting the job done.</p>
+
+<hr>
+
+<p><em>(This answer originally linked to <code>http://www.rubycentral.com/pickaxe/classes.html</code>, but that link and its domain are no longer active.)</em></p>
+<h4> Comment 48076624 scottburton11: </h4>Yep, this is how it works. As such, modules are <i>not</i> comparable to Java&#39;s &quot;static&quot; classes; the proxy superclass (some call it a &quot;metaclass&quot;) becomes the receiver of the module&#39;s method dispatch messages, which makes <i>it</i> more comparable to a static class in Java, and its methods work like static methods. The same is true, however, for Ruby&#39;s classes, which can take on &quot;static&quot;-like methods by <code>extend</code>ing a class. Ruby doesn&#39;t actually distinguish between &quot;instance&quot; and &quot;class/static&quot; methods at all, only the receivers of them.<br>------------------------------------------------------------------ <br><h3> Answer 50883761 apadana: </h3><p>namespace: <strong>modules are namespaces</strong>...which don't exist in java ;)</p>
+
+<p>I also switched from Java and python to Ruby, I remember had exactly this same question...</p>
+
+<p>So the simplest answer is that module is a namespace, which doesn't exist in Java. In java the closest mindset to namespace is a <strong>package</strong>. </p>
+
+<p>So a module in ruby is like what in java:<br>
+<strong>class?</strong> No<br>
+<strong>interface?</strong> No<br>
+<strong>abstract class?</strong> No<br>
+<strong>package?</strong> Yes (maybe)  </p>
+
+<p>static methods inside classes in java: same as methods inside modules in ruby</p>
+
+<p>In java the minimum unit is a class, you can't have a function outside of a class. However in ruby this is possible (like python). </p>
+
+<p>So what goes into a module?<br>
+classes, methods, constants. Module protects them under that namespace. </p>
+
+<p><strong>No instance:</strong> modules can't be used to create instances </p>
+
+<p><strong>Mixed ins:</strong> sometimes inheritance models are not good for classes, but in terms of functionality want to group a set of classes/ methods/ constants together</p>
+
+<p>Rules about modules in ruby:<br>
+- Module names are UpperCamelCase<br>
+- constants within modules are ALL CAPS (this rule is the same for all ruby constants, not specific to modules)<br>
+- access methods: use . operator<br>
+- access constants: use :: symbol   </p>
+
+<p>simple example of a module: </p>
+
+<pre><code>module MySampleModule
+  CONST1 = "some constant"
+
+  def self.method_one(arg1)
+    arg1 + 2
+  end
+end
+</code></pre>
+
+<p>how to use methods inside a module: </p>
+
+<pre><code>puts MySampleModule.method_one(1) # prints: 3
+</code></pre>
+
+<p>how to use constants of a module: </p>
+
+<pre><code>puts MySampleModule::CONST1 # prints: some constant
+</code></pre>
+
+<p>Some other conventions about modules:<br>
+Use one module in a file (like ruby classes, one class per ruby file)</p>
+<h4> Comment 89277099 Qiulang: </h4>“- access methods: use . operator - access constants: use :: symbol” only this answer mentioned this!<br>------------------------------------------------------------------ <br><h3> Answer 17027346 Boris Stitnicky: </h3><p><code>Module</code> in Ruby, to a degree, corresponds to Java <em>abstract class</em> -- has instance methods, classes can inherit from it (via <code>include</code>, Ruby guys call it a "mixin"), but has no instances. There are other minor differences, but this much information is enough to get you started.</p>
+------------------------------------------------------------------ <br><h3> Answer 29219321 IQ Sayed: </h3><p>Bottom line: A module is a cross between a static/utility class and a mixin.</p>
+
+<p>Mixins are reusable pieces of "partial" implementation, that can be combined (or composed) in a mix &amp; match fashion, to help write new classes.  These classes can additionally have their own state and/or code, of course.</p>
+------------------------------------------------------------------ <br><h3> Answer 46993480 Prasanth_Rubyist: </h3><p><strong>Class</strong> </p>
+
+<p>When you define a class, you define a blueprint for a data type. 
+ class hold data, have method that interact with that data and are used to instantiate objects.</p>
+
+<p><strong>Module</strong></p>
+
+<ul>
+<li><p>Modules are a way of grouping together methods, classes, and constants.</p></li>
+<li><p>Modules give you two major benefits:</p>
+
+<p>=> Modules provide a namespace and prevent name clashes.
+Namespace help avoid conflicts with functions and classes with the same name that have been written by someone else.</p>
+
+<p>=> Modules implement the mixin facility.</p></li>
+</ul>
+
+<blockquote>
+  <p>(including Module in Klazz gives instances of Klazz access to Module
+  methods. )</p>
+  
+  <p>(extend Klazz with Mod giving the class Klazz access to Mods methods.)</p>
+</blockquote>
+------------------------------------------------------------------ <br><h3> Answer 50575317 Daniel Viglione: </h3><p>First, some similarities that have not been mentioned yet. Ruby supports open classes, but modules are open too. After all, Class inherits from Module in the Class inheritance chain and so Class and Module do have some similar behavior.</p>
+<p>But you need to ask yourself what is the purpose of having both a Class and a Module in a programming language? A class is intended to be a blueprint for creating instances, and each instance is a realized variation of the blueprint. An instance is just a realized variation of a blueprint (the Class). Naturally then, Classes function as object creation. Furthermore, since we sometimes want one blueprint to derive from another blueprint, Classes are designed to support inheritance.</p>
+<p>Modules cannot be instantiated, do not create objects, and do not support inheritance. So remember one module does NOT inherit from another!</p>
+<p>So then what is the point of having Modules in a language? One obvious usage of Modules is to create a namespace, and you will notice this with other languages too. Again, what's cool about Ruby is that Modules can be reopened (just as Classes). And this is a big usage when you want to reuse a namespace in different Ruby files:</p>
+<pre><code>module Apple
+  def a
+    puts 'a'
+  end
+end
+
+module Apple 
+  def b
+    puts 'b'
+  end
+end
+ 
+class Fruit
+  include Apple
+end
+ 
+ &gt; f = Fruit.new
+ =&gt; #&lt;Fruit:0x007fe90c527c98&gt; 
+ &gt; f.a
+ =&gt; a
+ &gt; f.b
+ =&gt; b
+</code></pre>
+<p>But there is no inheritance between modules:</p>
+<pre><code>module Apple
+  module Green
+    def green
+      puts 'green'
+    end
+  end
+end
+ 
+class Fruit
+  include Apple
+end
+
+&gt; f = Fruit.new
+ =&gt; #&lt;Fruit:0x007fe90c462420&gt; 
+&gt; f.green
+NoMethodError: undefined method `green' for #&lt;Fruit:0x007fe90c462420&gt;
+</code></pre>
+<p>The Apple module did not inherit any methods from the Green module and when we included Apple in the Fruit class, the methods of the Apple module are added to the ancestor chain of Apple instances, but not methods of the Green module, even though the Green module was defined in the Apple module.</p>
+<p>So how do we gain access to the green method? You have to explicitly include it in your class:</p>
+<pre><code>class Fruit
+  include Apple::Green
+end
+ =&gt; Fruit 
+ &gt; f.green
+=&gt; green
+</code></pre>
+<p>But Ruby has another important usage for Modules. This is the Mixin facility, which I describe in another answer on SO. But to summarize, mixins allow you to define methods into the inheritance chain of objects. Through mixins, you can add methods to the inheritance chain of object instances (include) or the singleton_class of self (extend).</p>

@@ -1,0 +1,58 @@
+ <h2> Title: How to convert a ruby hash object to JSON? </h2> <h3> kapso, question_id: 3183786 </h3>Score: 399, Tags: {ruby-on-rails,json,ruby,hashmap} <br><p>How to convert a ruby hash object to JSON? So I am trying this example below &amp; it doesn't work?</p>
+
+<p>I was looking at the RubyDoc and obviously <code>Hash</code> object doesn't have a <code>to_json</code> method. But I am reading on blogs that Rails supports <code>active_record.to_json</code> and also supports <code>hash#to_json</code>. I can understand <code>ActiveRecord</code> is a Rails object, but <code>Hash</code> is not native to Rails, it's a pure Ruby object. So in Rails you can do a <code>hash.to_json</code>, but not in pure Ruby??</p>
+
+<pre><code>car = {:make =&gt; "bmw", :year =&gt; "2003"}
+car.to_json
+</code></pre>
+<h4> Comment 130913242 duhaime: </h4>beware though, if the object on which you call <code>to_json</code> is already json, you&#39;ll get a mess: <code>{ foo: &quot;bar&quot; }.to_json.to_json</code><br>------------------------------------------------------------------ <br><h3> Answer 3184039 Mladen Jablanović: </h3><p>One of the numerous niceties of Ruby is the possibility to extend existing classes with your own methods. That's called "class reopening" or monkey-patching (the meaning of the latter <a href="https://stackoverflow.com/questions/394144/what-does-monkey-patching-exactly-mean-in-ruby">can vary</a>, though).</p>
+
+<p>So, take a look here:</p>
+
+<pre><code>car = {:make =&gt; "bmw", :year =&gt; "2003"}
+# =&gt; {:make=&gt;"bmw", :year=&gt;"2003"}
+car.to_json
+# NoMethodError: undefined method `to_json' for {:make=&gt;"bmw", :year=&gt;"2003"}:Hash
+#   from (irb):11
+#   from /usr/bin/irb:12:in `&lt;main&gt;'
+require 'json'
+# =&gt; true
+car.to_json
+# =&gt; "{"make":"bmw","year":"2003"}"
+</code></pre>
+
+<p>As you can see, requiring <code>json</code> has magically brought method <code>to_json</code> to our <code>Hash</code>.</p>
+<h4> Comment 3284224 Mladen Jablanović: </h4>No, no, someone has to code how the object of an arbitrary class should be serialized to JSON. They did it for <code>Hash</code> and <code>Array</code> classes in <code>json</code> gem, but your class <code>Person</code> is just a plain <code>Object</code>. But you can inherit <code>Hash</code> instead. You can open a new question if you don&#39;t manage.<br><h4> Comment 3284072 kapso: </h4>all i can say is wow :) also thanks  a lot!!  so basically i was able to extend the json class dynamically??<br><h4> Comment 3284137 kapso: </h4>I tried the same thing with Ruby object and it does not work??   &gt;&gt; require &#39;json&#39; =&gt; true &gt;&gt; class Person &gt;&gt; attr_accessor :fname, :lname &gt;&gt; end =&gt; nil &gt;&gt; p = Person.new =&gt; #&lt;Person:0x101155f70&gt; &gt;&gt; p.fname = &quot;Bill&quot; =&gt; &quot;Bill&quot; &gt;&gt; p.lname = &quot;Shine&quot; =&gt; &quot;Shine&quot; &gt;&gt; p.to_json =&gt; &quot;\&quot;#&lt;Person:0x101155f70&gt;\&quot;&quot;<br><h4> Comment 3329241 kapso: </h4>thanks. here&#39;s the new question, any help would be appreciated. Thanks.  <a href="http://stackoverflow.com/questions/3226054/how-to-convert-a-ruby-object-to-json" title="how to convert a ruby object to json">stackoverflow.com/questions/3226054/&hellip;</a><br><h4> Comment 25764775 Douglas G. Allen: </h4>You&#39;re showing what looks to be IRB type output. I was trying to get hash#to_json to work for DateTime object. Thanks to this post I got it. But I did inspect with p date_json  This is what I got for a true string &quot;{\&quot;year\&quot;:2013,\&quot;mon\&quot;:7,\&quot;mday\&quot;:16,\&quot;hour\&quot;:13,\&quot;min\&quot;:54&zwnj;&#8203;,\&quot;sec\&quot;:32,\&quot;zone\&quot;&zwnj;&#8203;:\&quot;-05:00\&quot;,\&quot;offset&zwnj;&#8203;\&quot;:-18000}&quot; so you may see that it is making the key symbols as strings and of course that data is unchanged. Thanks again. Sorry I&#39;m so late though.<br><h4> Comment 73817028 kayleeFrye_onDeck: </h4>Is the <code>json</code> gem built-in to Ruby installations, or do you need to grab it with <code>gem install json</code>?<br><h4> Comment 111094959 cdmo: </h4>Hmm, when I do this in IRB now I get different results. All the double quote characters are escaped: <code>&quot;{\&quot;make\&quot;:\&quot;bmw\&quot;,\&quot;year\&quot;:\&quot;2003\&quot;}&quot;</code><br>------------------------------------------------------------------ <br><h3> Answer 25363760 nurettin: </h3><pre><code>require 'json/ext' # to use the C based extension instead of json/pure
+
+puts {hash: 123}.to_json
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 56193735 vinibrsl: </h3><p>You can also use <code>JSON.generate</code>:</p>
+
+<pre><code>require 'json'
+
+JSON.generate({ foo: "bar" })
+=&gt; "{\"foo\":\"bar\"}"
+</code></pre>
+
+<p>Or its alias, <code>JSON.unparse</code>:</p>
+
+<pre><code>require 'json'
+
+JSON.unparse({ foo: "bar" })
+=&gt; "{\"foo\":\"bar\"}"
+</code></pre>
+<h4> Comment 111201884 bkunzi01: </h4>JSON.generate only allows objects or arrays to be converted to JSON syntax. to_json, however, accepts many Ruby classes even though it acts only as a method for serialization: 1.to_json # =&gt; &quot;1&quot;.   Docs here: <a href="https://ruby-doc.org/stdlib-2.6.3/libdoc/json/rdoc/JSON.html" rel="nofollow noreferrer">ruby-doc.org/stdlib-2.6.3/libdoc/json/rdoc/JSON.html</a><br>------------------------------------------------------------------ <br><h3> Answer 58876862 Apurv Pandey: </h3><p>Add the following line on the top of your file</p>
+
+<pre><code>require 'json'
+</code></pre>
+
+<p>Then you can use:</p>
+
+<pre><code>car = {:make =&gt; "bmw", :year =&gt; "2003"}
+car.to_json
+</code></pre>
+
+<p>Alternatively, you can use:</p>
+
+<pre><code>JSON.generate({:make =&gt; "bmw", :year =&gt; "2003"})
+</code></pre>

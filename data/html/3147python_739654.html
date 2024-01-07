@@ -1,0 +1,1773 @@
+ <h2> Title: How do I make function decorators and chain them together? </h2> <h3> Imran, question_id: 739654 </h3>Score: 3147, Tags: {python,function,decorator,python-decorators,chain} <br><p>How do I make two decorators in Python that would do the following?</p>
+<pre><code>@make_bold
+@make_italic
+def say():
+   return &quot;Hello&quot;
+</code></pre>
+<p>Calling <code>say()</code> should return:</p>
+<pre><code>&quot;&lt;b&gt;&lt;i&gt;Hello&lt;/i&gt;&lt;/b&gt;&quot;
+</code></pre>
+<h4> Comment 129523904 Karl Knechtel: </h4>See also: <a href="/questions/6392739">What does the &quot;at&quot; (@) symbol do in Python?</a><br>------------------------------------------------------------------ <br><h3> Answer 1594484 Bite code: </h3><p>If you are not into long explanations, see <a href="https://stackoverflow.com/questions/739654/understanding-python-decorators#answer-739665">Paolo Bergantino’s answer</a>.</p>
+<h1>Decorator Basics</h1>
+<h2>Python’s functions are objects</h2>
+<p>To understand decorators, you must first understand that functions are objects in Python. This has important consequences. Let’s see why with a simple example :</p>
+<pre><code>def shout(word=&quot;yes&quot;):
+    return word.capitalize()+&quot;!&quot;
+
+print(shout())
+# outputs : 'Yes!'
+
+# As an object, you can assign the function to a variable like any other object 
+scream = shout
+
+# Notice we don't use parentheses: we are not calling the function,
+# we are putting the function &quot;shout&quot; into the variable &quot;scream&quot;.
+# It means you can then call &quot;shout&quot; from &quot;scream&quot;:
+
+print(scream())
+# outputs : 'Yes!'
+
+# More than that, it means you can remove the old name 'shout',
+# and the function will still be accessible from 'scream'
+
+del shout
+try:
+    print(shout())
+except NameError as e:
+    print(e)
+    #outputs: &quot;name 'shout' is not defined&quot;
+
+print(scream())
+# outputs: 'Yes!'
+</code></pre>
+<p>Keep this in mind. We’ll circle back to it shortly.</p>
+<p>Another interesting property of Python functions is they can be defined inside another function!</p>
+<pre><code>def talk():
+
+    # You can define a function on the fly in &quot;talk&quot; ...
+    def whisper(word=&quot;yes&quot;):
+        return word.lower()+&quot;...&quot;
+
+    # ... and use it right away!
+    print(whisper())
+
+# You call &quot;talk&quot;, that defines &quot;whisper&quot; EVERY TIME you call it, then
+# &quot;whisper&quot; is called in &quot;talk&quot;. 
+talk()
+# outputs: 
+# &quot;yes...&quot;
+
+# But &quot;whisper&quot; DOES NOT EXIST outside &quot;talk&quot;:
+
+try:
+    print(whisper())
+except NameError as e:
+    print(e)
+    #outputs : &quot;name 'whisper' is not defined&quot;*
+    #Python's functions are objects
+</code></pre>
+<h2>Functions references</h2>
+<p>Okay, still here? Now the fun part...</p>
+<p>You’ve seen that functions are objects. Therefore, functions:</p>
+<ul>
+<li>can be assigned to a variable</li>
+<li>can be defined in another function</li>
+</ul>
+<p>That means that <strong>a function can <code>return</code> another function</strong>.</p>
+<pre><code>def getTalk(kind=&quot;shout&quot;):
+
+    # We define functions on the fly
+    def shout(word=&quot;yes&quot;):
+        return word.capitalize()+&quot;!&quot;
+
+    def whisper(word=&quot;yes&quot;) :
+        return word.lower()+&quot;...&quot;
+
+    # Then we return one of them
+    if kind == &quot;shout&quot;:
+        # We don't use &quot;()&quot;, we are not calling the function,
+        # we are returning the function object
+        return shout  
+    else:
+        return whisper
+
+# How do you use this strange beast?
+
+# Get the function and assign it to a variable
+talk = getTalk()      
+
+# You can see that &quot;talk&quot; is here a function object:
+print(talk)
+#outputs : &lt;function shout at 0xb7ea817c&gt;
+
+# The object is the one returned by the function:
+print(talk())
+#outputs : Yes!
+
+# And you can even use it directly if you feel wild:
+print(getTalk(&quot;whisper&quot;)())
+#outputs : yes...
+</code></pre>
+<p>There’s more!</p>
+<p>If you can <code>return</code> a function, you can pass one as a parameter:</p>
+<pre><code>def doSomethingBefore(func): 
+    print(&quot;I do something before then I call the function you gave me&quot;)
+    print(func())
+
+doSomethingBefore(scream)
+#outputs: 
+#I do something before then I call the function you gave me
+#Yes!
+</code></pre>
+<p>Well, you just have everything needed to understand decorators. You see, decorators are “wrappers”, which means that <strong>they let you execute code before and after the function they decorate</strong> without modifying the function itself.</p>
+<h2>Handcrafted decorators</h2>
+<p>How you’d do it manually:</p>
+<pre><code># A decorator is a function that expects ANOTHER function as parameter
+def my_shiny_new_decorator(a_function_to_decorate):
+
+    # Inside, the decorator defines a function on the fly: the wrapper.
+    # This function is going to be wrapped around the original function
+    # so it can execute code before and after it.
+    def the_wrapper_around_the_original_function():
+
+        # Put here the code you want to be executed BEFORE the original function is called
+        print(&quot;Before the function runs&quot;)
+
+        # Call the function here (using parentheses)
+        a_function_to_decorate()
+
+        # Put here the code you want to be executed AFTER the original function is called
+        print(&quot;After the function runs&quot;)
+
+    # At this point, &quot;a_function_to_decorate&quot; HAS NEVER BEEN EXECUTED.
+    # We return the wrapper function we have just created.
+    # The wrapper contains the function and the code to execute before and after. It’s ready to use!
+    return the_wrapper_around_the_original_function
+
+# Now imagine you create a function you don't want to ever touch again.
+def a_stand_alone_function():
+    print(&quot;I am a stand alone function, don't you dare modify me&quot;)
+
+a_stand_alone_function() 
+#outputs: I am a stand alone function, don't you dare modify me
+
+# Well, you can decorate it to extend its behavior.
+# Just pass it to the decorator, it will wrap it dynamically in 
+# any code you want and return you a new function ready to be used:
+
+a_stand_alone_function_decorated = my_shiny_new_decorator(a_stand_alone_function)
+a_stand_alone_function_decorated()
+#outputs:
+#Before the function runs
+#I am a stand alone function, don't you dare modify me
+#After the function runs
+</code></pre>
+<p>Now, you probably want that every time you call <code>a_stand_alone_function</code>, <code>a_stand_alone_function_decorated</code> is called instead. That’s easy, just overwrite <code>a_stand_alone_function</code> with the function returned by <code>my_shiny_new_decorator</code>:</p>
+<pre><code>a_stand_alone_function = my_shiny_new_decorator(a_stand_alone_function)
+a_stand_alone_function()
+#outputs:
+#Before the function runs
+#I am a stand alone function, don't you dare modify me
+#After the function runs
+
+# That’s EXACTLY what decorators do!
+</code></pre>
+<h2>Decorators demystified</h2>
+<p>The previous example, using the decorator syntax:</p>
+<pre><code>@my_shiny_new_decorator
+def another_stand_alone_function():
+    print(&quot;Leave me alone&quot;)
+
+another_stand_alone_function()  
+#outputs:  
+#Before the function runs
+#Leave me alone
+#After the function runs
+</code></pre>
+<p>Yes, that’s all, it’s that simple. <code>@decorator</code> is just a shortcut to:</p>
+<pre><code>another_stand_alone_function = my_shiny_new_decorator(another_stand_alone_function)
+</code></pre>
+<p>Decorators are just a pythonic variant of the <a href="http://en.wikipedia.org/wiki/Decorator_pattern" rel="noreferrer">decorator design pattern</a>. There are several classic design patterns embedded in Python to ease development (like iterators).</p>
+<p>Of course, you can accumulate decorators:</p>
+<pre><code>def bread(func):
+    def wrapper():
+        print(&quot;&lt;/''''''\&gt;&quot;)
+        func()
+        print(&quot;&lt;\______/&gt;&quot;)
+    return wrapper
+
+def ingredients(func):
+    def wrapper():
+        print(&quot;#tomatoes#&quot;)
+        func()
+        print(&quot;~salad~&quot;)
+    return wrapper
+
+def sandwich(food=&quot;--ham--&quot;):
+    print(food)
+
+sandwich()
+#outputs: --ham--
+sandwich = bread(ingredients(sandwich))
+sandwich()
+#outputs:
+#&lt;/''''''\&gt;
+# #tomatoes#
+# --ham--
+# ~salad~
+#&lt;\______/&gt;
+</code></pre>
+<p>Using the Python decorator syntax:</p>
+<pre><code>@bread
+@ingredients
+def sandwich(food=&quot;--ham--&quot;):
+    print(food)
+
+sandwich()
+#outputs:
+#&lt;/''''''\&gt;
+# #tomatoes#
+# --ham--
+# ~salad~
+#&lt;\______/&gt;
+</code></pre>
+<p>The order you set the decorators MATTERS:</p>
+<pre><code>@ingredients
+@bread
+def strange_sandwich(food=&quot;--ham--&quot;):
+    print(food)
+
+strange_sandwich()
+#outputs:
+##tomatoes#
+#&lt;/''''''\&gt;
+# --ham--
+#&lt;\______/&gt;
+# ~salad~
+</code></pre>
+<hr />
+<h1>Now: to answer the question...</h1>
+<p>As a conclusion, you can easily see how to answer the question:</p>
+<pre><code># The decorator to make it bold
+def makebold(fn):
+    # The new function the decorator returns
+    def wrapper():
+        # Insertion of some code before and after
+        return &quot;&lt;b&gt;&quot; + fn() + &quot;&lt;/b&gt;&quot;
+    return wrapper
+
+# The decorator to make it italic
+def makeitalic(fn):
+    # The new function the decorator returns
+    def wrapper():
+        # Insertion of some code before and after
+        return &quot;&lt;i&gt;&quot; + fn() + &quot;&lt;/i&gt;&quot;
+    return wrapper
+
+@makebold
+@makeitalic
+def say():
+    return &quot;hello&quot;
+
+print(say())
+#outputs: &lt;b&gt;&lt;i&gt;hello&lt;/i&gt;&lt;/b&gt;
+
+# This is the exact equivalent to 
+def say():
+    return &quot;hello&quot;
+say = makebold(makeitalic(say))
+
+print(say())
+#outputs: &lt;b&gt;&lt;i&gt;hello&lt;/i&gt;&lt;/b&gt;
+</code></pre>
+<p>You can now just leave happy, or burn your brain a little bit more and see advanced uses of decorators.</p>
+<hr />
+<h1>Taking decorators to the next level</h1>
+<h2>Passing arguments to the decorated function</h2>
+<pre><code># It’s not black magic, you just have to let the wrapper 
+# pass the argument:
+
+def a_decorator_passing_arguments(function_to_decorate):
+    def a_wrapper_accepting_arguments(arg1, arg2):
+        print(&quot;I got args! Look: {0}, {1}&quot;.format(arg1, arg2))
+        function_to_decorate(arg1, arg2)
+    return a_wrapper_accepting_arguments
+
+# Since when you are calling the function returned by the decorator, you are
+# calling the wrapper, passing arguments to the wrapper will let it pass them to 
+# the decorated function
+
+@a_decorator_passing_arguments
+def print_full_name(first_name, last_name):
+    print(&quot;My name is {0} {1}&quot;.format(first_name, last_name))
+    
+print_full_name(&quot;Peter&quot;, &quot;Venkman&quot;)
+# outputs:
+#I got args! Look: Peter Venkman
+#My name is Peter Venkman
+</code></pre>
+<h2>Decorating methods</h2>
+<p>One nifty thing about Python is that methods and functions are really the same.  The only difference is that methods expect that their first argument is a reference to the current object (<code>self</code>).</p>
+<p>That means you can build a decorator for methods the same way! Just remember to take <code>self</code> into consideration:</p>
+<pre><code>def method_friendly_decorator(method_to_decorate):
+    def wrapper(self, lie):
+        lie = lie - 3 # very friendly, decrease age even more :-)
+        return method_to_decorate(self, lie)
+    return wrapper
+    
+    
+class Lucy(object):
+    
+    def __init__(self):
+        self.age = 32
+    
+    @method_friendly_decorator
+    def sayYourAge(self, lie):
+        print(&quot;I am {0}, what did you think?&quot;.format(self.age + lie))
+        
+l = Lucy()
+l.sayYourAge(-3)
+#outputs: I am 26, what did you think?
+</code></pre>
+<p>If you’re making general-purpose decorator--one you’ll apply to any function or method, no matter its arguments--then just use <code>*args, **kwargs</code>:</p>
+<pre><code>def a_decorator_passing_arbitrary_arguments(function_to_decorate):
+    # The wrapper accepts any arguments
+    def a_wrapper_accepting_arbitrary_arguments(*args, **kwargs):
+        print(&quot;Do I have args?:&quot;)
+        print(args)
+        print(kwargs)
+        # Then you unpack the arguments, here *args, **kwargs
+        # If you are not familiar with unpacking, check:
+        # http://www.saltycrane.com/blog/2008/01/how-to-use-args-and-kwargs-in-python/
+        function_to_decorate(*args, **kwargs)
+    return a_wrapper_accepting_arbitrary_arguments
+
+@a_decorator_passing_arbitrary_arguments
+def function_with_no_argument():
+    print(&quot;Python is cool, no argument here.&quot;)
+
+function_with_no_argument()
+#outputs
+#Do I have args?:
+#()
+#{}
+#Python is cool, no argument here.
+
+@a_decorator_passing_arbitrary_arguments
+def function_with_arguments(a, b, c):
+    print(a, b, c)
+    
+function_with_arguments(1,2,3)
+#outputs
+#Do I have args?:
+#(1, 2, 3)
+#{}
+#1 2 3 
+ 
+@a_decorator_passing_arbitrary_arguments
+def function_with_named_arguments(a, b, c, platypus=&quot;Why not ?&quot;):
+    print(&quot;Do {0}, {1} and {2} like platypus? {3}&quot;.format(a, b, c, platypus))
+
+function_with_named_arguments(&quot;Bill&quot;, &quot;Linus&quot;, &quot;Steve&quot;, platypus=&quot;Indeed!&quot;)
+#outputs
+#Do I have args ? :
+#('Bill', 'Linus', 'Steve')
+#{'platypus': 'Indeed!'}
+#Do Bill, Linus and Steve like platypus? Indeed!
+
+class Mary(object):
+    
+    def __init__(self):
+        self.age = 31
+    
+    @a_decorator_passing_arbitrary_arguments
+    def sayYourAge(self, lie=-3): # You can now add a default value
+        print(&quot;I am {0}, what did you think?&quot;.format(self.age + lie))
+
+m = Mary()
+m.sayYourAge()
+#outputs
+# Do I have args?:
+#(&lt;__main__.Mary object at 0xb7d303ac&gt;,)
+#{}
+#I am 28, what did you think?
+</code></pre>
+<h2>Passing arguments to the decorator</h2>
+<p>Great, now what would you say about passing arguments to the decorator itself?</p>
+<p>This can get somewhat twisted, since a decorator must accept a function as an argument. Therefore, you cannot pass the decorated function’s arguments directly to the decorator.</p>
+<p>Before rushing to the solution, let’s write a little reminder:</p>
+<pre><code># Decorators are ORDINARY functions
+def my_decorator(func):
+    print(&quot;I am an ordinary function&quot;)
+    def wrapper():
+        print(&quot;I am function returned by the decorator&quot;)
+        func()
+    return wrapper
+
+# Therefore, you can call it without any &quot;@&quot;
+
+def lazy_function():
+    print(&quot;zzzzzzzz&quot;)
+
+decorated_function = my_decorator(lazy_function)
+#outputs: I am an ordinary function
+            
+# It outputs &quot;I am an ordinary function&quot;, because that’s just what you do:
+# calling a function. Nothing magic.
+
+@my_decorator
+def lazy_function():
+    print(&quot;zzzzzzzz&quot;)
+    
+#outputs: I am an ordinary function
+</code></pre>
+<p>It’s exactly the same. &quot;<code>my_decorator</code>&quot; is called. So when you <code>@my_decorator</code>, you are telling Python to call the function 'labelled by the variable &quot;<code>my_decorator</code>&quot;'.</p>
+<p>This is important! The label you give can point directly to the decorator—<strong>or not</strong>.</p>
+<p>Let’s get evil. ☺</p>
+<pre><code>def decorator_maker():
+    
+    print(&quot;I make decorators! I am executed only once: &quot;
+          &quot;when you make me create a decorator.&quot;)
+            
+    def my_decorator(func):
+        
+        print(&quot;I am a decorator! I am executed only when you decorate a function.&quot;)
+               
+        def wrapped():
+            print(&quot;I am the wrapper around the decorated function. &quot;
+                  &quot;I am called when you call the decorated function. &quot;
+                  &quot;As the wrapper, I return the RESULT of the decorated function.&quot;)
+            return func()
+        
+        print(&quot;As the decorator, I return the wrapped function.&quot;)
+        
+        return wrapped
+    
+    print(&quot;As a decorator maker, I return a decorator&quot;)
+    return my_decorator
+            
+# Let’s create a decorator. It’s just a new function after all.
+new_decorator = decorator_maker()       
+#outputs:
+#I make decorators! I am executed only once: when you make me create a decorator.
+#As a decorator maker, I return a decorator
+
+# Then we decorate the function
+            
+def decorated_function():
+    print(&quot;I am the decorated function.&quot;)
+   
+decorated_function = new_decorator(decorated_function)
+#outputs:
+#I am a decorator! I am executed only when you decorate a function.
+#As the decorator, I return the wrapped function
+     
+# Let’s call the function:
+decorated_function()
+#outputs:
+#I am the wrapper around the decorated function. I am called when you call the decorated function.
+#As the wrapper, I return the RESULT of the decorated function.
+#I am the decorated function.
+</code></pre>
+<p>No surprise here.</p>
+<p>Let’s do EXACTLY the same thing, but skip all the pesky intermediate variables:</p>
+<pre><code>def decorated_function():
+    print(&quot;I am the decorated function.&quot;)
+decorated_function = decorator_maker()(decorated_function)
+#outputs:
+#I make decorators! I am executed only once: when you make me create a decorator.
+#As a decorator maker, I return a decorator
+#I am a decorator! I am executed only when you decorate a function.
+#As the decorator, I return the wrapped function.
+
+# Finally:
+decorated_function()    
+#outputs:
+#I am the wrapper around the decorated function. I am called when you call the decorated function.
+#As the wrapper, I return the RESULT of the decorated function.
+#I am the decorated function.
+</code></pre>
+<p>Let’s make it <em>even shorter</em>:</p>
+<pre><code>@decorator_maker()
+def decorated_function():
+    print(&quot;I am the decorated function.&quot;)
+#outputs:
+#I make decorators! I am executed only once: when you make me create a decorator.
+#As a decorator maker, I return a decorator
+#I am a decorator! I am executed only when you decorate a function.
+#As the decorator, I return the wrapped function.
+
+#Eventually: 
+decorated_function()    
+#outputs:
+#I am the wrapper around the decorated function. I am called when you call the decorated function.
+#As the wrapper, I return the RESULT of the decorated function.
+#I am the decorated function.
+</code></pre>
+<p>Hey, did you see that? We used a function call with the &quot;<code>@</code>&quot; syntax! :-)</p>
+<p>So, back to decorators with arguments. If we can use functions to generate the decorator on the fly, we can pass arguments to that function, right?</p>
+<pre><code>def decorator_maker_with_arguments(decorator_arg1, decorator_arg2):
+    
+    print(&quot;I make decorators! And I accept arguments: {0}, {1}&quot;.format(decorator_arg1, decorator_arg2))
+            
+    def my_decorator(func):
+        # The ability to pass arguments here is a gift from closures.
+        # If you are not comfortable with closures, you can assume it’s ok,
+        # or read: https://stackoverflow.com/questions/13857/can-you-explain-closures-as-they-relate-to-python
+        print(&quot;I am the decorator. Somehow you passed me arguments: {0}, {1}&quot;.format(decorator_arg1, decorator_arg2))
+               
+        # Don't confuse decorator arguments and function arguments!
+        def wrapped(function_arg1, function_arg2) :
+            print(&quot;I am the wrapper around the decorated function.\n&quot;
+                  &quot;I can access all the variables\n&quot;
+                  &quot;\t- from the decorator: {0} {1}\n&quot;
+                  &quot;\t- from the function call: {2} {3}\n&quot;
+                  &quot;Then I can pass them to the decorated function&quot;
+                  .format(decorator_arg1, decorator_arg2,
+                          function_arg1, function_arg2))
+            return func(function_arg1, function_arg2)
+        
+        return wrapped
+    
+    return my_decorator
+
+@decorator_maker_with_arguments(&quot;Leonard&quot;, &quot;Sheldon&quot;)
+def decorated_function_with_arguments(function_arg1, function_arg2):
+    print(&quot;I am the decorated function and only knows about my arguments: {0}&quot;
+           &quot; {1}&quot;.format(function_arg1, function_arg2))
+          
+decorated_function_with_arguments(&quot;Rajesh&quot;, &quot;Howard&quot;)
+#outputs:
+#I make decorators! And I accept arguments: Leonard Sheldon
+#I am the decorator. Somehow you passed me arguments: Leonard Sheldon
+#I am the wrapper around the decorated function. 
+#I can access all the variables 
+#   - from the decorator: Leonard Sheldon 
+#   - from the function call: Rajesh Howard 
+#Then I can pass them to the decorated function
+#I am the decorated function and only knows about my arguments: Rajesh Howard
+</code></pre>
+<p>Here it is: a decorator with arguments. Arguments can be set as variable:</p>
+<pre><code>c1 = &quot;Penny&quot;
+c2 = &quot;Leslie&quot;
+
+@decorator_maker_with_arguments(&quot;Leonard&quot;, c1)
+def decorated_function_with_arguments(function_arg1, function_arg2):
+    print(&quot;I am the decorated function and only knows about my arguments:&quot;
+           &quot; {0} {1}&quot;.format(function_arg1, function_arg2))
+
+decorated_function_with_arguments(c2, &quot;Howard&quot;)
+#outputs:
+#I make decorators! And I accept arguments: Leonard Penny
+#I am the decorator. Somehow you passed me arguments: Leonard Penny
+#I am the wrapper around the decorated function. 
+#I can access all the variables 
+#   - from the decorator: Leonard Penny 
+#   - from the function call: Leslie Howard 
+#Then I can pass them to the decorated function
+#I am the decorated function and only know about my arguments: Leslie Howard
+</code></pre>
+<p>As you can see, you can pass arguments to the decorator like any function using this trick. You can even use <code>*args, **kwargs</code> if you wish. But remember decorators are called <strong>only once</strong>. Just when Python imports the script. You can't dynamically set the arguments afterwards. When you do &quot;import x&quot;, <strong>the function is already decorated</strong>, so you can't
+change anything.</p>
+<hr />
+<h1>Let’s practice: decorating a decorator</h1>
+<p>Okay, as a bonus, I'll give you a snippet to make any decorator accept generically any argument. After all, in order to accept arguments, we created our decorator using another function.</p>
+<p>We wrapped the decorator.</p>
+<p>Anything else we saw recently that wrapped function?</p>
+<p>Oh yes, decorators!</p>
+<p>Let’s have some fun and write a decorator for the decorators:</p>
+<pre><code>def decorator_with_args(decorator_to_enhance):
+    &quot;&quot;&quot; 
+    This function is supposed to be used as a decorator.
+    It must decorate an other function, that is intended to be used as a decorator.
+    Take a cup of coffee.
+    It will allow any decorator to accept an arbitrary number of arguments,
+    saving you the headache to remember how to do that every time.
+    &quot;&quot;&quot;
+    
+    # We use the same trick we did to pass arguments
+    def decorator_maker(*args, **kwargs):
+       
+        # We create on the fly a decorator that accepts only a function
+        # but keeps the passed arguments from the maker.
+        def decorator_wrapper(func):
+       
+            # We return the result of the original decorator, which, after all, 
+            # IS JUST AN ORDINARY FUNCTION (which returns a function).
+            # Only pitfall: the decorator must have this specific signature or it won't work:
+            return decorator_to_enhance(func, *args, **kwargs)
+        
+        return decorator_wrapper
+    
+    return decorator_maker
+       
+</code></pre>
+<p>It can be used as follows:</p>
+<pre><code># You create the function you will use as a decorator. And stick a decorator on it :-)
+# Don't forget, the signature is &quot;decorator(func, *args, **kwargs)&quot;
+@decorator_with_args 
+def decorated_decorator(func, *args, **kwargs): 
+    def wrapper(function_arg1, function_arg2):
+        print(&quot;Decorated with {0} {1}&quot;.format(args, kwargs))
+        return func(function_arg1, function_arg2)
+    return wrapper
+    
+# Then you decorate the functions you wish with your brand new decorated decorator.
+
+@decorated_decorator(42, 404, 1024)
+def decorated_function(function_arg1, function_arg2):
+    print(&quot;Hello {0} {1}&quot;.format(function_arg1, function_arg2))
+
+decorated_function(&quot;Universe and&quot;, &quot;everything&quot;)
+#outputs:
+#Decorated with (42, 404, 1024) {}
+#Hello Universe and everything
+
+# Whoooot!
+</code></pre>
+<p>I know, the last time you had this feeling, it was after listening a guy saying: &quot;before understanding recursion, you must first understand recursion&quot;. But now, don't you feel good about mastering this?</p>
+<hr />
+<h1>Best practices: decorators</h1>
+<ul>
+<li>Decorators were introduced in Python 2.4, so be sure your code will be run on &gt;= 2.4.</li>
+<li>Decorators slow down the function call. Keep that in mind.</li>
+<li><strong>You cannot un-decorate a function.</strong> (There <em>are</em> hacks to create decorators that can be removed, but nobody uses them.) So once a function is decorated, it’s decorated <em>for all the code</em>.</li>
+<li>Decorators wrap functions, which can make them hard to debug.  (This gets better from Python &gt;= 2.5; see below.)</li>
+</ul>
+<p>The <code>functools</code> module was introduced in Python 2.5. It includes the function <code>functools.wraps()</code>, which copies the name, module, and docstring of the decorated function to its wrapper.</p>
+<p>(Fun fact: <code>functools.wraps()</code> is a decorator! ☺)</p>
+<pre><code># For debugging, the stacktrace prints you the function __name__
+def foo():
+    print(&quot;foo&quot;)
+    
+print(foo.__name__)
+#outputs: foo
+    
+# With a decorator, it gets messy    
+def bar(func):
+    def wrapper():
+        print(&quot;bar&quot;)
+        return func()
+    return wrapper
+
+@bar
+def foo():
+    print(&quot;foo&quot;)
+
+print(foo.__name__)
+#outputs: wrapper
+
+# &quot;functools&quot; can help for that
+
+import functools
+
+def bar(func):
+    # We say that &quot;wrapper&quot;, is wrapping &quot;func&quot;
+    # and the magic begins
+    @functools.wraps(func)
+    def wrapper():
+        print(&quot;bar&quot;)
+        return func()
+    return wrapper
+
+@bar
+def foo():
+    print(&quot;foo&quot;)
+
+print(foo.__name__)
+#outputs: foo
+</code></pre>
+<hr />
+<h1>How can the decorators be useful?</h1>
+<p><strong>Now the big question:</strong> What can I use decorators for?</p>
+<p>Seem cool and powerful, but a practical example would be great. Well, there are 1000 possibilities. Classic uses are extending a function behavior from an external lib (you can't modify it), or for debugging (you don't want to modify it because it’s temporary).</p>
+<p>You can use them to extend several functions in a DRY’s way, like so:</p>
+<pre><code>def benchmark(func):
+    &quot;&quot;&quot;
+    A decorator that prints the time a function takes
+    to execute.
+    &quot;&quot;&quot;
+    import time
+    def wrapper(*args, **kwargs):
+        t = time.clock()
+        res = func(*args, **kwargs)
+        print(&quot;{0} {1}&quot;.format(func.__name__, time.clock()-t))
+        return res
+    return wrapper
+
+
+def logging(func):
+    &quot;&quot;&quot;
+    A decorator that logs the activity of the script.
+    (it actually just prints it, but it could be logging!)
+    &quot;&quot;&quot;
+    def wrapper(*args, **kwargs):
+        res = func(*args, **kwargs)
+        print(&quot;{0} {1} {2}&quot;.format(func.__name__, args, kwargs))
+        return res
+    return wrapper
+
+
+def counter(func):
+    &quot;&quot;&quot;
+    A decorator that counts and prints the number of times a function has been executed
+    &quot;&quot;&quot;
+    def wrapper(*args, **kwargs):
+        wrapper.count = wrapper.count + 1
+        res = func(*args, **kwargs)
+        print(&quot;{0} has been used: {1}x&quot;.format(func.__name__, wrapper.count))
+        return res
+    wrapper.count = 0
+    return wrapper
+
+@counter
+@benchmark
+@logging
+def reverse_string(string):
+    return str(reversed(string))
+
+print(reverse_string(&quot;Able was I ere I saw Elba&quot;))
+print(reverse_string(&quot;A man, a plan, a canoe, pasta, heros, rajahs, a coloratura, maps, snipe, percale, macaroni, a gag, a banana bag, a tan, a tag, a banana bag again (or a camel), a crepe, pins, Spam, a rut, a Rolo, cash, a jar, sore hats, a peon, a canal: Panama!&quot;))
+
+#outputs:
+#reverse_string ('Able was I ere I saw Elba',) {}
+#wrapper 0.0
+#wrapper has been used: 1x 
+#ablE was I ere I saw elbA
+#reverse_string ('A man, a plan, a canoe, pasta, heros, rajahs, a coloratura, maps, snipe, percale, macaroni, a gag, a banana bag, a tan, a tag, a banana bag again (or a camel), a crepe, pins, Spam, a rut, a Rolo, cash, a jar, sore hats, a peon, a canal: Panama!',) {}
+#wrapper 0.0
+#wrapper has been used: 2x
+#!amanaP :lanac a ,noep a ,stah eros ,raj a ,hsac ,oloR a ,tur a ,mapS ,snip ,eperc a ,)lemac a ro( niaga gab ananab a ,gat a ,nat a ,gab ananab a ,gag a ,inoracam ,elacrep ,epins ,spam ,arutaroloc a ,shajar ,soreh ,atsap ,eonac a ,nalp a ,nam A
+</code></pre>
+<p>Of course the good thing with decorators is that you can use them right away on almost anything without rewriting. DRY, I said:</p>
+<pre><code>@counter
+@benchmark
+@logging
+def get_random_futurama_quote():
+    from urllib import urlopen
+    result = urlopen(&quot;http://subfusion.net/cgi-bin/quote.pl?quote=futurama&quot;).read()
+    try:
+        value = result.split(&quot;&lt;br&gt;&lt;b&gt;&lt;hr&gt;&lt;br&gt;&quot;)[1].split(&quot;&lt;br&gt;&lt;br&gt;&lt;hr&gt;&quot;)[0]
+        return value.strip()
+    except:
+        return &quot;No, I'm ... doesn't!&quot;
+
+    
+print(get_random_futurama_quote())
+print(get_random_futurama_quote())
+
+#outputs:
+#get_random_futurama_quote () {}
+#wrapper 0.02
+#wrapper has been used: 1x
+#The laws of science be a harsh mistress.
+#get_random_futurama_quote () {}
+#wrapper 0.01
+#wrapper has been used: 2x
+#Curse you, merciful Poseidon!
+</code></pre>
+<p>Python itself provides several decorators: <code>property</code>, <code>staticmethod</code>, etc.</p>
+<ul>
+<li>Django uses decorators to manage caching and view permissions.</li>
+<li>Twisted to fake inlining asynchronous functions calls.</li>
+</ul>
+<p>This really is a large playground.</p>
+<h4> Comment 54343607 metatoaster: </h4>&quot;You cannot un-decorate a function.&quot; - While normally true, it is possible to reach inside the closure in the function return by a decorator (i.e. via its <code>__closure__</code> attribute) to pull out the original undecorated function.  One example usage is documented in <a href="http://stackoverflow.com/a/33254457/2904896">this answer</a> which covers how it is possible to inject a decorator function in a lower level in limited circumstances.<br><h4> Comment 60699659 Blckknght: </h4>While this is a great answer, I think it is a bit misleading in some ways. Python&#39;s <code>@decorator</code> syntax is probably most often used to replace a function with a wrapper closure (as the answer describes). But it can also replace the function with something else. The builtin <code>property</code>, <code>classmethod</code> and <code>staticmethod</code> decorators replace the function with a descriptor, for example. A decorator can also do something with a function, such as saving a reference to it in a registry of some sort, then return it, unmodified, without any wrapper.<br><h4> Comment 124101829 merwok: </h4>functools.wraps sets the attribute <code>__wrapped__</code> on the wrapper function, to allow retrieving the original wrapped function.  That’s more reliable than looking at closed-over variables.<br><h4> Comment 127849842 Mous: </h4>Adding on to what Blckknght said, a decorator doesn&#39;t just return something else, it can return any object.<br><h4> Comment 133581998 t3chb0t: </h4>Is there a way to preserve the agument information about the decorated function when stacking decorators so that <code>inspect.getfullargspec(decoratee)</code> would yield useful results?<br><h4> Comment 123132247 thoroc: </h4>The only thing missing is how to test a function that has been created as decorator (if that makes sense).<br>------------------------------------------------------------------ <br><h3> Answer 739665 Paolo Bergantino: </h3><p>Check out <a href="http://docs.python.org/reference/compound_stmts.html#function" rel="noreferrer">the documentation</a> to see how decorators work. Here is what you asked for:</p>
+<pre><code>from functools import wraps
+
+def makebold(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        return &quot;&lt;b&gt;&quot; + fn(*args, **kwargs) + &quot;&lt;/b&gt;&quot;
+    return wrapper
+
+def makeitalic(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        return &quot;&lt;i&gt;&quot; + fn(*args, **kwargs) + &quot;&lt;/i&gt;&quot;
+    return wrapper
+
+@makebold
+@makeitalic
+def hello():
+    return &quot;hello world&quot;
+
+@makebold
+@makeitalic
+def log(s):
+    return s
+
+print hello()        # returns &quot;&lt;b&gt;&lt;i&gt;hello world&lt;/i&gt;&lt;/b&gt;&quot;
+print hello.__name__ # with functools.wraps() this returns &quot;hello&quot;
+print log('hello')   # returns &quot;&lt;b&gt;&lt;i&gt;hello&lt;/i&gt;&lt;/b&gt;&quot;
+</code></pre>
+<h4> Comment 5934940 Marius Gedminas: </h4>Consider using <a href="http://docs.python.org/library/functools.html#functools.wraps" rel="nofollow noreferrer">functools.wraps</a> or, better yet, the <a href="http://pypi.python.org/pypi/decorator" rel="nofollow noreferrer">decorator module from PyPI</a>: they preserve certain important metadata (such as <code>__name__</code> and, speaking about the decorator package, function signature).<br><h4> Comment 73409873 Blusky: </h4><code>*args</code>and <code>**kwargs</code> should be added in the answer. Decorated function can have arguments, and they will be lost if not specified.<br><h4> Comment 96953340 smarie: </h4>Although this answer has the great advantage of only using the stdlib, and works for this simple example where there are no <i>decorator</i> arguments nor <i>decorated function</i> arguments, it has 3 major limitations: (1) no simple support for optional decorator arguments (2) not signature-preserving (3) no simple way to extract a named argument from <code>*args</code>, <code>**kwargs</code>.  An easy way to solve these 3 issues at once is to use <code>decopatch</code> as explained <a href="https://stackoverflow.com/a/55105198/7262247">here</a>. You can also use <code>decorator</code> as already mentioned by Marius Gedminas, to solve points 2 and 3.<br>------------------------------------------------------------------ <br><h3> Answer 739679 Trevor: </h3><p>Alternatively, you could write a factory function which return a decorator which wraps the return value of the decorated function in a tag passed to the factory function. For example:</p>
+
+<pre><code>from functools import wraps
+
+def wrap_in_tag(tag):
+    def factory(func):
+        @wraps(func)
+        def decorator():
+            return '&lt;%(tag)s&gt;%(rv)s&lt;/%(tag)s&gt;' % (
+                {'tag': tag, 'rv': func()})
+        return decorator
+    return factory
+</code></pre>
+
+<p>This enables you to write:</p>
+
+<pre><code>@wrap_in_tag('b')
+@wrap_in_tag('i')
+def say():
+    return 'hello'
+</code></pre>
+
+<p>or</p>
+
+<pre><code>makebold = wrap_in_tag('b')
+makeitalic = wrap_in_tag('i')
+
+@makebold
+@makeitalic
+def say():
+    return 'hello'
+</code></pre>
+
+<p>Personally I would have written the decorator somewhat differently:</p>
+
+<pre><code>from functools import wraps
+
+def wrap_in_tag(tag):
+    def factory(func):
+        @wraps(func)
+        def decorator(val):
+            return func('&lt;%(tag)s&gt;%(val)s&lt;/%(tag)s&gt;' %
+                        {'tag': tag, 'val': val})
+        return decorator
+    return factory
+</code></pre>
+
+<p>which would yield:</p>
+
+<pre><code>@wrap_in_tag('b')
+@wrap_in_tag('i')
+def say(val):
+    return val
+say('hello')
+</code></pre>
+
+<p>Don't forget the construction for which decorator syntax is a shorthand:</p>
+
+<pre><code>say = wrap_in_tag('b')(wrap_in_tag('i')(say)))
+</code></pre>
+<h4> Comment 29212998 guneysus: </h4>In my opinion, it is better to avoid more than one decorator as far as possible. If i had to write a factory function i would code it with *kwargs like <code>def wrap_in_tag(*kwargs)</code> then <code>@wrap_in_tag(&#39;b&#39;,&#39;i&#39;)</code><br>------------------------------------------------------------------ <br><h3> Answer 739721 Unknown: </h3><p>Decorators are just syntactical sugar.</p>
+<p>This</p>
+<pre><code>@decorator
+def func():
+    ...
+</code></pre>
+<p>expands to</p>
+<pre><code>def func():
+    ...
+func = decorator(func)
+</code></pre>
+<h4> Comment 79889780 Omer Dagan: </h4>Great and simple answer. Would like to add that when using <code>@decorator()</code> (instead of <code>@decorator</code>) it is syntactic sugar for <code>func = decorator()(func)</code>. This is also common practice when you need to generate decorators &quot;on the fly&quot;<br><h4> Comment 78992106 eric: </h4>This is so elegant, simple, easy to understand. 10000 upvotes for you, Sir Ockham.<br><h4> Comment 124402234 leo848: </h4>@OmerDagan this is not syntactic sugar, but just regular python code. In the generator (after the @ sign) you can put a regular python expression that yields a decorator function.<br><h4> Comment 127923097 Gathide: </h4>In <code>func = decorator(func)</code>, must the variable name be <code>func</code> which is also the original function name? Can <code>var = decorator(func)</code> also work?<br><h4> Comment 130603477 Anirban Mukherjee: </h4>Yes. The left hand side variable name and the right hand side variable name need not be the same; <code>decorator(func)</code> is assigned to <code>var</code>. If they are the same then <code>func</code> is overwritten. Else not.<br><h4> Comment 130603495 Anirban Mukherjee: </h4>Put a different way, if you want <code>func</code> to be overwritten then <code>@decorator</code> is elegant shorthand. If you don&#39;t then <code>var = decorator(func)</code> has to be written out in detail.<br>------------------------------------------------------------------ <br><h3> Answer 4012213 Rune Kaagaard: </h3><p>And of course you can return lambdas as well from a decorator function:</p>
+
+<pre><code>def makebold(f): 
+    return lambda: "&lt;b&gt;" + f() + "&lt;/b&gt;"
+def makeitalic(f): 
+    return lambda: "&lt;i&gt;" + f() + "&lt;/i&gt;"
+
+@makebold
+@makeitalic
+def say():
+    return "Hello"
+
+print say()
+</code></pre>
+<h4> Comment 31016621 martineau: </h4>@Robᵩ: To be syntactically correct: <code>makebold = lambda f: lambda: &quot;&lt;b&gt;&quot; + f() + &quot;&lt;&#47;b&gt;&quot;</code><br><h4> Comment 21440413 Robᵩ: </h4>And one step further: <code>makebold = lambda f : lambda &quot;&lt;b&gt;&quot; + f() + &quot;&lt;&#47;b&gt;&quot;</code><br><h4> Comment 45084827 seequ: </h4>Late to the party, but I really would suggest <code>makebold = lambda f: lambda *a, **k: &quot;&lt;b&gt;&quot; + f(*a, **k) + &quot;&lt;&#47;b&gt;&quot;</code><br><h4> Comment 91668716 Eric: </h4>This needs <code>functools.wraps</code> in order to not discard the docstring / signature / name of <code>say</code><br><h4> Comment 91729536 Eric: </h4>Well, what matters is whether it&#39;s mentioned in your answer. Having <code>@wraps</code> somewhere else on this page isn&#39;t going to help me when I print <code>help(say)</code> and get <i>&quot;Help on function &lt;lambda&gt;`</i> instead of <i>&quot;Help on function say&quot;</i>.<br>------------------------------------------------------------------ <br><h3> Answer 739667 Abhinav Gupta: </h3><p>Python decorators add extra functionality to another function</p>
+
+<p>An italics decorator could be like</p>
+
+<pre><code>def makeitalic(fn):
+    def newFunc():
+        return "&lt;i&gt;" + fn() + "&lt;/i&gt;"
+    return newFunc
+</code></pre>
+
+<p>Note that a function is defined inside a function.
+What it basically does is replace a function with the newly defined one. For example, I have this class</p>
+
+<pre><code>class foo:
+    def bar(self):
+        print "hi"
+    def foobar(self):
+        print "hi again"
+</code></pre>
+
+<p>Now say, I want both functions to print "---" after and before they are done.
+I could add a print "---" before and after each print statement.
+But because I don't like repeating myself, I will make a decorator</p>
+
+<pre><code>def addDashes(fn): # notice it takes a function as an argument
+    def newFunction(self): # define a new function
+        print "---"
+        fn(self) # call the original function
+        print "---"
+    return newFunction
+    # Return the newly defined function - it will "replace" the original
+</code></pre>
+
+<p>So now I can change my class to </p>
+
+<pre><code>class foo:
+    @addDashes
+    def bar(self):
+        print "hi"
+
+    @addDashes
+    def foobar(self):
+        print "hi again"
+</code></pre>
+
+<p>For more on decorators, check
+<a href="http://www.ibm.com/developerworks/linux/library/l-cpdecor.html" rel="noreferrer">http://www.ibm.com/developerworks/linux/library/l-cpdecor.html</a></p>
+<h4> Comment 25647861 martineau: </h4>@Phoenix: The <code>self</code> argument is needed because the <code>newFunction()</code> defined in <code>addDashes()</code> was specifically designed to be a <i>method</i> decorator not a general function decorator. The <code>self</code> argument represents the class instance and is passed to class methods whether they use it or not -- see the section titled <b>Decorating methods</b> in @e-satis&#39;s answer.<br><h4> Comment 49011060 user1767754: </h4>Print the output as well please.<br><h4> Comment 91668702 Eric: </h4>Missing <code>functools.wraps</code><br><h4> Comment 123973093 Rich Lysakowski PhD: </h4>The link to the IBM website is out-of-date clickbait.  Please update the link or delete it.  It goes nowhere except into the Big Blue Linux Developer Hole.  Thank you.<br><h4> Comment 8532286 rds: </h4>Note as elegant as the lambda functions proposed by @Rune Kaagaard<br>------------------------------------------------------------------ <br><h3> Answer 30283056 martineau: </h3><p>You <em>could</em> make two separate decorators that do what you want as illustrated directly below. Note the use of <code>*args, **kwargs</code> in the declaration of the <code>wrapped()</code> function which supports the decorated function having multiple arguments (which isn't really necessary for the example <code>say()</code> function, but is included for generality).</p>
+
+<p>For similar reasons, the <code>functools.wraps</code> decorator is used to change the meta attributes of the wrapped function to be those of the one being decorated. This makes error messages and embedded function documentation (<code>func.__doc__</code>) be those of the decorated function instead of <code>wrapped()</code>'s.</p>
+
+<pre><code>from functools import wraps
+
+def makebold(fn):
+    @wraps(fn)
+    def wrapped(*args, **kwargs):
+        return "&lt;b&gt;" + fn(*args, **kwargs) + "&lt;/b&gt;"
+    return wrapped
+
+def makeitalic(fn):
+    @wraps(fn)
+    def wrapped(*args, **kwargs):
+        return "&lt;i&gt;" + fn(*args, **kwargs) + "&lt;/i&gt;"
+    return wrapped
+
+@makebold
+@makeitalic
+def say():
+    return 'Hello'
+
+print(say())  # -&gt; &lt;b&gt;&lt;i&gt;Hello&lt;/i&gt;&lt;/b&gt;
+</code></pre>
+
+<h2>Refinements</h2>
+
+<p>As you can see there's a lot of duplicate code in these two decorators. Given this similarity it would be better for you to instead make a generic one that was actually a <em>decorator factory</em>—in other words, a decorator function that makes other decorators. That way there would be less code repetition—and allow the <a href="https://en.wikipedia.org/wiki/Don&#39;t_repeat_yourself" rel="noreferrer">DRY</a> principle to be followed.</p>
+
+<pre><code>def html_deco(tag):
+    def decorator(fn):
+        @wraps(fn)
+        def wrapped(*args, **kwargs):
+            return '&lt;%s&gt;' % tag + fn(*args, **kwargs) + '&lt;/%s&gt;' % tag
+        return wrapped
+    return decorator
+
+@html_deco('b')
+@html_deco('i')
+def greet(whom=''):
+    return 'Hello' + (' ' + whom) if whom else ''
+
+print(greet('world'))  # -&gt; &lt;b&gt;&lt;i&gt;Hello world&lt;/i&gt;&lt;/b&gt;
+</code></pre>
+
+<p>To make the code more readable, you can assign a more descriptive name to the factory-generated decorators:</p>
+
+<pre><code>makebold = html_deco('b')
+makeitalic = html_deco('i')
+
+@makebold
+@makeitalic
+def greet(whom=''):
+    return 'Hello' + (' ' + whom) if whom else ''
+
+print(greet('world'))  # -&gt; &lt;b&gt;&lt;i&gt;Hello world&lt;/i&gt;&lt;/b&gt;
+</code></pre>
+
+<p>or even combine them like this:</p>
+
+<pre><code>makebolditalic = lambda fn: makebold(makeitalic(fn))
+
+@makebolditalic
+def greet(whom=''):
+    return 'Hello' + (' ' + whom) if whom else ''
+
+print(greet('world'))  # -&gt; &lt;b&gt;&lt;i&gt;Hello world&lt;/i&gt;&lt;/b&gt;
+</code></pre>
+
+<h3>Efficiency</h3>
+
+<p>While the above examples do all work, the code generated involves a fair amount of overhead in the form of extraneous function calls when multiple decorators are applied at once. This may not matter, depending the exact usage (which might be I/O-bound, for instance).</p>
+
+<p>If speed of the decorated function is important, the overhead can be kept to a single extra function call by writing a slightly different decorator factory-function which implements adding all the tags at once, so it can generate code that avoids the addtional function calls incurred by using separate decorators for each tag.</p>
+
+<p>This requires more code in the decorator itself, but this only runs when it's being applied to function definitions, not later when they themselves are called. This also applies when creating more readable names by using <code>lambda</code> functions as previously illustrated. Sample:</p>
+
+<pre><code>def multi_html_deco(*tags):
+    start_tags, end_tags = [], []
+    for tag in tags:
+        start_tags.append('&lt;%s&gt;' % tag)
+        end_tags.append('&lt;/%s&gt;' % tag)
+    start_tags = ''.join(start_tags)
+    end_tags = ''.join(reversed(end_tags))
+
+    def decorator(fn):
+        @wraps(fn)
+        def wrapped(*args, **kwargs):
+            return start_tags + fn(*args, **kwargs) + end_tags
+        return wrapped
+    return decorator
+
+makebolditalic = multi_html_deco('b', 'i')
+
+@makebolditalic
+def greet(whom=''):
+    return 'Hello' + (' ' + whom) if whom else ''
+
+print(greet('world'))  # -&gt; &lt;b&gt;&lt;i&gt;Hello world&lt;/i&gt;&lt;/b&gt;
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 8633375 qed: </h3><p>Another way of doing the same thing:</p>
+
+<pre><code>class bol(object):
+  def __init__(self, f):
+    self.f = f
+  def __call__(self):
+    return "&lt;b&gt;{}&lt;/b&gt;".format(self.f())
+
+class ita(object):
+  def __init__(self, f):
+    self.f = f
+  def __call__(self):
+    return "&lt;i&gt;{}&lt;/i&gt;".format(self.f())
+
+@bol
+@ita
+def sayhi():
+  return 'hi'
+</code></pre>
+
+<p>Or, more flexibly:</p>
+
+<pre><code>class sty(object):
+  def __init__(self, tag):
+    self.tag = tag
+  def __call__(self, f):
+    def newf():
+      return "&lt;{tag}&gt;{res}&lt;/{tag}&gt;".format(res=f(), tag=self.tag)
+    return newf
+
+@sty('b')
+@sty('i')
+def sayhi():
+  return 'hi'
+</code></pre>
+<h4> Comment 91668693 Eric: </h4>Needs <code>functools.update_wrapper</code> in order to keep <code>sayhi.__name__ == &quot;sayhi&quot;</code><br>------------------------------------------------------------------ <br><h3> Answer 34073212 Russia Must Remove Putin: </h3><blockquote>
+  <h1>How can I make two decorators in Python that would do the following?</h1>
+</blockquote>
+
+<p>You want the following function, when called:</p>
+
+<blockquote>
+<pre><code>@makebold
+@makeitalic
+def say():
+    return "Hello"
+</code></pre>
+</blockquote>
+
+<p>To return:</p>
+
+<blockquote>
+<pre><code>&lt;b&gt;&lt;i&gt;Hello&lt;/i&gt;&lt;/b&gt;
+</code></pre>
+</blockquote>
+
+<h2>Simple solution</h2>
+
+<p>To most simply do this, make decorators that return lambdas (anonymous functions) that close over the function (closures) and call it:</p>
+
+<pre><code>def makeitalic(fn):
+    return lambda: '&lt;i&gt;' + fn() + '&lt;/i&gt;'
+
+def makebold(fn):
+    return lambda: '&lt;b&gt;' + fn() + '&lt;/b&gt;'
+</code></pre>
+
+<p>Now use them as desired:</p>
+
+<pre><code>@makebold
+@makeitalic
+def say():
+    return 'Hello'
+</code></pre>
+
+<p>and now:</p>
+
+<pre><code>&gt;&gt;&gt; say()
+'&lt;b&gt;&lt;i&gt;Hello&lt;/i&gt;&lt;/b&gt;'
+</code></pre>
+
+<h2>Problems with the simple solution</h2>
+
+<p>But we seem to have nearly lost the original function. </p>
+
+<pre><code>&gt;&gt;&gt; say
+&lt;function &lt;lambda&gt; at 0x4ACFA070&gt;
+</code></pre>
+
+<p>To find it, we'd need to dig into the closure of each lambda, one of which is buried in the other:</p>
+
+<pre><code>&gt;&gt;&gt; say.__closure__[0].cell_contents
+&lt;function &lt;lambda&gt; at 0x4ACFA030&gt;
+&gt;&gt;&gt; say.__closure__[0].cell_contents.__closure__[0].cell_contents
+&lt;function say at 0x4ACFA730&gt;
+</code></pre>
+
+<p>So if we put documentation on this function, or wanted to be able to decorate functions that take more than one argument, or we just wanted to know what function we were looking at in a debugging session, we need to do a bit more with our wrapper.</p>
+
+<h2>Full featured solution - overcoming most of these problems</h2>
+
+<p>We have the decorator <code>wraps</code> from the <code>functools</code> module in the standard library! </p>
+
+<pre><code>from functools import wraps
+
+def makeitalic(fn):
+    # must assign/update attributes from wrapped function to wrapper
+    # __module__, __name__, __doc__, and __dict__ by default
+    @wraps(fn) # explicitly give function whose attributes it is applying
+    def wrapped(*args, **kwargs):
+        return '&lt;i&gt;' + fn(*args, **kwargs) + '&lt;/i&gt;'
+    return wrapped
+
+def makebold(fn):
+    @wraps(fn)
+    def wrapped(*args, **kwargs):
+        return '&lt;b&gt;' + fn(*args, **kwargs) + '&lt;/b&gt;'
+    return wrapped
+</code></pre>
+
+<p>It is unfortunate that there's still some boilerplate, but this is about as simple as we can make it. </p>
+
+<p>In Python 3, you also get <code>__qualname__</code> and <code>__annotations__</code> assigned by default.</p>
+
+<p>So now:</p>
+
+<pre><code>@makebold
+@makeitalic
+def say():
+    """This function returns a bolded, italicized 'hello'"""
+    return 'Hello'
+</code></pre>
+
+<p>And now:</p>
+
+<pre><code>&gt;&gt;&gt; say
+&lt;function say at 0x14BB8F70&gt;
+&gt;&gt;&gt; help(say)
+Help on function say in module __main__:
+
+say(*args, **kwargs)
+    This function returns a bolded, italicized 'hello'
+</code></pre>
+
+<h2>Conclusion</h2>
+
+<p>So we see that <code>wraps</code> makes the wrapping function do almost everything except tell us exactly what the function takes as arguments. </p>
+
+<p>There are other modules that may attempt to tackle the problem, but the solution is not yet in the standard library.</p>
+------------------------------------------------------------------ <br><h3> Answer 11673539 Davoud Taghawi-Nejad: </h3><p>A decorator takes the function definition and creates a new function that executes this function and transforms the result.</p>
+
+<pre><code>@deco
+def do():
+    ...
+</code></pre>
+
+<p>is equivalent to:</p>
+
+<pre><code>do = deco(do)
+</code></pre>
+
+<h2>Example:</h2>
+
+<pre><code>def deco(func):
+    def inner(letter):
+        return func(letter).upper()  #upper
+    return inner
+</code></pre>
+
+<p>This</p>
+
+<pre><code>@deco
+def do(number):
+    return chr(number)  # number to letter
+</code></pre>
+
+<p>is equivalent to this</p>
+
+<pre><code>def do2(number):
+    return chr(number)
+
+do2 = deco(do2)
+</code></pre>
+
+<p>65 &lt;=> 'a'</p>
+
+<pre><code>print(do(65))
+print(do2(65))
+&gt;&gt;&gt; B
+&gt;&gt;&gt; B
+</code></pre>
+
+<p>To understand the decorator, it is important to notice, that decorator created a new function do which is inner that executes function and transforms the result.</p>
+------------------------------------------------------------------ <br><h3> Answer 53176726 v4gil: </h3><p>This answer has long been answered, but I thought I would share my Decorator class which makes writing new decorators easy and compact.</p>
+
+<pre><code>from abc import ABCMeta, abstractclassmethod
+
+class Decorator(metaclass=ABCMeta):
+    """ Acts as a base class for all decorators """
+
+    def __init__(self):
+        self.method = None
+
+    def __call__(self, method):
+        self.method = method
+        return self.call
+
+    @abstractclassmethod
+    def call(self, *args, **kwargs):
+        return self.method(*args, **kwargs)
+</code></pre>
+
+<p>For one I think this makes the behavior of decorators very clear, but it also makes it easy to define new decorators very concisely. For the example listed above, you could then solve it as:</p>
+
+<pre><code>class MakeBold(Decorator):
+    def call():
+        return "&lt;b&gt;" + self.method() + "&lt;/b&gt;"
+
+class MakeItalic(Decorator):
+    def call():
+        return "&lt;i&gt;" + self.method() + "&lt;/i&gt;"
+
+@MakeBold()
+@MakeItalic()
+def say():
+   return "Hello"
+</code></pre>
+
+<p>You could also use it to do more complex tasks, like for instance a decorator which automatically makes the function get applied recursively to all arguments in an iterator:</p>
+
+<pre><code>class ApplyRecursive(Decorator):
+    def __init__(self, *types):
+        super().__init__()
+        if not len(types):
+            types = (dict, list, tuple, set)
+        self._types = types
+
+    def call(self, arg):
+        if dict in self._types and isinstance(arg, dict):
+            return {key: self.call(value) for key, value in arg.items()}
+
+        if set in self._types and isinstance(arg, set):
+            return set(self.call(value) for value in arg)
+
+        if tuple in self._types and isinstance(arg, tuple):
+            return tuple(self.call(value) for value in arg)
+
+        if list in self._types and isinstance(arg, list):
+            return list(self.call(value) for value in arg)
+
+        return self.method(arg)
+
+
+@ApplyRecursive(tuple, set, dict)
+def double(arg):
+    return 2*arg
+
+print(double(1))
+print(double({'a': 1, 'b': 2}))
+print(double({1, 2, 3}))
+print(double((1, 2, 3, 4)))
+print(double([1, 2, 3, 4, 5]))
+</code></pre>
+
+<p>Which prints:</p>
+
+<pre><code>2
+{'a': 2, 'b': 4}
+{2, 4, 6}
+(2, 4, 6, 8)
+[1, 2, 3, 4, 5, 1, 2, 3, 4, 5]
+</code></pre>
+
+<p>Notice that this example didn't include the <code>list</code> type in the instantiation of the decorator, so in the final print statement the method gets applied to the list itself, not the elements of the list.</p>
+------------------------------------------------------------------ <br><h3> Answer 22833714 nickleefly: </h3><pre><code>#decorator.py
+def makeHtmlTag(tag, *args, **kwds):
+    def real_decorator(fn):
+        css_class = " class='{0}'".format(kwds["css_class"]) \
+                                 if "css_class" in kwds else ""
+        def wrapped(*args, **kwds):
+            return "&lt;"+tag+css_class+"&gt;" + fn(*args, **kwds) + "&lt;/"+tag+"&gt;"
+        return wrapped
+    # return decorator dont call it
+    return real_decorator
+
+@makeHtmlTag(tag="b", css_class="bold_css")
+@makeHtmlTag(tag="i", css_class="italic_css")
+def hello():
+    return "hello world"
+
+print hello()
+</code></pre>
+
+<p>You can also write decorator in Class</p>
+
+<pre><code>#class.py
+class makeHtmlTagClass(object):
+    def __init__(self, tag, css_class=""):
+        self._tag = tag
+        self._css_class = " class='{0}'".format(css_class) \
+                                       if css_class != "" else ""
+
+    def __call__(self, fn):
+        def wrapped(*args, **kwargs):
+            return "&lt;" + self._tag + self._css_class+"&gt;"  \
+                       + fn(*args, **kwargs) + "&lt;/" + self._tag + "&gt;"
+        return wrapped
+
+@makeHtmlTagClass(tag="b", css_class="bold_css")
+@makeHtmlTagClass(tag="i", css_class="italic_css")
+def hello(name):
+    return "Hello, {}".format(name)
+
+print hello("Your name")
+</code></pre>
+<h4> Comment 39900963 Jon Jay Obermark: </h4>The reason to like a class here is that there is clearly related behavior, with two instances.  You can actually get your two decorators by assigning the constructed classes to the names you wanted, rather than re-iterating the parameters.  This is harder to do with a function.  Adding it to the example would point out why this is not just redundant.<br>------------------------------------------------------------------ <br><h3> Answer 17140530 resigned: </h3><p>Here is a simple example of chaining decorators.  Note the last line - it shows what is going on under the covers.</p>
+
+<pre><code>############################################################
+#
+#    decorators
+#
+############################################################
+
+def bold(fn):
+    def decorate():
+        # surround with bold tags before calling original function
+        return "&lt;b&gt;" + fn() + "&lt;/b&gt;"
+    return decorate
+
+
+def uk(fn):
+    def decorate():
+        # swap month and day
+        fields = fn().split('/')
+        date = fields[1] + "/" + fields[0] + "/" + fields[2]
+        return date
+    return decorate
+
+import datetime
+def getDate():
+    now = datetime.datetime.now()
+    return "%d/%d/%d" % (now.day, now.month, now.year)
+
+@bold
+def getBoldDate(): 
+    return getDate()
+
+@uk
+def getUkDate():
+    return getDate()
+
+@bold
+@uk
+def getBoldUkDate():
+    return getDate()
+
+
+print getDate()
+print getBoldDate()
+print getUkDate()
+print getBoldUkDate()
+# what is happening under the covers
+print bold(uk(getDate))()
+</code></pre>
+
+<p>The output looks like:</p>
+
+<pre><code>17/6/2013
+&lt;b&gt;17/6/2013&lt;/b&gt;
+6/17/2013
+&lt;b&gt;6/17/2013&lt;/b&gt;
+&lt;b&gt;6/17/2013&lt;/b&gt;
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 55105198 smarie: </h3><p><a href="https://stackoverflow.com/a/739665/7262247">Paolo Bergantino's answer</a> has the great advantage of only using the stdlib, and works for this simple example where there are no <em>decorator</em> arguments nor <em>decorated function</em> arguments. </p>
+
+<p>However it has 3 major limitations if you want to tackle more general cases:</p>
+
+<ul>
+<li>as already noted in several answers, you can not easily modify the code to <strong>add optional decorator arguments</strong>. For example creating a <code>makestyle(style='bold')</code> decorator is non-trivial.</li>
+<li>besides, wrappers created with <code>@functools.wraps</code> <strong>do not preserve the signature</strong>, so if bad arguments are provided they will start executing, and might raise a different kind of error than the usual <code>TypeError</code>.</li>
+<li>finally, it is quite difficult in wrappers created with <code>@functools.wraps</code> to <strong>access an argument based on its name</strong>. Indeed the argument can appear in <code>*args</code>, in <code>**kwargs</code>, or may not appear at all (if it is optional).</li>
+</ul>
+
+<p>I wrote <a href="https://smarie.github.io/python-decopatch/" rel="noreferrer"><code>decopatch</code></a> to solve the first issue, and wrote <a href="https://smarie.github.io/python-makefun/#signature-preserving-function-wrappers" rel="noreferrer"><code>makefun.wraps</code></a> to solve the other two. Note that <code>makefun</code> leverages the same trick than the famous <a href="https://github.com/micheles/decorator" rel="noreferrer"><code>decorator</code></a> lib.</p>
+
+<p>This is how you would create a decorator with arguments, returning truly signature-preserving wrappers:</p>
+
+<pre><code>from decopatch import function_decorator, DECORATED
+from makefun import wraps
+
+@function_decorator
+def makestyle(st='b', fn=DECORATED):
+    open_tag = "&lt;%s&gt;" % st
+    close_tag = "&lt;/%s&gt;" % st
+
+    @wraps(fn)
+    def wrapped(*args, **kwargs):
+        return open_tag + fn(*args, **kwargs) + close_tag
+
+    return wrapped
+</code></pre>
+
+<p><code>decopatch</code> provides you with two other development styles that hide or show the various python concepts, depending on your preferences. The most compact style is the following:</p>
+
+<pre><code>from decopatch import function_decorator, WRAPPED, F_ARGS, F_KWARGS
+
+@function_decorator
+def makestyle(st='b', fn=WRAPPED, f_args=F_ARGS, f_kwargs=F_KWARGS):
+    open_tag = "&lt;%s&gt;" % st
+    close_tag = "&lt;/%s&gt;" % st
+    return open_tag + fn(*f_args, **f_kwargs) + close_tag
+</code></pre>
+
+<p>In both cases you can check that the decorator works as expected:</p>
+
+<pre><code>@makestyle
+@makestyle('i')
+def hello(who):
+    return "hello %s" % who
+
+assert hello('world') == '&lt;b&gt;&lt;i&gt;hello world&lt;/i&gt;&lt;/b&gt;'    
+</code></pre>
+
+<p>Please refer to the <a href="https://smarie.github.io/python-decopatch/" rel="noreferrer">documentation</a> for details.</p>
+------------------------------------------------------------------ <br><h3> Answer 9540819 marqueed: </h3><p>Speaking of the counter example - as given above, the counter will be shared between all functions that use the decorator:</p>
+
+<pre><code>def counter(func):
+    def wrapped(*args, **kws):
+        print 'Called #%i' % wrapped.count
+        wrapped.count += 1
+        return func(*args, **kws)
+    wrapped.count = 0
+    return wrapped
+</code></pre>
+
+<p>That way, your decorator can be reused for different functions (or used to decorate the same function multiple times: <code>func_counter1 = counter(func); func_counter2 = counter(func)</code>), and the counter variable will remain private to each. </p>
+------------------------------------------------------------------ <br><h3> Answer 15840821 rabin utam: </h3><h1>Decorate functions with different number of arguments:</h1>
+<pre><code>def frame_tests(fn):
+    def wrapper(*args):
+        print &quot;\nStart: %s&quot; %(fn.__name__)
+        fn(*args)
+        print &quot;End: %s\n&quot; %(fn.__name__)
+    return wrapper
+
+@frame_tests
+def test_fn1():
+    print &quot;This is only a test!&quot;
+
+@frame_tests
+def test_fn2(s1):
+    print &quot;This is only a test! %s&quot; %(s1)
+
+@frame_tests
+def test_fn3(s1, s2):
+    print &quot;This is only a test! %s %s&quot; %(s1, s2)
+
+if __name__ == &quot;__main__&quot;:
+    test_fn1()
+    test_fn2('OK!')
+    test_fn3('OK!', 'Just a test!')
+</code></pre>
+<p>Result:</p>
+<pre><code>Start: test_fn1  
+This is only a test!  
+End: test_fn1  
+  
+  
+Start: test_fn2  
+This is only a test! OK!  
+End: test_fn2  
+  
+  
+Start: test_fn3  
+This is only a test! OK! Just a test!  
+End: test_fn3  
+</code></pre>
+<h4> Comment 48663733 martineau: </h4>This could easily be made even more versatile by also providing support for keyword arguments via <code>def wrapper(*args, **kwargs):</code> and <code>fn(*args, **kwargs)</code>.<br>------------------------------------------------------------------ <br><h3> Answer 74888820 user3844097: </h3><p>Consider the following decorator, note that we are returning the wrapper() function as an object</p>
+<pre><code>def make_bold(func):
+    def wrapper():
+        return '&lt;b&gt;'+func()+'&lt;/b&gt;'
+    return wrapper
+</code></pre>
+<p>So This</p>
+<pre><code>@make_bold
+def say():
+    return &quot;Hello&quot;
+</code></pre>
+<p>evaluates to this</p>
+<pre><code>x = make_bold(say)
+</code></pre>
+<p>Note that x is not the say() but the wrapper object that calls say() internally. That is how decorator works. It always returns the wrapper object which calls the actual function.
+In case of chaining this</p>
+<pre><code>@make_italic
+@make_bold
+def say():
+    return &quot;Hello&quot;
+</code></pre>
+<p>gets converted to this</p>
+<pre><code>x = make_bold(say)
+y = make_italic(x)
+</code></pre>
+<p>Below is the complete code</p>
+<pre><code>def make_italic(func):
+    def wrapper():
+        return '&lt;i&gt;'+func()+'&lt;/i&gt;'
+    return wrapper
+
+
+def make_bold(func):
+    def wrapper():
+        return '&lt;b&gt;'+func()+'&lt;/b&gt;'
+    return wrapper
+
+
+@make_italic
+@make_bold
+def say():
+    return &quot;Hello&quot;
+
+
+if __name__ == '__main__':
+    # x = make_bold(say) When you wrap say with make_bold decorator
+    # y = make_italic(x) When you also add make_italic as part of chaining
+    # print(y())
+    print(say())
+
+
+</code></pre>
+<p>The above code will return</p>
+<pre><code>&lt;i&gt;&lt;b&gt;Hello&lt;/b&gt;&lt;/i&gt;
+
+</code></pre>
+<p>Hope this helps</p>
+------------------------------------------------------------------ <br><h3> Answer 67247689 Alexey Nikonov: </h3><p>I add a case when you need to add custom parameters in decorator, pass it to final function and then work it with.</p>
+<p>the very decorators:</p>
+<pre><code>def jwt_or_redirect(fn):
+  @wraps(fn)
+  def decorator(*args, **kwargs):
+    ...
+    return fn(*args, **kwargs)
+  return decorator
+
+def jwt_refresh(fn):
+  @wraps(fn)
+  def decorator(*args, **kwargs):
+    ...
+    new_kwargs = {'refreshed_jwt': 'xxxxx-xxxxxx'}
+    new_kwargs.update(kwargs)
+    return fn(*args, **new_kwargs)
+  return decorator
+</code></pre>
+<p>and the final function:</p>
+<pre><code>@app.route('/')
+@jwt_or_redirect
+@jwt_refresh
+def home_page(*args, **kwargs):
+  return kwargs['refreched_jwt']
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 71546227 Sandipan Dey: </h3><p>Yet another example of nested decorators for plotting an image:</p>
+<pre><code>import matplotlib.pylab as plt
+
+def remove_axis(func):
+    def inner(img, alpha):
+        plt.axis('off')
+        func(img, alpha)
+    return inner
+
+def plot_gray(func):
+    def inner(img, alpha):
+        plt.gray()
+        func(img, alpha)
+    return inner
+
+@remove_axis
+@plot_gray
+def plot_image(img, alpha):
+    plt.imshow(img, alpha=alpha)
+    plt.show()
+</code></pre>
+<p>Now, let's show a color image first without axis labels using the nested decorators:</p>
+<pre><code>plot_image(plt.imread('lena_color.jpg'), 0.4)
+</code></pre>
+<p><a href="https://i.stack.imgur.com/n6Pbn.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/n6Pbn.png" alt="enter image description here" /></a></p>
+<p>Next, let's show a gray scale image without axis labels using the nested decorators <code>remove_axis</code> and <code>plot_gray</code> (we need to <code>cmap='gray'</code>, otherwise the default colormap is <code>viridis</code>, so a grayscale image is by default not displayed in black and white shades, unless explicitly specified)</p>
+<pre><code>plot_image(plt.imread('lena_bw.jpg'), 0.8)
+</code></pre>
+<p><a href="https://i.stack.imgur.com/JAhvK.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/JAhvK.png" alt="enter image description here" /></a></p>
+<p>The above function call reduces down to the following nested call</p>
+<pre><code>remove_axis(plot_gray(plot_image))(img, alpha)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 74413269 Super Kai - Kazuya Ito: </h3><p>With <code>make_bold()</code> and <code>make_italic()</code> below:</p>
+<pre class="lang-py prettyprint-override"><code>def make_bold(func):
+    def core(*args, **kwargs):
+        result = func(*args, **kwargs)
+        return &quot;&lt;b&gt;&quot; + result + &quot;&lt;/b&gt;&quot;
+    return core
+
+def make_italic(func):
+    def core(*args, **kwargs):
+        result = func(*args, **kwargs)
+        return &quot;&lt;i&gt;&quot; + result + &quot;&lt;/i&gt;&quot;
+    return core
+</code></pre>
+<p>You can use them as decorators with <code>say()</code> as shown below:</p>
+<pre class="lang-py prettyprint-override"><code>@make_bold
+@make_italic
+def say():
+   return &quot;Hello&quot;
+
+print(say())
+</code></pre>
+<p>Output:</p>
+<pre class="lang-none prettyprint-override"><code>&lt;b&gt;&lt;i&gt;Hello&lt;/i&gt;&lt;/b&gt;
+</code></pre>
+<p>And of course, you can directly use <code>make_bold()</code> and <code>make_italic()</code> without decorators as shown below:</p>
+<pre class="lang-py prettyprint-override"><code>def say():
+    return &quot;Hello&quot;
+    
+f1 = make_italic(say)
+f2 = make_bold(f1)
+result = f2()
+print(result)
+</code></pre>
+<p>In short:</p>
+<pre class="lang-py prettyprint-override"><code>def say():
+    return &quot;Hello&quot;
+    
+result = make_bold(make_italic(say))()
+print(result)
+</code></pre>
+<p>Output:</p>
+<pre class="lang-none prettyprint-override"><code>&lt;b&gt;&lt;i&gt;Hello&lt;/i&gt;&lt;/b&gt;
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 77251949 Pavan Chandaka: </h3><p>python 3.9 the lambda expressions can be used as decorators.</p>
+<p>For your question</p>
+<pre><code>@lambda func: (lambda *variable: '&lt;b&gt;' + func(*variable) + '&lt;/b&gt;')
+@lambda func: (lambda *variable: '&lt;i&gt;' + func(*variable) + '&lt;/i&gt;')
+def say():
+    return &quot;Hello&quot;
+
+print(say())
+</code></pre>
+<p>If you want to reuse the above lambdas after first function call, it is possible to assign them to a variable and reuse. Example below.</p>
+<pre><code>@make_bold := lambda func: (lambda *variable: '&lt;b&gt;' + func(*variable) + '&lt;/b&gt;')
+@make_italic := lambda func: (lambda *variable: '&lt;i&gt;' + func(*variable) + '&lt;/i&gt;')
+def say():
+    return &quot;Hello&quot;
+
+@make_bold
+@make_italic
+def say2():
+    return &quot;World&quot;
+
+print(say())
+print(say2())
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 76082534 Toothpick Anemone: </h3><h1>Problem</h1>
+<blockquote>
+<p>How do we make two decorators in Python that would do the following?</p>
+<pre><code>@make_bold
+@make_italic
+def say():
+    return &quot;Hello&quot;
+</code></pre>
+<p>Calling <code>say()</code> should return <code>&quot;&lt;b&gt;&lt;i&gt;Hello&lt;/i&gt;&lt;/b&gt;&quot;</code></p>
+</blockquote>
+<hr />
+<h1>Solution</h1>
+<hr />
+<p><strong><code>make_bold</code></strong></p>
+<pre class="lang-python prettyprint-override"><code>from functools import update_wrapper  
+
+class make_bold:
+
+    def __new__(cls, kallable):
+        instance = super().__new__(cls)
+        instance = update_wrapper(instance, kallable)
+        return instance
+
+    def __init__(self, kallable):
+        self._kallable = kallable
+        self._file     = sys.stdout
+
+    def __call__(self, *args, **kwargs):   
+        # `iret` ...... initial return value
+        # `oret` ...... output  return value
+        iret = self._kallable(*args, **kwargs)
+        oret = &quot;&lt;b&gt;&quot; + r + &quot;&lt;/b&gt;&quot;
+        
+    def __getattr__(self, attrname:str):  
+        return getattr(self._kallable, attrname) 
+</code></pre>
+<hr />
+<p><strong><code>make_italic</code></strong></p>
+<pre class="lang-python prettyprint-override"><code>from functools import update_wrapper  
+
+class make_italic:
+
+    def __new__(cls, kallable):
+        instance = super().__new__(cls)
+        instance = update_wrapper(instance, kallable)
+        return instance
+
+    def __init__(self, kallable):
+        self._kallable = kallable
+        self._file     = sys.stdout
+
+    def __call__(self, *args, **kwargs):   
+        # `iret` ...... initial return value
+        # `oret` ...... output  return value
+        iret = self._kallable(*args, **kwargs)
+        ret  = &quot;&quot;.join(str(x) for x in iret)
+        oret = &quot;&lt;i&gt;&quot; + ret + &quot;&lt;/i&gt;&quot;
+        
+    def __getattr__(self, attrname:str):  
+        return getattr(self._kallable, attrname) 
+</code></pre>
+<hr />
+<p>I added one additional line to <code>make_italic</code> to modify the value returned by the wrapped function.</p>
+<pre class="lang-python prettyprint-override"><code>ret = &quot;&quot;.join(str(x) for x in iret)
+</code></pre>
+<p>The line of code may or may not be useful to some people:</p>
+<pre class="lang-python prettyprint-override"><code>   ABOUT...         ret = &quot;&quot;.join(str(x) for x in iret)
+     +--------------+---------------------------+----------+
+     | non-standard |           input           |  output  |  
+     | notation     |                           |          |
+     | for          |                           |          |
+     | input        |                           |          |
+     | type         |                           |          |
+     +--------------+---------------------------+----------+
+     | string       | 'howdy'                   | 'howdy'  |
+     | tuple&lt;char&gt;  | ('h', 'o', 'w', 'd', 'y') | 'howdy'  |
+     | list&lt;char&gt;   | ['h', 'o', 'w', 'd', 'y'] | 'howdy'  |
+     | list&lt;string&gt; | ['ho', 'wdy']             | 'howdy'  |
+     | list&lt;int&gt;    | [1, 2, 3, 456]            | '123456' |
+     +--------------+---------------------------+----------+
+</code></pre>

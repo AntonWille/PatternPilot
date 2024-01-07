@@ -1,0 +1,371 @@
+ <h2> Title: Error installing mysql2: Failed to build gem native extension </h2> <h3> spacemonkey, question_id: 3608287 </h3>Score: 530, Tags: {mysql,ruby-on-rails,ruby,rubygems,mysql2} <br><p>I am having some problems when trying to install <code>mysql2</code> gem for Rails. When I try to install it by running <code>bundle install</code> or <code>gem install mysql2</code> it gives me the following error:</p>
+
+<blockquote>
+  <p>Error installing mysql2: ERROR: Failed to build gem native extension.</p>
+</blockquote>
+
+<p>How can I fix this and successfully install <code>mysql2</code>?</p>
+<h4> Comment 53687304 Lucio: </h4>In my case ruby 2.1 no error was shown but it freezed for several minutes. Spacemonkey answer fixed it.<br>------------------------------------------------------------------ <br><h3> Answer 6131858 Kelsin: </h3><p>I'm on a mac and use <a href="https://brew.sh/" rel="noreferrer">homebrew</a> to install open source programs. I did have to install mac Dev tools in order to install homebrew, but after that it was a simple:</p>
+
+<pre><code>brew install mysql
+</code></pre>
+
+<p>to install mysql. I haven't had a mysql gem problem since.</p>
+<h4> Comment 67248507 Chuck Batson: </h4>If this doesn&#39;t help, try <code>brew link mysql --force</code>.<br><h4> Comment 12913275 hnprashanth: </h4>I&#39;m getting error even after doing this. Should I pass some options when I do gem i mysql2 ??<br><h4> Comment 126411241 Swaathi Kakarla: </h4>@ChuckBatson Perfect it worked! I had mysql@5.7 installed so I just had to do <code>brew link mysql@5.7 --force</code><br><h4> Comment 14299778 KrisG: </h4>After running this I had no problems installing the mysql2 ruby gem on Mac OSX Lion.<br>------------------------------------------------------------------ <br><h3> Answer 3608756 spacemonkey: </h3><p>On Ubuntu/Debian and other distributions using aptitude:</p>
+
+<pre><code>sudo apt-get install libmysql-ruby libmysqlclient-dev
+</code></pre>
+
+<p>Package <code>libmysql-ruby</code> has been phased out and replaced by <code>ruby-mysql</code>. <a href="https://askubuntu.com/a/641953">This</a> is where I found the solution.</p>
+
+<p>If the above command doesn't work because <code>libmysql-ruby</code> cannot be found, the following should be sufficient:</p>
+
+<pre><code>sudo apt-get install libmysqlclient-dev
+</code></pre>
+
+<p>On Red Hat/CentOS and other distributions using yum:</p>
+
+<pre><code>sudo yum install mysql-devel
+</code></pre>
+
+<p>On Mac OS X with <a href="https://brew.sh/" rel="noreferrer">Homebrew</a>:</p>
+
+<pre><code>brew install mysql
+</code></pre>
+<h4> Comment 18173102 S.M.Mousavi: </h4>Hello,   I&#39;m using Ubuntu 12.04 with Ruby 1.9.3 and Rails 3.2.8 and in my case, installing <code>libmysqlclient-dev</code> was sufficient.<br><h4> Comment 6263789 femi: </h4>i have the same issue on windows 7..any ideas? the command above didnt work for me..<br><h4> Comment 21600249 Americo Savinon: </h4>If you are using Mac OSX: update to the latest version of XCode and install the Development Tools. I had the same mysql install issue (even when using the --with-mysql-config=/usr/local/mysql/bin/mysql_config )<br><h4> Comment 38535414 nitigyan: </h4>For windows try the Ticked answer from <a href="https://stackoverflow.com/questions/19014117/ruby-mysql2-gem-installation-on-windows-7/19023107#19023107" title="ruby mysql2 gem installation on windows 7">stackoverflow.com/questions/19014117/&hellip;</a><br><h4> Comment 27432795 Michael Lang: </h4>Did not need libmysql-ruby since I had installed Ruby via RVM<br><h4> Comment 25510658 vish: </h4>On centos, I also had to do this: yum install mysql mysql-server<br><h4> Comment 25895621 Green: </h4>I must admit it works. I&#39;m on Xubuntu 13.04 (but pure kubuntu-desktop) and ruby-2.0.0-p247, and after copy-paste-run the command I could <code>gem install mysql2</code> successfully. I&#39;m impressed. I had so much pain with that gem on Win XP, and managed to install it so easy on kubuntu. Why is it not as easy on Windows?<br><h4> Comment 26703381 Jona: </h4>Had the same problem, but <code>brew install mysql</code> wouldn&#39;t solve the issue. It still complained that some <code>mysql.h</code> file is missing. This answer solved it <a href="http://stackoverflow.com/a/17262871/723769">stackoverflow.com/a/17262871/723769</a><br><h4> Comment 31874836 Andrey Rudenko: </h4>In case you are trying to install GitLab, you&#39;ll need only <code>libmysqlclient-dev</code>.<br><h4> Comment 42657059 Ricardo Masao Shigeoka: </h4>I ran &quot;brew install mysql&quot;, and I still getting the same error when running bundle install. Anybody can help me?<br><h4> Comment 49469789 Satya Kalluri: </h4>&quot;sudo apt-get install libmysqlclient-dev&quot; worked for me. Thanks<br><h4> Comment 53223044 Anuj: </h4>For Windows, There is a libmysqlcient.dll/libmysqlclient-dev.dll file in Mysql/lib folder.  Copy that file and paste into where you installed your ruby i.e. Ruby1.9/lib  Hope this will work<br><h4> Comment 127898958 Aleksey Tsalolikhin: </h4>On Amazon Linux 2022 Preview (which is based on Fedora 34), I had to install &quot;mysql-community-devel&quot; package.<br>------------------------------------------------------------------ <br><h3> Answer 32869742 aruanoc: </h3><p><strong>Another way for MacOS users</strong></p>
+
+<p>If you used "brew" to install mysql:</p>
+
+<pre><code>gem install mysql2 -v 'x.x.x' -- --with-mysql-config=/usr/local/Cellar/mysql/y.y.y/bin/mysql_config
+</code></pre>
+
+<p>x.x.x = version of the mysql2 gem you want to install<br>
+y.y.y = the version of mysql you have installed <code>ls /usr/local/Cellar/mysql</code> to find it.</p>
+<h4> Comment 55591302 Stan: </h4>Tried ~10 answers from all sort of questions asked here... You solved it. Thanks :)<br>------------------------------------------------------------------ <br><h3> Answer 4772801 OfficeYA: </h3><p>I have several computers, 32 and 64 bits processor, they run on Ubuntu Linux, Maverick (10.10) release.</p>
+<p>I had the same problem, and for me, the
+<code>sudo apt-get install libmysql-ruby libmysqlclient-dev</code>
+did the job!!!</p>
+------------------------------------------------------------------ <br><h3> Answer 9317994 Francois: </h3><p><em>here is a solution for the <strong>windows users</strong>, hope it helps!</em></p>
+
+<h2>Using MySQL with Rails 3 on Windows</h2>
+
+<ul>
+<li><p><strong>Install railsinstaller</strong> -> <em>www.railsinstaller.org</em> (I installed it to c:\Rails)</p></li>
+<li><p><strong>Install MySQL</strong> (I used MySQL 5.5) -> <em>dev.mysql.com/downloads/installer/</em></p></li>
+</ul>
+
+<blockquote>
+  <p><strong>--- for mySQL installation ---</strong>
+  <br /><br /> If you dont already have <strong>these two files</strong> installed you might need them to get your MySQL going<br /><br />
+  vcredist_x86.exe -> <a href="http://www.microsoft.com/download/en/details.aspx?id=5555" rel="noreferrer">http://www.microsoft.com/download/en/details.aspx?id=5555</a>
+  dotNetFx40_Full_x86_x64.exe -> <a href="http://www.microsoft.com/download/en/details.aspx?id=17718" rel="noreferrer">http://www.microsoft.com/download/en/details.aspx?id=17718</a>
+  <br /><br />
+  Use default install
+  Developer Machine</p>
+  
+  <p><strong>-MySQL Server Config-</strong><br />
+  port: 3306<br />
+  windows service name: MySQL55<br />
+  mysql root pass: root (you can change this later)<br />
+  (username: root)<br />
+  <strong>-MySQL Server Config-</strong></p>
+  
+  <p><strong>--- for mySQL installation ---</strong></p>
+</blockquote>
+
+<p><br /></p>
+
+<blockquote>
+  <p><strong>--- Install the mysql2 Gem ---</strong><br /><br />
+  Important: <strong>Do this with Git Bash Command Line</strong>(this was installed with railsinstaller) -> start/Git Bash<br /><br />
+  <i><strong>gem install mysql2 -- '--with-mysql-lib="c:\Program Files\MySQL\MySQL Server 5.5\lib" --with-mysql-include="c:\Program Files\MySQL\MySQL Server 5.5\include"'</strong></i>
+  <br /><br>
+  Now the gem should have installed correctly
+  <br /><br>
+  Lastly copy the libmysql.dll file from<br />
+  C:\Program Files\MySQL\MySQL Server 5.5\lib<br />
+  to<br />
+  C:\Rails\Ruby1.9.2\bin<br /><br />
+  <strong>--- Install the mysql2 Gem ---</strong></p>
+</blockquote>
+
+<p><br />
+<em>You will now be able to use your Rails app with MySQL, if you are not sure how to create a Rails 3 app with MySQL read on...</em></p>
+
+<hr />
+
+<p><strong>--- Get a Rails 3 app going with MySQL ---</strong><br /><br />
+Open command prompt(not Git Bash) -> start/cmd<br />
+Navigate to your  folder (c:\Sites)<br />
+Create new rails app<br /></p>
+
+<pre><code>rails new world
+</code></pre>
+
+<p>Delete the file c:\Sites\world\public\index.html<br />
+Edit the file c:\Sites\world\config\routes.rb<br />
+add this line -> root :to => 'cities#index'<br /><br /></p>
+
+<p>Open command prompt (generate views and controllers)<br /></p>
+
+<pre><code>rails generate scaffold city ID:integer Name:string CountryCode:string District:string Population:integer
+</code></pre>
+
+<p><br /><br>
+Edit the file c:\Sites\world\app\models\city.rb to look like this</p>
+
+<pre><code>class City &lt; ActiveRecord::Base
+ set_table_name "city"
+end
+</code></pre>
+
+<p>Edit the file c:\Sites\world\config\database.yml to look like this</p>
+
+<pre><code>development:
+adapter: mysql2
+encoding: utf8
+database: world
+pool: 5
+username: root
+password: root
+socket: /tmp/mysql.sock
+</code></pre>
+
+<p>add to gemfile</p>
+
+<pre><code>gem 'mysql2'
+</code></pre>
+
+<p>Open <strong>command prompt</strong> windows cmd, not Git Bash(run your app!)<br />
+Navigate to your app folder (c:\Sites\world)<br /></p>
+
+<pre><code>rails s
+</code></pre>
+
+<p>Open your browser here -> <em><a href="http://localhost:3000" rel="noreferrer">http://localhost:3000</a></em></p>
+
+<p><strong>--- Get a Rails 3 app going with MySQL ---</strong></p>
+<h4> Comment 37599082 Mifeng: </h4>Using XAMPP: <code>gem install mysql2 -- --with-mysql-dir=C:\xampp\mysql</code><br><h4> Comment 42481429 Ivan: </h4>Look at path --with-mysql-include:  gem install mysql2 -- --platform=ruby --with-mysql-lib=&quot;d:\mariadb\lib&quot; --with-mysql-include=&quot;d:\mariadb\include\mysql&quot;<br><h4> Comment 43739216 O&#39;Mutt: </h4>@Mifeng worked great for me but i am using GitBash and needed <code>-- --with-mysql-dir=&quot;C:\xampp\mysql&quot;</code> without the quotes my `` were stripped. Thank you<br><h4> Comment 15760463 Danpe: </h4>Thanks, the problem was that i used widnows PowerShell and not normal command prompt. now it&#39;s working :)<br><h4> Comment 17863245 duykhoa: </h4>the host must be 127.0.0.1, and if the password is number, it must be put in quote ex &#39;123456&#39; otherwise we can type normally ex admin123<br>------------------------------------------------------------------ <br><h3> Answer 57450494 Allen: </h3><p>For <strong>MacOS Mojave</strong>:</p>
+
+<p><code>gem install mysql2 -v '0.5.2' -- --with-ldflags=-L/usr/local/opt/openssl/lib --with-cppflags=-I/usr/local/opt/openssl/include</code></p>
+<h4> Comment 109285918 Vlad: </h4>as well as for MacOS Catalina<br><h4> Comment 111281998 Akash Agarwal: </h4>Worked for the issue: <code>clang: error: linker command failed with exit code 1 (use -v to see invocation) make: *** [mysql2.bundle] Error 1</code>. Thanks!<br><h4> Comment 120267185 Pattu: </h4>I was stuck with this for hours. Only this solution worked.<br>------------------------------------------------------------------ <br><h3> Answer 59821664 Paa Yaw: </h3><p><strong>On Ubuntu(18.04)</strong></p>
+
+<p>i was able to solve this issue by running the following:</p>
+
+<pre><code>sudo apt-get install build-essential libmysqlclient-dev
+gem install mysql2
+</code></pre>
+
+<p><a href="https://forum.opennebula.org/t/solved-error-when-running-script-that-install-the-required-gems/7845" rel="noreferrer">reference</a></p>
+<h4> Comment 121300086 Rich Steinmetz: </h4>the thing that worked for me on Ubuntu 20.04<br>------------------------------------------------------------------ <br><h3> Answer 3608489 Jo&#227;o Pereira: </h3><p>Have you tried using</p>
+
+<pre><code> gem install mysql -- --with-mysql-lib=/usr/lib/mysql/lib 
+</code></pre>
+
+<p>to specify the location of thebase directory as well as the path to the MySQL libraries that are necessary to complete the gem installation?</p>
+
+<p>Sources:
+<a href="http://www.question-defense.com/2009/03/10/mysql-gem-install-error-failed-to-build-gem-native-extension" rel="noreferrer">MySQL Gem Install ERROR: Failed to build gem native extension</a>
+<a href="http://forums.mysql.com/read.php?116,157273,157273#msg-157273" rel="noreferrer">MySQL Forums :: Ruby :: Help needed with installing MySQL binding for Ruby</a></p>
+<h4> Comment 81002678 Joshua Pinter: </h4>Worked great. I had to use a different path, which I found by calling <code>which mysql</code> and then finding the <code>lib</code> directory from there.<br>------------------------------------------------------------------ <br><h3> Answer 7841500 Mark Locklear: </h3><p>If you are using yum try:</p>
+
+<pre><code>sudo yum install mysql-devel
+</code></pre>
+<h4> Comment 16347156 Lennon: </h4>It worked for me in an Amazon EC2 Micro Instance, CentOS based.<br>------------------------------------------------------------------ <br><h3> Answer 6990545 Carlos Pardilla: </h3><p>This solved my problem once in Windows:</p>
+
+<pre><code>subst X: "C:\Program files\MySQL\MySQL Server 5.5" 
+gem install mysql2 -v 0.x.x --platform=ruby -- --with-mysql-dir=X: --with-mysql-lib=X:\lib\opt 
+subst X: /D
+</code></pre>
+<h4> Comment 34351888 Junior Mayh&#233;: </h4>If your lib does not have opt folder: <code>gem install mysql2 --platform=ruby -- --with-mysql-dir=X: --without-opt-dir</code><br><h4> Comment 130626338 Mako212: </h4>This worked for me (a whole decade later!). This is the full install command that worked for me <code>gem install mysql2 -v 0.3.11 --platform=ruby -- --with-mysql-lib=X: --without-opt-dir</code>. And using MySQL Server 8.0<br><h4> Comment 8342789 Carlos Pardilla: </h4>I was about to post the source but I see user Ritesh Kumar has already done so. So his merit, not mine.<br>------------------------------------------------------------------ <br><h3> Answer 50612528 Ali: </h3><p>On Debian Stretch the package that worked for me was <strong>default-libmysqlclient-dev</strong></p>
+
+<p><code>sudo apt-get update &amp;&amp; apt-get install -y default-libmysqlclient-dev
+</code></p>
+------------------------------------------------------------------ <br><h3> Answer 56275163 Aurelio: </h3><p>In my case this helped:</p>
+
+<pre class="lang-sh prettyprint-override"><code>$ export LDFLAGS="-L/usr/local/opt/openssl/lib"
+$ export CPPFLAGS="-I/usr/local/opt/openssl/include"
+</code></pre>
+
+<p>Then:</p>
+
+<pre class="lang-sh prettyprint-override"><code>gem install mysql2 -v '0.5.2' --source 'https://rubygems.org/' -- --with-cppflags=-I/usr/local/opt/openssl/include --with-ldflags=-L/usr/local/opt/openssl/lib
+</code></pre>
+
+<p>Result:</p>
+
+<pre><code>Building native extensions with: '--with-cppflags=-I/usr/local/opt/openssl/include --with-ldflags=-L/usr/local/opt/openssl/lib'
+This could take a while...
+Successfully installed mysql2-0.5.2
+Parsing documentation for mysql2-0.5.2
+Installing ri documentation for mysql2-0.5.2
+Done installing documentation for mysql2 after 0 seconds
+1 gem installed
+</code></pre>
+
+<p><a href="https://qiita.com/HrsUed/items/ca2e0aee6a2402571cf6" rel="nofollow noreferrer">See this post</a> (WARNING: Japanese language inside).</p>
+------------------------------------------------------------------ <br><h3> Answer 5056114 santo101: </h3><p>I had this issue on Windows 7. This is apparently an incompatibility issue and the solution is as follows:</p>
+
+<p>Download the <code>libmySQL.dll</code> file from an older InstantRails installer. It is available from the <a href="https://github.com/drnic/instantrails/blob/master/InstantRails-win/InstantRails/mysql/bin/libmySQL.dll" rel="nofollow noreferrer">InstantRails GitHub repo</a>.</p>
+
+<p>Next, copy that file into your Ruby/bin folder.</p>
+
+<p>Now, you are good to go ;)</p>
+<h4> Comment 8339275 aakoch: </h4>Hrm. :(  I tried this but still get there error when trying to run <code>bundle install</code>.<br>------------------------------------------------------------------ <br><h3> Answer 18057091 capu: </h3><p><strong>If you are still having trouble….</strong></p>
+
+<p>Try installing </p>
+
+<pre><code>   sudo apt-get install ruby1.9.1-dev
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 3948925 arty: </h3><p>I got this error too. Solved by installing development packages. I'm using arch and it was:</p>
+
+<pre><code>sudo pacman -S base-devel
+</code></pre>
+
+<p>which installed:</p>
+
+<pre><code>m4, autoconf, automake, bison, fakeroot, flex, libmpc, ppl, cloog-ppl, elfutils, gcc,
+libtool, make, patch, pkg-config
+</code></pre>
+
+<p>but I think it actually needed make and gcc. Error output said (on my machine, among other):</p>
+
+<p>"You have to install development tools first."</p>
+
+<p>So it was an obvious decision and it helped.</p>
+------------------------------------------------------------------ <br><h3> Answer 34494473 vipin: </h3><p>You have to Install some dependencies</p>
+
+<pre><code>sudo apt-get install libmysql-ruby libmysqlclient-dev
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 67517222 Yonela Nuba: </h3><p>I can see most of the people have found the solution to this problem, this is mostly coused but not limited to missing packages, this happened to me after I have purged mysql and reinstalled it. I had to run this command in order to fix my problem:</p>
+<p><code>sudo apt-get install libmysqlclient-dev</code></p>
+<p>This command helped me fix my problem</p>
+------------------------------------------------------------------ <br><h3> Answer 3710632 lofte: </h3><p>I was running into this error on my mac and found that I needed to upgrade from mysql 32bit to mysql 64 bit to get this error to go away.  I was running OSX 10.6 on an intel macbook pro with ruby 1.9.2 and rails3.0.0 </p>
+
+<p>I also needed to install xcode in order to get unix utilities like "make" that are required to compile the gem.</p>
+
+<p>once this was done I was able to run gem install mysql and gem install mysql2 without error.</p>
+------------------------------------------------------------------ <br><h3> Answer 4678024 tobinjim: </h3><p>I got the gem built on Mac OS X 10.6.6 by
+1) Ensuring the Developer tools package is installed
+2) Downloading the current MySQL package (5.5.8 in my case) from Source
+3) Installing the cmake tool from cmake.org
+4) Following the instructions in section 2.11 of INSTALL-SOURCE from the mysql distribution files
+5) <code>sudo gem install mysql2 -- --srcdir=/usr/local/mysql/include</code>
+The gem built successfully, but there are two errors in the documentation that rdoc and ri complain about.
+But now when I try to require 'mysql2' I get a </p>
+
+<pre><code>LoadError: no such file to load -- mysql2/mysql2
+</code></pre>
+
+<p>I was hoping the error I would get was that the libmysqlclient.16.dylib couldn't be found because we figured that out in another post (search for install_name_tool).</p>
+
+<p>My $PATH has /usr/local/mysql in it (that's where my source and built files are located), so I'm a little stumped.  If anyone has any thoughts, I'll check back after a few hours of sleep.</p>
+------------------------------------------------------------------ <br><h3> Answer 31980262 Arman Ortega: </h3><p>For windows user:
+You set the lib and include path of your mysql, for instance, if youre using xampp you can have like this:</p>
+
+<pre><code>gem install mysql2 -- '--with-mysql-lib="C:\xampp\mysql\lib" --withmysql-include="C:\xampp\mysql\include"'
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 40923505 the12: </h3><p><strong>Solution only works on Mac OS X</strong></p>
+
+<p>If you've installed MySQL with homebrew, what worked for me was uninstalling MySQL, and installing MySQL Community Edition via the MySQL website (<a href="https://www.mysql.com/" rel="nofollow noreferrer">https://www.mysql.com/</a>). </p>
+
+<p>After installed, just re-enter the command to <code>gem install mysql2</code> or if necessary, <code>sudo gem install mysql2</code>, if you are getting permission denied problems. </p>
+------------------------------------------------------------------ <br><h3> Answer 69985685 Lane: </h3><p>According to <a href="https://github.com/brianmario/mysql2/issues/1175" rel="nofollow noreferrer">https://github.com/brianmario/mysql2/issues/1175</a> , I fixed it by</p>
+<pre class="lang-sh prettyprint-override"><code>gem install mysql2 -- \
+ --with-mysql-lib=/usr/local/Cellar/mysql/8.0.26/lib \
+ --with-mysql-dir=/usr/local/Cellar/mysql/8.0.26 \
+ --with-mysql-config=/usr/local/Cellar/mysql/8.0.26/bin/mysql_config \
+ --with-mysql-include=/usr/local/Cellar/mysql/8.0.26/include
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 76492302 FreePender: </h3><p>For M1 with Ventura:</p>
+<pre><code>gem install mysql2 -v '0.5.3' -- --with-mysql-config=$(brew --prefix mysql)/bin/mysql_config --with-ldflags=&quot;-L$(brew --prefix zstd)/lib -L$(brew --prefix openssl)/lib&quot; --with-cppflags=-I$(brew --prefix openssl)/include
+</code></pre>
+<p>Thanks to <a href="https://gist.github.com/fernandoaleman/385aad12a18fe50cf5fd1e988e76fd63" rel="nofollow noreferrer">https://gist.github.com/fernandoaleman/385aad12a18fe50cf5fd1e988e76fd63</a></p>
+------------------------------------------------------------------ <br><h3> Answer 6179736 Ritesh Kumar: </h3><p>If still getting error then follow the steps of mysql2 gem installation on Rails 3 on - </p>
+
+<p><a href="http://rorguide.blogspot.com/2011/03/installing-mysql2-gem-on-ruby-192-and.html" rel="nofollow">http://rorguide.blogspot.com/2011/03/installing-mysql2-gem-on-ruby-192-and.html</a></p>
+
+<p>where most of the user were able to install mysql2 gem.</p>
+------------------------------------------------------------------ <br><h3> Answer 8483760 mmell: </h3><p>After you get the mysql-dev issues corrected, you may need to remove the bad mysql2 install. Look carefully at the messages after $ bundle install. You may need to </p>
+
+<pre><code>rm -rf vendor/cache/
+rm -rf ./Zentest
+</code></pre>
+
+<p>This will clear out the bad mysql2 installation so that a final $ bundle install can create a good one.</p>
+------------------------------------------------------------------ <br><h3> Answer 12705704 Bruce: </h3><p>download the right version of mysqllib.dll then copy it to ruby bin really works for me. Follow this link plases <a href="https://stackoverflow.com/questions/8740868/mysql2-gem-compiled-for-wrong-mysql-client-library">mysql2 gem compiled for wrong mysql client library</a></p>
+------------------------------------------------------------------ <br><h3> Answer 14824376 Sunil D.: </h3><p>Got the "You have to install development tools first." error when trying to install the mysql2 gem <strong>after upgrading to Mac OS X Mountain Lion</strong>.  Apparently doing this upgrade removes the command line compilers.</p>
+
+<p>To fix:</p>
+
+<ul>
+<li>I uninstalled my very old version of Xcode (ran the uninstall script in /Developer/Library). Then deleted the /Developer directory.</li>
+<li>Went to the AppStore and downloaded Xcode.</li>
+<li>Launched Xcode and went into the Preferences -> Downloads, and installed the command line tools.</li>
+</ul>
+------------------------------------------------------------------ <br><h3> Answer 22491081 Amrit Dhungana: </h3><p>You are getting this problem because you have not install MySql. Before install mysql2 gem. Install MySQL. After that mysql2 gem will install. </p>
+------------------------------------------------------------------ <br><h3> Answer 26136240 Sony Mathew: </h3><p>I just wanted to add this answer specifically for <strong>Mac Users</strong>.</p>
+
+<p>My server was running perfectly fine until I updated my xcode. The while starting my rails server the error was shown like this</p>
+
+<pre><code>Gem::Installer::ExtensionBuildError: ERROR: Failed to build gem native extension.
+
+    /Users/user/.rvm/rubies/ruby-1.9.3-p448/bin/ruby extconf.rb --with-mysql-
+    checking for rb_thread_blocking_region()... /Users/user/.rvm/rubies/ruby-1.9.3-  
+    p448/lib/ruby/1.9.1/mkmf.rb:381:in `try_do': The compiler failed to generate an    
+    executable file. (RuntimeError)
+</code></pre>
+
+<p>And there was suggestion to install mysql2 gem at the end of the error message. So when i tried installing it I got the error as above mentioned in this question. The error I got is as follows </p>
+
+<pre><code>ERROR:  Error installing mysql2:
+ERROR: Failed to build gem native extension.
+</code></pre>
+
+<p>So as suggested in this post I tried 'brew install mysql' and that quitted saying that mysql version so and so already installed. But there was warning before it saying</p>
+
+<pre><code>Warning: You have not agreed to the Xcode license.
+Builds will fail! Agree to the license by opening Xcode.app or running:
+xcodebuild -license
+</code></pre>
+
+<p>Then I tried this <code>sudo xcodebuild -license</code> and type 'agree' at the end. You have to be root to agree to the license.</p>
+
+<p>After this, I again tried bundle install and then everything is working fine as normal. [ Even due to this xcode updation, I had problem with my tower also.]</p>
+------------------------------------------------------------------ <br><h3> Answer 49233197 Jerome: </h3><p><code>libmysql-ruby</code>  has been phased out and replaced.  New command:</p>
+
+<pre><code> sudo apt-get install ruby-mysql libmysqlclient-dev
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 69754764 Jean-Roch B.: </h3><p>Under ubuntu 20.04 LTS it's the only solution that have been working for me:</p>
+<pre><code>sudo apt-get install ruby-mysql2
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 73472546 John: </h3><p>An updated solution for Windows users.  I am running</p>
+<p><strong>Windows 10</strong></p>
+<p><strong>MySql 8.0.30</strong></p>
+<p><strong>Ruby 3.1.2</strong></p>
+<p>My Ruby version is the one from rubyinstaller.org with the MYSYS devkit included</p>
+<p>I downloaded a MariaDB C connector library msi installer file v3.1.17, ran it and it installed the relevant files in a directory in Program Files.  I copied that directory to another location, renamed it so that it didn't have any spaces and ran the command:</p>
+<pre><code>gem install mysql2 --platform=ruby -- --with-mysql-dir=&quot;c:/my-mariadb-connector-path-with-no-spaces&quot;
+</code></pre>
+<p>This gave me a functioning gem.</p>
+<p>This is a specific version of the library and not the most recent.  Finding your way around the download options on the MariaDB website is a bit confusing, so here is the direct download link.</p>
+<p><a href="https://dlm.mariadb.com/2319542/Connectors/c/connector-c-3.1.17/mariadb-connector-c-3.1.17-win64.msi" rel="nofollow noreferrer">https://dlm.mariadb.com/2319542/Connectors/c/connector-c-3.1.17/mariadb-connector-c-3.1.17-win64.msi</a></p>
+<p>Before I got to this point I'd tried several things which hadn't worked. I've included them below as background information, but if all you're interested in is a working solution then you can stop reading now.</p>
+<p>A few sources suggest that if you have the MYSYS devkit installed you can build the gem with the following command:</p>
+<pre><code>ridk exec gem install mysql2 --platform=ruby -- --use-system-libraries
+</code></pre>
+<p>This did not compile for me.</p>
+<p>You may also have seen a recommendation to download an archived version - 6.1 - of the MySQl connector library.  I tried this, the gem compiled, but when I tried to start my app I got an error message: &quot;Incorrect MySQL client library version! This gem was compiled for 6.1.11 but the client library is 10.5.5.&quot;</p>
+<p>In MySQL V8 and above the C library is no longer an optional extra but is included in the main installation.  I found the relevant files, copied them to a no spaces directory path and tried the usual command.  Again the gem compiled but the app wouldn't start.  This time the error message said that &quot;This gem was compiled for 8.0.30 but the client library is 10.5.5&quot;</p>
+<p>I also tried the latest version of of the MariaDB library.  With that the error message said that the gem was compiled for 10.6.8.  You need the specific version described above, and yes, it really is a MariaDB library you need even if you're using &quot;Original&quot; MySql as distributed by the Oracle Corporation</p>
+------------------------------------------------------------------ <br><h3> Answer 74041727 Ramshad: </h3><ol>
+<li><p>Download the connector C file from [here][1]. (https://downloads.mysql.com/archives/c-c/)</p>
+</li>
+<li><p>Extract the file to a location, like C:\ror\mysqlC\mysql-connector-c-6.1.11-winx64\lib</p>
+</li>
+<li><p>Use this template</p>
+</li>
+</ol>
+<p>gem install mysql2 -- '--with-mysql-lib=&quot;$<em>lib_location</em>&quot; --with-mysql-include=&quot;$<em>include_location</em>&quot;'</p>
+<p>eg: My installed location is <strong>lib_location</strong> -&gt;  C:\ror\mysqlC\mysql-connector-c-6.1.11-winx64\lib</p>
+<p><em>gem install mysql2 -- '--with-mysql-lib=&quot;C:\ror\mysqlC\mysql-connector-c-6.1.11-winx64\lib&quot; --with-mysql-include=&quot;C:\ror\mysqlC\mysql-connector-c-6.1.11-winx64\include&quot;'</em></p>

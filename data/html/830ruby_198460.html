@@ -1,0 +1,235 @@
+ <h2> Title: How to get a random number in Ruby </h2> <h3> Mark A. Nicolosi, question_id: 198460 </h3>Score: 830, Tags: {ruby-on-rails,ruby,ruby-on-rails-3,ruby-on-rails-4,random} <br><p>How do I generate a random number between <code>0</code> and <code>n</code>?</p>
+<h4> Comment 106719919 Purplejacket: </h4>Using <code>srand &lt;some_number&gt;</code> before writing <code>rand</code> code will give you a deterministic (i.e. repeatable) pseudo-random sequence, if you need that.  <a href="https://ruby-doc.org/core-2.5.6/Random.html#method-c-srand" rel="nofollow noreferrer">ruby-doc.org/core-2.5.6/Random.html#method-c-srand</a><br>------------------------------------------------------------------ <br><h3> Answer 198470 VonC: </h3><p>Use <a href="http://www.ruby-doc.org/core-2.1.3/Kernel.html#method-i-rand" rel="noreferrer"><code>rand(range)</code></a></p>
+
+<p>From <a href="http://www.codeodor.com/index.cfm/2007/3/25/Ruby-random-numbers/1042" rel="noreferrer">Ruby Random Numbers</a>:</p>
+
+<blockquote>
+  <p>If you needed a random integer to simulate a roll of a six-sided die, you'd use: <code>1 + rand(6)</code>. A roll in craps could be simulated with <code>2 + rand(6) + rand(6)</code>.</p>
+  
+  <p>Finally, if you just need a random float, just call <code>rand</code> with no arguments.</p>
+</blockquote>
+
+<hr>
+
+<p>As <a href="https://stackoverflow.com/users/8279/marc-andre-lafortune">Marc-André Lafortune</a> mentions in <a href="https://stackoverflow.com/questions/198460/how-to-get-a-random-number-in-ruby/2773866#2773866">his answer below (go upvote it)</a>, <a href="http://www.ruby-lang.org/en/news/2009/07/20/ruby-1-9-2-preview-1-released/" rel="noreferrer">Ruby 1.9.2 has its own <code>Random</code> class</a> (that Marc-André himself <a href="http://redmine.ruby-lang.org/issues/show/3104" rel="noreferrer">helped to debug</a>, hence the <a href="http://redmine.ruby-lang.org/versions/show/11" rel="noreferrer">1.9.2 target</a> for that feature).</p>
+
+<p>For instance, in this <a href="http://www.eggheadcafe.com/software/aspnet/35817496/random-integer-within-a-r.aspx" rel="noreferrer">game where you need to guess 10 numbers</a>, you can initialize them with:</p>
+
+<pre><code>10.times.map{ 20 + Random.rand(11) } 
+#=&gt; [26, 26, 22, 20, 30, 26, 23, 23, 25, 22]
+</code></pre>
+
+<p>Note: </p>
+
+<ul>
+<li><p>Using <code>Random.new.rand(20..30)</code> (using <code>Random.new</code>) generally would not be a good idea, as explained in detail (again) by <a href="https://stackoverflow.com/users/8279/marc-andre-lafortune">Marc-André Lafortune</a>, in <a href="https://stackoverflow.com/questions/198460/how-to-get-a-random-number-in-ruby/2773866#2773866">his answer</a> (again).</p></li>
+<li><p>But if you don't use <code>Random.new</code>, then the <a href="http://www.ruby-doc.org/core/classes/Random.src/M000693.html" rel="noreferrer">class method <code>rand</code></a> only takes a <code>max</code> value, not a <code>Range</code>, as <a href="https://stackoverflow.com/users/66725/banister">banister</a> (energetically) points out in the comment (and as documented in the <a href="http://www.ruby-doc.org/core/classes/Random.html" rel="noreferrer">docs for <code>Random</code></a>).  Only the <a href="http://www.ruby-doc.org/core/classes/Random.src/M000688.html" rel="noreferrer">instance method</a> can take a <code>Range</code>, as illustrated by <a href="https://stackoverflow.com/questions/5722881/generate-a-random-number-with-7-digits/5723105#5723105">generate a random number with 7 digits</a>.</p></li>
+</ul>
+
+<p>This is why the equivalent of <code>Random.new.rand(20..30)</code> would be <code>20 + Random.rand(11)</code>, since <code>Random.rand(int)</code> returns “a random integer greater than or equal to zero and <em>less than the argument</em>.” <code>20..30</code> includes 30, I need to come up with a random number between 0 and 11, excluding 11.</p>
+<h4> Comment 7633685 horseyguy: </h4>@VonC ah :) sorry if i was a bit harsh, it just surprised me<br><h4> Comment 2082750 Dan Rosenstark: </h4>Isn&#39;t this terribly non-ruby-like? I thought everything is an object, least-surprise and that...<br><h4> Comment 2807560 Marc-Andr&#233; Lafortune: </h4>@yar: It is a bit &quot;perlish&quot;. Now Ruby has it&#39;s Random class (see my answer)<br><h4> Comment 43906708 Ajedi32: </h4><code>Random.rand</code> <i>does</i> accept a range, actually. (Since 1.9.3, I believe.)<br><h4> Comment 85468640 Eric Duminil: </h4>@DanRosenstark: 8 years later... <code>method(:rand)</code> outputs <code>#&lt;Method: Object(Kernel)#rand&gt;</code>. So <code>rand</code> is a <code>Kernel</code> method, available to every <code>Object</code>. You can call <code>self.send(:rand, 0..10)</code> if it makes you feel better.<br><h4> Comment 51426466 digitalextremist: </h4>Link to game guessing 10 numbers is gone.<br><h4> Comment 7630961 horseyguy: </h4><code>Random.rand</code> does not accept a range, and so this code does not work: <code>Random.rand(20..30)</code>, I am running on 1.9.2p180.<br><h4> Comment 7631106 horseyguy: </h4>also the top-level <code>rand</code> method does not accept a range! how the heck did you get 74 points when your code is totally broken?!<br><h4> Comment 7631158 VonC: </h4>@banister: that is strange, according to the current implementation, it (i.e: <code>Random.rand</code>) should support Range: <a href="http://redmine.ruby-lang.org/projects/ruby-19/repository/entry/random.c#L1124" rel="nofollow noreferrer">redmine.ruby-lang.org/projects/ruby-19/repository/entry/&hellip;</a><br><h4> Comment 7632362 horseyguy: </h4>@VonC, im pretty sure that&#39;s the docs for the Random#rand <i>instance_method</i> you&#39;re looking at there ;). For some reason the Random.rand class method behaves differently to the Random#rand instance method in this case<br><h4> Comment 7633441 VonC: </h4>@banister: very good point (that &#39;<code>static</code>&#39; there through me off). I have edited the answer to reflect your remark. To answer your other question &quot;how the heck did you get 74 points when your code is totally broken?!&quot;, it is because up until less than a month ago, this answer contained &quot;<code>Random.new.rand(20..30)</code>, ie <i>instance</i> method <code>rand</code> ;) The recent edit in <a href="http://stackoverflow.com/questions/198460/how-to-get-a-random-number-in-ruby/2773866#2773866">Marc-Andr&#233;&#39;s answer</a> prompted me to update (a bit too quickly) that code in order to use the class method.<br>------------------------------------------------------------------ <br><h3> Answer 2773866 Marc-Andr&#233; Lafortune: </h3><p>While you can use <code>rand(42-10) + 10</code> to get a random number between <code>10</code> and <code>42</code> (where 10 is inclusive and 42 exclusive), there's a better way since Ruby 1.9.3, where you are able to call:</p>
+
+<pre><code>rand(10...42) # =&gt; 13
+</code></pre>
+
+<p>Available for all versions of Ruby by requiring my <a href="http://github.com/marcandre/backports" rel="noreferrer"><code>backports</code></a> gem.</p>
+
+<p>Ruby 1.9.2 also introduced the <code>Random</code> class so you can create your own random number generator objects and has a nice API:</p>
+
+<pre><code>r = Random.new
+r.rand(10...42) # =&gt; 22
+r.bytes(3) # =&gt; "rnd"
+</code></pre>
+
+<p>The <code>Random</code> class itself acts as a random generator, so you call directly:</p>
+
+<pre><code>Random.rand(10...42) # =&gt; same as rand(10...42)
+</code></pre>
+
+<p><strong><em>Notes on <code>Random.new</code></em></strong></p>
+
+<p>In most cases, the simplest is to use <code>rand</code> or <code>Random.rand</code>. Creating a new random generator each time you want a random number is a <em>really bad idea</em>. If you do this, you will get the random properties of the initial seeding algorithm which are atrocious compared to the properties of the <a href="http://en.wikipedia.org/wiki/Mersenne_twister" rel="noreferrer">random generator itself</a>.</p>
+
+<p>If you use <code>Random.new</code>, you should thus call it <em>as rarely as possible</em>, for example once as <code>MyApp::Random = Random.new</code> and use it everywhere else.</p>
+
+<p>The cases where <code>Random.new</code> is helpful are the following:</p>
+
+<ul>
+<li>you are writing a gem and don't want to interfere with the sequence of <code>rand</code>/<code>Random.rand</code> that the main programs might be relying on</li>
+<li>you want separate reproducible sequences of random numbers (say one per thread)</li>
+<li>you want to be able to save and resume a reproducible sequence of random numbers (easy as <code>Random</code> objects can marshalled)</li>
+</ul>
+<h4> Comment 2807717 VonC: </h4>Excellent! +1. I have completed my own answer to reflect that new feature (and mentioning your contribution with Bug #3104 ;) ).<br><h4> Comment 2808289 Marc-Andr&#233; Lafortune: </h4>@yar: My <code>backports</code> gem is simply a collection of methods that are new to RUby 1.8.7, 1.9.1, 1.9.2, but implemented in Ruby. I use RubySpec to insure that the results are compatible with Ruby.<br><h4> Comment 7630939 horseyguy: </h4><code>Random.rand(10..42)</code> does not work. The <code>Random.rand</code> class method does not accept a range. (Ruby 1.9.2p180)<br><h4> Comment 7637036 Marc-Andr&#233; Lafortune: </h4>@banister: wow, I was convinced that the new api (rand with range, bytes, etc...) was available directly through the Random object. rand with range will be in 1.9.3, and I&#39;ll make a feature request for bytes. I&#39;ve edited my answer<br><h4> Comment 7486850 Marc-Andr&#233; Lafortune: </h4>@Juanda: Actually my example is in two lines because it&#39;s a terrible idea to call <code>Random.new</code> all the time. I&#39;ve edited my answer<br><h4> Comment 2808735 Dan Rosenstark: </h4>@Marc-Andr&#233; Lafortune, thanks for that. It&#39;s always been strange to me how much of Ruby is implemented in non-Ruby (C or whatever) due to speed requirements. But them&#39;s the breaks<br><h4> Comment 2809051 Marc-Andr&#233; Lafortune: </h4>@yar: Until there is a really good implementation of Ruby, the builtin Random class will perform much better than my compatible Ruby version... It&#39;s the goal of Rubinius to minimize the C++ code without a big loss of performance.<br><h4> Comment 2809620 Dan Rosenstark: </h4>@Marc-Andr&#233; Lafortune, while we&#39;re here: is JRuby not a good implementation? I could be totally off-base and you&#39;ll say, &quot;no it&#39;s the worst of all.&quot;<br><h4> Comment 2809893 Marc-Andr&#233; Lafortune: </h4>@yar: It is! But the mersenne twister in Ruby will spend most of the time in function calls and very little time doing the basic calculations. By a good implementation, I meant one that could inline those dynamic calls very well (which I don&#39;t think the JVM can do). Rubinius aims to do that. I haven&#39;t done any performance testing, though, so I&#39;m speculating :-)<br><h4> Comment 2809946 Dan Rosenstark: </h4>Rubinius, eh? I&#39;ll keep my eye on that one, I see it&#39;s right in line with what we&#39;re talking about. Fascinating in any case... thanks for the chat.<br><h4> Comment 4426439 Juanda: </h4>Shorter version would be  Random.new.rand(0..100)<br>------------------------------------------------------------------ <br><h3> Answer 11578224 Thomas Fankhauser: </h3><p>If you're not only seeking for a number but also hex or uuid it's worth mentioning that the <code>SecureRandom</code> module found its way from <code>ActiveSupport</code> to the ruby core in 1.9.2+. So without the need for a full blown framework:</p>
+
+<pre><code>require 'securerandom'
+
+p SecureRandom.random_number(100) #=&gt; 15
+p SecureRandom.random_number(100) #=&gt; 88
+
+p SecureRandom.random_number #=&gt; 0.596506046187744
+p SecureRandom.random_number #=&gt; 0.350621695741409
+
+p SecureRandom.hex #=&gt; "eb693ec8252cd630102fd0d0fb7c3485"
+</code></pre>
+
+<p>It's documented here: <a href="http://rubydoc.info/stdlib/securerandom/1.9.3/SecureRandom" rel="noreferrer">Ruby 1.9.3 - Module: SecureRandom (lib/securerandom.rb) </a></p>
+<h4> Comment 63506820 Jesse Farmer: </h4>Random.rand(1000..9999)<br><h4> Comment 51715898 JayTarka: </h4>onurozgurozkan I presume <code>SecureRandom.random_number(1000..9999)</code><br><h4> Comment 54543824 mwp: </h4><code>SecureRandom.random_number()</code> doesn&#39;t take a range, so no. You would probably want something like <code>SecureRandom.random_number(10_000)</code> (for 0-9999) or <code>SecureRandom.random_number(9_000)+1_000</code> (for 1000-9999).<br><h4> Comment 32464054 onurozgurozkan: </h4>What about if you need 4 digits random number?<br>------------------------------------------------------------------ <br><h3> Answer 13847818 user1389938: </h3><p>You can generate a random number with the <code>rand</code> method. The argument passed to the <code>rand</code> method should be an <code>integer</code> or a <code>range</code>, and returns a corresponding random number within the range:</p>
+
+<pre><code>rand(9)       # this generates a number between 0 to 8
+rand(0 .. 9)  # this generates a number between 0 to 9
+rand(1 .. 50) # this generates a number between 1 to 50
+#rand(m .. n) # m is the start of the number range, n is the end of number range
+</code></pre>
+<h4> Comment 37324249 isomorphismes: </h4>I think using your <code>rand(1..6)</code> reads clearer than the top answer&#39;s <code>rand(6)+1</code>.<br>------------------------------------------------------------------ <br><h3> Answer 198469 Mark A. Nicolosi: </h3><p>Well, I figured it out. Apparently there is a builtin (?) function called rand:</p>
+
+<pre><code>rand(n + 1)
+</code></pre>
+
+<p>If someone answers with a more detailed answer, I'll mark that as the correct answer.</p>
+<h4> Comment 74895 Christoph Schiessl: </h4>Yes, it&#39;s builtin in the Kernel module.<br>------------------------------------------------------------------ <br><h3> Answer 10714301 Rimian: </h3><p>What about this?</p>
+
+<pre><code>n = 3
+(0..n).to_a.sample
+</code></pre>
+<h4> Comment 71981015 Travis: </h4>It should be noted that generating an array of numbers like this solution provides has terrible performance on large ranges as it&#39;s O(n) while <code>rand</code> is O(1).<br>------------------------------------------------------------------ <br><h3> Answer 28614573 sqrcompass: </h3><p>Simplest answer to the question:</p>
+
+<pre><code>rand(0..n)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 13408086 Josh: </h3><pre><code>rand(6)    #=&gt; gives a random number between 0 and 6 inclusively 
+rand(1..6) #=&gt; gives a random number between 1 and 6 inclusively
+</code></pre>
+
+<p>Note that the range option is only available in newer(1.9+ I believe) versions of ruby.</p>
+<h4> Comment 19098609 Batkins: </h4>I believe the range option is only available in <code>ruby 1.9.3+</code>.  It didn&#39;t work in <code>1.9.2</code> when I tried at least.<br>------------------------------------------------------------------ <br><h3> Answer 41675944 techdreams: </h3><p>You can simply use <code>random_number</code>.</p>
+
+<p>If a positive integer is given as n, <code>random_number</code> returns an integer: 0 &lt;= <code>random_number</code> &lt; n.</p>
+
+<p>Use it like this:</p>
+
+<pre><code>any_number = SecureRandom.random_number(100) 
+</code></pre>
+
+<p>The output will be any number between 0 and 100.</p>
+------------------------------------------------------------------ <br><h3> Answer 36936006 sumit: </h3><p>range = 10..50</p>
+
+<p><strong>rand(range)</strong></p>
+
+<p>or</p>
+
+<p><strong>range.to_a.sample</strong></p>
+
+<p>or</p>
+
+<p><strong>range.to_a.shuffle</strong>(this will shuffle whole array and you can pick a random number by first or last or any from this array to pick random one)</p>
+<h4> Comment 99092809 Greg: </h4><code>range.to_a.sample</code> is an awful idea when the sample is big.<br>------------------------------------------------------------------ <br><h3> Answer 32161641 Scott: </h3><p>you can do rand(range)</p>
+
+<pre><code>x = rand(1..5)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 20764761 Sam: </h3><p>This link is going to be helpful regarding this;</p>
+
+<p><a href="http://ruby-doc.org/core-1.9.3/Random.html" rel="nofollow">http://ruby-doc.org/core-1.9.3/Random.html</a></p>
+
+<p><strong>And some more clarity below over the random numbers in ruby;</strong></p>
+
+<p>Generate an integer from 0 to 10</p>
+
+<pre><code>puts (rand() * 10).to_i
+</code></pre>
+
+<p>Generate a number from 0 to 10
+In a more readable way</p>
+
+<pre><code>puts rand(10)
+</code></pre>
+
+<p>Generate a number from 10 to 15
+Including 15</p>
+
+<pre><code>puts rand(10..15)
+</code></pre>
+
+<p><strong>Non-Random Random Numbers</strong></p>
+
+<p>Generate the same sequence of numbers every time
+the program is run</p>
+
+<pre><code>srand(5)
+</code></pre>
+
+<p>Generate 10 random numbers</p>
+
+<pre><code>puts (0..10).map{rand(0..10)}
+</code></pre>
+<h4> Comment 31120639 Sam: </h4>Also you can follow this blog for step by step very clear picture over random nos in ruby; <a href="http://www.sitepoint.com/tour-random-ruby/" rel="nofollow noreferrer">sitepoint.com/tour-random-ruby</a><br>------------------------------------------------------------------ <br><h3> Answer 42270685 Vaisakh VM: </h3><p>Easy way to get random number in ruby is,</p>
+
+<pre><code>def random    
+  (1..10).to_a.sample.to_s
+end
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 35942168 amarradi: </h3><p>Maybe it help you. I use this in my app</p>
+
+<pre><code>https://github.com/rubyworks/facets
+class String
+
+  # Create a random String of given length, using given character set
+  #
+  # Character set is an Array which can contain Ranges, Arrays, Characters
+  #
+  # Examples
+  #
+  #     String.random
+  #     =&gt; "D9DxFIaqR3dr8Ct1AfmFxHxqGsmA4Oz3"
+  #
+  #     String.random(10)
+  #     =&gt; "t8BIna341S"
+  #
+  #     String.random(10, ['a'..'z'])
+  #     =&gt; "nstpvixfri"
+  #
+  #     String.random(10, ['0'..'9'] )
+  #     =&gt; "0982541042"
+  #
+  #     String.random(10, ['0'..'9','A'..'F'] )
+  #     =&gt; "3EBF48AD3D"
+  #
+  #     BASE64_CHAR_SET =  ["A".."Z", "a".."z", "0".."9", '_', '-']
+  #     String.random(10, BASE64_CHAR_SET)
+  #     =&gt; "xM_1t3qcNn"
+  #
+  #     SPECIAL_CHARS = ["!", "@", "#", "$", "%", "^", "&amp;", "*", "(", ")", "-", "_", "=", "+", "|", "/", "?", ".", ",", ";", ":", "~", "`", "[", "]", "{", "}", "&lt;", "&gt;"]
+  #     BASE91_CHAR_SET =  ["A".."Z", "a".."z", "0".."9", SPECIAL_CHARS]
+  #     String.random(10, BASE91_CHAR_SET)
+  #      =&gt; "S(Z]z,J{v;"
+  #
+  # CREDIT: Tilo Sloboda
+  #
+  # SEE: https://gist.github.com/tilo/3ee8d94871d30416feba
+  #
+  # TODO: Move to random.rb in standard library?
+
+  def self.random(len=32, character_set = ["A".."Z", "a".."z", "0".."9"])
+    chars = character_set.map{|x| x.is_a?(Range) ? x.to_a : x }.flatten
+    Array.new(len){ chars.sample }.join
+  end
+
+end
+</code></pre>
+
+<p><a href="https://github.com/rubyworks/facets/blob/5569b03b4c6fd25897444a266ffe25872284be2b/lib/core/facets/string/random.rb" rel="nofollow">https://github.com/rubyworks/facets/blob/5569b03b4c6fd25897444a266ffe25872284be2b/lib/core/facets/string/random.rb</a></p>
+
+<p>It works fine for me</p>
+------------------------------------------------------------------ <br><h3> Answer 35942797 Juan Dela Cruz: </h3><p>How about this one?</p>
+
+<pre><code>num = Random.new
+num.rand(1..n)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 198486 Liebach: </h3><p>Don't forget to seed the RNG with <em>srand()</em> first.</p>
+<h4> Comment 2164872 Julian H: </h4>srand is automatically called with the seed being from the current time if it wasn&#39;t already called.<br><h4> Comment 83699 Alex B: </h4>What happens if you don&#39;t call srand()?<br>------------------------------------------------------------------ <br><h3> Answer 28115646 LuckyElf: </h3><p>Try <code>array#shuffle</code> method for randomization</p>
+
+<pre><code>array = (1..10).to_a
+array.shuffle.first
+</code></pre>
+<h4> Comment 102405488 Camille Goudeseune: </h4>If you <i>must</i> make an entire array, at least replace <code>.shuffle.first</code> with <code>.sample</code>!<br>------------------------------------------------------------------ <br><h3> Answer 75150559 Sachin Singh: </h3><p>You can use ruby <a href="https://apidock.com/ruby/Random/rand" rel="nofollow noreferrer">rand</a> method for this like below:</p>
+<pre><code>rand(n+1)
+</code></pre>
+<p>You need to use <code>n+1</code> as the rand method returns any random number greater than or equal to 0 but less than the passed parameter value.</p>

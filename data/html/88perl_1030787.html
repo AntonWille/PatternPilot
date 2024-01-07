@@ -1,0 +1,167 @@
+ <h2> Title: Multiline search replace with Perl </h2> <h3> user44556, question_id: 1030787 </h3>Score: 88, Tags: {perl} <br><p>I know this kind of questions have been asked already many times before. The reason why I come here again is that I feel like I've missed something simple and fundamental.</p>
+
+<p>Is it possible to make this kind of search-replace routine better. For example without opening same file twice. Also speed related advices are welcome.</p>
+
+<p>Please notice that this works with multiline matches and replaces also multiline strings.</p>
+
+<pre><code>#!/bin/perl -w -0777
+
+local $/ = undef;
+
+open INFILE, $full_file_path or die "Could not open file. $!";
+$string =  &lt;INFILE&gt;;
+close INFILE;
+
+$string =~ s/START.*STOP/$replace_string/sm;
+
+open OUTFILE, "&gt;", $full_file_path or die "Could not open file. $!";
+print OUTFILE ($string);
+close OUTFILE;
+</code></pre>
+<h4> Comment 113076522 Joshua Goldberg: </h4>I gravitate towards general solutions, but I sometimes need to be reminded that for something like this it can be (and was, today!) worth trying it in an IDE (e.g,. IntellJ&#39;s Find In Project + Find-and-Replace) versus the ramp-up, trial-and-error, and checking afterwards for a scripting solution.<br><h4> Comment 840906 Nathan Fellman: </h4>It seems like you&#39;re trying to edit the file in place.  That is, open it for reading as well as for writing.  Is that correct?<br><h4> Comment 840938 user44556: </h4>Yes, editing file in place. That&#39;s the most common use case for me.<br>------------------------------------------------------------------ <br><h3> Answer 1030819 aks: </h3><p>This kind of search and replace can be accomplished with a one-liner such as -</p>
+
+<pre><code>perl -i -pe 's/START.*STOP/replace_string/g' file_to_change
+</code></pre>
+
+<p>For more ways to accomplish the same thing check out this <a href="https://stackoverflow.com/questions/934733/perl-loop-through-a-file-and-substitute">thread</a>. To handle multi-line searches use the following command - </p>
+
+<pre><code>perl -i -pe 'BEGIN{undef $/;} s/START.*STOP/replace_string/smg' file_to_change
+</code></pre>
+
+<p>In order to convert the following code from a one-liner to a perl program have a look at the <a href="http://perldoc.perl.org/perlrun.html" rel="noreferrer">perlrun documentation</a>.</p>
+
+<p>If you really find the need to convert this into a working program then just let Perl handle the file opening/closing for you.</p>
+
+<pre><code>#!/usr/bin/perl -pi
+#multi-line in place substitute - subs.pl
+use strict;
+use warnings;
+
+BEGIN {undef $/;}
+
+s/START.*STOP/replace_string/smg;
+</code></pre>
+
+<p>You can then call the script with the filename as the first argument</p>
+
+<pre><code>$perl subs.pl file_to_change
+</code></pre>
+
+<p>If you want a more meatier script where you get to handle the file open/close operations(don't we love all those 'die' statements) then have a look at the example in perlrun under the -i[extension] switch.</p>
+<h4> Comment 10271855 zbyszek: </h4>Even shorter version: <code>perl -i -p0e &#39;s&#47;START.*STOP&#47;replace_string&#47;smg&#39; file_to_change</code> (<code>-0</code> sets the line separator to nul).<br><h4> Comment 48933780 JBENOIT: </h4>For those who want to know what is <code>undef $&#47;;</code>. It is called <i>&quot;slurp mode&quot;</i>. More information <a href="http://perlmaven.com/slurp" rel="nofollow noreferrer">here</a>.<br><h4> Comment 6667584 aks: </h4>START and STOP are the start and end, respectively, of the regular expression you are trying to match. By undef&#39;ing the input-record separator(&#39;$/&#39;) we effectively get Perl to slurp in the entire file at once into $_ thereby enabling us to do multi-line substitutions.<br><h4> Comment 841027 aks: </h4>Check the edit, the BEGIN block now ensures that this works on multi-line matches too.<br><h4> Comment 841377 user44556: </h4>Alright, can it be written as perl code (not in one-liner)? I want to know that what happens to file opening/writing routines.<br><h4> Comment 82007758 Beejor: </h4>@Petr Check out the comments above yours.<br><h4> Comment 122394996 caw: </h4>(Note the <code>-0777</code> option at the top of the code in the question, which makes this work.)<br><h4> Comment 6570100 algo-geeks: </h4>@muteW can please make it clear what should i do for matching multi-line pattern in perl and what is start and stop here .please reply soon.<br><h4> Comment 840926 user44556: </h4>How do you convert this one liner to actual perl code? Does it get ugly?<br><h4> Comment 841462 Hynek -Pichi- Vychodil: </h4>regexp /START.*STOP/smg will not match more than once.<br><h4> Comment 842145 aks: </h4>Hynek, by not match more than &quot;once&quot; I assume you state that because of the greedy * operator. I left it in just so that once the OP realises the need for *? he/she will have the /g extension ready.<br>------------------------------------------------------------------ <br><h3> Answer 47525973 Beejor: </h3><p>Pulling the short answer from the comments, for anyone looking for a quick one-liner, and the reason Perl is ignoring their RegEx options from the command line.</p>
+
+<p><code>perl -0pe 's/search/replace/gms' file</code></p>
+
+<p>Without the <code>-0</code> argument, Perl processes data <a href="https://perlmaven.com/slurp" rel="noreferrer">line-by-line</a>, which causes multiline searches to fail.</p>
+<h4> Comment 92861730 Andreas H.: </h4>For me the 0-switch was the crucial thing. Thanks and +1<br><h4> Comment 85446535 ederag: </h4>Perfect. And if it does not seem to work, try with <code>\R</code> (matches all kinds of end of line) instead of <code>\n</code>.<br><h4> Comment 108303723 Princekin: </h4><code>perl -0777 -i -pe &#39;s&#47;search&#47;replace&#47;&#39;  1.h</code> work for me on macosx<br><h4> Comment 126668011 Martian2020: </h4>on perls I worked, <code>.</code> does not not include <code>\n</code>, so I had to use <code>[\s\S]*</code>. I wonder why nobody here mentioned it.<br>------------------------------------------------------------------ <br><h3> Answer 1030991 Nathan Fellman: </h3><p>Considering that you slurp in the whole contents of the file with:</p>
+
+<pre><code>local $/ = undef;
+
+open INFILE, $full_file_path or die "Could not open file. $!";
+$string =  &lt;INFILE&gt;;
+close INFILE;
+</code></pre>
+
+<p>And then do all the processing with <code>$string</code>, there's no connection between how you handle the file and how you process the contents.  You'd have an issue if you opened the file for writing before you were done reading it, since opening a file for writing creates a new file, discarding the previous contents.</p>
+
+<p>If all you're trying to do is save on open/close statements, then do as <a href="https://stackoverflow.com/questions/1030787/multiline-search-replace-with-perl/1030804#1030804">Jonathan Leffer suggested</a>.  If your question is about multiline search and replace, then please clarify what the problem is.</p>
+<h4> Comment 841366 user44556: </h4>It&#39;s about generic multiline search and replace. Is it really fine that I open the same file pointer again even if the file is very huge? In one-liners there seem to be no need to open same file twice. I&#39;m still missing something here. Maybe I should see Jonathan&#39;s example in practice.<br><h4> Comment 841533 Nathan Fellman: </h4>creating a file handler has nothing to do with the file&#39;s size.  It&#39;s just a pointer.  The act of opening a file doesn&#39;t imply reading its contents.<br><h4> Comment 841593 user44556: </h4>I think this is somewhere near my misunderstanding. How to open the same file once for both reading and writing when reading means the necessary operation of going it through to find possible matches?<br><h4> Comment 842176 Nathan Fellman: </h4>you have to read it once and only once.  When you open it for writing you&#39;re not reading it at all.  It doesn&#39;t matter how big the file was before you opened it for writing because you&#39;re discarding all of that anyway.<br>------------------------------------------------------------------ <br><h3> Answer 57384414 Tilo: </h3><p>you might want to check out my Perl script, which is battle tested (used heavily in production), and has quite a lot of features, such as:</p>
+
+<ul>
+<li>do multiple search-replace or query-search-replace operations</li>
+<li>search-replace expressions can be given on the command line or read from a file
+processes multiple input files</li>
+<li>recursively descend into directory and do multiple search/replace operations on all files</li>
+<li>user defined perl expressions are applied to each line of each input file
+optionally run in paragraph mode (for multi-line search/replace)</li>
+<li>interactive mode</li>
+<li>batch mode</li>
+<li>optionally backup files and backup numbering</li>
+<li>preserve modes/owner when run as root</li>
+<li>ignore symbolic links, empty files, write protected files, sockets, named pipes, and directory names</li>
+<li>optionally replace lines only matching / not matching a given regular expression</li>
+</ul>
+
+<p><a href="https://github.com/tilo/replace_string" rel="nofollow noreferrer">https://github.com/tilo/replace_string</a></p>
+<h4> Comment 122936809 Lou: </h4>-1 This is not an answer as you&#39;ve not told OP how to solve the problem, but just pointed to your code instead. If you explained the key bit of your code that solves OP&#39;s query, that would be a better answer.<br><h4> Comment 122954365 Tilo: </h4>@Lou I provided a more general tool, that is also using Perl. Did you look at it&#39;s source code? you might find the answer there.. ;) Given that there is a handy tool for doing multi-file search/replace operations, it is better to use that, instead of trying to code it &quot;by hand&quot;<br><h4> Comment 122954793 Lou: </h4>That would be fine if you explained in the answer how your general solution solves the problem. Links (or repositories) can break, then future readers are none the wiser as to how your general solution helps anyone to do multiline search+replaces. See also: <a href="https://meta.stackexchange.com/q/225370/257825">Your answer is in another castle</a> and <a href="https://meta.stackexchange.com/a/8259/257825">this answer</a> to a similar question.<br>------------------------------------------------------------------ <br><h3> Answer 70405661 Yordan Georgiev: </h3><p>the combination of bash script + perl -pi -e is unbeatable - an example of bash function to directly type the search and replace strings before the EOF label :</p>
+<pre><code># usage put into foobar.sh file, source foobar.sh file
+# call directly into the shell do_multiline_srch_and_replace
+do_multiline_srch_and_replace(){
+
+                test -z $dir_to_work &amp;&amp; {
+         echo &quot;You must export dir_to_work=&lt;&lt;the-dir&gt;&gt; - it is empty !!!&quot;; exit 1;
+      }
+                test -d $dir_to_work || {
+         echo &quot;The dir to work on: \&quot;$dir_to_work\&quot; is not a dir !!!&quot;; exit 1;
+      }
+
+                echo &quot;INFO dir_to_work: $dir_to_work&quot; ; sleep 1
+                echo &quot;INFO START :: searching and replacing in the non-binary files only&quot;
+
+                while read -r file ; do (
+                        echo &quot;DEBUG working on the following file: $file&quot;
+
+         # those pattern in the file names we want to skip usually - git, not , py files
+         case &quot;$file&quot; in
+            *.git*)
+            continue ;;
+            *node_modules*)
+            continue ;;
+            *.venv*)
+            continue ;;
+         esac
+         # note the string should be exactly between the s|| and the replace str between the ||gs
+         # the 'EOF' guarantees that no special chars from the shell will affect the result
+                        perl -pi - &lt;&lt;'EOF' &quot;$file&quot;
+BEGIN{undef $/;}
+s|a multiline
+string|the multiline
+string to replace|gs
+EOF
+                );
+                done &lt; &lt;(find $dir_to_work -type f -not -exec file {} \; | grep text | cut -d: -f1)
+
+                echo &quot;INFO STOP  :: search and replace in non-binary files&quot;
+
+}
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 75836129 user3008410: </h3><p>I know this has been answered but this is how I managed to solve this.</p>
+<p>Let's say you wanted to change out a UUID but there must be a match on the line above because you have many UUID's that belong to other things.</p>
+<p>perl call in a bash script in Ubuntu 20:</p>
+<pre><code>_UUID=$(uuidgen | sed 's/-//g')
+export _UUID
+perl -0777 -pi.back -e 's/(&lt;stringProp\sname=&quot;Argument\.name&quot;&gt;_BINARYVIDEOTEMPURL&lt;\/stringProp&gt;\n.*&lt;stringProp\sname=&quot;Argument\.value&quot;&gt;)[a-zA-Z0-9]{32}(&lt;\/stringProp&gt;)/$1$ENV{_UUID}$2/g;' test.txt
+</code></pre>
+<p>Your test.txt file reads like so:  (not a valid XML I know but just create it)</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt; &lt;jmeterTestPlan version=&quot;1.2&quot; properties=&quot;5.0&quot; jmeter=&quot;5.2.1&quot;&gt;
+  &lt;hashTree&gt;
+&lt;TestPlan guiclass=&quot;TestPlanGui&quot; testclass=&quot;TestPlan&quot; testname=&quot;K8S Load Test Plan&quot; enabled=&quot;true&quot;&gt;      
+  &lt;stringProp name=&quot;TestPlan.user_define_classpath&quot;&gt;&lt;/stringProp&gt;
+&lt;/TestPlan&gt;
+      &lt;collectionProp name=&quot;Arguments.arguments&quot;&gt;
+        &lt;elementProp name=&quot;_SESSIONID&quot; elementType=&quot;Argument&quot;&gt;
+          &lt;stringProp name=&quot;Argument.name&quot;&gt;_SESSIONID&lt;/stringProp&gt;
+          &lt;stringProp name=&quot;Argument.value&quot;&gt;7c096b65-84b6-40c9-be93-a5891ec0394d&lt;/stringProp&gt;
+          &lt;stringProp name=&quot;Argument.metadata&quot;&gt;=&lt;/stringProp&gt;
+        &lt;/elementProp&gt;
+        &lt;elementProp name=&quot;_BINARYVIDEOTEMPURL&quot; elementType=&quot;Argument&quot;&gt;
+          &lt;stringProp name=&quot;Argument.name&quot;&gt;_BINARYVIDEOTEMPURL&lt;/stringProp&gt;
+          &lt;stringProp name=&quot;Argument.value&quot;&gt;64e1886127fa41c4a58e59fe2bb098e1&lt;/stringProp&gt;
+          &lt;stringProp name=&quot;Argument.metadata&quot;&gt;=&lt;/stringProp&gt;
+        &lt;/elementProp&gt;
+      &lt;/collectionProp&gt;
+</code></pre>
+<p>So a lot is happening here but let me explain.</p>
+<ol>
+<li>Create a new UUID to replace.</li>
+<li>Export the UUID because perl will pick it up in the ENVIRONMENT variables.</li>
+<li>Call perl to handle the search and replacement</li>
+</ol>
+<ul>
+<li>-077 makes perl be able to use multiline and accomplish the
+multiline lookahead and behind. I couldn't tell you how perl works.</li>
+<li>-pi.back basically inline editing and backing up the file.</li>
+<li>-e is basically 's/reaplcethis/withthis/g' but it contains the regex
+with new lines needed to match. Plus it shows how to use ENVIRONMENT variables and grouping to recreate the string.</li>
+</ul>
+<p>Anyways, hope this helps someone.</p>

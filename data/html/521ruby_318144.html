@@ -1,0 +1,179 @@
+ <h2> Title: What is the difference between include and require in Ruby? </h2> <h3> Owen, question_id: 318144 </h3>Score: 521, Tags: {ruby,class,module,include,require} <br><p>My question is similar to "<a href="https://stackoverflow.com/questions/156362/what-is-the-difference-between-include-and-extend-in-ruby">What is the difference between include and extend in Ruby?</a>".</p>
+
+<p>What's the difference between <code>require</code> and <code>include</code> in Ruby?  If I just want to use the methods from a module in my class, should I <code>require</code> it or <code>include</code> it?</p>
+<h4> Comment 33776113 user456814: </h4>For what it&#39;s worth, here are links to the community documentation for <a href="http://www.ruby-doc.org/core-2.1.1/Kernel.html#method-i-require" rel="nofollow noreferrer"><code>require</code></a> and <a href="http://ruby-doc.org/core-2.1.1/Module.html#method-i-include" rel="nofollow noreferrer"><code>include</code></a>, and also relevant, <a href="http://ruby-doc.org/core-2.1.1/Module.html#method-i-append_features" rel="nofollow noreferrer"><code>Module#append_features</code></a>.<br>------------------------------------------------------------------ <br><h3> Answer 318170 HanClinto: </h3><blockquote>
+  <p><em>What's the difference between
+  "include" and "require" in Ruby?</em></p>
+  
+  <p><strong>Answer:</strong></p>
+  
+  <p>The include and require methods do
+  very different things.</p>
+  
+  <p>The require method does what include
+  does in most other programming
+  languages: run another file. It also
+  tracks what you've required in the
+  past and won't require the same file
+  twice. To run another file without
+  this added functionality, you can use
+  the load method.</p>
+  
+  <p>The include method takes all the
+  methods from another module and
+  includes them into the current module.
+  This is a language-level thing as
+  opposed to a file-level thing as with
+  require. The include method is the
+  primary way to "extend" classes with
+  other modules (usually referred to as
+  mix-ins). For example, if your class
+  defines the method "each", you can
+  include the mixin module Enumerable
+  and it can act as a collection. This
+  can be confusing as the include verb
+  is used very differently in other
+  languages.</p>
+</blockquote>
+
+<p><a href="https://web.archive.org/web/20150405161656/http://ruby.about.com/b/2008/10/23/a-quick-peek-at-ruby-include-vs-require.htm" rel="noreferrer">Source</a></p>
+
+<p>So if you just want to use a module, rather than extend it or do a mix-in, then you'll want to use <code>require</code>.</p>
+
+<p>Oddly enough, Ruby's <code>require</code> is analogous to C's <code>include</code>, while Ruby's <code>include</code> is almost nothing like C's <code>include</code>.</p>
+<h4> Comment 21340984 mb14: </h4>In fact C&#39;s include, doesn&#39;t load a file as require do, but instead replace the #include line, by the content of the file. Included files don&#39;t have to be &#39;header&#39; and  #include don&#39;t have to be at the beginning of file but can be anywhere, like in class or even a method definition. This means you can do mixin in C++ by writting some methods in a file and include it in the code of a class, exactly  has you would do in ruby. So they are not that far, even though it&#39;s indeed not a common practice in C&#39;s.<br><h4> Comment 29868173 Travis Bear: </h4>This answer could benefit by including examples.<br><h4> Comment 33020322 Lonny Eachus: </h4>mb14&#39;s comment implies this, but it bears stating explicitly: contrary to what the answer says, require does <b>not</b> &quot;run&quot; a file, but rather loads it as though it were part of the containing file. This might seem like semantic nitpicking but actually it&#39;s a rather important difference.<br><h4> Comment 75210231 J&#246;rg W Mittag: </h4>@LonnyEachus: This is wrong. <code>require</code> simply runs the file. Period. In particular, this means that if you put the <code>require</code> call inside a class declaration, the code in the file will <i>not</i> become a part of that class, if you put the <code>require</code> call inside a method definition, the code in the file will <i>not</i> become a part of that method, if you put the <code>require</code> call inside a module declaration, the code in the file will <i>not</i> become part of that module, and so on and so forth. It doesn&#39;t even become part of the file the <code>require</code> call is in. There&#39;s plenty of question here on <a href="https://stackoverflow.com">Stack Overflow</a> that are …<br><h4> Comment 75210283 J&#246;rg W Mittag: </h4>@GregSchmit: <code>include</code> in Ruby is simply inheritance. <code>class C; include M end</code> makes <code>M</code> the superclass of <code>C</code> and the (former) superclass of <code>C</code> the  superclass of <code>M</code>. I don&#39;t think that C&#39;s <code>include</code> works via inheritance, I think it is simple textual/lexical substitution.<br><h4> Comment 115880764 FrankHB: </h4>In general, <code>require</code> = cached <code>load</code> and <code>load</code> = <code>read</code> + <code>eval</code> (in Lisp parlance). Other operations not prefixed by a <code>read</code>-like input operation is not necessarily relevant to the external source representation. C&#39;s <code>#include</code> is like the former (using an operand like filename), just with an <code>eval</code> guaranteed implemented in the preprocessing phase. In the case of <i>source inclusion</i> (<code>#include &quot;...&quot;</code>), it is textual combination; in the case of <i>header inclusion</i> (i.e. <code>#include &lt;...&gt;</code>), other implementation-defined operations can be involved.<br><h4> Comment 75218566 Greg Schmit: </h4>@J&#246;rgWMittag Oh! I see. Yes, you&#39;re right. I was thinking of putting include at the top of the Ruby file, but now I see what you mean.<br><h4> Comment 75225726 J&#246;rg W Mittag: </h4>@GregSchmit: At the top-level all &quot;class&quot; operations (such as <code>include</code>, <code>def</code>, <code>define_method</code> etc.) are implicitly in <code>Object</code>, while <code>self</code> is <code>main</code>. <code>include</code>ing a module in a script body is the same as <code>class ::Object; include M end</code>.<br><h4> Comment 75210263 J&#246;rg W Mittag: </h4>… caused by <i>exactly</i> that same misunderstanding. See, e.g. one of the myriad of question about how to access local variables defined in the <code>require</code>d file (the answer is: you can&#39;t, precisely <i>because</i> the file is simply ran, and not made a part of the file the call to <code>require</code> is in).<br><h4> Comment 35100472 ArtSabintsev: </h4>Great explanation. Thanks for driving the point home with the last statement &#39;Oddly enough, Ruby&#39;s require is analogous to C&#39;s include, while Ruby&#39;s include is almost nothing like C&#39;s include.&#39;<br><h4> Comment 73981813 Greg Schmit: </h4>I&#39;m so confused. Based on the comments, <code>include</code> in Ruby seems to do the same thing as <code>include</code> in C: equivalent to copy/paste the destination file over the <code>include</code> line.<br>------------------------------------------------------------------ <br><h3> Answer 14212020 Peter Dang: </h3><p>If you're using a module, that means you're bringing all the methods into your class. 
+   If you <code>extend</code> a class with a module, that means you're "bringing in" the module's methods as <strong>class</strong> methods.
+   If you <code>include</code> a class with a  module, that means you're "bringing in" the module's methods as <strong>instance</strong> methods.</p>
+
+<p>EX:</p>
+
+<pre><code> module A
+   def say
+     puts "this is module A"
+   end
+ end
+
+ class B
+   include A
+ end
+
+ class C
+   extend A
+ end
+</code></pre>
+
+<p><code>B.say</code>
+=> undefined method 'say' for B:Class</p>
+
+<p><code>B.new.say</code>
+=> this is module A</p>
+
+<p><code>C.say</code>
+=> this is module A</p>
+
+<p><code>C.new.say</code>
+=> undefined method 'say' for C:Class</p>
+<h4> Comment 29192210 Ciro Santilli OurBigBook.com: </h4>I think this does not answer the question, but it is what I was looking for =)<br><h4> Comment 33776174 user456814: </h4>This doesn&#39;t actually answer the question of what the differences between <code>require</code> and <code>include</code> are.<br>------------------------------------------------------------------ <br><h3> Answer 6082775 Pratik Khadloya: </h3><p>From the Metaprogramming Ruby book,  </p>
+
+<blockquote>
+  <p>The <code>require()</code> method is quite similar to <code>load()</code>, but it’s meant for
+  a different purpose. You use <code>load()</code> to execute code, and you use
+  <code>require()</code> to import libraries.</p>
+</blockquote>
+<h4> Comment 9052040 Stevo: </h4>Upvote for not comparing to another language in your answer :)<br><h4> Comment 67257286 benc: </h4>Down vote for not providing an answer in the context of the question: &quot;If I just want to use the methods from a module in my class?&quot;<br>------------------------------------------------------------------ <br><h3> Answer 318180 bradheintz: </h3><ul>
+<li><p>Ruby <code>require</code> is more like "include" in other languages (such as C). It tells Ruby that you want to <strong><em>bring in the contents of another file</em></strong>. Similar mechanisms in other languages are:</p>
+
+<ul>
+<li><a href="http://msdn.microsoft.com/en-us/library/sf0df423.aspx" rel="noreferrer"><code>using &lt;namespace&gt;</code> directive in C#</a>.</li>
+<li><a href="https://stackoverflow.com/questions/12620369/how-java-import-works"><code>import &lt;package&gt;</code> in Java</a>.</li>
+</ul></li>
+<li><p>Ruby <code>include</code> is an <strong><em>object-oriented inheritance mechanism used for mixins</em></strong>.</p></li>
+</ul>
+
+<p>There is a good explanation <a href="http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/16071" rel="noreferrer" title="Ruby require vs. include">here</a>:</p>
+
+<blockquote>
+  <p>[The] simple answer is that require and include are essentially unrelated.</p>
+  
+  <p><strong>"require"</strong> is similar to the C include, which may cause newbie confusion.
+  (One notable difference is that locals inside the required file "evaporate"
+  when the require is done.)</p>
+  
+  <p>The Ruby <strong>include</strong> is nothing like the C include. The include statement "mixes in" a module into a class. It's a <strong><em>limited form
+  of multiple inheritance</em></strong>. An included module literally bestows an "is-a"
+  relationship on the thing including it.</p>
+</blockquote>
+
+<p>Emphasis added.</p>
+<h4> Comment 115880859 FrankHB: </h4>Module import is not that like file inclusion, as it has nothing necessarily to do with the external source representation of the program. It is more like the <code>include</code> here. Namespaces, packages and class-typed objects can all be treated as specialized <i>environments</i> which hold name bindings in general. (Consider  <a href="https://stackoverflow.com/questions/38924452">these differences</a> and Kernel&#39;s <code>$import!</code>. Also notes Racket&#39;s environments are implemented in namespaces.)<br>------------------------------------------------------------------ <br><h3> Answer 25478040 cizixs: </h3><p>From <em>Programming Ruby 1.9</em></p>
+
+<blockquote>
+  <p>We’ll make a couple of points about the include statement before we go on. First, it has
+  nothing to do with files. C programmers use a preprocessor directive called #include to
+  insert the contents of one file into another during compilation. The Ruby include statement
+  simply makes a reference to a module. If that module is in a separate file, you must use
+  require (or its less commonly used cousin, load) to drag that file in before using include.
+  Second, a Ruby include does not simply copy the module’s instance methods into the class.
+  Instead, it makes a reference from the class to the included module. If multiple classes
+  include that module, they’ll all point to the same thing. If you change the definition of a
+  method within a module, even while your program is running, all classes that include that
+  module will exhibit the new behavior.</p>
+</blockquote>
+------------------------------------------------------------------ <br><h3> Answer 59708603 Vaishali Venkatesan: </h3><p>'Load'- inserts a file's contents.(Parse file every time the file is being called)</p>
+
+<p>'Require'- inserts a file parsed content.(File parsed once and stored in memory)</p>
+
+<p>'Include'- includes the module into the class and can use methods inside the module as class's instance method</p>
+
+<p>'Extend'- includes the module into the class and can use methods inside the module as class method</p>
+------------------------------------------------------------------ <br><h3> Answer 17057245 Boris Stitnicky: </h3><p>Have you ever tried to <code>require</code> a module? What were the results? Just try:</p>
+
+<pre><code>MyModule = Module.new
+require MyModule # see what happens
+</code></pre>
+
+<p>Modules cannot be required, only included!</p>
+<h4> Comment 104946245 pjd: </h4>The assertion here is not correct. Modules can be required. And anyone running the above code will find that they receive the same result (<code>TypeError</code>) if the word <code>Module</code> is changed to <code>Class</code>.<br>------------------------------------------------------------------ <br><h3> Answer 27168078 Sanket: </h3><p>Include
+When you Include a module into your class as shown below, it’s as if you took the code defined within the module and inserted it within the class, where you ‘include’ it. It allows the ‘mixin’ behavior. It’s used to DRY up your code to avoid duplication, for instance, if there were multiple classes that would need the same code within the module.</p>
+
+<p>Load
+The load method is almost like the require method except it doesn’t keep track of whether or not that library has been loaded. So it’s possible to load a library multiple times and also when using the load method you must specify the “.rb” extension of the library file name.</p>
+
+<p>Require
+The require method allows you to load a library and prevents it from being loaded more than once. The require method will return ‘false’ if you try to load the same library after the first time. The require method only needs to be used if library you are loading is defined in a separate file, which is usually the case.</p>
+
+<p>You can prefer this 
+<a href="http://ionrails.com/2009/09/19/ruby_require-vs-load-vs-include-vs-extend/" rel="nofollow">http://ionrails.com/2009/09/19/ruby_require-vs-load-vs-include-vs-extend/</a></p>
+------------------------------------------------------------------ <br><h3> Answer 49038369 Awais Shafqat: </h3><p>Below are few basic differences between require and include: </p>
+
+<p>Require:</p>
+
+<ol>
+<li>Require reads the file from the file system, parses it, saves to the memory and runs it in a given place which means if you will even change anything while the script is running than that change will not reflect.</li>
+<li>We require file by name, not by module name.</li>
+<li>It is typically used for libraries and extensions.</li>
+</ol>
+
+<p>Include: </p>
+
+<ol>
+<li>When you include a module into your class it behaves as if you took the code defined in your module and inserted it in your class.</li>
+<li>We include module name, not the file name.</li>
+<li>It is typically used to dry up the code and to remove duplication in the code. </li>
+</ol>
+------------------------------------------------------------------ <br><h3> Answer 34592408 Shrinivas: </h3><pre><code>require(name)
+</code></pre>
+
+<p>It will return bolean true/false</p>
+
+<p>The name which is passed as parameter to the require, ruby will try to find the source file with that name in your load path.
+ The require method will return ‘false’ if you try to load the same library after the first time. The require method only needs to be used if library you are loading is defined in a separate file.
+So it keeps track of whether that library was already loaded or not.</p>
+
+<pre><code>include module_name
+</code></pre>
+
+<p>Suppose if you have some methods that you need to have in two different classes. Then you don't have to write them in both the classes. Instead what you can do is, define it in module. And then include this module in other classes.
+It is provided by Ruby just to ensure DRY principle.  It’s used to DRY up your code to avoid duplication</p>
+------------------------------------------------------------------ <br><h3> Answer 74899489 Eduardo Romero: </h3><p>For example: When you use <code>require 'math'</code> you have to write <code>Math::PI</code>.
+But when you use <code>include 'math'</code> you can simply write <code>PI</code>.</p>

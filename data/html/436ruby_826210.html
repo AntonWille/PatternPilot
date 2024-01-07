@@ -1,0 +1,97 @@
+ <h2> Title: How do I get the name of a Ruby class? </h2> <h3> andi, question_id: 826210 </h3>Score: 436, Tags: {ruby-on-rails,ruby,rails-activerecord} <br><p>How can I get the class name from an ActiveRecord object?</p>
+
+<p>I have:</p>
+
+<pre><code>result = User.find(1)
+</code></pre>
+
+<p>I tried:</p>
+
+<pre><code>result.class
+# =&gt; User(id: integer, name: string ...)
+result.to_s
+# =&gt; #&lt;User:0x3d07cdc&gt;"
+</code></pre>
+
+<p>I need only the class name, in a string (<code>User</code> in this case). Is there a method for that? </p>
+
+<p>I know this is pretty basic, but I searched both Rails' and Ruby's docs, and I couldn't find it.</p>
+<h4> Comment 8362689 Andrew Grimm: </h4>@Oliver N.: With normal Ruby objects, <code>Object#class.inspect</code> gives the same as <code>Object#class.name</code>, whereas this isn&#39;t the case with ActiveRecord objects.<br>------------------------------------------------------------------ <br><h3> Answer 47668307 Chivorn Kouch: </h3><p>In my case when I use something like <code>result.class.name</code> I got something like <code>Module1::class_name</code>. But if we only want <code>class_name</code>, use </p>
+
+<p><code>result.class.table_name.singularize</code></p>
+------------------------------------------------------------------ <br><h3> Answer 24832287 Darren Hicks: </h3><p>Here's the correct answer, extracted from comments by Daniel Rikowski and pseidemann.  I'm tired of having to weed through comments to find the right answer...</p>
+
+<p>If you use Rails (ActiveSupport):</p>
+
+<pre><code>result.class.name.demodulize
+</code></pre>
+
+<p>If you use POR (plain-ol-Ruby):</p>
+
+<pre><code>result.class.name.split('::').last
+</code></pre>
+<h4> Comment 112467480 Dennis: </h4>An answer that is comparing a solution to others and claims to better, should also explain why.<br><h4> Comment 129651472 pseidemann: </h4>well, technically, my comment answered more than what was originally asked ;)<br>------------------------------------------------------------------ <br><h3> Answer 826227 flicken: </h3><p>You want to call <a href="https://www.ruby-doc.org/core/classes/Module.html#M001699" rel="noreferrer">.name</a> on the object's class:</p>
+
+<pre><code>result.class.name
+</code></pre>
+<h4> Comment 9713719 pseidemann: </h4>@Abe: even cleaner (ActiveSupport): <code>result.class.name.demodulize</code><br><h4> Comment 9249395 Daniel Rikowski: </h4>@Abe: <code>result.class.name.split(&#39;::&#39;).last</code><br><h4> Comment 8769609 Abe Petrillo: </h4>When I do this I get the Module names before it, so &quot;Module::SubModule::Class&quot;, is there a way of getting just &quot;Class&quot;<br><h4> Comment 18445102 Dan Polites: </h4>For the newcomers out there, you can also obtain the class name as a string by using the class like this: <code>User.name</code>. <code>User.to_s</code> also seems to work.<br><h4> Comment 64062135 Per Lundberg: </h4>The demodulize method comes from here: <a href="http://apidock.com/rails/ActiveSupport/Inflector/demodulize" rel="nofollow noreferrer">apidock.com/rails/ActiveSupport/Inflector/demodulize</a>  (You need to load the ActiveSupport string inflections to be able to use if, if you are not a Rails project.)<br><h4> Comment 80415708 Cyril Duchon-Doris: </h4>How do you do when the class hides its name ? I wanted to get the full namespace + class of a proxy object, but its name was overriden with <code>[Proxy] Foo</code> ? EDIT : It&#39;s possible to show the name by triggering an error on the class and the real class name will be printed in the debug, but well..<br>------------------------------------------------------------------ <br><h3> Answer 826853 tal: </h3><p>Both <code>result.class.to_s</code> and <code>result.class.name</code> work.</p>
+<h4> Comment 635657 kch: </h4>But conceptually, #name returns the name, #to_s returns a string representation, which just happens to be identical to the name. I&#39;d stick to using #name, just out of anal-retentiveness.<br>------------------------------------------------------------------ <br><h3> Answer 49804985 jayhendren: </h3><p>If you want to get a class name from inside a class method, <code>class.name</code> or <code>self.class.name</code> won't work.  These will just output <code>Class</code>, since the class of a class is <code>Class</code>.  Instead, you can just use <code>name</code>:</p>
+
+<pre><code>module Foo
+  class Bar
+    def self.say_name
+      puts "I'm a #{name}!"
+    end
+  end
+end
+
+Foo::Bar.say_name
+</code></pre>
+
+<p>output:</p>
+
+<pre><code>I'm a Foo::Bar!
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 73680628 software_writer: </h3><p>In Ruby, you'd use the <code>object.class.name</code> method as follows.</p>
+<pre class="lang-rb prettyprint-override"><code>module Bank
+  class Account
+  end
+end
+
+irb(main):005:0&gt; account = Bank::Account.new
+=&gt; #&lt;Bank::Account:0x0000000106115b00&gt;
+irb(main):006:0&gt; account.class.name
+=&gt; &quot;Bank::Account&quot;
+irb(main):008:0&gt; account.class.name.split(&quot;::&quot;).last
+=&gt; &quot;Account&quot;
+</code></pre>
+<p>In Rails, as others mentioned, you can use the <a href="https://api.rubyonrails.org/classes/String.html#method-i-demodulize" rel="nofollow noreferrer"><code>demodulize</code></a> method on a string, which is added by Active Support. It removes the module part from the constant expression in the string.</p>
+<pre class="lang-bash prettyprint-override"><code>irb(main):014:0&gt; account.class.name.demodulize
+=&gt; &quot;Account&quot;
+</code></pre>
+<p>Internally, this method calls the <a href="https://api.rubyonrails.org/classes/ActiveSupport/Inflector.html#method-i-demodulize" rel="nofollow noreferrer"><code>demodulize</code></a> class method on the <code>ActiveSupport::Inflector</code> class, passing itself as the argument.</p>
+<pre class="lang-rb prettyprint-override"><code># File activesupport/lib/active_support/core_ext/string/inflections.rb, line 166
+def demodulize
+  ActiveSupport::Inflector.demodulize(self)
+end
+</code></pre>
+<p>The <code>Inflector.demodulize</code> function does the same thing.</p>
+<pre class="lang-rb prettyprint-override"><code>demodulize('ActiveSupport::Inflector::Inflections') # =&gt; &quot;Inflections&quot;
+demodulize('Inflections')                           # =&gt; &quot;Inflections&quot;
+demodulize('::Inflections')                         # =&gt; &quot;Inflections&quot;
+demodulize('')                                      # =&gt; &quot;&quot;
+</code></pre>
+<p>However, its internal implementation is different than the simple version above.</p>
+<pre class="lang-rb prettyprint-override"><code># File activesupport/lib/active_support/inflector/methods.rb, line 228
+def demodulize(path)
+  path = path.to_s
+  if i = path.rindex(&quot;::&quot;)
+    path[(i + 2)..-1]
+  else
+    path
+  end
+end
+</code></pre>
+<p>After converting the path argument to a string, it gets the index of the last occurrence of <code>::</code> using Ruby's <a href="https://ruby-doc.org/core-3.1.1/String.html#method-i-rindex" rel="nofollow noreferrer"><code>rindex</code></a> function. If it exists, then it returns the remaining substring. Otherwise, it returns the original string. The <code>array[n..-1]</code> expression returns the substring from <code>n</code> to the last character in the string.</p>
+<p>Now I haven't done any benchmark studies to find why Rails uses this alternative approach using <code>rindex</code> (please comment if you know why), but as a code readability enthusiast, I like the first one using the <code>split</code> and <code>last</code> functions.</p>
+<p><em>Source: <a href="https://www.akshaykhot.com/how-to-get-objects-class-name-in-ruby-rails/" rel="nofollow noreferrer">How to Get an Object's Class Name in Rails</a></em></p>

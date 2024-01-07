@@ -1,0 +1,78 @@
+ <h2> Title: How to convert a string to lower or upper case in Ruby </h2> <h3> Heat Miser, question_id: 1020568 </h3>Score: 1223, Tags: {ruby,string,uppercase,lowercase} <br><p>How do I take a string and convert it to lower or upper case in Ruby?</p>
+------------------------------------------------------------------ <br><h3> Answer 1020571 Sophie Alpert: </h3><p>Ruby has a few methods for changing the case of strings. To convert to lowercase, use <code>downcase</code>:</p>
+<pre><code>&quot;hello James!&quot;.downcase    #=&gt; &quot;hello james!&quot;
+</code></pre>
+<p>Similarly, <code>upcase</code> capitalizes every letter and <code>capitalize</code> capitalizes the first letter of the string but lowercases the rest:</p>
+<pre><code>&quot;hello James!&quot;.upcase      #=&gt; &quot;HELLO JAMES!&quot;
+&quot;hello James!&quot;.capitalize  #=&gt; &quot;Hello james!&quot;
+&quot;hello James!&quot;.titleize    #=&gt; &quot;Hello James!&quot; (Rails/ActiveSupport only)
+</code></pre>
+<p>If you want to modify a string in place, you can add an exclamation point to any of those methods:</p>
+<pre><code>string = &quot;hello James!&quot;
+string.downcase!
+string   #=&gt; &quot;hello james!&quot;
+</code></pre>
+<p>Refer to the <a href="http://www.ruby-doc.org/core/String.html" rel="noreferrer">documentation for String</a> for more information.</p>
+<h4> Comment 17978310 Sophie Alpert: </h4>Oftentimes, &quot;bang methods&quot; return <code>nil</code>; you should use them if you want to change an object in place, not if you want to store the value in another variable.<br><h4> Comment 17977529 Phil_Ken_Sebben: </h4>Watch out! looks to me like using the bang &quot;!&quot;  will return nil if there&#39;s no capital letter.   so  str = &quot;this&quot;.downcase!  returns str = nil<br><h4> Comment 61230760 Fernando Basso: </h4><code>&#39;cora&#231;&#227;o&#39;.upcase</code> produces <code>&#39;CORA&#231;&#227;O&#39;</code>. It may be advised to use some gem like “unicode_utils“, “activesupport“ or “Unicode”.<br><h4> Comment 19577464 eayurt: </h4>but it&#39;is a problem in &quot;i&quot; char if you are using utf-8. For instance, string = FEN BİLİMLERİ. string.capitalize must be &quot;Fen bİlİmlerİ&quot; or it could be changed because of css font style choice.<br>------------------------------------------------------------------ <br><h3> Answer 1021299 mlambie: </h3><p>You can find out all the methods available on a String by opening irb and running:</p>
+
+<pre><code>"MyString".methods.sort
+</code></pre>
+
+<p>And for a list of the methods available for strings in particular:</p>
+
+<pre><code>"MyString".own_methods.sort
+</code></pre>
+
+<p>I use this to find out new and interesting things about objects which I might not otherwise have known existed.</p>
+<h4> Comment 11437448 Mark Wilden: </h4>The only problem with this answer is that #own_methods doesn&#39;t appear to exist. Is it from an Irb extension?<br><h4> Comment 13606061 oceanician: </h4>Hi - I thought I was learning something new with the #own_methods then, but it doesn&#39;t exist for me either. However, I usually go: (&quot;MyString&quot;.methods - Object.merhods).sort<br><h4> Comment 20515800 mlambie: </h4>Very similar to the patch @fakeleft referenced, and I have it in my .irbrc file.  I monkey patch Object and create #own_methds with this:    (obj.methods - obj.class.superclass.instance_methods).sort<br><h4> Comment 48600000 anon: </h4>@Laser The methods for String in particular are the ones defined in the String class itself. The methods available on a String include the ones defined in its superclass(es).<br><h4> Comment 104038277 3limin4t0r: </h4>Use <a href="https://ruby-doc.org/core-2.6.5/Module.html#method-i-public_instance_methods" rel="nofollow noreferrer"><code>String.public_instance_methods(false)</code></a> to find all public instance methods specifically defined by <code>String</code>.<br><h4> Comment 124603549 SEGV: </h4>Or you can look for official documentation, all methods which belong to any class are already over there. :)<br><h4> Comment 48659448 Laser: </h4>@QPaysTaxes Got it, thanks. Any idea why own_methods doesn&#39;t exist for me in irb ruby 2.1.4? Are there no methods by default in the String class, so it would just be if I manually had added some? And if I wanted to, do you know where I&#39;d find basic ruby classes, like String, in a rails app? Thanks<br><h4> Comment 48659482 anon: </h4>@Laser Well, according to <a href="http://stackoverflow.com/questions/1020568/how-to-convert-a-string-to-lower-or-upper-case-in-ruby/1021299?noredirect=1#comment18832728_1021299">fakeleft&#39;s comment</a>, it&#39;s possible a monkey patch or something. It&#39;s not a real extension. I have no idea where you&#39;d find the definitions in a Rails installation; presumably in the same place as a Ruby one. The problem is that it might be in C, so unless you can read C you wouldn&#39;t be able to read the source file.<br><h4> Comment 44825870 Laser: </h4>What&#39;s the difference between &#39;all the methods available on a String&#39; and &#39;the methods available for strings in particular&#39; ? They seem synonymous. Of course it doesn&#39;t particular matter since own_methods seems to be some extension I don&#39;t have, but I still am curious.<br><h4> Comment 18832728 fakeleft: </h4>Ditto. @mlambie might have something like <a href="http://www.wikyblog.com/AmanKing/A_Ruby_object%27s_own_methods" rel="nofollow noreferrer">this monkey patch</a> set up somewhere.<br>------------------------------------------------------------------ <br><h3> Answer 16098006 nurettin: </h3><p>Like @endeR mentioned, if internationalization is a concern, the unicode_utils gem is more than adequate.</p>
+
+<pre><code>$ gem install unicode_utils
+$ irb
+&gt; require 'unicode_utils'
+=&gt; true
+&gt; UnicodeUtils.downcase("FEN BİLİMLERİ", :tr)
+=&gt; "fen bilimleri"
+</code></pre>
+
+<hr>
+
+<p>String manipulations  in Ruby 2.4 are now unicode-sensitive.</p>
+------------------------------------------------------------------ <br><h3> Answer 1020570 Heat Miser: </h3><p>The ruby <code>downcase</code> method returns a string with its uppercase letters replaced by lowercase letters.</p>
+
+<pre><code>"string".downcase
+</code></pre>
+
+<p><a href="https://ruby-doc.org/core-2.1.0/String.html#method-i-downcase" rel="noreferrer">https://ruby-doc.org/core-2.1.0/String.html#method-i-downcase</a></p>
+<h4> Comment 59470278 the Tin Man: </h4>While technically this does help answer the question, it really should be more illuminating. Show the result perhaps? Maybe a link to the documentation?<br><h4> Comment 830145 TStamper: </h4>ruby conversions here: <a href="http://www.techotopia.com/index.php/Ruby_String_Conversions" rel="nofollow noreferrer">techotopia.com/index.php/Ruby_String_Conversions</a><br>------------------------------------------------------------------ <br><h3> Answer 1021280 mlambie: </h3><p>... and the uppercase is:</p>
+
+<pre><code>"Awesome String".upcase
+=&gt; "AWESOME STRING"
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 25090224 helder.vasc: </h3><p>The  Rails Active Support gem provides <code>upcase</code>, <code>downcase</code>, <code>swapcase</code>,<code>capitalize</code>, etc. methods with internationalization support:</p>
+
+<pre><code>gem install activesupport
+irb -ractive_support/core_ext/string
+"STRING  ÁÂÃÀÇÉÊÍÓÔÕÚ".mb_chars.downcase.to_s
+ =&gt; "string  áâãàçéêíóôõú"
+"string  áâãàçéêíóôõú".mb_chars.upcase.to_s
+=&gt; "STRING  ÁÂÃÀÇÉÊÍÓÔÕÚ"
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 56359510 Rajkumar Ulaganadhan: </h3><p>The <code>.swapcase</code> method transforms the uppercase letters in a string to lowercase and the lowercase letters to uppercase.</p>
+<pre><code>'TESTING'.swapcase #=&gt; testing
+'testing'.swapcase #=&gt; TESTING
+</code></pre>
+<h4> Comment 99337848 Matthew: </h4>Thanks! This is exactly what I was looking for. A mixed case string might make it more obvious exactly what this method does... <code>&#39;Testing&#39;.swapcase #=&gt; tESTING</code><br>------------------------------------------------------------------ <br><h3> Answer 54420908 Foram: </h3><p>You can find strings method like <code>"strings".methods</code>
+You can define string as <code>upcase</code>, <code>downcase</code>, <code>titleize</code>.
+For Example,</p>
+
+<pre><code>"hii".downcase
+"hii".titleize
+"hii".upcase
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 46282446 mmichaa: </h3><p>Since Ruby 2.4 there is a built in <a href="https://github.com/ruby/ruby/blob/v2_4_0_preview3/string.c#L6083-L6131" rel="nofollow noreferrer">full Unicode case mapping</a>. Source: <a href="https://stackoverflow.com/a/38016153/888294">https://stackoverflow.com/a/38016153/888294</a>. See Ruby 2.4.0 documentation for details: <a href="https://ruby-doc.org/core-2.4.0/String.html#method-i-downcase" rel="nofollow noreferrer">https://ruby-doc.org/core-2.4.0/String.html#method-i-downcase</a></p>
+------------------------------------------------------------------ <br><h3> Answer 58530455 Mason SB: </h3><p>Won't work for every, but this just saved me a bunch of time. I just had the problem with a CSV returning "TRUE or "FALSE" so I just added VALUE.to_s.downcase == "true" which will return the boolean true if the value is "TRUE" and false if the value is "FALSE", but will still work for the boolean true and false.</p>
+------------------------------------------------------------------ <br><h3> Answer 63226116 Elvack Riansyah: </h3><p>In combination with <code>try</code> method, to support <code>nil</code> value:</p>
+<pre><code>'string'.try(:upcase)
+'string'.try(:capitalize)
+'string'.try(:titleize)
+</code></pre>

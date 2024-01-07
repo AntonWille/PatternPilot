@@ -1,0 +1,404 @@
+ <h2> Title: fatal error: Python.h: No such file or directory </h2> <h3> Mohanad Y., question_id: 21530577 </h3>Score: 1833, Tags: {python,gcc,python-c-api} <br><p>I am trying to build a shared library using a C extension file but first I have to generate the output file using the command below:</p>
+<pre class="lang-bash prettyprint-override"><code>gcc -Wall utilsmodule.c -o Utilc
+</code></pre>
+<p>After executing the command, I get this error message:</p>
+<pre class="lang-none prettyprint-override"><code>&gt; utilsmodule.c:1:20: fatal error: Python.h: No such file or directory
+compilation terminated.
+</code></pre>
+<p>I have tried all the suggested solutions over the internet but the problem still exists. I have no problem with <code>Python.h</code>. I managed to locate the file on my machine.</p>
+------------------------------------------------------------------ <br><h3> Answer 31309573 yespbs: </h3><p>In AWS API (centOS) its </p>
+
+<pre><code>yum install python27-devel
+</code></pre>
+<h4> Comment 50627952 Tadeusz Kopec for Ukraine: </h4>@Wtower Yes, it does provide an answer.<br><h4> Comment 51487398 Ganesh Krishnan: </h4>It does provide an answer. Although you have to substitute the version for what you need.<br><h4> Comment 72402804 ryantuck: </h4>this helped overcome my issues attempting to <code>pip install cryptography</code> on an amazon linux instance.<br><h4> Comment 50611131 Wtower: </h4>This does not provide an answer to the question. To critique or request clarification from an author, leave a comment below their post - you can always comment on your own posts, and once you have sufficient <a href="http://stackoverflow.com/help/whats-reputation">reputation</a> you will be able to <a href="http://stackoverflow.com/help/privileges/comment">comment on any post</a>.<br><h4> Comment 80550381 Kristofor Carle: </h4>This was a helpful answer, while it is possible to install python-devel or python2-devel on Amazon Linux, this is the only one that actually worked for me when running a pip install inside a virtualenv<br>------------------------------------------------------------------ <br><h3> Answer 41111097 parsethis: </h3><p>AWS EC2 install running python34:</p>
+
+<p><code>sudo yum install python34-devel</code></p>
+<h4> Comment 129153371 Arundale Ramanathan: </h4>This worked for me: <code>yum install python3-devel</code><br>------------------------------------------------------------------ <br><h3> Answer 21530768 wim: </h3>
+<p>Looks like you haven't properly installed the header files and static libraries for python dev.  Use your package manager to install them system-wide.</p>
+<p>For <code>apt</code> (<strong>Ubuntu, Debian...</strong>):</p>
+<pre class="lang-bash prettyprint-override"><code>sudo apt-get install python-dev   # for python2.x installs
+sudo apt-get install python3-dev  # for python3.x installs
+</code></pre>
+<p>For <code>yum</code> (<strong>CentOS, RHEL...</strong>):</p>
+<pre class="lang-bash prettyprint-override"><code>sudo yum install python-devel    # for python2.x installs
+sudo yum install python3-devel   # for python3.x installs
+</code></pre>
+<p>For <code>dnf</code> (<strong>Fedora...</strong>):</p>
+<pre class="lang-bash prettyprint-override"><code>sudo dnf install python2-devel  # for python2.x installs
+sudo dnf install python3-devel  # for python3.x installs
+</code></pre>
+<p>For <code>zypper</code> (<strong>openSUSE...</strong>):</p>
+<pre class="lang-bash prettyprint-override"><code>sudo zypper in python-devel   # for python2.x installs
+sudo zypper in python3-devel  # for python3.x installs
+</code></pre>
+<p>For <code>apk</code> (<strong>Alpine...</strong>):</p>
+<pre class="lang-bash prettyprint-override"><code># This is a departure from the normal Alpine naming
+# scheme, which uses py2- and py3- prefixes
+sudo apk add python2-dev  # for python2.x installs
+sudo apk add python3-dev  # for python3.x installs
+</code></pre>
+<p>For <code>apt-cyg</code> (<strong>Cygwin...</strong>):</p>
+<pre class="lang-bash prettyprint-override"><code>apt-cyg install python-devel   # for python2.x installs
+apt-cyg install python3-devel  # for python3.x installs
+</code></pre>
+<p><em>Note:</em> python3-dev does not automatically cover all minor versions of python3, if you are using e.g. python 3.8 you may need to install python3.8-dev.</p>
+<h4> Comment 133014646 Thanos: </h4>It seems that we need to install the specific python(2-3)-dev version. Sample for 3.11:  <code>sudo apt-get install python3.11-dev</code>.  Only this worked for me.<br><h4> Comment 129057062 sh37211: </h4>What if we don&#39;t have su access on the machine? I&#39;m working in a viritual env with local user authorization.  Is there any &quot;pip&quot;-like fix available, or someplace we can manually place a copy of Python.h?<br><h4> Comment 134936058 Francisco Pena: </h4>@sh37211 a bit late but i would go with linuxbrew. Compiling python from source needs some (a lot) packages installed from system package manager too<br><h4> Comment 132952848 wim: </h4>@PhilGoetz See <a href="https://stackoverflow.com/q/45286337/674039">how to install apt-cyg for Cygwin?</a><br><h4> Comment 131409794 wim: </h4>@sh37211 Yeah, you would usually just download the CPython sources to your homedir. Some custom linker options providing the path would usually be required in that case.<br><h4> Comment 132944431 Phil Goetz: </h4>cygwin doesn&#39;t provide anything called &quot;apt-cyg&quot;, so what is that, &amp; how do I install it into cygwin?<br><h4> Comment 135413244 liorko: </h4>IF you are using Ubuntu 22.04 use <code>sudo apt install python2-dev</code><br><h4> Comment 136926396 exebook: </h4>Void Linux: <code>sudo xbps-install python3-devel</code><br><h4> Comment 125702919 JavaRunner: </h4>What about Arch Linux?<br>------------------------------------------------------------------ <br><h3> Answer 22077790 FreshPow: </h3><p>On Ubuntu, I was running Python 3 and I had to install </p>
+
+<pre><code>sudo apt-get install python3-dev
+</code></pre>
+
+<p>If you want to use a version of Python that is not linked to python3, install the associated python3.x-dev package.  For example:</p>
+
+<pre><code>sudo apt-get install python3.5-dev
+</code></pre>
+<h4> Comment 126033422 ruhsuzbaykus: </h4>If you are using virtual envs with different python versions, make sure to create the virtual env after the necessary dev package is installed. Otherwise the header files won&#39;t be copied correctly.<br><h4> Comment 133577660 Chiffa: </h4>The python version addition was quite helpful in my case<br>------------------------------------------------------------------ <br><h3> Answer 57698471 ijoseph: </h3><p>For <strong>Python 3.7</strong> and <strong>Ubuntu</strong> in particular, I needed</p>
+<h3><code>sudo apt install libpython3.7-dev</code></h3>
+<p>.
+I think at some point names were changed from <code>pythonm.n-dev</code> to this.</p>
+<p>for Python 3.6, 3.8 through 3.10 (and counting…) similarly:</p>
+<h4><code>sudo apt install libpython3.6-dev</code> </h4>
+<h4><code>sudo apt install libpython3.8-dev</code> </h4>
+<h4><code>sudo apt install libpython3.9-dev</code></h4>
+<h4><code>sudo apt install libpython3.10-dev</code></h4>
+<h4><code>sudo apt install libpython3.11-dev</code></h4>
+<h4><code>sudo apt install libpython3.12-dev</code></h4>
+<h4> Comment 126018023 Daniel: </h4>Same for Python 3.10<br><h4> Comment 136171313 sp1111: </h4>worked on 3.12 for compiling packages, thanks!<br><h4> Comment 132974309 Jalil Nourmohammadi Khiarak: </h4>This was the best solution for pyhton3.10.<br><h4> Comment 134876622 shacker: </h4>This is the only suggestion I&#39;ve found that works for 3.11. Thanks!<br><h4> Comment 136794317 nivpeled: </h4>Best solution for Python 3.9 under Ubuntu<br>------------------------------------------------------------------ <br><h3> Answer 21530866 vartec: </h3><p>Two things you have to do.</p>
+
+<p>Install development package for Python, in case of Debian/Ubuntu/Mint it's done with command:</p>
+
+<pre><code>sudo apt-get install python-dev
+</code></pre>
+
+<p>Second thing is that include files are not by default in the include path, nor is Python library linked with executable by default. You need to add these flags (replace Python's version accordingly):</p>
+
+<pre><code>-I/usr/include/python2.7 -lpython2.7 
+</code></pre>
+
+<p>In other words your compile command ought to be:</p>
+
+<pre><code>gcc -Wall -I/usr/include/python2.7 -lpython2.7  utilsmodule.c -o Utilc 
+</code></pre>
+<h4> Comment 39171739 FreshPow: </h4>If you are using another version of Python, 3.3 for example: sudo apt-get install python3.3-dev<br><h4> Comment 32539758 Mohanad Y.: </h4>do I have to add flags for each included file in the C extension file ??<br>------------------------------------------------------------------ <br><h3> Answer 30676339 ravi.zombie: </h3><p>on Fedora run this for Python 2:</p>
+
+<pre><code>sudo dnf install python2-devel
+</code></pre>
+
+<p>and for Python 3:</p>
+
+<pre><code>sudo dnf install python3-devel
+</code></pre>
+<h4> Comment 78931376 CoderGuy123: </h4>On Mint 18.2 (Ubuntu based), it was <code>apt-get install python-dev</code>.<br>------------------------------------------------------------------ <br><h3> Answer 29830656 Christian Long: </h3><p>If you are using <a href="https://tox.readthedocs.org/en/latest/">tox</a> to run tests on multiple versions of Python, you may need to install the Python dev libraries for each version of Python you are testing on.</p>
+
+<pre><code>sudo apt-get install python2.6-dev 
+sudo apt-get install python2.7-dev 
+etc.
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 42983458 David Ferenczy Rogožan: </h3><h2>Solution for <em>Cygwin</em></h2>
+
+<p>You need to <strong>install the package <code>python2-devel</code> or <code>python3-devel</code></strong>, depending on the Python version you're using. </p>
+
+<p>You can quickly install it using the <a href="https://cygwin.com/setup-x86.exe" rel="noreferrer">32-bit</a> or <a href="https://cygwin.com/setup-x86_64.exe" rel="noreferrer">64-bit</a> <code>setup.exe</code> (depending on your installation) from <a href="http://cygwin.com" rel="noreferrer">Cygwin.com</a>.</p>
+
+<p>Example (modify <code>setup.exe</code>'s filename and Python's major version if you need):</p>
+
+<pre><code>$ setup.exe -q --packages=python3-devel
+</code></pre>
+
+<p>You can also check my <a href="https://stackoverflow.com/a/23143997/971141">other answer</a> for a few more options to install Cygwin's packages from the command-line.</p>
+------------------------------------------------------------------ <br><h3> Answer 21531170 sleblanc: </h3><p>Make sure that the Python dev files come with your OS.</p>
+<p>You should not hard code the library and include paths. Instead, use pkg-config, which will output the correct options for your specific system:</p>
+<pre><code>$ pkg-config --cflags --libs python2
+-I/usr/include/python2.7 -lpython2.7
+</code></pre>
+<p>You may add it to your <em>gcc</em> line:</p>
+<pre><code>gcc -Wall utilsmodule.c -o Utilc $(pkg-config --cflags --libs python2) 
+</code></pre>
+<h4> Comment 110188762 Fedor Alexander Steeman: </h4>I get the following error message on RHEL: &quot;Unknown option -I/usr/include/python2.7&quot;<br><h4> Comment 110853436 sleblanc: </h4>@FedorSteeman, someone edited my answer and removed the newline from the command.<br>------------------------------------------------------------------ <br><h3> Answer 33711076 sashoalm: </h3><p>For me, changing it to this worked:</p>
+
+<pre><code>#include &lt;python2.7/Python.h&gt;
+</code></pre>
+
+<p>I found the file <code>/usr/include/python2.7/Python.h</code>, and since <code>/usr/include</code> is already in the include path, then <code>python2.7/Python.h</code> should be sufficient.</p>
+
+<p>You could also add the include path from command line instead - <code>gcc -I/usr/lib/python2.7</code> (thanks @erm3nda).</p>
+<h4> Comment 65033433 noɥʇʎԀʎzɐɹƆ: </h4>All the other answers tell you to install something. This one worked for me. Why isn&#39;t this the top answer?<br><h4> Comment 65821356 Louis: </h4>@ uoɥʇʎPʎzɐɹC  Maybe because it won&#39;t run under python3 ?<br><h4> Comment 74046200 David Ferenczy Rogožan: </h4>@noɥʇʎԀʎzɐɹƆ Because it should work without changing the code. You often need to compile a code not owned by you, some external dependency for example, and the worst thing you can do is to modify that code.<br><h4> Comment 130294739 Gokul nath: </h4>This worked for me in Python3 as well<br><h4> Comment 90667448 Ciro Santilli OurBigBook.com: </h4>I&#39;d recommend using <code>pkg-config</code> instead of modifying your C sources: <a href="https://stackoverflow.com/a/21531170/895245">stackoverflow.com/a/21531170/895245</a><br><h4> Comment 74066757 noɥʇʎԀʎzɐɹƆ: </h4>@DawidFerenczy Understod.<br><h4> Comment 73249227 m3nda: </h4>It is better to set the lib at <code>gcc -I&#47;usr&#47;lib&#47;python2.7 etc</code> rather than hardcode the include calls.<br>------------------------------------------------------------------ <br><h3> Answer 67000027 Milo: </h3><p>This problem can also arise when you have different Python versions installed and you use a pip that's not the system's one. In that case, the non-system pip won't find the right version of Python headers.</p>
+<p>It happened to me when trying to <em>pip install</em> a package for a Python bundled with an application. As it was not system's python, <em>apt install pythonXX-dev</em> didn't work.</p>
+<p>In this case, the solution is to find the right python header:</p>
+<pre><code>find / -iname 'Python.h'
+</code></pre>
+<p>In the output, you will see system python headers, and hopefully the one you are looking for, for example:</p>
+<pre><code>/usr/include/python3.7m/Python.h
+/usr/include/python3.6m/Python.h
+/home/ubuntu/workspace/blender-git/lib/linux_centos7_x86_64/python/include/python3.7m/Python.h
+/home/ubuntu/miniconda3/pkgs/python-3.8.5-h7579374_1/include/python3.8/Python.h
+/home/ubuntu/miniconda3/pkgs/python-3.7.0-h6e4f718_3/include/python3.7m/Python.h
+/home/ubuntu/miniconda3/include/python3.8/Python.h
+/home/ubuntu/miniconda3/envs/sim/include/python3.7m/Python.h
+/home/ubuntu/src/blender-deps/Python-3.7.7/Include/Python.h
+/opt/lib/python-3.7.7/include/python3.7m/Python.h
+</code></pre>
+<p>Then, you can set a compiler flag that will get used by gcc when called by pip.
+Mine was /home/ubuntu/workspace/blender-git/lib/linux_centos7_x86_64/python/include/python3.7m/Python.h, so I did:</p>
+<pre><code>export CPPFLAGS=-I/home/ubuntu/src/blender-deps/Python-3.7.7/Include
+pip install &lt;package&gt;
+</code></pre>
+<h4> Comment 124590449 musicman523: </h4>Thanks, this gave me the hint I needed - I needed to install python3.8-dev :)<br><h4> Comment 135257147 Fusion: </h4>This is the most killer answer right here! Instead of randomly installing new dependencies, first search for your system.<br><h4> Comment 124552458 Christopher Marlowe: </h4>What is the purpose of -I ?<br><h4> Comment 124553070 Milo: </h4>@SultanAhmedSagor the -I flag tells the compiler that it is a path in which look for header files (-I as &quot;include&quot;, I guess): <a href="https://caiorss.github.io/C-Cpp-Notes/compiler-flags-options.html" rel="nofollow noreferrer">caiorss.github.io/C-Cpp-Notes/compiler-flags-options.html</a><br><h4> Comment 135583653 user7611503: </h4>I have this problem with Windows and I am stuck.  I put &lt;Python.h&gt; include directory in the &quot;includePath&quot; environmental variable and it can&#39;t open the header as it appears to not be recognized.  I get error&quot; fatal error: Python.h: No such file or directory&quot;.  Can someone 1) advise on what is meant by &quot;system Python&quot; and/or 2) have some Windows troubleshooting tips? How to ask this question for Windows case without it getting flagged as a duplicate?<br><h4> Comment 129006698 Seeker: </h4>I mixed this and &quot;rpm -ql python36-devel.x86_64 | grep -i &quot;Python.h&quot; solution. Helped a lot! thanks!<br><h4> Comment 134253767 Tushar: </h4>Perfect. Though, I was trying to install packagone for python-3.10 but i found python.h for python-3.11 and it worked. Thanks!<br>------------------------------------------------------------------ <br><h3> Answer 43868978 Guillaume Cisco: </h3><p>If you use a virtualenv with a 3.6 python (edge right now), be sure to install the matching python 3.6 dev <code>sudo apt-get install python3.6-dev</code>, otherwise executing <code>sudo python3-dev</code> will install the python dev 3.3.3-1, which won't solve the issue.</p>
+<h4> Comment 75497244 Seth: </h4>Worked great for me on 3.5(.2), too. Explicitly installing the right dev package for your version of Python is a Good Thing.<br>------------------------------------------------------------------ <br><h3> Answer 21548557 Mohanad Y.: </h3><p>I managed to solve this issue and generate the .so file in one command </p>
+
+<pre><code>gcc -shared -o UtilcS.so
+-fPIC -I/usr/include/python2.7 -lpython2.7  utilsmodule.c
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 35121730 Oriol Nieto: </h3><p>In my case, what fixed it in Ubuntu was to install the packages <code>libpython-all-dev</code> (or <code>libpython3-all-dev</code> if you use Python 3).</p>
+<h4> Comment 62596157 Dave S.: </h4><code>python-all-dev</code> in my case, but close enough.<br><h4> Comment 71935327 shrawan_lakhe: </h4>@Oriol Nieto, Thank you very much. python-all-dev also solved the issue for me.<br>------------------------------------------------------------------ <br><h3> Answer 44475142 Hugo L.M: </h3><p>It's not the same situation, but it also works for me and now I can use <strong>SWIG</strong> with <strong>Python3.5</strong>:</p>
+
+<p>I was trying to compile:</p>
+
+<pre><code>gcc -fPIC -c existe.c existe_wrap.c -I /usr/include/python3.5m/
+</code></pre>
+
+<p><strong>With Python 2.7 works fine, not with my version 3.5:</strong></p>
+
+<blockquote>
+  <p>existe_wrap.c:147:21: fatal error: Python.h: No existe el archivo o el
+  directorio compilation terminated.</p>
+</blockquote>
+
+<p><strong>After run in my Ubuntu 16.04 installation:</strong></p>
+
+<pre><code>sudo apt-get install python3-dev  # for python3.x installs
+</code></pre>
+
+<p><strong>Now I can compile without problems Python3.5:</strong></p>
+
+<pre><code>gcc -fPIC -c existe.c existe_wrap.c -I /usr/include/python3.5m/
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 50322253 Wreeecks: </h3><p>I also encountered this error when I was installing coolprop in ubuntu. </p>
+
+<p>For ubuntu 16.04 with python 3.6 </p>
+
+<pre><code>sudo apt-get install python3.6-dev
+</code></pre>
+
+<p>If ever this doesn't work try installing/updating <code>gcc</code> lib.</p>
+
+<pre><code>sudo apt-get install gcc
+</code></pre>
+<h4> Comment 97049911 Blairg23: </h4>omg, I struggled with this for SO long because I had run <code>python3-dev</code> many times and kept getting the same error, but didn&#39;t know about <code>python3.6-dev</code>!! Thanks!!<br>------------------------------------------------------------------ <br><h3> Answer 33499131 Venfah Nazir: </h3><p>try apt-file. It is difficult to remember the package name where the missing file resides. It is generic and useful for any package files.</p>
+
+<p>For example:</p>
+
+<pre><code>root@ubuntu234:~/auto# apt-file search --regexp '/Python.h$'
+pypy-dev: /usr/lib/pypy/include/Python.h
+python2.7-dbg: /usr/include/python2.7_d/Python.h
+python2.7-dev: /usr/include/python2.7/Python.h
+python3.2-dbg: /usr/include/python3.2dmu/Python.h
+python3.2-dev: /usr/include/python3.2mu/Python.h
+root@ubuntu234:~/auto# 
+</code></pre>
+
+<p>Now you can make an expert guess as to which one to choose from.</p>
+------------------------------------------------------------------ <br><h3> Answer 65896015 serg06: </h3><p>Here is yet another solution, because none of these solutions worked for me. For reference, I was trying to <code>pip install</code> something on an Amazon Linux AMI base Docker image for Python 3.6.</p>
+<p>Non-docker solution:</p>
+<pre><code># Install python3-devel like everyone says
+yum -y install python36-devel.x86_64
+
+# Find the install directory of `Python.h`
+rpm -ql python36-devel.x86_64 | grep -i &quot;Python.h&quot;
+
+# Forcefully add it to your include path
+C_INCLUDE_PATH='/usr/include/python3.6m'
+export C_INCLUDE_PATH
+</code></pre>
+<p>Docker solution:</p>
+<pre><code># Install python3-devel like everyone says
+RUN yum -y install python36-devel.x86_64
+
+# Find the install directory of `Python.h`, for me it was /usr/include/python3.6m
+RUN rpm -ql python36-devel.x86_64 | grep -i &quot;Python.h&quot; &amp;&amp; fake_command_so_docker_fails_and_shows_us_the_output
+
+# Since the previous command contains a purposeful error, remove it before the next run
+
+# Forcefully add it to your include path
+ARG C_INCLUDE_PATH='/usr/include/python3.6m'
+</code></pre>
+<p>NOTE: If you're getting the error when compiling C++, use <code>CPLUS_INCLUDE_PATH</code>.</p>
+<p>Alternatively, you may prefer to use another Docker image. For example, I was trying to install <code>asyncpg~=0.24.0</code> on <code>python:3.9.4-slim</code>, which generated the same error as you saw. However, when I updated the image to <code>python:3</code>, it worked fine.</p>
+<h4> Comment 120135756 Kubra Altun: </h4>The exact solution to my problem, thanks!<br><h4> Comment 126119974 damuz91: </h4>As of 2022 went great. I added the commands you pointed out in a single line of my build spec, separated by ; so the EXPORT would work<br><h4> Comment 136264973 Crimeira: </h4>Worked on centos 8 plesk django 4.2 app thank you<br><h4> Comment 121876827 deeshank: </h4>Worked for amazon linux like a charm. Glad i found your solution. Thank you<br>------------------------------------------------------------------ <br><h3> Answer 47515642 Steve G: </h3><p>For CentOS 7:   </p>
+
+<pre class="lang-sh prettyprint-override"><code>sudo yum install python36u-devel
+</code></pre>
+
+<p>I followed the instructions here for installing python3.6 on several VMs: <a href="https://www.digitalocean.com/community/tutorials/how-to-install-python-3-and-set-up-a-local-programming-environment-on-centos-7" rel="noreferrer">https://www.digitalocean.com/community/tutorials/how-to-install-python-3-and-set-up-a-local-programming-environment-on-centos-7</a>
+and was then able to build mod_wsgi and get it working with a python3.6 virtualenv</p>
+------------------------------------------------------------------ <br><h3> Answer 29326063 kmonsoor: </h3><p>For the OpenSuse comrades out there:</p>
+
+<pre><code>sudo zypper install python3-devel
+</code></pre>
+<h4> Comment 135676894 wisbucky: </h4>make sure to use the exact version of python, e.g. <code>python39-devel</code><br>------------------------------------------------------------------ <br><h3> Answer 48768510 Egal: </h3><p>If you're using Python 3.6 on Amazon Linux (based on RHEL, but the RHEL answers given here didn't work):</p>
+
+<pre><code>sudo yum install python36-devel
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 56508166 Antti Haapala -- Слава Україні: </h3><ol>
+<li><p>You must install the Python development files on your operating system if the Python provided with your operating system does not come with them. The many answers on this question show the myriad ways this can be achieved on different systems.</p></li>
+<li><p><strong>When</strong> you have done so, the problem is telling the compiler where they're located and how to compile against them. Python comes with a program called <code>python-config</code>. For compilation, you need the <code>--includes</code> output and for linking a program against the Python library (embedding Python into your program) the <code>--ldflags</code> output. Example:</p>
+
+<pre><code>gcc -c mypythonprogram.c $(python3-config --includes)
+gcc -o program mypythonprogram.o $(python3-config --ldflags)
+</code></pre></li>
+</ol>
+
+<p>The <code>python-config</code> program can be named after the Python versions - on Debian, Ubuntu for example these can be named <code>python3-config</code> or <code>python3.6-config</code>.</p>
+------------------------------------------------------------------ <br><h3> Answer 41019110 Huge: </h3><p>Sure <code>python-dev</code> or <code>libpython-all-dev</code> are the first thing to (<code>apt</code> )<code>install</code>, but if that doesn't help as was my case, I advice you to install the <em>foreign Function Interface</em> packages by <code>sudo apt-get install libffi-dev</code> and <code>sudo pip install cffi</code>.</p>
+
+<p>This should help out especially if you see the error as/from <code>c/_cffi_backend.c:2:20: fatal error: Python.h: No such file or directory</code>.</p>
+<h4> Comment 79464187 Magnus Melwin: </h4>sudo pip3 install cffi              (# for python3)<br>------------------------------------------------------------------ <br><h3> Answer 63520784 gemfield: </h3><p>try locate your Python.h:</p>
+<pre><code>gemfield@ThinkPad-X1C:~$ locate Python.h
+/home/gemfield/anaconda3/include/python3.7m/Python.h
+/home/gemfield/anaconda3/pkgs/python-3.7.6-h0371630_2/include/python3.7m/Python.h
+/usr/include/python3.8/Python.h
+</code></pre>
+<p>if not found, then install python-dev or python3-dev; else include the correct header path for compiler:</p>
+<pre><code>g++ -I/usr/include/python3.8 ...
+</code></pre>
+<h4> Comment 119377779 aerijman: </h4>neat. Thank you!<br><h4> Comment 130225310 Aaron Meese: </h4>On CentOS you have to run <code>yum install mlocate</code> first, in case anyone else tries this!<br>------------------------------------------------------------------ <br><h3> Answer 70452627 Valery Noname: </h3><p>I am on <strong>Ubuntu</strong>. I have installed all packages as was recommended in some answers.</p>
+<pre><code>sudo apt-get install python-dev   # for python2.x installs
+sudo apt-get install python3-dev  # for python3.x installs
+</code></pre>
+<p>I still had this problem, the line:</p>
+<pre><code>#include &quot;Python.h&quot;
+</code></pre>
+<p>And some others, I can edit them manually, it is a bad practice.
+I know the secret now, it comes from the <em>cython</em> source code. I have the file. It compiles without errors. That is the file.
+Change PYTHON to python version you have, python/python3. Change FILE to your c-filename. The name of the makefile file should be <strong>Makefile</strong>. Run the the file with the command:</p>
+<pre><code>make all
+</code></pre>
+<h3>Makefile for creating our standalone Cython program</h3>
+<pre><code>    FILE := file.c
+    PYTHON := python3
+    PYVERSION := $(shell $(PYTHON) -c &quot;import sys;                     
+    print(sys.version[:3])&quot;)
+    PYPREFIX := $(shell $(PYTHON) -c &quot;import sys; print(sys.prefix)&quot;)
+
+    INCDIR := $(shell $(PYTHON) -c &quot;from distutils import sysconfig; 
+    print(sysconfig.get_python_inc())&quot;)
+    PLATINCDIR := $(shell $(PYTHON) -c &quot;from distutils import 
+    sysconfig; print(sysconfig.get_python_inc(plat_specific=True))&quot;)
+    LIBDIR1 := $(shell $(PYTHON) -c &quot;from distutils import sysconfig; 
+    print(sysconfig.get_config_var('LIBDIR'))&quot;)
+    LIBDIR2 := $(shell $(PYTHON) -c &quot;from distutils import sysconfig; 
+    print(sysconfig.get_config_var('LIBPL'))&quot;)
+    PYLIB := $(shell $(PYTHON) -c &quot;from distutils import sysconfig; 
+    print(sysconfig.get_config_var('LIBRARY')[3:-2])&quot;)
+
+    CC := $(shell $(PYTHON) -c &quot;import distutils.sysconfig; 
+    print(distutils.sysconfig.get_config_var('CC'))&quot;)
+    LINKCC := $(shell $(PYTHON) -c &quot;import distutils.sysconfig; 
+    print(distutils.sysconfig.get_config_var('LINKCC'))&quot;)
+    LINKFORSHARED := $(shell $(PYTHON) -c &quot;import distutils.sysconfig; 
+    print(distutils.sysconfig.get_config_var('LINKFORSHARED'))&quot;)
+    LIBS := $(shell $(PYTHON) -c &quot;import distutils.sysconfig; 
+    print(distutils.sysconfig.get_config_var('LIBS'))&quot;)
+    SYSLIBS :=  $(shell $(PYTHON) -c &quot;import distutils.sysconfig; 
+    print(distutils.sysconfig.get_config_var('SYSLIBS'))&quot;)
+
+    .PHONY: paths all clean test
+
+    paths:
+        @echo &quot;PYTHON=$(PYTHON)&quot;
+        @echo &quot;PYVERSION=$(PYVERSION)&quot;
+        @echo &quot;PYPREFIX=$(PYPREFIX)&quot;
+        @echo &quot;INCDIR=$(INCDIR)&quot;
+        @echo &quot;PLATINCDIR=$(PLATINCDIR)&quot;
+        @echo &quot;LIBDIR1=$(LIBDIR1)&quot;
+        @echo &quot;LIBDIR2=$(LIBDIR2)&quot;
+        @echo &quot;PYLIB=$(PYLIB)&quot;
+        @echo &quot;CC=$(CC)&quot;
+        @echo &quot;LINKCC=$(LINKCC)&quot;
+        @echo &quot;LINKFORSHARED=$(LINKFORSHARED)&quot;
+        @echo &quot;LIBS=$(LIBS)&quot;
+        @echo &quot;SYSLIBS=$(SYSLIBS)&quot;
+
+    $(FILE:.c=): $(FILE:.c=.o)
+        $(LINKCC) -o $@ $^ -L$(LIBDIR1) -L$(LIBDIR2) -l$(PYLIB)         
+    $(LIBS) $(SYSLIBS) $(LINKFORSHARED)
+
+    $(FILE:.c=.o): $(FILE)
+        $(CC) -c $^ -I$(INCDIR) -I$(PLATINCDIR)
+
+    all: $(FILE:.c=)
+</code></pre>
+<h4> Comment 124590460 musicman523: </h4>Note: python3-dev does not automatically cover all minor versions of python3, if you are using e.g. python 3.8 you may need to install python3.8-dev<br><h4> Comment 124591145 Valery Noname: </h4>The problem is that I have a wrong include <code>#include &quot;Python.h&quot;</code>. Compiler doesn&#39;t see it. You should edit the path manually. Or you can take the Makefile that I have posted. This file does the same as the manual edit of <code>#include</code><br>------------------------------------------------------------------ <br><h3> Answer 47101147 Babu Arunachalam: </h3><p>This error occurred when I attempted to install ctds on CentOS 7 with Python3.6. I did all the tricks mentioned here including <code>yum install python34-devel</code>.  The problem was <code>Python.h</code> was found in <code>/usr/include/python3.4m but not in /usr/include/python3.6m</code>.  I tried to use <code>--global-option</code> to point to include dir (<code>pip3.6 install --global-option=build_ext --global-option="--include-dirs=/usr/include/python3.4m" ctds</code>).  This resulted in a <code>lpython3.6m</code> not found when linking ctds.</p>
+
+<p>Finally what worked was fixing the development environment for Python3.6 needs to correct with the include and libs.</p>
+
+<pre><code>yum -y install https://dl.iuscommunity.org/pub/ius/stable/CentOS/7/x86_64/python36u-libs-3.6.3-1.ius.centos7.x86_64.rpm
+</code></pre>
+
+<p>Python.h needs to be in your include path for gcc.  Whichever version of python is used, for example if it's 3.6, then it should be in <code>/usr/include/python3.6m/Python.h</code> typically.</p>
+<h4> Comment 81592189 Babu Arunachalam: </h4>Not sure why there is a -1 but this is a problem as of today for python3.6 with CentOS as python36-devel is not available.  You will need to install it from the URL above.<br>------------------------------------------------------------------ <br><h3> Answer 51073198 HimanshuGahlot: </h3><p>Sometimes even after installing python-dev the error persists,
+Check for the error if it is 'gcc' missing.</p>
+
+<p>First download as stated in <a href="https://stackoverflow.com/a/21530768/8687063">https://stackoverflow.com/a/21530768/8687063</a>, then install gcc</p>
+
+<p><strong>For apt (Ubuntu, Debian...):</strong></p>
+
+<pre><code>sudo apt-get install gcc
+</code></pre>
+
+<p><strong>For yum (CentOS, RHEL...):</strong></p>
+
+<pre><code>sudo yum install gcc
+</code></pre>
+
+<p><strong>For dnf (Fedora...):</strong></p>
+
+<pre><code>sudo dnf install gcc
+</code></pre>
+
+<p><strong>For zypper (openSUSE...):</strong></p>
+
+<pre><code>sudo zypper in gcc
+</code></pre>
+
+<p><strong>For apk (Alpine...):</strong></p>
+
+<pre><code>sudo apk gcc
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 49829034 dphans: </h3><p>It often appear when you trying to remove <code>python3.5</code> and install <code>python3.6</code>.</p>
+
+<p>So when using <code>python3</code> (which <code>python3 -V</code> => <code>python3.6</code>) to install some packages required <code>python3.5</code> header will appear this error.</p>
+
+<p>Resolve by install <code>python3.6-dev</code> module.</p>
+------------------------------------------------------------------ <br><h3> Answer 21530823 Kos: </h3><p>This means that <code>Python.h</code> isn't in your compiler's default include paths. Have you installed it system-wide or locally? What's your OS?</p>
+
+<p>You could use the <code>-I&lt;path&gt;</code> flag to specify an additional directory where your compiler should look for headers. You will probably have to follow up with <code>-L&lt;path&gt;</code> so that gcc can find the library you'll be linking with using <code>-l&lt;name&gt;</code>.</p>
+------------------------------------------------------------------ <br><h3> Answer 72769163 SpaceTraveler: </h3><p>It is confirmed that if you are running centos 8+. You will need to run the followings:</p>
+<pre><code>sudo yum -y install python36 python38 python39
+sudo yum -y install python36-devel.x86_64 python38-devel.x86_64 python39-devel.x86_64
+
+pip3.8 install cpython
+pip3.9 install cpython
+pip3.6 install cpython
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 74790998 Gustavo Barbosa: </h3><p>The problem maybe that you do not have the appropiate Python Library headers installed. If you use Linux Solus, this can be solved by using the command:</p>
+<pre><code>sudo eopkg install python3-devel
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 69178207 Crawl.W: </h3><p>The situation I encountered is my <code>Python.h</code> in the directory <strong>/usr/include/python3.8</strong> and <strong>/usr/include/python2.7</strong>，just give the path to <strong>gcc</strong> by like <code>-I /usr/include/python3.8</code>。python's version replace with yours。</p>
+------------------------------------------------------------------ <br><h3> Answer 72932363 Tobias Bergkvist: </h3><p>In case you already have Python installed, and want to link against a specific Python version, you can get the relevant include path from Python.</p>
+<pre class="lang-py prettyprint-override"><code>&gt;&gt;&gt; import sysconfig
+&gt;&gt;&gt; sysconfig.get_path('include')
+'/usr/include/python3.10' # Example output
+</code></pre>
+<p>You can manually specify the include path/build against a specific python version using a shell script:</p>
+<pre class="lang-bash prettyprint-override"><code>#!/bin/sh
+python_include=$(python3.10 -c &quot;import sysconfig; print(sysconfig.get_path('include'))&quot;)
+gcc -Wall utilsmodule.c -o Utilc -I&quot;$python_include&quot;
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 65842438 KingKong: </h3><p>If you use cmake to build project, you can use this example.</p>
+<pre><code>cmake_minimum_required(VERSION 2.6)
+project(demo)
+find_package(PythonLibs REQUIRED)
+include_directories(${PYTHON_INCLUDE_DIRS})
+add_executable(demo main.cpp)
+target_link_libraries(demo ${PYTHON_LIBRARIES})
+</code></pre>

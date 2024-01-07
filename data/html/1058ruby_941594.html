@@ -1,0 +1,222 @@
+ <h2> Title: Understanding the Rails Authenticity Token </h2> <h3> Ricardo Acras, question_id: 941594 </h3>Score: 1058, Tags: {ruby-on-rails,ruby,authenticity-token} <br><p>What is the Authenticity Token in Rails?</p>
+<h4> Comment 21022293 Chloe: </h4>Also see: &quot;Why Does Google Prepend while(1) to their JSON response?&quot; <a href="http://stackoverflow.com/questions/2669690/why-does-google-prepend-while1-to-their-json-responses" title="why does google prepend while1 to their json responses">stackoverflow.com/questions/2669690/&hellip;</a><br><h4> Comment 120888800 satchel: </h4>I put this as an edit to the answer as well: a link to the github repo that allows a click-through to reference: <a href="https://pix.realquadrant.com/authenticity-token" rel="nofollow noreferrer">pix.realquadrant.com/authenticity-token</a><br>------------------------------------------------------------------ <br><h3> Answer 1571900 Faisal: </h3><p><strong>What happens</strong></p>
+<p>When the user views a form to create, update, or destroy a resource, the Rails app creates a random <code>authenticity_token</code>, stores this token in the session, and places it in a hidden field in the form. When the user submits the form, Rails looks for the <code>authenticity_token</code>, compares it to the one stored in the session, and if they match the request is allowed to continue.</p>
+<p><strong>Why it happens</strong></p>
+<p>Since the authenticity token is stored in the session, the client cannot know its value. This prevents people from submitting forms to a Rails app without viewing the form within that app itself.
+Imagine that you are using service A, you logged into the service and everything is OK. Now imagine that you went to use service B, and you saw a picture you like, and pressed on the picture to view a larger size of it. Now, if some evil code was there at service B, it might send a request to service A (which you are logged into), and ask to delete your account, by sending a request to <code>http://serviceA.example/close_account</code>. This is what is known as <a href="http://en.wikipedia.org/wiki/Cross-site_request_forgery" rel="noreferrer">CSRF (Cross Site Request Forgery)</a>.</p>
+<p>If service A is using authenticity tokens, this attack vector is no longer applicable, since the request from service B would not contain the correct authenticity token, and will not be allowed to continue.</p>
+<p><a href="http://api.rubyonrails.org/classes/ActionController/RequestForgeryProtection.html" rel="noreferrer">API docs</a> describes details about meta tag:</p>
+<blockquote>
+<p>CSRF protection is turned on with the <code>protect_from_forgery</code> method,
+which checks the token and resets the session if it doesn't match what
+was expected. A call to this method is generated for new Rails
+applications by default.
+The token parameter is named <code>authenticity_token</code> by default. The name
+and value of this token must be added to every layout that renders
+forms by including <code>csrf_meta_tags</code> in the HTML head.</p>
+</blockquote>
+<p><strong>Notes</strong></p>
+<p>Keep in mind, Rails only verifies not idempotent methods (POST, PUT/PATCH and DELETE). GET request are not checked for authenticity token. Why? because the HTTP specification states that GET requests is idempotent and should <strong>not</strong> create, alter, or destroy resources at the server, and the request should be idempotent (if you run the same command multiple times, you should get the same result every time).</p>
+<p>Also the real implementation is a bit more complicated as defined in the beginning, ensuring better security. Rails does not issue the same stored token with every form. Neither does it generate and store a different token every time. It generates and stores a cryptographic hash in a session and issues new cryptographic tokens, which can be matched against the stored one, every time a page is rendered. See <a href="https://github.com/rails/rails/blob/master/actionpack/lib/action_controller/metal/request_forgery_protection.rb#L329" rel="noreferrer">request_forgery_protection.rb</a>.</p>
+<p><strong>Lessons</strong></p>
+<p>Use <code>authenticity_token</code> to protect your not idempotent methods (POST, PUT/PATCH, and DELETE). Also make sure not to allow any GET requests that could potentially modify resources on the server.</p>
+<hr />
+<p>Check <a href="https://stackoverflow.com/questions/941594/understand-rails-authenticity-token#comment16039314_1571900">the comment by @erturne</a> regarding GET requests being idempotent. He explains it in a better way than I have done here.</p>
+<h4> Comment 4309815 marcamillion: </h4>For instance by hijacking the data returned from a debug function? Just a thought.<br><h4> Comment 16039314 Eric Turner: </h4>&quot;...and the request should be idempotent (if you run the same command multiple times, you should get the same result every time).&quot;  Just a subtle clarification here. Safe means no side-effects. Idempotent means the same side effect no matter how many time a service is called. All safe services are inherently idempotent because there are no side effects.  Calling GET on a current-time resource multiple times would return a different result each time, but it&#39;s safe (and thus idempotent).<br><h4> Comment 4309372 marcamillion: </h4>@Faisal, is it possible then, for an attacker to simply read/capture the &#39;hidden&#39; element of the form for Service A and get that unique token generated for the user - given that they have gotten access to the session started by the user for Service A?<br><h4> Comment 4311935 Faisal: </h4>@marcamillion: If somebody hijacked your session at service A, then the authenticity token won&#39;t protect you. The hijacker will be able to submit a request and it will be allowed to proceed.<br><h4> Comment 5384888 Faisal: </h4>@zabba: Rails raises an ActionController::InvalidAuthenticityToken exception if a form is submitted without the proper token. You can rescue_from the exception and do whatever processing you want.<br><h4> Comment 13288158 Steven Soroka: </h4>re &quot;Also make sure not to make any GET requests that could potentially modify resources on the server.&quot; -- this includes not using match() in routes which could potentially allow GET requests to controller actions intended to receive only POSTs<br><h4> Comment 45266188 Faisal: </h4>@austio, same-origin policy would prevent the javascript loaded by other origins (websites) from reading a cookie from a different domain. As an added precaution, you should make your session cookie &quot;httpOnly&quot;, so that javascript can&#39;t read it at all.<br><h4> Comment 58178409 Chuck Batson: </h4>Can&#39;t a malicious page use JavaScript to issue a GET to the target page, extract the authenticity token from the returned HTML, and thus have the token for its own purposes?<br><h4> Comment 22908164 Faisal: </h4>@dukedave in the context of a CSRF attack, the statement holds, because the client (in this case, javascript running in the malicious site origin) can not view the cookie from a different origin. Also, for anyone reading this way down here, dukedave says &quot;by default&quot;, because the default session store is the cookie. Switching to any other session store will nullify this risk.<br><h4> Comment 5801659 Vijay Dev: </h4>This behaviour has changed from Rails 3.0.4. <a href="http://weblog.rubyonrails.org/2011/2/8/csrf-protection-bypass-in-ruby-on-rails" rel="nofollow noreferrer">weblog.rubyonrails.org/2011/2/8/&hellip;</a><br><h4> Comment 56155996 saihgala: </h4>@Faisal PUT and DELETE are idempotent methods. So rails CSRF premise is not based on idempotence (state of system after a request has been executed). Rather it is proactive damage control that potentially &quot;evil&quot; code can cause to your system.<br><h4> Comment 45262499 Austio: </h4>Hey so if the cookie store holds the session couldn&#39;t a csrf attack just grab the token from cookie and then submit?<br><h4> Comment 21223305 fabspro: </h4>GET requests shouldn&#39;t need to be idempotent. What if you are viewing a frequently updated feed, or a list of random things?<br><h4> Comment 25977636 Faisal: </h4>@BrianArmstrong The meta tags do the exact same thing as the hidden form fields, however they exist as a way for javascript and ajax to have access to the token to send with AJAX requests.   As for your other question, the token stays the same during a single session, so loading multiple forms won&#39;t generate multiple tokens, and they would all function as expected<br><h4> Comment 26207141 Brian Armstrong: </h4>Gotcha.  What if the page first loads with one authenticity token in the meta tag.  Then you have two ajax forms on the page.  The first runs and uses the authenticity token.  The second then runs and tries to use the same token, but it has already been used.  Is this possible or what am I missing?  Thanks!<br><h4> Comment 26207493 Brian Armstrong: </h4>Ahh, didn&#39;t realize the authentity_token stays the same for an entire session.  Makes more sense now!<br><h4> Comment 25975338 Brian Armstrong: </h4>Thx for the explanation - can you explain also why the authenticity_token is placed both in the meta tag, and also in each form, and what happens if an ajax response replaces a form on the page.  Aren&#39;t there forms now with different authenticity_tokens?  Are they one time use?  And if so how do the other forms continue to work.<br><h4> Comment 59030534 Abel: </h4>Why the html include two token?     head token and form token<br><h4> Comment 61146556 Abhilash: </h4>@Faisal So turning csrf off for javascript requests is not safer..right??<br><h4> Comment 65367248 BenKoshy: </h4>&quot;GET request are not checked for authenticity token.&quot; ---&gt; Would like to add that, apparently (if i read wikipedia correctly), this was the root cause of an ING security breach (ING is a bank).<br><h4> Comment 72135488 bjm88: </h4>@ChuckBatson - I 100% agree, CSRF tokens are kind of pointless in this regard, an attacker can just grab it before making POST call.  It does make it slightly harder and can&#39;t do it with just links, but require extra javascript steps, besides that its barely more secure it seems...<br><h4> Comment 74249645 Demi: </h4>@bjm88 The same-origin policy prevents the attacker from doing so.<br><h4> Comment 21592962 mfq: </h4>Whats if request is coming from mobile platform instead of browser ? then how I gona handle this situation @Faisal<br><h4> Comment 21617188 Faisal: </h4>@mfq: If by mobile you mean something like API access, then you should be using API keys and secret API keys to authenticate and validate requests. The built-in CSRF token in rails does not work with API like requests<br><h4> Comment 21622918 mfq: </h4>@Faisal like facebook connect. I guess you are referring to outh token implementation ?<br><h4> Comment 22463891 chuck w: </h4>@mfq, that&#39;s one way to handle it.  See this railscast for others: <a href="http://railscasts.com/episodes/352-securing-an-api?view=asciicast" rel="nofollow noreferrer">railscasts.com/episodes/352-securing-an-api?view=asciicast</a><br><h4> Comment 22898577 davetapley: </h4>Note that by default, the statement, &quot;Since the authenticity token is stored in the session, the client can not know its value.&quot; is not true. See <a href="http://stackoverflow.com/a/8097243/21115">this answer</a>.<br><h4> Comment 20104864 Weverton Timoteo: </h4>only remeber if you are working in app that will make a remote post from another url (like Facebook iframe apps) you need to deactivate for this especific form.<br><h4> Comment 115906476 Dennis Hackethal: </h4>&quot;Since the authenticity token is stored in the session, the client cannot know its value.&quot; This isn&#39;t true. The token is rendered as part of the form and that point the client <i>does</i> have access to it.<br><h4> Comment 120888775 satchel: </h4>@Faisal -- I added a link to the github repo in a searchable environment to see the definition of authenticity token verification and ability to click to tests and references: <a href="https://pix.realquadrant.com/authenticity-token" rel="nofollow noreferrer">pix.realquadrant.com/authenticity-token</a><br><h4> Comment 56158405 Faisal: </h4>@saihgala please check the comment by erturne. He explained it in a better way than I have.<br><h4> Comment 5382599 Zabba: </h4>Is it possible to detect when a CSRF attempt occurs? Maybe write to a log file or get a notification email ?<br>------------------------------------------------------------------ <br><h3> Answer 941660 Topher Fangio: </h3><p>The authenticity token is designed so that you know your form is being submitted from your website. It is generated from the machine on which it runs with a unique identifier that only your machine can know, thus helping prevent cross-site request forgery attacks.</p>
+
+<p>If you are simply having difficulty with rails denying your AJAX script access, you can use</p>
+
+<pre><code>&lt;%= form_authenticity_token %&gt;
+</code></pre>
+
+<p>to generate the correct token when you are creating your form.</p>
+
+<p>You can read more about it in the <a href="http://api.rubyonrails.org/classes/ActionController/RequestForgeryProtection.html#M000491" rel="noreferrer">documentation</a>.</p>
+------------------------------------------------------------------ <br><h3> Answer 26895980 Ciro Santilli OurBigBook.com: </h3><p><strong>Minimal attack example that would be prevented: CSRF</strong></p>
+<p>On my website <code>evil.example</code> I convince you to submit the following form:</p>
+<pre><code>&lt;form action=&quot;http://bank.com/transfer&quot; method=&quot;post&quot;&gt;
+  &lt;p&gt;&lt;input type=&quot;hidden&quot; name=&quot;to&quot;      value=&quot;ciro&quot;&gt;&lt;/p&gt;
+  &lt;p&gt;&lt;input type=&quot;hidden&quot; name=&quot;ammount&quot; value=&quot;100&quot;&gt;&lt;/p&gt;
+  &lt;p&gt;&lt;button type=&quot;submit&quot;&gt;CLICK TO GET PRIZE!!!&lt;/button&gt;&lt;/p&gt;
+&lt;/form&gt;
+</code></pre>
+<p>If you are logged into your bank through session cookies, then the cookies would be sent and the transfer would be made without you even knowing it.</p>
+<p>That is were the CSRF token comes into play:</p>
+<ul>
+<li>with the GET response that that returned the form, Rails sends a very long random hidden parameter</li>
+<li>when the browser makes the POST request, it will send the parameter along, and the server will only accept it if it matches</li>
+</ul>
+<p>So the form on an authentic browser would look like:</p>
+<pre><code>&lt;form action=&quot;http://bank.com/transfer&quot; method=&quot;post&quot;&gt;
+  &lt;p&gt;&lt;input type=&quot;hidden&quot; name=&quot;authenticity_token&quot; value=&quot;j/DcoJ2VZvr7vdf8CHKsvjdlDbmiizaOb5B8DMALg6s=&quot; &gt;&lt;/p&gt;
+  &lt;p&gt;&lt;input type=&quot;hidden&quot; name=&quot;to&quot;                 value=&quot;ciro&quot;&gt;&lt;/p&gt;
+  &lt;p&gt;&lt;input type=&quot;hidden&quot; name=&quot;ammount&quot;            value=&quot;100&quot;&gt;&lt;/p&gt;
+  &lt;p&gt;&lt;button type=&quot;submit&quot;&gt;Send 100$ to Ciro.&lt;/button&gt;&lt;/p&gt;
+&lt;/form&gt;
+</code></pre>
+<p>Thus, my attack would fail, since it was not sending the <code>authenticity_token</code> parameter, and there is no way I could have guessed it since it is a huge random number.</p>
+<p>This prevention technique is called <strong>Synchronizer Token Pattern</strong>.</p>
+<p><strong>Same Origin Policy</strong></p>
+<p>But what if the attacker made two requests with JavaScript, one to read the token, and the second one to make the transfer?</p>
+<p>The synchronizer token pattern alone is not enough to prevent that!</p>
+<p>This is where the Same Origin Policy comes to the rescue, as I have explained at: <a href="https://security.stackexchange.com/questions/8264/why-is-the-same-origin-policy-so-important/72569#72569">https://security.stackexchange.com/questions/8264/why-is-the-same-origin-policy-so-important/72569#72569</a></p>
+<p><strong>How Rails sends the tokens</strong></p>
+<p>Covered at: <a href="https://stackoverflow.com/questions/9996665/rails-how-does-csrf-meta-tag-work">Rails: How Does csrf_meta_tag Work?</a></p>
+<p>Basically:</p>
+<ul>
+<li><p>HTML helpers like <code>form_tag</code> add a hidden field to the form for you if it's not a GET form</p>
+</li>
+<li><p>AJAX is dealt with automatically by <a href="https://github.com/rails/jquery-ujs" rel="nofollow noreferrer">jquery-ujs</a>, which reads the token from the <code>meta</code> elements added to your header by <code>csrf_meta_tags</code> (present in the default template), and adds it to any request made.</p>
+<p>uJS also tries to update the token in forms in outdated cached fragments.</p>
+</li>
+</ul>
+<p><strong>Other prevention approaches</strong></p>
+<ul>
+<li>check if certain headers is present e.g. <code>X-Requested-With</code>:
+<ul>
+<li><a href="https://stackoverflow.com/questions/17478731/whats-the-point-of-the-x-requested-with-header">What&#39;s the point of the X-Requested-With header?</a></li>
+<li><a href="https://security.stackexchange.com/questions/23371/csrf-protection-with-custom-headers-and-without-validating-token">https://security.stackexchange.com/questions/23371/csrf-protection-with-custom-headers-and-without-validating-token</a></li>
+<li><a href="https://stackoverflow.com/questions/3315914/is-an-x-requested-with-header-server-check-sufficient-to-protect-against-a-csrf">Is an X-Requested-With header server check sufficient to protect against a CSRF for an ajax-driven application?</a></li>
+</ul>
+</li>
+<li>check the value of the <code>Origin</code> header: <a href="https://security.stackexchange.com/questions/91165/why-is-the-synchronizer-token-pattern-preferred-over-the-origin-header-check-to">https://security.stackexchange.com/questions/91165/why-is-the-synchronizer-token-pattern-preferred-over-the-origin-header-check-to</a></li>
+<li>re-authentication: ask user for password again. This should be done for every critical operation (bank login and money transfers, password changes in most websites), in case your site ever gets XSSed. The downside is that the user has to type the password multiple times, which is tiresome, and increases the chances of keylogging / shoulder surfing.</li>
+</ul>
+<h4> Comment 72140392 Ciro Santilli OurBigBook.com: </h4>@bjm88 inject the script where? On your site, or on the attacked site? If attacked site, allowing script injection is a well known security flaw, and effectively pawns the website. Every website must fight it through input sanitation. For images, I don&#39;t see how they can be used for an attack. On attacking site: you could modify your browser to allow the read, and thus auto pawn yourself at will :-) but decent browsers prevent it by default, give it a try.<br><h4> Comment 72135610 bjm88: </h4>Thank you, but your point about relying on same origin policy to not be able to just read the CSRF token first seems flawed.  So first you saying you can POST to a different origin but can&#39;t read from it, seems weird but I guess that is correct, but you could inject an image or script tag with a get to the page and link a handler to parse response and get it yes?<br>------------------------------------------------------------------ <br><h3> Answer 11007237 Rose Perrone: </h3><h2>What is CSRF?</h2>
+
+<p>The Authenticity Token is a countermeasure to Cross-Site Request Forgery (CSRF). What is CSRF, you ask?</p>
+
+<p>It's a way that an attacker can potentially hijack sessions without even knowing session tokens. </p>
+
+<p><strong>Scenario</strong>:</p>
+
+<ul>
+<li>Visit your bank's site, log in.</li>
+<li>Then visit the attacker's site (e.g. sponsored ad from an untrusted organization).</li>
+<li>Attacker's page includes form with same fields as the bank's "Transfer Funds" form.</li>
+<li>Attacker knows your account info, and has pre-filled form fields to transfer money from your account to attacker's account.</li>
+<li>Attacker's page includes Javascript that submits form to your bank.</li>
+<li>When form gets submitted, browser includes your cookies for the bank site, including the session token.</li>
+<li>Bank transfers money to attacker's account.</li>
+<li>The form can be in an iframe that is invisible, so you never know the attack occurred. </li>
+<li>This is called Cross-Site Request Forgery (CSRF). </li>
+</ul>
+
+<p><strong>CSRF solution</strong>:</p>
+
+<ul>
+<li>Server can mark forms that came from the server itself</li>
+<li>Every form must contain an additional authentication token as a hidden field.</li>
+<li>Token must be unpredictable (attacker can't guess it).</li>
+<li>Server provides valid token in forms in its pages.</li>
+<li>Server checks token when form posted, rejects forms without proper token. </li>
+<li>Example token: session identifier encrypted with server secret key.</li>
+<li>Rails automatically generates such tokens: see the authenticity_token input field in every form. </li>
+</ul>
+<h4> Comment 55424358 Lutz Prechelt: </h4>Here is a version of this same explanation that is less precise but also less abstract: <a href="http://stackoverflow.com/a/33829607/2810305">stackoverflow.com/a/33829607/2810305</a><br><h4> Comment 120500759 Peter Gerdes: </h4>@divideByZero (ohh great name!) there is some protection in the form of CORS headers.  A site can specify what domains it wishes to receive requests from (and certain browsers/apis are even more restrictive) but I&#39;m not sure when this was adopted or if really old browsers all support it and one probably also wants to have this kind of protection in case the domain left their CORS settings to *.   <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" rel="nofollow noreferrer">developer.mozilla.org/en-US/docs/Web/HTTP/CORS</a><br><h4> Comment 66600101 divideByZero: </h4>I&#39;m not sure but, do modern browsers allow sending not idempotent requests(POST/PUT/DELETE) to another domain? I guess, there must be protection against such in things in browser itself<br>------------------------------------------------------------------ <br><h3> Answer 43405245 Adam Zerner: </h3><p>The authenticity token is used to prevent Cross-Site Request Forgery attacks (CSRF). To understand the authenticity token, you must first understand CSRF attacks.</p>
+<h1>CSRF</h1>
+<p>Suppose that you are the author of <code>bank.example</code>. You have a form on your site that is used to transfer money to a different account with a GET request:</p>
+<p><a href="https://i.stack.imgur.com/QV7s3.png" rel="noreferrer"><img src="https://i.stack.imgur.com/QV7s3.png" alt="enter image description here" /></a></p>
+<p>A hacker could just send an HTTP request to the server saying <code>GET /transfer?amount=$1000000&amp;account-to=999999</code>, right?</p>
+<p><a href="https://i.stack.imgur.com/acVPX.png" rel="noreferrer"><img src="https://i.stack.imgur.com/acVPX.png" alt="enter image description here" /></a></p>
+<p>Wrong. The hackers attack won't work. The server will basically think?</p>
+<blockquote>
+<p>Huh? Who is this guy trying to initiate a transfer. It's not the owner of the account, that's for sure.</p>
+</blockquote>
+<p>How does the server know this? Because there's no <code>session_id</code> cookie authenticating the requester.</p>
+<p>When you sign in with your username and password, the server sets a <code>session_id</code> cookie on your browser. That way, you don't have to authenticate each request with your username and password. When your browser sends the <code>session_id</code> cookie, the server knows:</p>
+<blockquote>
+<p>Oh, that's John Doe. He signed in successfully 2.5 minutes ago. He's good to go.</p>
+</blockquote>
+<p>A hacker might think:</p>
+<blockquote>
+<p>Hmm. A normal HTTP request won't work, but if I could get my hand on that <code>session_id</code> cookie, I'd be golden.</p>
+</blockquote>
+<p>The users browser has a bunch of cookies set for the <code>bank.example</code> domain. Every time the user makes a request to the <code>bank.example</code> domain, all of the cookies get sent along. Including the <code>session_id</code> cookie.</p>
+<p>So if a hacker could get <em>you</em> to make the GET request that transfers money into his account, he'd be successful. How could he trick you into doing so?
+With Cross Site Request Forgery.</p>
+<p>It's pretty simply, actually. The hacker could just get you to visit his website. On his website, he could have the following image tag:</p>
+<pre><code>&lt;img src=&quot;http://bank.example/transfer?amount=$1000000&amp;account-to=999999&quot;&gt;
+</code></pre>
+<p>When the users browser comes across that image tag, it'll be making a GET request to that url. And since the request comes from his browser, it'll send with it all of the cookies associated with <code>bank.example</code>. If the user had recently signed in to <code>bank.example</code>... the <code>session_id</code> cookie will be set, and the server will think that the user meant to transfer $1,000,000 to account 999999!</p>
+<p><a href="https://i.stack.imgur.com/UGrgL.png" rel="noreferrer"><img src="https://i.stack.imgur.com/UGrgL.png" alt="enter image description here" /></a></p>
+<blockquote>
+<p>Well, just don't visit dangerous sites and you'll be fine.</p>
+</blockquote>
+<p>That isn't enough. What if someone posts that image to Facebook and it appears on your wall? What if it's injected into a site you're visiting with a XSS attack?</p>
+<blockquote>
+<p>It's not so bad. Only GET requests are vulnerable.</p>
+</blockquote>
+<p>Not true. A form that sends a POST request can be dynamically generated. Here's the example from the <a href="http://guides.rubyonrails.org/security.html#cross-site-request-forgery-csrf" rel="noreferrer">Rails Guide on Security</a>:</p>
+<pre><code>&lt;a href=&quot;http://www.harmless.example/&quot; onclick=&quot;
+  var f = document.createElement('form');
+  f.style.display = 'none';
+  this.parentNode.appendChild(f);
+  f.method = 'POST';
+  f.action = 'http://www.example.com/account/destroy';
+  f.submit();
+  return false;&quot;&gt;To the harmless survey&lt;/a&gt;
+</code></pre>
+<h1>Authenticity Token</h1>
+<p>When your <code>ApplicationController</code> has this:</p>
+<pre><code>protect_from_forgery with: :exception
+</code></pre>
+<p>This:</p>
+<pre><code>&lt;%= form_tag do %&gt;
+  Form contents
+&lt;% end %&gt;
+</code></pre>
+<p>Is compiled into this:</p>
+<pre><code>&lt;form accept-charset=&quot;UTF-8&quot; action=&quot;/&quot; method=&quot;post&quot;&gt;
+  &lt;input name=&quot;utf8&quot; type=&quot;hidden&quot; value=&quot;&amp;#x2713;&quot; /&gt;
+  &lt;input name=&quot;authenticity_token&quot; type=&quot;hidden&quot; value=&quot;J7CBxfHalt49OSHp27hblqK20c9PgwJ108nDHX/8Cts=&quot; /&gt;
+  Form contents
+&lt;/form&gt;
+</code></pre>
+<p>In particular, the following is generated:</p>
+<pre><code>&lt;input name=&quot;authenticity_token&quot; type=&quot;hidden&quot; value=&quot;J7CBxfHalt49OSHp27hblqK20c9PgwJ108nDHX/8Cts=&quot; /&gt;
+</code></pre>
+<p>To protect against CSRF attacks, if Rails doesn't see the authenticity token sent along with a request, it won't consider the request safe.</p>
+<p>How is an attacker supposed to know what this token is? A different value is generated randomly each time the form is generated:</p>
+<p><a href="https://i.stack.imgur.com/4AJHB.gif" rel="noreferrer"><img src="https://i.stack.imgur.com/4AJHB.gif" alt="enter image description here" /></a></p>
+<p>A Cross Site Scripting (XSS) attack - that's how. But that's a different vulnerability for a different day.</p>
+------------------------------------------------------------------ <br><h3> Answer 941661 andi: </h3><p>The <code>Authenticity Token</code> is rails' method to <a href="http://en.wikipedia.org/wiki/Cross-site_request_forgery#Prevention" rel="noreferrer">prevent</a> <a href="http://en.wikipedia.org/wiki/Cross-site_request_forgery#Example_and_characteristics" rel="noreferrer">'cross-site request forgery (CSRF or XSRF) attacks'</a>.</p>
+
+<p>To put it simple, it makes sure that the PUT / POST / DELETE (methods that can modify content) requests to your web app are made from the client's browser and not from a third party (an attacker) that has access to a cookie created on the client side.</p>
+------------------------------------------------------------------ <br><h3> Answer 11752866 Yuan He: </h3><p>since <code>Authenticity Token</code> is so important, and in Rails 3.0+ you can use</p>
+
+<pre><code> &lt;%= token_tag nil %&gt;
+</code></pre>
+
+<p>to create </p>
+
+<pre><code>&lt;input name="authenticity_token" type="hidden" value="token_value"&gt;
+</code></pre>
+
+<p>anywhere</p>
+<h4> Comment 33330155 Michael: </h4>This was helpful to me. I was actually trying to do <code>XSS</code> on the login page, not for nefarious purposes, but to create a new session with pre-filled user name. Now I know I can just use <code>value=&quot;token_value&quot;</code>.<br>------------------------------------------------------------------ <br><h3> Answer 7251066 jdp: </h3><p>Beware the Authenticity Token mechanism can result in race conditions if you have multiple, concurrent requests from the same client. In this situation your server can generate multiple authenticity tokens when there should only be one, and the client receiving the earlier token in a form will fail on it's next request because the session cookie token has been overwritten.
+There is a write up on this problem and a not entirely trivial solution here:
+<a href="http://www.paulbutcher.com/2007/05/race-conditions-in-rails-sessions-and-how-to-fix-them/">http://www.paulbutcher.com/2007/05/race-conditions-in-rails-sessions-and-how-to-fix-them/</a></p>
+------------------------------------------------------------------ <br><h3> Answer 22039573 uma: </h3><p><strong>Methods Where <code>authenticity_token</code> is required</strong></p>
+
+<blockquote>
+  <p><code>authenticity_token</code> is required in case of idempotent methods like post, put and delete, Because Idempotent methods are affecting to data.</p>
+</blockquote>
+
+<p><strong>Why It is Required</strong></p>
+
+<blockquote>
+  <p>It is required to prevent from evil actions. authenticity_token is stored in session, whenever a form is created on web pages for creating or updating to resources then a authenticity token is stored in hidden field and it sent with form on server. Before executing action user sent authenticity_token is cross checked with <code>authenticity_token</code> stored in session. If <code>authenticity_token</code> is same then process is continue otherwise it does not perform actions.</p>
+</blockquote>
+<h4> Comment 38251948 Jean-Th&#233;o: </h4>Actually, isn&#39;t it the opposite ? GET is idempotent since its call shouldn&#39;t alter the state of the system, where PUT POST and DELETE verbs are NOT idempotent verbs since they alter the system state.  I.E : authenticity_token is required in case of NOT idempotent methods.<br><h4> Comment 42344796 Ciro Santilli OurBigBook.com: </h4>@Jean-Daube, uma: idempotent means that if done twice, action only happens once. GET, PUT and DELETE <i>are</i> idempotent: <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html" rel="nofollow noreferrer">w3.org/Protocols/rfc2616/rfc2616-sec9.html</a> The key property here is not idempotency, but if the method changes or not the data, which is called &quot;Safe method&quot; or not.<br>------------------------------------------------------------------ <br><h3> Answer 38517058 Pradeep Sapkota: </h3><p><strong>What is an authentication_token ?</strong></p>
+
+<p>This is a random string used by rails application to make sure that the user is requesting or performing an action from the app page, not from another app or site.</p>
+
+<p><strong>Why is an authentication_token is necessary ?</strong></p>
+
+<p>To protect your app or site from cross-site request forgery.</p>
+
+<p><strong>How to add an authentication_token to a form ?</strong></p>
+
+<p>If you are generating a form using form_for tag an authentication_token is automatically added else you can use <code>&lt;%= csrf_meta_tag %&gt;</code>.</p>
+------------------------------------------------------------------ <br><h3> Answer 77148985 Mohsin Amjad: </h3><p>In Ruby on Rails, the authenticity token, often referred to as the CSRF (Cross-Site Request Forgery) token, is a security feature used to protect web applications from certain types of attacks, particularly CSRF attacks.</p>

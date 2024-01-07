@@ -1,0 +1,349 @@
+ <h2> Title: How do you round a floating point number in Perl? </h2> <h3> Ranguard, question_id: 178539 </h3>Score: 195, Tags: {perl,floating-point,rounding} <br><p>How can I round a decimal number (floating point) to the nearest integer? </p>
+
+<p>e.g.</p>
+
+<pre><code>1.2 = 1
+1.7 = 2
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 179086 Kyle: </h3><p><p>If you decide to use printf or sprintf, note that they use the <a href="http://en.wikipedia.org/wiki/Rounding#Round_half_to_even" rel="noreferrer">Round half to even</a> method.</p>
+
+<pre><code>foreach my $i ( 0.5, 1.5, 2.5, 3.5 ) {
+    printf "$i -&gt; %.0f\n", $i;
+}
+__END__
+0.5 -&gt; 0
+1.5 -&gt; 2
+2.5 -&gt; 2
+3.5 -&gt; 4
+</code></pre>
+<h4> Comment 3893615 Jean Vincent: </h4>Thanks for pointing this out.  More precisely, the name of the method is &#39;Round Half to Even&#39;.<br><h4> Comment 58152352 insaner: </h4>All the answers that mention printf, or sprintf should mention this.<br><h4> Comment 77046565 Boris D&#228;ppen: </h4>This is an extremly important information. I had serveral times bugs in software because I assumed 5 will always be rounded up. I finally found, why perl never did what I wanted. Thanks for pointing this out.<br><h4> Comment 77532340 Apoc: </h4>Actually, this is OS dependent! In Windows it will round half away from zero and unix-like will round half to even: <a href="http://www.exploringbinary.com/inconsistent-rounding-of-printed-floating-point-numbers/" rel="nofollow noreferrer">exploringbinary.com/&hellip;</a><br><h4> Comment 112138498 user8017719: </h4>@Apoc It is defined as &quot;round to nearest (integer) ties to even&quot; in <a href="https://en.wikipedia.org/wiki/IEEE_754#Roundings_to_nearest" rel="nofollow noreferrer">IEEE754</a>. Nearest is any integer that is less than 0.5 (in magnitude) away. If it happens that the number is <b>exactly</b> half way (a tie) then round to even. Yes, Windows does not follow the IEEE spec.<br>------------------------------------------------------------------ <br><h3> Answer 178551 Vinko Vrsalovic: </h3><p>Output of <a href="http://perldoc.perl.org/perlfaq4.html#Does-Perl-have-a-round%28)-function%3f--What-about-ceil()-and-floor()%3f--Trig-functions%3f" rel="noreferrer"><code>perldoc -q round</code></a></p>
+
+<blockquote>
+Does Perl have a round() function?  What about ceil() and floor()?
+Trig functions?
+<p>
+Remember that <a href="http://perldoc.perl.org/functions/int.html" rel="noreferrer"><code>int()</code></a> merely truncates toward <code>0</code>.  For rounding to a certain number of digits, <a href="http://perldoc.perl.org/functions/sprintf.html" rel="noreferrer"><code>sprintf()</code></a> or <a href="http://perldoc.perl.org/functions/printf.html" rel="noreferrer"><code>printf()</code></a> is usually the easiest
+route.
+<p>
+<pre><code>    printf("%.3f", 3.1415926535);       # prints 3.142
+</code></pre>
+<p>
+The <a href="http://perldoc.perl.org/POSIX.html" rel="noreferrer"><code>POSIX</code></a> module (part of the standard Perl distribution) implements
+<code>ceil()</code>, <code>floor()</code>, and a number of other mathematical and trigonometric
+functions.
+<p>
+<pre><code>    use POSIX;
+    $ceil   = ceil(3.5);                        # 4
+    $floor  = floor(3.5);                       # 3
+</code></pre>
+<p>
+In 5.000 to 5.003 perls, trigonometry was done in the <a href="http://perldoc.perl.org/Math/Complex.html" rel="noreferrer"><code>Math::Complex</code></a>
+module.  With 5.004, the <a href="http://perldoc.perl.org/Math/Trig.html" rel="noreferrer"><code>Math::Trig</code></a> module (part of the standard Perl
+distribution) implements the trigonometric functions. Internally it
+uses the <a href="http://perldoc.perl.org/Math/Complex.html" rel="noreferrer"><code>Math::Complex</code></a> module and some functions can break out from the
+real axis into the complex plane, for example the inverse sine of 2.
+<p>
+Rounding in financial applications can have serious implications, and
+the rounding method used should be specified precisely.  In these
+cases, it probably pays not to trust whichever system rounding is being
+used by Perl, but to instead implement the rounding function you need
+yourself.
+<p>
+To see why, notice how you'll still have an issue on half-way-point
+alternation:
+<p>
+<pre><code>    for ($i = 0; $i &lt; 1.01; $i += 0.05) { printf "%.1f ",$i}
+
+    0.0 0.1 0.1 0.2 0.2 0.2 0.3 0.3 0.4 0.4 0.5 0.5 0.6 0.7 0.7
+    0.8 0.8 0.9 0.9 1.0 1.0
+</code></pre>
+<p>
+Don't blame Perl.  It's the same as in C.  IEEE says we have to do
+this.  Perl numbers whose absolute values are integers under <code>2**31</code> (on
+32 bit machines) will work pretty much like mathematical integers.
+Other numbers are not guaranteed.
+</p>
+</blockquote>
+<h4> Comment 29262474 Sam Watkins: </h4>^ Thariama, why would ceil be deprecated? It&#39;s not deprecated in POSIX or perl as far as I know. Citation needed!<br><h4> Comment 59741148 Boris D&#228;ppen: </h4>@Beginners, don&#39;t try to use <code>printf</code> if you want the result in a variable, use <code>sprintf</code>... hope this saves you some debugging-time :-P<br><h4> Comment 80218873 Joseph Argenio: </h4>use POSIX; &lt;br/&gt; $x = ($x - floor($x) &gt;= .5) ? ceil($x) : floor($x);<br><h4> Comment 76287890 CinCout: </h4>Can I use <code>int()</code> on PDLs?<br>------------------------------------------------------------------ <br><h3> Answer 1274692 RET: </h3><p>Whilst not disagreeing with the complex answers about half-way marks and so on, for the more common (and possibly trivial) use-case:</p>
+
+<p><code>my $rounded = int($float + 0.5);</code></p>
+
+<p><strong>UPDATE</strong></p>
+
+<p>If it's possible for your <code>$float</code> to be negative, the following variation will produce the correct result:</p>
+
+<p><code>my $rounded = int($float + $float/abs($float*2 || 1));</code></p>
+
+<p>With this calculation -1.4 is rounded to -1, and -1.6 to -2, and zero won't explode.</p>
+<h4> Comment 19271330 fishinear: </h4>@RET Yes, it does fail with negative numbers. $float=-1.4 results in 0 with this method. That is not what they taught at my school. Remember that int() truncates towards zero.<br><h4> Comment 19294982 RET: </h4>@fishinear You are correct, and I am duly chastened. But I did say &#39;for trivial use-case&#39;. My answer has been corrected.<br><h4> Comment 17837710 alessandro: </h4>... but it fails on negative numbers: still better sprintf<br><h4> Comment 17856535 RET: </h4>Ah no, it does not. Rounding up a negative number takes you closer to zero, not further away. What are they teaching in schools these days?<br><h4> Comment 72745315 mat: </h4>Note that it $float = 0, this will fail :-)<br><h4> Comment 111254134 Ecuador: </h4>Ancient post, but I don&#39;t see why the code should become complicated for negatives: <code>$rounded = int(abs($float) + 0.5); $rounded = $float * -1 if $float &lt; 0;</code> is much simpler and 25% faster when I bench it with positive values (loses a bit of the advantage with negatives). You can even write it in a single line with the ternary operator if you HAVE to: <code>int(abs($float) + 0.5)*($float &lt; 0 ? -1 : 1);</code> still easier to understand and faster...<br><h4> Comment 66638321 HoldOffHunger: </h4>For instances where I was just correcting for floating points incapable of reaching an integer, I used this modified solution: my $rounded = floor($float + 0.1);<br><h4> Comment 72750191 RET: </h4>@mat That&#39;s a correction that&#39;s been a long time coming! Duly fixed, thanks for pointing it out.<br>------------------------------------------------------------------ <br><h3> Answer 178550 EvdB: </h3><p>You can either use a module like <A href="http://search.cpan.org/dist/Math-Round" rel="noreferrer">Math::Round</a>:</p>
+
+<pre><code>use Math::Round;
+my $rounded = round( $float );
+</code></pre>
+
+<p>Or you can do it the crude way:</p>
+
+<pre><code>my $rounded = sprintf "%.0f", $float;
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 178576 Kent Fredric: </h3><p>See <a href="http://perldoc.perl.org/perlfaq4.html" rel="nofollow noreferrer">perldoc/perlfaq</a>:</p>
+
+<blockquote>
+  <p>Remember that <code>int()</code> merely truncates toward 0.  For rounding to a
+  certain number of digits, <code>sprintf()</code> or <code>printf()</code> is usually the
+  easiest route.</p>
+
+<pre><code> printf("%.3f",3.1415926535);
+ # prints 3.142
+</code></pre>
+  
+  <p>The <code>POSIX</code> module (part of the standard Perl distribution)
+  implements <code>ceil()</code>, <code>floor()</code>, and a number of other mathematical
+  and trigonometric functions.</p>
+
+<pre><code>use POSIX;
+$ceil  = ceil(3.5); # 4
+$floor = floor(3.5); # 3
+</code></pre>
+  
+  <p>In 5.000 to 5.003 perls, trigonometry was done in the <code>Math::Complex</code> module.</p>
+  
+  <p>With 5.004, the <code>Math::Trig</code> module (part of the standard Perl distribution) > implements the trigonometric functions.</p>
+  
+  <p>Internally it uses the <code>Math::Complex</code> module and some functions can break
+  out from the real axis into the complex plane, for example the inverse sine of 2.</p>
+  
+  <p>Rounding in financial applications can have serious implications, and the rounding
+  method used should be specified precisely.  In these cases, it probably pays not to
+  trust whichever system rounding is being used by Perl, but to instead implement the
+  rounding function you need yourself.</p>
+  
+  <p>To see why, notice how you'll still have an issue on half-way-point alternation:</p>
+
+<pre><code>for ($i = 0; $i &lt; 1.01; $i += 0.05)
+{
+   printf "%.1f ",$i
+}
+
+0.0 0.1 0.1 0.2 0.2 0.2 0.3 0.3 0.4 0.4 0.5 0.5 0.6 0.7 0.7 0.8 0.8 0.9 0.9 1.0 1.0
+</code></pre>
+  
+  <p>Don't blame Perl.  It's the same as in C.  IEEE says we have to do
+  this. Perl numbers whose absolute values are integers under 2**31 (on
+  32 bit machines) will work pretty much like mathematical integers.
+  Other numbers are not guaranteed.</p>
+</blockquote>
+------------------------------------------------------------------ <br><h3> Answer 6336201 activealexaoki: </h3><p>You don't need any external module.</p>
+
+<pre><code>$x[0] = 1.2;
+$x[1] = 1.7;
+
+foreach (@x){
+  print $_.' = '.( ( ($_-int($_))&lt;0.5) ? int($_) : int($_)+1 );
+  print "\n";
+}
+</code></pre>
+
+<p>I may be missing your point, but I thought this was much cleaner way to do the same job.</p>
+
+<p>What this does is to walk through every positive number in the element, print the number and rounded integer in the format you mentioned. The code concatenates respective rounded positive integer only based on the decimals. int($_) basically <em>round-down</em> the number so ($<em>-int($</em>)) captures the decimals. If the decimals are (by definition) strictly less than 0.5, round-down the number. If not, round-up by adding 1.</p>
+<h4> Comment 24293714 cptstubing06: </h4>This really isn&#39;t very complicated, and RET&#39;s answer involves a bunch of math that a) theoretically risks overflow, b) takes longer, and c) needlessly introduces more fp imprecision to your final value.  Wait, which one is complicated again? ;)<br><h4> Comment 7412831 Joel Berger: </h4>Once again, why answer an ancient question with a complicated answer when something like RET&#39;s answer works equally well.<br>------------------------------------------------------------------ <br><h3> Answer 25810334 seacoder: </h3><p>The following will round positive or negative numbers to a given decimal position:</p>
+
+<pre><code>sub round ()
+{
+    my ($x, $pow10) = @_;
+    my $a = 10 ** $pow10;
+
+    return (int($x / $a + (($x &lt; 0) ? -0.5 : 0.5)) * $a);
+}
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 4503906 David Beckman: </h3><p>Following is a sample of five different ways to summate values. The first is a naive way to perform the summation (and fails). The second attempts to use <code>sprintf()</code>, but it too fails. The third uses <code>sprintf()</code> successfully while the final two (4th &amp; 5th) use <code>floor($value + 0.5)</code>.</p>
+
+<pre><code> use strict;
+ use warnings;
+ use POSIX;
+
+ my @values = (26.67,62.51,62.51,62.51,68.82,79.39,79.39);
+ my $total1 = 0.00;
+ my $total2 = 0;
+ my $total3 = 0;
+ my $total4 = 0.00;
+ my $total5 = 0;
+ my $value1;
+ my $value2;
+ my $value3;
+ my $value4;
+ my $value5;
+
+ foreach $value1 (@values)
+ {
+      $value2 = $value1;
+      $value3 = $value1;
+      $value4 = $value1;
+      $value5 = $value1;
+
+      $total1 += $value1;
+
+      $total2 += sprintf('%d', $value2 * 100);
+
+      $value3 = sprintf('%1.2f', $value3);
+      $value3 =~ s/\.//;
+      $total3 += $value3;
+
+      $total4 += $value4;
+
+      $total5 += floor(($value5 * 100.0) + 0.5);
+ }
+
+ $total1 *= 100;
+ $total4 = floor(($total4 * 100.0) + 0.5);
+
+ print '$total1: '.sprintf('%011d', $total1)."\n";
+ print '$total2: '.sprintf('%011d', $total2)."\n";
+ print '$total3: '.sprintf('%011d', $total3)."\n";
+ print '$total4: '.sprintf('%011d', $total4)."\n";
+ print '$total5: '.sprintf('%011d', $total5)."\n";
+
+ exit(0);
+
+ #$total1: 00000044179
+ #$total2: 00000044179
+ #$total3: 00000044180
+ #$total4: 00000044180
+ #$total5: 00000044180
+</code></pre>
+
+<p>Note that <code>floor($value + 0.5)</code> can be replaced with <code>int($value + 0.5)</code> to remove the dependency on <code>POSIX</code>.</p>
+------------------------------------------------------------------ <br><h3> Answer 7154435 matt: </h3><p>Negative numbers can add some quirks that people need to be aware of.</p>
+
+<p><code>printf</code>-style approaches give us correct numbers, but they can result in some odd displays. We have discovered that this method (in my opinion, stupidly) puts in a <code>-</code> sign whether or not it should or shouldn't. For example, -0.01 rounded to one decimal place returns a -0.0, rather than just 0. If you are going to do the <code>printf</code> style approach, and you know you want no decimal, use <code>%d</code> and not <code>%f</code> (when you need decimals, it's when the display gets wonky).</p>
+
+<p>While it's correct and for math no big deal, for display it just looks weird showing something like "-0.0".</p>
+
+<p>For the int method, negative numbers can change what you want as a result (though there are some arguments that can be made they are correct).</p>
+
+<p>The <code>int + 0.5</code> causes real issues with -negative numbers, unless you want it to work that way, but I imagine most people don't. -0.9 should probably round to -1, not 0. If you know that you want negative to be a ceiling rather than a floor then you can do it in one-liner, otherwise, you might want to use the int method with a minor modification (this obviously only works to get back whole numbers:</p>
+
+<pre><code>my $var = -9.1;
+my $tmpRounded = int( abs($var) + 0.5));
+my $finalRounded = $var &gt;= 0 ? 0 + $tmpRounded : 0 - $tmpRounded;
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 39668498 HoldOffHunger: </h3><p>If you are only concerned with getting an integer value out of a whole floating point number (i.e. 12347.9999 or 54321.0001), this approach (borrowed and modified from above) will do the trick:</p>
+
+<pre><code>my $rounded = floor($float + 0.1); 
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 8064429 Akvel: </h3><p>My solution for sprintf</p>
+
+<pre><code>if ($value =~ m/\d\..*5$/){
+    $format =~ /.*(\d)f$/;
+    if (defined $1){
+       my $coef = "0." . "0" x $1 . "05";    
+            $value = $value + $coef;    
+    }
+}
+
+$value = sprintf( "$format", $value );
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 59225239 Jarett Lloyd: </h3><p>loads of reading documentation on how to round numbers, many experts suggest writing your own rounding routines, as the 'canned' version provided with your language may not be precise enough, or contain errors.  i imagine, however, they're talking many decimal places not just one, two, or three.  with that in mind, here is my solution (although not EXACTLY as requested as my needs are to display dollars - the process is not much different, though).  </p>
+
+<pre><code>sub asDollars($) {
+  my ($cost) = @_;
+  my $rv = 0;
+
+  my $negative = 0;
+  if ($cost =~ /^-/) {
+    $negative = 1;
+    $cost =~ s/^-//;
+  }
+
+  my @cost = split(/\./, $cost);
+
+  # let's get the first 3 digits of $cost[1]
+  my ($digit1, $digit2, $digit3) = split("", $cost[1]);
+  # now, is $digit3 &gt;= 5?
+  # if yes, plus one to $digit2.
+  # is $digit2 &gt; 9 now?
+  # if yes, $digit2 = 0, $digit1++
+  # is $digit1 &gt; 9 now??
+  # if yes, $digit1 = 0, $cost[0]++
+  if ($digit3 &gt;= 5) {
+    $digit3 = 0;
+    $digit2++;
+    if ($digit2 &gt; 9) {
+      $digit2 = 0;
+      $digit1++;
+      if ($digit1 &gt; 9) {
+        $digit1 = 0;
+        $cost[0]++;
+      }
+    }
+  }
+  $cost[1] = $digit1 . $digit2;
+  if ($digit1 ne "0" and $cost[1] &lt; 10) { $cost[1] .= "0"; }
+
+  # and pretty up the left of decimal
+  if ($cost[0] &gt; 999) { $cost[0] = commafied($cost[0]); }
+
+  $rv = join(".", @cost);
+
+  if ($negative) { $rv = "-" . $rv; }
+
+  return $rv;
+}
+
+sub commafied($) {
+  #*
+  # to insert commas before every 3rd number (from the right)
+  # positive or negative numbers
+  #*
+  my ($num) = @_; # the number to insert commas into!
+
+  my $negative = 0;
+  if ($num =~ /^-/) {
+    $negative = 1;
+    $num =~ s/^-//;
+  }
+  $num =~ s/^(0)*//; # strip LEADING zeros from given number!
+  $num =~ s/0/-/g; # convert zeros to dashes because ... computers!
+
+  if ($num) {
+    my @digits = reverse split("", $num);
+    $num = "";
+
+    for (my $i = 0; $i &lt; @digits; $i += 3) {
+      $num .= $digits[$i];
+      if ($digits[$i+1]) { $num .= $digits[$i+1]; }
+      if ($digits[$i+2]) { $num .= $digits[$i+2]; }
+      if ($i &lt; (@digits - 3)) { $num .= ","; }
+      if ($i &gt;= @digits) { last; }
+    }
+
+    #$num =~ s/,$//;
+    $num = join("", reverse split("", $num));
+    $num =~ s/-/0/g;
+  }
+
+  if ($negative) { $num = "-" . $num; }
+
+  return $num; # a number with commas added
+  #usage: my $prettyNum = commafied(1234567890);
+}
+</code></pre>
+<h4> Comment 104665085 Jarett Lloyd: </h4>to make the subroutine conform to your specifications, simply modify the following:  <code>if ($digit3 &gt;= 5) {     $digit3 = 0;     $digit2++;     if ($digit2 &gt; 9) {       $digit2 = 0;       $digit1++;       if ($digit1 &gt; 9) {         $digit1 = 0;         $cost[0]++;       }     }   }</code>  so it&#39;s:  <code>if ($digit1 &gt;= 5) {    $digit1 = 0;    $cost[0]++;  }</code>  then just <code>return commafied($cost[0]);</code><br>------------------------------------------------------------------ <br><h3> Answer 67497204 A1rPun: </h3><p>Using <a href="https://perldoc.perl.org/Math::BigFloat" rel="nofollow noreferrer"><code>Math::BigFloat</code></a> you can do something like this:</p>
+<pre><code>use Math::BigFloat;
+
+print Math::BigFloat-&gt;new(1.2)-&gt;bfround(1); ## 1
+print Math::BigFloat-&gt;new(1.7)-&gt;bfround(1); ## 2
+</code></pre>
+<p>This can be wrapped in a subroutine</p>
+<pre><code>use Math::BigFloat;
+
+sub round {
+  Math::BigFloat-&gt;new(shift)-&gt;bfround(1);
+}
+
+print round(1.2); ## 1
+print round(1.7); ## 2
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 1272301 user155846: </h3><pre><code>cat table |
+  perl -ne '/\d+\s+(\d+)\s+(\S+)/ &amp;&amp; print "".**int**(log($1)/log(2))."\t$2\n";' 
+</code></pre>

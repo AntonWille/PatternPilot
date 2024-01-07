@@ -1,0 +1,341 @@
+ <h2> Title: How do I get the row count of a Pandas DataFrame? </h2> <h3> yemu, question_id: 15943769 </h3>Score: 1882, Tags: {python,pandas,dataframe} <br><p>How do I get the number of rows of a pandas dataframe <code>df</code>?</p>
+<h4> Comment 35404579 smci: </h4>^ Dangerous! Beware that <code>df.count()</code> will only return the count of non-NA/NaN rows for each column. You should use <code>df.shape[0]</code> instead, which will always correctly tell you the number of rows.<br><h4> Comment 22717432 yemu: </h4>ok I found out, i should have called method not check property, so it should be df.count() no df.count<br><h4> Comment 52520893 Marcelo Bielsa: </h4>Note that df.count will not return an int when the dataframe is empty (e.g., pd.DataFrame(columns=[&quot;Blue&quot;,&quot;Red&quot;).count is not 0)<br><h4> Comment 127427086 MikeB2019x: </h4>could use df.info() so you get row count (# entries), number of non-null entries in each column, dtypes and memory usage.  Good complete picture of the df.  If you&#39;re looking for a number you can use programatically then df.shape[0].<br>------------------------------------------------------------------ <br><h3> Answer 46334240 Vlad: </h3><p>For dataframe df, a printed comma formatted row count used while exploring data:    </p>
+
+<pre><code>def nrow(df):
+    print("{:,}".format(df.shape[0]))
+</code></pre>
+
+<p>Example:</p>
+
+<pre><code>nrow(my_df)
+12,456,789
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 15943975 root: </h3><p>For a dataframe <code>df</code>, one can use any of the following:</p>
+<ul>
+<li><code>len(df.index)</code></li>
+<li><code>df.shape[0]</code></li>
+<li><code>df[df.columns[0]].count()</code> (== <a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.count.html" rel="noreferrer">number of non-NaN values</a> in first column)</li>
+</ul>
+<p><a href="https://i.stack.imgur.com/wEzue.png" rel="noreferrer"><img src="https://i.stack.imgur.com/wEzue.png" alt="Performance plot" /></a></p>
+<hr />
+<p>Code to reproduce the plot:</p>
+<pre class="lang-py prettyprint-override"><code>import numpy as np
+import pandas as pd
+import perfplot
+
+perfplot.save(
+    &quot;out.png&quot;,
+    setup=lambda n: pd.DataFrame(np.arange(n * 3).reshape(n, 3)),
+    n_range=[2**k for k in range(25)],
+    kernels=[
+        lambda df: len(df.index),
+        lambda df: df.shape[0],
+        lambda df: df[df.columns[0]].count(),
+    ],
+    labels=[&quot;len(df.index)&quot;, &quot;df.shape[0]&quot;, &quot;df[df.columns[0]].count()&quot;],
+    xlabel=&quot;Number of rows&quot;,
+)
+</code></pre>
+<h4> Comment 33352203 K.-Michael Aye: </h4>There&#39;s one good reason why to use <code>shape</code> in interactive work, instead of len(df): Trying out different filtering, I often need to know how many items remain. With shape I can see that just by adding .shape after my filtering. With len() the editing of the command-line becomes much more cumbersome, going back and forth.<br><h4> Comment 75258875 T.G.: </h4>I know it&#39;s been a while, but isn&#39;t len(df.index) takes 381 nanoseconds, or 0.381 microseconds, df.shape is 3 times slower, taking 1.17 microseconds. did I miss something? @root<br><h4> Comment 78353293 xaedes: </h4>(3,3) matrix is bad example as it does not show the order of the shape tuple<br><h4> Comment 59743082 jtschoonhoven: </h4>Won&#39;t work for OP, but if you just need to know whether the dataframe is empty, <code>df.empty</code> is the best option.<br><h4> Comment 85924648 itsjef: </h4>How is <code>df.shape[0]</code> faster than <code>len(df)</code> or <code>len(df.columns)</code>? Since <b>1 ns</b> (nanosecond) = <b>1000 &#181;s</b> (microsecond), therefore 1.17&#181;s = 1170ns, which means it&#39;s roughly 3 times slower than 381ns<br><h4> Comment 111245625 xuancong84: </h4>I have tested on Python3, @halloleo is right, len(df.index) is about twice as fast as df.shape[0]. On the other hand, len(df) sometimes returns the number of columns rather than rows, depending on the dataframe&#39;s current internal format.<br><h4> Comment 87035325 jared: </h4>@itsjef You have the conversion backward: 1 <b>μs</b> = 1000 <b>ns</b>.  But your point is correct, <code>len(df.index)</code> is actually faster.<br><h4> Comment 106200163 NoName: </h4>And what&#39;s the difference between <code>len(df)</code> and <code>len(df.index)</code>?  Why type extra for <code>df.index</code>?<br><h4> Comment 129674629 run_the_race: </h4>Very complicated answer which does not even state <code>len(df)</code><br><h4> Comment 91703236 halloleo: </h4>Updated answer to reflect fact that <code>len(df.index)</code> is the fastest method.<br><h4> Comment 106808583 gosuto: </h4>For the record: <code>len(df)</code> is slower than <code>len(df.index)</code> (@Decula, @NoName).<br><h4> Comment 95449495 Decula: </h4>looks like len(df) is the fastest.<br><h4> Comment 122796197 Mateen Ulhaq: </h4>@KarolZlot Improved the wording. <code>df[df.columns[0]]</code> returns the 0th column. <code>.count()</code> measures the number of non-NaN values in the given column.  The first two methods are what I would usually use -- the third is only useful in rare cases.<br><h4> Comment 76476361 Reddspark: </h4>From my testing df.shape[0]  and len(df.index) gave the same performance. df.shape was ever so slightly quicker.<br><h4> Comment 84641579 smci: </h4>Don&#39;t forget to answer the actual question; the answer is <code>df.shape[0]</code> not <code>df.shape</code> which gives a tuple, and as xaedes said, best to pick an example where nrows != ncols<br><h4> Comment 106808489 gosuto: </h4>Suspected <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Index.size.html" rel="nofollow noreferrer"><code>pandas.Index.size</code></a> would actually be faster than <code>len(df.index)</code> but <code>timeit</code> on my computer tells me otherwise (~150 ns slower per loop).<br><h4> Comment 129409346 justRandomLearner: </h4>Does len(df.index) work correctly even df has mixed indexes?<br><h4> Comment 133270759 Subatomic Tripod: </h4>My edits were rejected but len(df) should be included and the preferred answer. That and shape seem to be the only ones needed in a live interactive session. All of them finish in under a second at reasonable data sizes so outside of high performance production code there&#39;s no point complicating things. I don&#39;t think it&#39;s reasonable to expect people to interpret &quot;10^-2 seconds&quot; in a timing graph.<br><h4> Comment 122772999 Karol Zlot: </h4>@MateenUlhaq Can you explain what &quot;slowest, but avoids counting NaN values in the first column&quot; from your edit mean? Would be helpful to also include in the answer when can one expect the difference compared to other methods (with example).<br>------------------------------------------------------------------ <br><h3> Answer 35523946 Nasir Shah: </h3><p>Suppose <code>df</code> is your dataframe then:</p>
+<pre><code>count_row = df.shape[0]  # Gives number of rows
+count_col = df.shape[1]  # Gives number of columns
+</code></pre>
+<p>Or, more succinctly,</p>
+<pre><code>r, c = df.shape
+</code></pre>
+<h4> Comment 105298279 Sumit Pokhrel: </h4>If the data set is large, len (df.index) is significantly faster than df.shape[0] if you need only row count. I tested it.<br><h4> Comment 121262222 Connor: </h4>@ArdalanShahgholi it&#39;s probably because what was returned is a series, which is always 1 dimensional. Therefore, only <code>len(df.index)</code> will work<br><h4> Comment 113584567 Ardalan Shahgholi: </h4>Why i do not have shape method on my DataFrame?<br><h4> Comment 125288246 rubengavidia0x: </h4>@ArdalanShahgholi <code>shape</code> is not a function is an attribute you can discover that comparing <code>df.shape</code> with <code>df.shape()</code> in your df.<br><h4> Comment 125288271 rubengavidia0x: </h4>@connor <code>df.A.shape[0]</code> or <code>df.loc[:,&#39;A&#39;].shape[0]</code> work for series.<br><h4> Comment 121629565 Ardalan Shahgholi: </h4>@Connor I need to have Number of rows and number of Columns from my DF. In my DF also i have a select it means i have a table and now the question is why i do not have SHAPE function on my DF?<br><h4> Comment 121685105 Connor: </h4>Great question, make it a separate question on SO, share what you’ve tried and what you see as a result (give a full working set of code that’s simple for others to replicate) and then share the link to that question here. I’ll see if I can help<br>------------------------------------------------------------------ <br><h3> Answer 18317067 Dr. Jan-Philip Gehrcke: </h3><p>Use <code>len(df)</code> :-).</p>
+<p><code>__len__()</code> is documented with &quot;Returns length of index&quot;.</p>
+<p>Timing info, set up the same way as in <a href="https://stackoverflow.com/questions/15943769/how-do-i-get-the-row-count-of-a-pandas-dataframe/15943975#15943975">root's answer</a>:</p>
+<pre class="lang-none prettyprint-override"><code>In [7]: timeit len(df.index)
+1000000 loops, best of 3: 248 ns per loop
+
+In [8]: timeit len(df)
+1000000 loops, best of 3: 573 ns per loop
+</code></pre>
+<p>Due to one additional function call, it is of course correct to say that it is a bit slower than calling <code>len(df.index)</code> directly. But this should not matter in most cases. I find <code>len(df)</code> to be quite readable.</p>
+------------------------------------------------------------------ <br><h3> Answer 55435185 cs95: </h3><blockquote>
+<h1>How do I get the row count of a Pandas DataFrame?</h1>
+</blockquote>
+<p>This table summarises the different situations in which you'd want to count something in a DataFrame (or Series, for completeness), along with the recommended method(s).</p>
+<p><a href="https://i.stack.imgur.com/3FXuI.png" rel="noreferrer"><img src="https://i.stack.imgur.com/3FXuI.png" alt="Enter image description here" /></a></p>
+<blockquote>
+<p><strong>Footnotes</strong></p>
+<ol>
+<li><code>DataFrame.count</code> returns counts for each column as a <code>Series</code> since the non-null count varies by column.</li>
+<li><code>DataFrameGroupBy.size</code> returns a <code>Series</code>, since all columns in the same group share the same row-count.</li>
+<li><code>DataFrameGroupBy.count</code> returns a <code>DataFrame</code>, since the non-null count could differ across columns in the same group. To get the group-wise non-null count for a specific column, use <code>df.groupby(...)['x'].count()</code> where &quot;x&quot; is the column to count.</li>
+</ol>
+</blockquote>
+<hr />
+<h1><strong>Minimal Code Examples</strong></h1>
+<p>Below, I show examples of each of the methods described in the table above. First, the setup -</p>
+<pre><code>df = pd.DataFrame({
+    'A': list('aabbc'), 'B': ['x', 'x', np.nan, 'x', np.nan]})
+s = df['B'].copy()
+
+df
+
+   A    B
+0  a    x
+1  a    x
+2  b  NaN
+3  b    x
+4  c  NaN
+
+s
+
+0      x
+1      x
+2    NaN
+3      x
+4    NaN
+Name: B, dtype: object
+</code></pre>
+<h3>Row Count of a DataFrame: <code>len(df)</code>, <code>df.shape[0]</code>, or <code>len(df.index)</code></h3>
+<pre><code>len(df)
+# 5
+
+df.shape[0]
+# 5
+
+len(df.index)
+# 5
+</code></pre>
+<p>It seems silly to compare the performance of constant time operations, especially when the difference is on the level of &quot;seriously, don't worry about it&quot;. But this seems to be a trend with other answers, so I'm doing the same for completeness.</p>
+<p>Of the three methods above, <code>len(df.index)</code> (as mentioned in other answers) is the fastest.</p>
+<blockquote>
+<p><strong>Note</strong></p>
+<ul>
+<li>All the methods above are constant time operations as they are simple attribute lookups.</li>
+<li><code>df.shape</code> (similar to <code>ndarray.shape</code>) is an attribute that returns a tuple of <code>(# Rows, # Cols)</code>. For example, <code>df.shape</code> returns <code>(8, 2)</code> for the example here.</li>
+</ul>
+</blockquote>
+<h3>Column Count of a DataFrame: <code>df.shape[1]</code>, <code>len(df.columns)</code></h3>
+<pre><code>df.shape[1]
+# 2
+
+len(df.columns)
+# 2
+</code></pre>
+<p>Analogous to <code>len(df.index)</code>, <code>len(df.columns)</code> is the faster of the two methods (but takes more characters to type).</p>
+<h3>Row Count of a Series: <code>len(s)</code>, <code>s.size</code>, <code>len(s.index)</code></h3>
+<pre><code>len(s)
+# 5
+
+s.size
+# 5
+
+len(s.index)
+# 5
+</code></pre>
+<p><code>s.size</code> and <code>len(s.index)</code> are about the same in terms of speed. But I recommend <code>len(df)</code>.</p>
+<blockquote>
+<p><strong>Note</strong>
+<code>size</code> is an attribute, and it returns the number of elements (=count
+of rows for any Series). DataFrames also define a size attribute which
+returns the same result as <code>df.shape[0] * df.shape[1]</code>.</p>
+</blockquote>
+<h3>Non-Null Row Count: <code>DataFrame.count</code> and <code>Series.count</code></h3>
+<p>The methods described here only count non-null values (meaning NaNs are ignored).</p>
+<p>Calling <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.count.html" rel="noreferrer"><code>DataFrame.count</code></a> will return non-NaN counts for <em>each</em> column:</p>
+<pre><code>df.count()
+
+A    5
+B    3
+dtype: int64
+</code></pre>
+<p>For Series, use <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.count.html" rel="noreferrer"><code>Series.count</code></a> to similar effect:</p>
+<pre><code>s.count()
+# 3
+</code></pre>
+<h3>Group-wise Row Count: <code>GroupBy.size</code></h3>
+<p>For <code>DataFrames</code>, use <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.core.groupby.DataFrameGroupBy.size.html" rel="noreferrer"><code>DataFrameGroupBy.size</code></a> to count the number of rows per group.</p>
+<pre><code>df.groupby('A').size()
+
+A
+a    2
+b    2
+c    1
+dtype: int64
+</code></pre>
+<p>Similarly, for <code>Series</code>, you'll use <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.core.groupby.GroupBy.size.html" rel="noreferrer"><code>SeriesGroupBy.size</code></a>.</p>
+<pre><code>s.groupby(df.A).size()
+
+A
+a    2
+b    2
+c    1
+Name: B, dtype: int64
+</code></pre>
+<p>In both cases, a <code>Series</code> is returned. This makes sense for <code>DataFrames</code> as well since all groups share the same row-count.</p>
+<h3>Group-wise Non-Null Row Count: <code>GroupBy.count</code></h3>
+<p>Similar to above, but use <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.core.groupby.GroupBy.size.html" rel="noreferrer"><code>GroupBy.count</code></a>, not <code>GroupBy.size</code>. Note that <code>size</code> always returns a <code>Series</code>, while <code>count</code> returns a <code>Series</code> if called on a specific column, or else a <code>DataFrame</code>.</p>
+<p>The following methods return the same thing:</p>
+<pre><code>df.groupby('A')['B'].size()
+df.groupby('A').size()
+
+A
+a    2
+b    2
+c    1
+Name: B, dtype: int64
+</code></pre>
+<p>Meanwhile, for <code>count</code>, we have</p>
+<pre><code>df.groupby('A').count()
+
+   B
+A
+a  2
+b  1
+c  0
+</code></pre>
+<p>...called on the entire GroupBy object, vs.,</p>
+<pre><code>df.groupby('A')['B'].count()
+
+A
+a    2
+b    1
+c    0
+Name: B, dtype: int64
+</code></pre>
+<p>Called on a specific column.</p>
+<h4> Comment 125288311 rubengavidia0x: </h4><code>s.shape[0]</code> work for row count in a series.<br><h4> Comment 125434204 Aaditya Ura: </h4>Hi, could you take a look at this question <a href="https://stackoverflow.com/questions/70954791/identifying-statistical-outliers-with-pandas-groupby-and-reduce-rows-into-diffe" title="identifying statistical outliers with pandas groupby and reduce rows into diffe">stackoverflow.com/questions/70954791/&hellip;</a><br>------------------------------------------------------------------ <br><h3> Answer 38025280 Memin: </h3><h2>TL;DR <strong>use <code>len(df)</code></strong></h2>
+<p><strong><code>len()</code></strong> returns the number of items(the length) of a list object(also works for dictionary, string, tuple or range objects). So, for getting row counts of a DataFrame, simply use <code>len(df)</code>.
+For more about <em>len</em> function, see <a href="https://docs.python.org/3/library/functions.html#len" rel="noreferrer">the official page</a>.</p>
+<hr />
+<p>Alternatively, you can access all rows and all columns with <code>df.index</code>, and <code>df.columns</code>,respectively. Since you can use the <strong><code>len(anyList)</code></strong> for getting the element numbers, using the
+<code>len(df.index)</code> will give the number of rows, and <code>len(df.columns)</code> will give the number of columns.</p>
+<p>Or, you can use <code>df.shape</code> which returns the number of rows and columns together (as a tuple) where you can access each item with its index. If you want to access the number of rows, only use <code>df.shape[0]</code>. For the number of columns, only use: <code>df.shape[1]</code>.</p>
+<h4> Comment 122468353 Memin: </h4>@BrendanMetcalfe, I dont know what might me wrong with your dataframe without seeing the its data. You can check the small script end the end to see, indeed <code>len</code> works well for getting row counts. Here is the script <a href="https://onecompiler.com/python/3xc9nuvrx" rel="nofollow noreferrer">onecompiler.com/python/3xc9nuvrx</a><br><h4> Comment 131128536 CutePoison: </h4>I can&#39;t wrap my head around, why <code>df.shape</code> isn&#39;t faster than <code>len</code> as it just have to get the <code>shape</code> attribute and not call the function <code>__len__</code><br>------------------------------------------------------------------ <br><h3> Answer 61745860 Saurav: </h3><p>You can do this also:</p>
+<p>Let’s say <code>df</code> is your dataframe. Then <code>df.shape</code> gives you the shape of your dataframe i.e <code>(row,col)</code></p>
+<p>Thus, assign the below command to get the required</p>
+<pre><code> row = df.shape[0], col = df.shape[1]
+</code></pre>
+<h4> Comment 119426017 Nerxis: </h4>Or you can directly use <code>row, col = df.shape</code> instead if you need to get both at the same them (it&#39;s shorter and you do not have to care about indexes).<br>------------------------------------------------------------------ <br><h3> Answer 32103678 Nik: </h3><p>Apart from the previous answers, you can use <code>df.axes</code> to get the tuple with row and column indexes and then use the <code>len()</code> function:</p>
+<pre><code>total_rows = len(df.axes[0])
+total_cols = len(df.axes[1])
+</code></pre>
+<h4> Comment 97587965 cs95: </h4>This returns index objects, which may or may not be copies of the original, which is wasteful if you are just discarding them after checking the length. Unless you intend to do anything else with the index, <b>DO NOT USE</b>.<br>------------------------------------------------------------------ <br><h3> Answer 47705589 debo: </h3><p>...building on <a href="https://stackoverflow.com/questions/15943769/how-do-i-get-the-row-count-of-a-pandas-dataframe/18317067#18317067">Jan-Philip Gehrcke's answer</a>.</p>
+<p>The reason why <code>len(df)</code> or <code>len(df.index)</code> is faster than <code>df.shape[0]</code>:</p>
+<p>Look at the code. df.shape is a <code>@property</code> that runs a DataFrame method calling <code>len</code> twice.</p>
+<pre><code>df.shape??
+Type:        property
+String form: &lt;property object at 0x1127b33c0&gt;
+Source:
+# df.shape.fget
+@property
+def shape(self):
+    &quot;&quot;&quot;
+    Return a tuple representing the dimensionality of the DataFrame.
+    &quot;&quot;&quot;
+    return len(self.index), len(self.columns)
+</code></pre>
+<p>And beneath the hood of len(df)</p>
+<pre><code>df.__len__??
+Signature: df.__len__()
+Source:
+    def __len__(self):
+        &quot;&quot;&quot;Returns length of info axis, but here we use the index &quot;&quot;&quot;
+        return len(self.index)
+File:      ~/miniconda2/lib/python2.7/site-packages/pandas/core/frame.py
+Type:      instancemethod
+</code></pre>
+<p><code>len(df.index)</code> will be slightly faster than <code>len(df)</code> since it has one less function call, but this is always faster than <code>df.shape[0]</code></p>
+<h4> Comment 116872042 Peter Mortensen: </h4>The syntax highlighting does not seem quite right. Can you fix it? E.g., is this a mixture of output, code, and annotation (not a rhetorical question)?<br><h4> Comment 118425674 debo: </h4>@PeterMortensen This output is from ipython/jupyter. Executing a function name with two question marks and without the parenthesis will show the function definition. ie for function <code>len()</code> you would execute <code>len??</code><br>------------------------------------------------------------------ <br><h3> Answer 75536734 Subatomic Tripod: </h3><p>For a dataframe <code>df</code>:</p>
+<p>When you're still writing your code:</p>
+<ol>
+<li><code>len(df)</code></li>
+<li><code>df.shape[0]</code></li>
+</ol>
+<p>Fastest once your code is done:</p>
+<ul>
+<li><code>len(df.index)</code></li>
+</ul>
+<p>At <a href="https://www.wolframalpha.com/input?i=%282%5E24%29" rel="noreferrer">normal data sizes</a> each option will finish in <a href="https://www.wolframalpha.com/input?i=10%5E-2%20seconds" rel="noreferrer">under a second</a>. So the &quot;fastest&quot; option is actually whichever one lets you work the fastest, which can be <code>len(df)</code> or <code>df.shape[0]</code> if you already have a subsetted <code>df</code> and want to just add <code>.shape[0]</code> briefly in an interactive session.</p>
+<p>In final optimized code, the fastest runtime is <code>len(df.index)</code>.</p>
+<p><a href="https://i.stack.imgur.com/f9Ppy.png" rel="noreferrer"><img src="https://i.stack.imgur.com/f9Ppy.png" alt="Performance plot" /></a></p>
+<p><code>df[df.columns[0]].count()</code> was omitted in the above discussion because no commenter has identified a case where it is useful. It is exponentially slow, and long to type. It provides the <a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.count.html" rel="noreferrer">number of non-NaN values</a> in the first column.</p>
+<p>Code to reproduce the plot:</p>
+<p><code>pip install pandas perfplot</code></p>
+<pre class="lang-py prettyprint-override"><code>import numpy as np
+import pandas as pd
+import perfplot
+
+perfplot.save(
+    &quot;out.png&quot;,
+    setup=lambda n: pd.DataFrame(np.arange(n * 3).reshape(n, 3)),
+    n_range=[2**k for k in range(25)],
+    kernels=[
+        lambda df: len(df.index),
+        lambda df: len(df),
+        lambda df: df.shape[0],
+        lambda df: df[df.columns[0]].count(),
+    ],
+    labels=[&quot;len(df.index)&quot;, &quot;df.shape[0]&quot;, &quot;df[df.columns[0]].count()&quot;],
+    xlabel=&quot;Number of rows&quot;,
+)
+</code></pre>
+<h4> Comment 133270700 Subatomic Tripod: </h4>I&#39;ve tried twice to improve the accepted answer and been rejected both times. The accepted answer is unclear and pointlessly verbose, not telling people the fastest right of the bat. It also doesn&#39;t mention <code>len(df)</code> nor any purpose for <code>df[df.columns[0]].count()</code>.<br>------------------------------------------------------------------ <br><h3> Answer 39764266 Chau Pham: </h3><p>I come to Pandas from an <a href="https://en.wikipedia.org/wiki/R_%28programming_language%29" rel="nofollow noreferrer">R</a> background, and I see that Pandas is more complicated when it comes to selecting rows or columns.</p>
+<p>I had to wrestle with it for a while, and then I found some ways to deal with:</p>
+<p>Getting the number of columns:</p>
+<pre><code>len(df.columns)
+## Here:
+# df is your data.frame
+# df.columns returns a string. It contains column's titles of the df.
+# Then, &quot;len()&quot; gets the length of it.
+</code></pre>
+<p>Getting the number of rows:</p>
+<pre><code>len(df.index) # It's similar.
+</code></pre>
+<h4> Comment 92985803 Chau Pham: </h4>After using <i>Pandas</i> for a while, I think we should go with <code>df.shape</code>. It returns the number of rows and columns respectively.<br>------------------------------------------------------------------ <br><h3> Answer 48918940 Allen Qin: </h3><p>In case you want to get the row count in the middle of a chained operation, you can use:</p>
+
+<pre><code>df.pipe(len)
+</code></pre>
+
+<p>Example:</p>
+
+<pre><code>row_count = (
+      pd.DataFrame(np.random.rand(3,4))
+      .reset_index()
+      .pipe(len)
+)
+</code></pre>
+
+<p>This can be useful if you don't want to put a long statement inside a <code>len()</code> function.</p>
+
+<p>You could use <code>__len__()</code> instead but <code>__len__()</code> looks a bit weird. </p>
+<h4> Comment 97587995 cs95: </h4>It seems pointless to want to &quot;pipe&quot; this operation because there&#39;s nothing else you can pipe this into (it returns an integer). I would much rather <code>count = len(df.reset_index())</code> than <code>count = df.reset_index().pipe(len)</code>. The former is just an attribute lookup without the function call.<br>------------------------------------------------------------------ <br><h3> Answer 61413025 Kiprono Elijah Koech: </h3><p>Either of this can do it (<code>df</code> is the name of the DataFrame):</p>
+<p><strong>Method 1</strong>: Using the <code>len</code> function:</p>
+<p><code>len(df)</code> will give the number of rows in a DataFrame named <code>df</code>.</p>
+<p><strong>Method 2</strong>: using <code>count</code> function:</p>
+<p><code>df[col].count()</code> will count the number of rows in a given column <code>col</code>.</p>
+<p><code>df.count()</code> will give the number of rows for all the columns.</p>
+<h4> Comment 108642831 John: </h4>This is a fine answer, but there are already sufficient answers to this question, so this doesn&#39;t really add anything.<br>------------------------------------------------------------------ <br><h3> Answer 72603209 Lorenzo Bassetti: </h3><p>When using <code>len(df)</code> or <code>len(df.index)</code> you might encounter this error:</p>
+<pre class="lang-none prettyprint-override"><code>----&gt; 4 df['id'] = np.arange(len(df.index)
+TypeError: 'int' object is not callable
+</code></pre>
+<p><strong>Solution</strong>:</p>
+<pre><code>lengh = df.shape[0]
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 76371348 nikeshPyDev: </h3><p><code>df.index.stop</code> will return the last index, means the number of rows if the step is 1.</p>
+<p><code>df.index.size</code> will return the total number of rows.</p>
+<p>You can use either one, but preferably the latter.</p>
+------------------------------------------------------------------ <br><h3> Answer 60378831 gosuto: </h3><p>An alternative method to finding out the amount of rows in a dataframe which I think is the most readable variant is <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Index.size.html" rel="nofollow noreferrer"><code>pandas.Index.size</code></a>.</p>
+<p>Do note that, as I commented on <a href="https://stackoverflow.com/questions/15943769/how-do-i-get-the-row-count-of-a-pandas-dataframe/15943975#15943975">the accepted answer</a>,</p>
+<blockquote>
+<p>Suspected <code>pandas.Index.size</code> would actually be faster than <code>len(df.index)</code> but <code>timeit</code> on my computer tells me otherwise (~150 ns slower per loop).</p>
+</blockquote>
+------------------------------------------------------------------ <br><h3> Answer 61048561 Abhiraam Eranti: </h3><p>I'm not sure if this would work (data <em>could</em> be omitted), but this may work:</p>
+<pre><code>*dataframe name*.tails(1)
+</code></pre>
+<p>and then using this, you could find the number of rows by running the code snippet and looking at the row number that was given to you.</p>
+------------------------------------------------------------------ <br><h3> Answer 73389127 Zaid Parkar: </h3><p>len(df.index) would work the fastest of all the ways listed</p>
+<h4> Comment 130864044 Peter Mortensen: </h4>Why would that be? And do you have some performance measurements (incl. conditions, like hardware platform, all with versions)?<br>------------------------------------------------------------------ <br><h3> Answer 65545037 SamithaP: </h3><p>Think, the dataset is &quot;data&quot; and name your dataset as &quot; data_fr &quot; and number of rows in the data_fr is &quot;nu_rows&quot;</p>
+<pre><code>#import the data frame. Extention could be different as csv,xlsx or etc.
+data_fr = pd.read_csv('data.csv')
+
+#print the number of rows
+nu_rows = data_fr.shape[0]
+print(nu_rows)
+</code></pre>
+<h4> Comment 130864066 Peter Mortensen: </h4>What is the conclusion of that first sentence?<br>

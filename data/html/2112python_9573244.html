@@ -1,0 +1,297 @@
+ <h2> Title: How to check if the string is empty in Python? </h2> <h3> Joan Venge, question_id: 9573244 </h3>Score: 2112, Tags: {python,string,boolean,comparison-operators} <br><p>Does Python have something like an empty string variable where you can do:</p>
+<pre class="lang-python prettyprint-override"><code>if myString == string.empty:
+</code></pre>
+<p>Regardless, what's the most elegant way to check for empty string values? I find hard coding <code>&quot;&quot;</code> every time for checking an empty string not as good.</p>
+<h4> Comment 106353659 NoName: </h4>How is <code>&quot;&quot;</code> not as good?<br><h4> Comment 128800261 wheredidthatnamecomefrom: </h4>None won&#39;t match &quot;&quot;. So depends on the context as to what you want.<br>------------------------------------------------------------------ <br><h3> Answer 9573259 Andrew Clark: </h3><p>Empty strings are &quot;falsy&quot; (<a href="http://docs.python.org/2/library/stdtypes.html#truth-value-testing" rel="noreferrer">python 2</a> or <a href="https://docs.python.org/3/library/stdtypes.html#truth-value-testing" rel="noreferrer">python 3</a> reference), which means they are considered false in a Boolean context, so you can just do this:</p>
+<pre><code>if not myString:
+</code></pre>
+<p>This is the preferred way if you know that your variable is a string.  If your variable could also be some other type then you should use:</p>
+<pre><code>if myString == &quot;&quot;:
+</code></pre>
+<p>See the documentation on <a href="http://docs.python.org/library/stdtypes.html#truth-value-testing" rel="noreferrer">Truth Value Testing</a> for other values that are false in Boolean contexts.</p>
+<h4> Comment 12137875 Ignacio Vazquez-Abrams: </h4>Be careful, since lots of other things are false as well.<br><h4> Comment 26510689 Andrew Clark: </h4>OP wants to know if the variable is an empty string, but you would also enter the <code>if not myString:</code> block if <code>myString</code> were <code>None</code>, <code>0</code>, <code>False</code> etc.  So if you aren&#39;t sure what type <code>myString</code> is, you should use <code>if myString == &quot;&quot;:</code> to determine if it is an empty string as opposed to some other falsy value.<br><h4> Comment 12137965 Ignacio Vazquez-Abrams: </h4>@Joan: It evaluates as false in a boolean context.<br><h4> Comment 49670200 Stew: </h4>@AndrewClark, for such a case, instead of a chain of <code>if myString == ...</code> expressions, we could use <code>if myString in (None, &#39;&#39;)</code> or per @Bartek, <code>if myString in (None, &#39;&#39;) or not myString.strip()</code><br><h4> Comment 12137949 Joan Venge: </h4>I never heard of the term falsy before. Does it mean it returns false?<br><h4> Comment 82365780 pgpb.padilla: </h4>Checking for Falsyness results in bugs. Explicit is better than implicit, <code>the_string == &#39;&#39;</code> is harder to misinterpret.<br><h4> Comment 54955885 spectras: </h4>Well, if it <i>contains</i> a newline character, then it is not empty. Same goes for tabs, spaces and all forms of non-printable characters.<br><h4> Comment 26411855 k4ml: </h4>@Bartek answer below should be taken into consideration too. Being hit by this today, thinking django forms required validation will take care empty string such as <code>&quot; &quot;</code> while it&#39;s not.<br><h4> Comment 50781574 ColinMasters: </h4>Worth noting that you may get a positive on <code>if string</code> if the line appears blank, but actually contains a newline character &quot;\n&quot;<br><h4> Comment 83009531 serv-inc: </h4>@JoanVenge: the term <code>falsy</code> (as well as <code>truthy</code>) is widely used in JavaScript. See <a href="https://developer.mozilla.org/en-US/docs/Glossary/Falsy" rel="nofollow noreferrer">developer.mozilla.org/en-US/docs/Glossary/Falsy</a><br><h4> Comment 107812902 Grzegorz: </h4>if is not your string then whose it is ;) I would rather prefer == &#39;&#39;&#39;<br><h4> Comment 118595919 dfrankow: </h4>FYI truth value testing for python 3: <a href="https://docs.python.org/3/library/stdtypes.html#truth-value-testing" rel="nofollow noreferrer">docs.python.org/3/library/stdtypes.html#truth-value-testing</a><br>------------------------------------------------------------------ <br><h3> Answer 9573283 zenpoy: </h3><p>From <a href="http://www.python.org/dev/peps/pep-0008/">PEP 8</a>, in the <a href="https://www.python.org/dev/peps/pep-0008/#programming-recommendations">“Programming Recommendations” section</a>:</p>
+
+<blockquote>
+  <p>For sequences, (strings, lists, tuples), use the fact that empty sequences are false.</p>
+</blockquote>
+
+<p>So you should use:</p>
+
+<pre><code>if not some_string:
+</code></pre>
+
+<p>or:</p>
+
+<pre><code>if some_string:
+</code></pre>
+
+<p>Just to clarify, sequences are <strong>evaluated</strong> to <code>False</code> or <code>True</code> in a Boolean context if they are empty or not. They are <strong>not equal</strong> to <code>False</code> or <code>True</code>.</p>
+<h4> Comment 59575574 MestreLion: </h4>PS: In the PEP&#39;s defense, one could argue that saying &quot;<i>x is false</i>&quot; (lowercase <i>false</i>) already means that, rather than meaning <code>x == False</code>. But IMHO the clarification is still welcome given the target audience.<br>------------------------------------------------------------------ <br><h3> Answer 9573278 Bartek: </h3><p>The most elegant way would probably be to simply check if its true or falsy, e.g.:</p>
+
+<pre><code>if not my_string:
+</code></pre>
+
+<p>However, you may want to strip white space because:</p>
+
+<pre><code> &gt;&gt;&gt; bool("")
+ False
+ &gt;&gt;&gt; bool("   ")
+ True
+ &gt;&gt;&gt; bool("   ".strip())
+ False
+</code></pre>
+
+<p>You should probably be a bit more explicit in this however, unless you know for sure that this string has passed some kind of validation and is a string that can be tested this way.</p>
+------------------------------------------------------------------ <br><h3> Answer 24534152 rouble: </h3><p>I would test noneness before stripping. Also, I would use the fact that empty strings are False (or Falsy). This approach is similar to <a href="https://commons.apache.org/proper/commons-lang/apidocs/org/apache/commons/lang3/StringUtils.html#isBlank-java.lang.CharSequence-" rel="nofollow noreferrer">Apache's StringUtils.isBlank</a> or <a href="https://google.github.io/guava/releases/19.0/api/docs/com/google/common/base/Strings.html#isNullOrEmpty(java.lang.String)" rel="nofollow noreferrer">Guava's Strings.isNullOrEmpty</a></p>
+<p>This is what I would use to test if a string is either <code>None</code> OR empty OR blank:</p>
+<pre class="lang-py prettyprint-override"><code>def isBlank (myString):
+    return not (myString and myString.strip())
+</code></pre>
+<p>And the exact opposite to test if a string is not <code>None</code> NOR empty NOR blank:</p>
+<pre><code>def isNotBlank (myString):
+    return bool(myString and myString.strip())
+</code></pre>
+<h4> Comment 110561791 Cl&#233;ment: </h4><code>s.strip()</code> allocates a new string, which is pure waste.  Use <code>string.isspace()</code><br><h4> Comment 115121559 Guzman Ojero: </h4>this answer is not very pythonic<br><h4> Comment 48384086 Andrea Corbellini: </h4>How is it different from <code>string and not string.isspace()</code>?<br>------------------------------------------------------------------ <br><h3> Answer 27982561 vault: </h3><p>I once wrote something similar to Bartek's answer and javascript inspired:</p>
+<pre><code>def is_not_blank(s):
+    return bool(s and not s.isspace())
+</code></pre>
+<p>Test:</p>
+<pre><code>print is_not_blank(&quot;&quot;)    # False
+print is_not_blank(&quot;   &quot;) # False
+print is_not_blank(&quot;ok&quot;)  # True
+print is_not_blank(None)  # False
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 55747410 Dakkaron: </h3><p>The only really solid way of doing this is the following:</p>
+<pre><code>if &quot;&quot;.__eq__(myString):
+</code></pre>
+<p>All other solutions have possible problems and edge cases where the check can fail.</p>
+<ul>
+<li><p><code>len(myString) == 0</code> can fail if <code>myString</code> is an object of a class that inherits from <code>str</code> and overrides the <code>__len__()</code> method.</p>
+</li>
+<li><p><code>myString == &quot;&quot;</code> and <code>myString.__eq__(&quot;&quot;)</code> can fail if <code>myString</code> overrides <code>__eq__()</code> and <code>__ne__()</code>.</p>
+</li>
+<li><p><code>&quot;&quot; == myString</code> also gets fooled if <code>myString</code> overrides <code>__eq__()</code>.</p>
+</li>
+<li><p><code>myString is &quot;&quot;</code> and <code>&quot;&quot; is myString</code> are equivalent. They will both fail if <code>myString</code> is not actually a string but a subclass of string (both will return <code>False</code>). Also, since they are identity checks, the only reason why they work is because Python uses String Pooling (also called String Internment) which uses the same instance of a string if it is interned (see here: <a href="https://stackoverflow.com/questions/1504717/why-does-comparing-strings-using-either-or-is-sometimes-produce-a-differe">Why does comparing strings using either &#39;==&#39; or &#39;is&#39; sometimes produce a different result?</a>). And <code>&quot;&quot;</code> is interned from the start in CPython</p>
+<p>The big problem with the identity check is that String Internment is (as far as I could find) that it is not standardised which strings are interned. That means, theoretically <code>&quot;&quot;</code> is not necessary interned and that is implementation dependant.</p>
+<p>Also, comparing strings using <code>is</code> in general is a pretty evil trap since it will work correctly sometimes, but not at other times, since string pooling follows pretty strange rules.</p>
+</li>
+<li><p>Relying on the falsyness of a string may not work if the object overrides <code>__bool__()</code>.</p>
+</li>
+</ul>
+<p>The only way of doing this that really cannot be fooled is the one mentioned in the beginning: <code>&quot;&quot;.__eq__(myString)</code>. Since this explicitly calls the <code>__eq__()</code> method of the empty string it cannot be fooled by overriding any methods in myString and solidly works with subclasses of <code>str</code>.</p>
+<p>This is not only theoretical work but might actually be relevant in real usage since I have seen frameworks and libraries subclassing <code>str</code> before and using <code>myString is &quot;&quot;</code> might return a wrong output there.</p>
+<p>That said, in most cases all of the mentioned solutions will work correctly. This is post is mostly academic work.</p>
+<h4> Comment 103105957 Dakkaron: </h4>@simpleuser you are of course right. In the real world it is completely ok to use the falsiness of the string or compare it to an empty string. This here answer is overkill on purpose.<br>------------------------------------------------------------------ <br><h3> Answer 30137396 prrvchr: </h3><p>Test empty or blank string (shorter way):</p>
+
+<pre><code>if myString.strip():
+    print("it's not an empty or blank string")
+else:
+    print("it's an empty or blank string")
+</code></pre>
+<h4> Comment 67894323 Dominik: </h4>If <code>myString = None</code>, it will raise an exception. Better use @vault&#39;s <a href="http://stackoverflow.com/a/27982561/1168315">answer</a><br><h4> Comment 124432679 Hmerman6006: </h4>@Dominik if myString <code>isinstance(myString, int)</code> will also raise exception.  What is your point? The OP asked for ways to test empty strings, his question does not include type checking.<br>------------------------------------------------------------------ <br><h3> Answer 9573389 Silas Ray: </h3><p>If you want to differentiate between empty and null strings, I would suggest using <code>if len(string)</code>, otherwise, I'd suggest using simply <code>if string</code> as others have said.  The caveat about strings full of whitespace still applies though, so don't forget to <code>strip</code>.</p>
+<h4> Comment 83940351 Brōtsyorfuzthrāx: </h4>I don&#39;t know why you&#39;d want to avoid using &quot;&quot;, unless it impacts performance somehow, but I prefer your answer to the one with zillions of upvotes, as it&#39;s less confusing. However, I wanted to point out that an empty list is also False, apparently.<br>------------------------------------------------------------------ <br><h3> Answer 9573332 Kakashi: </h3><p><code>if stringname:</code> gives a <code>false</code> when the string is empty. I guess it can't be simpler than this.</p>
+------------------------------------------------------------------ <br><h3> Answer 39846695 firelynx: </h3><blockquote>
+<p>I find hardcoding(sic) &quot;&quot; every time for checking an empty string not as good.</p>
+</blockquote>
+<h1>Clean code approach</h1>
+<p>Doing this: <code>foo == &quot;&quot;</code> is very bad practice. <code>&quot;&quot;</code> is a magical value. You should never check against magical values (more commonly known as <a href="https://en.wikipedia.org/wiki/Magic_number_(programming)" rel="noreferrer">magical numbers</a>)</p>
+<p>What you should do is compare to a descriptive variable name.</p>
+<h2>Descriptive variable names</h2>
+<p>One may think that &quot;empty_string&quot; is a descriptive variable name. <strong>It isn't</strong>.</p>
+<p>Before you go and do <code>empty_string = &quot;&quot;</code> and think you have a great variable name to compare to. This is not what &quot;descriptive variable name&quot; means.</p>
+<p>A good descriptive variable name is based on its context.
+You have to think about what the empty string <strong>is</strong>.</p>
+<ul>
+<li>Where does it come from.</li>
+<li>Why is it there.</li>
+<li>Why do you need to check for it.</li>
+</ul>
+<h3>Simple form field example</h3>
+<p>You are building a form where a user can enter values. You want to check if the user wrote something or not.</p>
+<p>A good variable name may be <code>not_filled_in</code></p>
+<p>This makes the code very readable</p>
+<pre><code>if formfields.name == not_filled_in:
+    raise ValueError(&quot;We need your name&quot;)
+</code></pre>
+<h3>Thorough CSV parsing example</h3>
+<p>You are parsing CSV files and want the empty string to be parsed as <code>None</code></p>
+<p>(Since CSV is entirely text based, it cannot represent <code>None</code> without using predefined keywords)</p>
+<p>A good variable name may be <code>CSV_NONE</code></p>
+<p>This makes the code easy to change and adapt if you have a new CSV file that represents <code>None</code> with another string than <code>&quot;&quot;</code></p>
+<pre><code>if csvfield == CSV_NONE:
+    csvfield = None
+</code></pre>
+<p>There are no questions about if this piece of code is correct. It is pretty clear that it does what it should do.</p>
+<p>Compare this to</p>
+<pre><code>if csvfield == EMPTY_STRING:
+    csvfield = None
+</code></pre>
+<p>The first question here is, Why does the empty string deserve special treatment?</p>
+<p>This would tell future coders that an empty string should always be considered as <code>None</code>.</p>
+<p>This is because it mixes business logic (What CSV value should be <code>None</code>) with code implementation (What are we actually comparing to)</p>
+<p>There needs to be a <a href="https://en.wikipedia.org/wiki/Separation_of_concerns" rel="noreferrer">separation of concern</a> between the two.</p>
+<h4> Comment 99190633 Dakkaron: </h4>I would disagree with that answer. Magic numbers are bad, that makes sense. Magic values in general as well. But <code>&quot;&quot;</code> is not a magic value, same as <code>True</code>, <code>False</code> or <code>None</code> aren&#39;t magic values.<br><h4> Comment 90933021 user5451396: </h4>Does one really need to go to that much trouble to avoid a &quot;&quot;? In the context of comparison what else could a blank string mean?<br><h4> Comment 98050803 Tuncay G&#246;nc&#252;oğlu: </h4>you say &quot;not_filled_in&quot; is more descriptive than &quot;empty_string&quot; ? I say you are high.<br><h4> Comment 98123038 firelynx: </h4>@TuncayG&#246;nc&#252;oğlu &quot;Empty string&quot; does not describe what the if statement tests for.<br><h4> Comment 90933566 firelynx: </h4>As I write in my answer, CSV cannot represent null without using a string. If you are context free then congratulations! Most code isn&#39;t.<br><h4> Comment 99251815 Dakkaron: </h4>@firelynx how much more explicit explicit can you get to say &quot;this string is empty&quot; than to use <code>&quot;&quot;</code>? Would you also redefine <code>True</code> as <code>REALLY_TRUE</code>? In the end you will end up with a lot of variables (that are non-constant compared to a literal <code>&quot;&quot;</code>) that say the same thing. So, is CSV_NONE different to JSON_EMPTY_VALUE? The problem then occurs when you transfer between different parts of the program. Then you might not know anymore if you have a <code>None</code> or a <code>&quot;&quot;</code>, especially if you name your constants something misleading like <code>CSV_NONE</code>, which is actually not <code>None</code> but <code>&quot;&quot;</code>.<br><h4> Comment 99251995 Dakkaron: </h4>@firelynx This causes more ambiguity than just use the constant values <code>None</code>, <code>True</code>, <code>False</code> or <code>&quot;&quot;</code>. Using variables instead of magic values is useful whenever you encode more information in the name then what the value itself already has, e.g. use <code>STATE_A</code> instead of <code>27</code>. Or whenever there is ambiguity, e.g. <code>GPIO.HIGH</code> instead of <code>1</code>, because depending on the logic you use, <code>1</code> could be <code>HIGH</code> or <code>LOW</code>. But in the given example using a variable causes more harm than good.<br><h4> Comment 99253238 firelynx: </h4>@Dakkaron Some CSV files use &quot;NA&quot; as None. What would be better: <code>EMPTY_STRING = &quot;NA&quot;</code> or <code>CSV_NONE = &quot;NA&quot;</code><br><h4> Comment 99202702 firelynx: </h4>@Dakkaron maybe. But explicit is better than implicit. I think my point is valid, making your code readable is important (to me). But not everyone is a clean code Zealot like me.<br>------------------------------------------------------------------ <br><h3> Answer 72550980 wij: </h3><p>if you want to check if a string is completely empty</p>
+<pre><code>if not mystring
+</code></pre>
+<p>which works because empty strings are false
+but if a string is only whitespace it will be true so you might want to</p>
+<pre><code>if not mystring.strip()
+</code></pre>
+<h4> Comment 128160588 Mateen Ulhaq: </h4>Isn&#39;t this already covered by the other answers?<br><h4> Comment 129294004 wij: </h4>@MateenUlhaq Sorry for the late response,but Yes you are right but I feel that more answers saying the same thing gives the op more reassurance,and to be totally honest I don&#39;t really care about stupid internet points.<br>------------------------------------------------------------------ <br><h3> Answer 33390778 BuvinJ: </h3><p>How about this?  Perhaps it's not "the most elegant", but it seems pretty complete and clear:</p>
+
+<pre><code>if (s is None) or (str(s).strip()==""): // STRING s IS "EMPTY"...
+</code></pre>
+<h4> Comment 70453035 Chris Johnson: </h4>For most purposes, a string containing blanks is not &quot;empty&quot;.<br><h4> Comment 70479614 BuvinJ: </h4>I assume you mean nothing but white space? You are referring to my use of strip()?  For most purposes that IS empty!  It is ridiculously common to compound something like s.trim().isEmpty()<br><h4> Comment 70593404 BuvinJ: </h4>Hey @Chris Johnson, did you see that MOST of the answers here use strip() as well?  Did you down vote all of us, or just me?<br>------------------------------------------------------------------ <br><h3> Answer 59571358 Tom Stambaugh: </h3><p>I did some experimentation with strings like '', ' ', '\n', etc. I want isNotWhitespace to be True if and only if the variable foo is a string with at least one non-whitespace character. I'm using Python 3.6. Here's what I ended up with:</p>
+
+<pre><code>isWhitespace = str is type(foo) and not foo.strip()
+isNotWhitespace = str is type(foo) and not not foo.strip()
+</code></pre>
+
+<p>Wrap this in a method definition if desired.</p>
+------------------------------------------------------------------ <br><h3> Answer 43745819 Chris Johnson: </h3><p>Responding to @1290. Sorry, no way to format blocks in comments. The <code>None</code> value is not an empty string in Python, and neither is (spaces). The answer from Andrew Clark is the correct one: <code>if not myString</code>. The answer from @rouble is application-specific and does not answer the OP's question. You will get in trouble if you adopt a peculiar definition of what is a "blank" string. In particular, the standard behavior is that <code>str(None)</code> produces <code>'None'</code>, a non-blank string.</p>
+
+<p>However if you must treat <code>None</code> and (spaces) as "blank" strings, here is a better way:</p>
+
+<pre><code>class weirdstr(str):
+    def __new__(cls, content):
+        return str.__new__(cls, content if content is not None else '')
+    def __nonzero__(self):
+        return bool(self.strip())
+</code></pre>
+
+<p>Examples:</p>
+
+<pre><code>&gt;&gt;&gt; normal = weirdstr('word')
+&gt;&gt;&gt; print normal, bool(normal)
+word True
+
+&gt;&gt;&gt; spaces = weirdstr('   ')
+&gt;&gt;&gt; print spaces, bool(spaces)
+    False
+
+&gt;&gt;&gt; blank = weirdstr('')
+&gt;&gt;&gt; print blank, bool(blank)
+ False
+
+&gt;&gt;&gt; none = weirdstr(None)
+&gt;&gt;&gt; print none, bool(none)
+ False
+
+&gt;&gt;&gt; if not spaces:
+...     print 'This is a so-called blank string'
+... 
+This is a so-called blank string
+</code></pre>
+
+<p>Meets the @rouble requirements while not breaking the expected <code>bool</code> behavior of strings.</p>
+<h4> Comment 104501912 Yordan Georgiev: </h4><code>python -c &quot;if (str(None) == &#39;None&#39;): print (&#39;OMG, WHY ??&#39;)&quot;</code><br>------------------------------------------------------------------ <br><h3> Answer 72513171 Mateen Ulhaq: </h3><p>The clearest approach is:</p>
+<pre><code>if s == &quot;&quot;:
+</code></pre>
+<hr />
+<p>Benefits:</p>
+<ul>
+<li>Additional indication to the programmer what the type of <code>s</code> should be.</li>
+<li><code>&quot;&quot;</code> is not &quot;hard-coding&quot; a magic value any more than <code>x == 0</code> is.
+Some values are <em>fundamental</em> and do not need a named constant; e.g. <code>x % 2</code> to check for even numbers.</li>
+<li>Cannot incorrectly indicate that any falsy value (e.g. <code>[]</code>) is an empty string.</li>
+</ul>
+<hr />
+<p>Consider how one checks if an <em>integer</em> is 0:</p>
+<pre><code>if x == 0:
+</code></pre>
+<p>One certainly should <strong>not</strong> do:</p>
+<pre><code>if not x:
+</code></pre>
+<p>Both integers and strings are primitive value types. Why treat them differently?</p>
+------------------------------------------------------------------ <br><h3> Answer 18108072 Roman Semirook: </h3><pre><code>a = ''
+b = '   '
+a.isspace() -&gt; False
+b.isspace() -&gt; True
+</code></pre>
+<h4> Comment 107290557 Adrian Keister: </h4>Really don&#39;t understand what this solution gains. The question is about testing whether a string is empty. If you set <code>a=&#39;a&#39;</code> you would get <code>a.isspace() -&gt; False</code>, but <code>a</code> would not on that account be an empty string.<br>------------------------------------------------------------------ <br><h3> Answer 48973092 Fax: </h3><pre><code>not str(myString)
+</code></pre>
+
+<p>This expression is True for strings that are empty. Non-empty strings, None and non-string objects will all produce False, with the caveat that objects may override __str__ to thwart this logic by returning a falsy value.</p>
+------------------------------------------------------------------ <br><h3> Answer 28433279 kommradHomer: </h3><p>for those who expect a behaviour like the apache <a href="http://commons.apache.org/proper/commons-lang/apidocs/org/apache/commons/lang3/StringUtils.html#isBlank(java.lang.CharSequence)" rel="nofollow">StringUtils.isBlank</a> or Guava <a href="http://docs.guava-libraries.googlecode.com/git/javadoc/com/google/common/base/Strings.html#isNullOrEmpty(java.lang.String)" rel="nofollow">Strings.isNullOrEmpty</a> :</p>
+
+<pre><code>if mystring and mystring.strip():
+    print "not blank string"
+else:
+    print "blank string"
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 35827935 Pavel Štěrba: </h3><p>When you are reading file by lines and want to determine, which line is empty, make sure you will use <code>.strip()</code>, because there is new line character in "empty" line:</p>
+
+<pre><code>lines = open("my_file.log", "r").readlines()
+
+for line in lines:
+    if not line.strip():
+        continue
+
+    # your code for non-empty lines
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 69255692 Rene: </h3><p>If you are not totally sure, that your input is really a string, I would recommend to use <code>isinstance(object, classinfo)</code> <a href="https://docs.python.org/3/library/functions.html#isinstance" rel="nofollow noreferrer">link</a> in addition, as shown in the example.</p>
+<p>If not, lists or a <code>True</code> bool value could also be evaluated as <code>True</code>.</p>
+<p><div class="snippet" data-lang="js" data-hide="true" data-console="true" data-babel="false">
+<div class="snippet-code snippet-currently-hidden">
+<pre class="snippet-code-html lang-html prettyprint-override"><code>&lt;script type="text/javascript" src="//cdn.datacamp.com/dcl-react.js.gz"&gt;&lt;/script&gt;
+
+&lt;div data-datacamp-exercise data-lang="python"&gt;
+  &lt;code data-type="sample-code"&gt;
+def test_string(my_string):
+    if isinstance(my_string, str) and my_string:
+      print("It's a me, String! -&gt; " + my_string)
+    else: 
+      print("Nope. No, String")
+
+def not_fully_test_string(my_string):
+    if my_string:
+      print("It's a me, String??? -&gt; " + str(my_string))
+    else: 
+      print("Nope. No, String")
+  
+print("Testing String:")
+test_string("")
+test_string(True)
+test_string(["string1", "string2"])
+test_string("My String")
+test_string(" ")
+
+print("\nTesting String or not?")
+not_fully_test_string("")
+not_fully_test_string(True)
+not_fully_test_string(["string1", "string2"])
+not_fully_test_string("My String")
+not_fully_test_string(" ")
+
+  &lt;/code&gt;
+&lt;/div&gt;</code></pre>
+</div>
+</div>
+</p>
+------------------------------------------------------------------ <br><h3> Answer 76701107 Super Kai - Kazuya Ito: </h3><p>You can check if the string is completely empty or not as shown below. *<a href="https://docs.python.org/3/library/stdtypes.html#str.strip" rel="nofollow noreferrer">strip()</a> can remove spaces:</p>
+<pre class="lang-py prettyprint-override"><code>test1 = &quot;&quot;
+test2 = &quot;    &quot;
+test3 = &quot;    &quot;.strip()
+
+print(bool(test1), bool(test2), bool(test3))
+         # False      # True       # False
+
+if test1:
+    print(&quot;test1&quot;) # Not run
+    
+if test2:
+    print(&quot;test2&quot;) # Run
+
+if test3:
+    print(&quot;test3&quot;) # Not run
+
+if not test1:
+    print(&quot;test1&quot;) # Run
+    
+if not test2:
+    print(&quot;test2&quot;) # Not run
+
+if not test3:
+    print(&quot;test3&quot;) # Run
+</code></pre>

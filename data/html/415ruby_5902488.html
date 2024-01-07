@@ -1,0 +1,87 @@
+ <h2> Title: Uninstall old versions of Ruby gems </h2> <h3> Philippe Blayo, question_id: 5902488 </h3>Score: 415, Tags: {ruby,rubygems} <br><p>I have several versions of a Ruby gem:</p>
+
+<pre><code>$ gem list
+rjb (1.3.4, 1.3.3, 1.1.9)
+</code></pre>
+
+<p>How can I remove old versions but keep the most recent?</p>
+------------------------------------------------------------------ <br><h3> Answer 5902518 Dylan Markow: </h3><pre><code># remove all old versions of the gem
+gem cleanup rjb
+
+# choose which ones you want to remove
+gem uninstall rjb
+
+# remove version 1.1.9 only
+gem uninstall rjb --version 1.1.9
+
+# remove all versions less than 1.3.4
+gem uninstall rjb --version '&lt;1.3.4'
+</code></pre>
+<h4> Comment 126585166 Baurito: </h4>Note, in the last command there must be a space after &quot;Less than&quot; operator.<br>------------------------------------------------------------------ <br><h3> Answer 10344031 ohho: </h3><p>For removing older versions of <em>all</em> installed gems, following 2 commands are useful:</p>
+
+<pre><code> gem cleanup --dryrun
+</code></pre>
+
+<p>Above command will preview what gems are going to be removed.
+<br><br></p>
+
+<pre><code> gem cleanup
+</code></pre>
+
+<p>Above command will actually remove them.</p>
+<h4> Comment 118755425 Ahmed Mohamedeen: </h4>As of the current version of gem, 3.2.15, I get the following message. The <code>--dryrun</code> option has been deprecated and will be removed in future versions of Rubygems. Use <code>--dry-run</code> instead<br><h4> Comment 93453520 Mirv - Matt: </h4>Doesn&#39;t work in my ubuntu cloud9 setup ... have to run with sudo<br><h4> Comment 127803685 Asad Shakil: </h4>On Rails, I had to run bundle install after these two commands to re-install some gems that went missing such as puma.<br>------------------------------------------------------------------ <br><h3> Answer 29643822 user3118220: </h3><p>Way to clean out any old versions of gems.</p>
+
+<pre><code>sudo gem cleanup
+</code></pre>
+
+<p>If you just want to see a list of what would be removed you can use:</p>
+
+<pre><code>sudo gem cleanup -d
+</code></pre>
+
+<p>You can also cleanup just a specific gem by specifying its name:</p>
+
+<pre><code>sudo gem cleanup gemname
+</code></pre>
+
+<p>for remove specific version like 1.1.9 only</p>
+
+<pre><code>gem uninstall gemname --version 1.1.9
+</code></pre>
+
+<p>If you still facing some exception to install gem, like:</p>
+
+<p>invalid gem: package is corrupt, exception while verifying: undefined method `size' for nil:NilClass (NoMethodError) in /home/rails/.rvm/gems/ruby-2.1.1@project/cache/nokogiri-1.6.6.2.gem</p>
+
+<p>the, you can remove it from cache:</p>
+
+<pre><code>rm /home/rails/.rvm/gems/ruby-2.1.1@project/cache/nokogiri-1.6.6.2.gem
+</code></pre>
+
+<p>For more detail:</p>
+
+<p><a href="http://blog.grepruby.com/2015/04/way-to-clean-up-gem-or-remove-old.html" rel="noreferrer">http://blog.grepruby.com/2015/04/way-to-clean-up-gem-or-remove-old.html</a></p>
+<h4> Comment 106915950 Paul Danelli: </h4>You probably shouldn&#39;t be using <code>sudo</code><br>------------------------------------------------------------------ <br><h3> Answer 5902520 Daniel O&#39;Hara: </h3><p>Try something like <code>gem uninstall rjb --version 1.3.4</code>.</p>
+<h4> Comment 80172480 austinheiman: </h4>the question was &quot;How can I remove old versions but keep the most recent?&quot; this response would remove the newest version.<br>------------------------------------------------------------------ <br><h3> Answer 6719050 Anatoly: </h3><p><code>gem cleanup</code> uses system commands. Installed gems are just directories in the filesystem. If you want to batch delete, use <code>rm -R</code>.</p>
+
+<ol>
+<li><code>gem environment</code> and note the value of <code>GEM PATHS</code></li>
+<li><code>cd &lt;your-gem-paths&gt;/gems</code></li>
+<li><code>ls -1 |grep rjb- |xargs rm -R</code></li>
+</ol>
+<h4> Comment 76774656 philant: </h4>&quot;Installed gems are just directories in the filesystem.&quot; good to know, thanks<br>------------------------------------------------------------------ <br><h3> Answer 54410672 lkraider: </h3><p>You might need to set <code>GEM_HOME</code> for the cleanup to work. You can check what paths exist for gemfiles by running:</p>
+
+<pre><code>gem env
+</code></pre>
+
+<p>Take note of the GEM PATHS section.</p>
+
+<p>In my case, for example, with gems installed in my user home:</p>
+
+<pre><code>export GEM_HOME="~/.gem/ruby/2.4.0"
+gem cleanup
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 64851582 Mike: </h3><pre><code>bundler clean
+</code></pre>
+<p>Stopped the message showing for me, as a last step after I tried all of the above.</p>
+<h4> Comment 125473816 the Tin Man: </h4>This doesn&#39;t really answer the question: what if Bundler isn&#39;t installed or there is no bundle file?<br>

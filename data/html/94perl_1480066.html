@@ -1,0 +1,211 @@
+ <h2> Title: In Perl, how can I concisely check if a $variable is defined and contains a non zero length string? </h2> <h3> Jessica, question_id: 1480066 </h3>Score: 94, Tags: {perl,string} <br><p>I currently use the following Perl to check if a variable is defined and contains text. I have to check <code>defined</code> first to avoid an 'uninitialized value' warning:</p>
+
+<pre><code>if (defined $name &amp;&amp; length $name &gt; 0) {
+    # do something with $name
+}
+</code></pre>
+
+<p>Is there a better (presumably more concise) way to write this?</p>
+------------------------------------------------------------------ <br><h3> Answer 1481979 brian d foy: </h3><p>You often see the check for definedness so you don't have to deal with the warning for using an undef value (and in Perl 5.10 it tells you the offending variable):</p>
+<pre><code> Use of uninitialized value $name in ...
+</code></pre>
+<p>So, to get around this warning, people come up with all sorts of code, and that code starts to look like an important part of the solution rather than the bubble gum and duct tape that it is. Sometimes, it's better to show what you are doing by explicitly turning off the warning that you are trying to avoid:</p>
+<pre><code> {
+ no warnings 'uninitialized';
+
+ if( length $name ) {
+      ...
+      }
+ }
+</code></pre>
+<p>In other cases, using some sort of null value instead of the actual data gets around the problem. With <a href="http://www.effectiveperlprogramming.com/2010/10/set-default-values-with-the-defined-or-operator/" rel="nofollow noreferrer">Perl 5.10's defined-or operator</a>, give <code>length</code> an explicit empty string (defined, and gives back zero length) instead of the variable that would trigger the warning:</p>
+<pre><code> use 5.010;
+
+ if( length( $name // '' ) ) {
+      ...
+      }
+</code></pre>
+<p>In Perl 5.12, it's a bit easier because <a href="http://www.effectiveperlprogramming.com/2010/09/in-perl-v5-12-lengthundef-returns-undef/" rel="nofollow noreferrer"><code>length</code> on an undefined value also returns undefined</a>. That might seem like a bit of silliness, but that pleases the mathematician I might have wanted to be. That doesn't issue a warning, which is the reason this question exists.</p>
+<pre><code>use 5.012;
+use warnings;
+
+my $name;
+
+if( length $name ) { # no warning
+    ...
+    }
+</code></pre>
+<h4> Comment 38228454 rjbs: </h4>Also, in v5.12 and later, <code>length undef</code> returns undef, instead of warning and returning 0.  In boolean context, undef is just as false as 0, so if you&#39;re targeting v5.12 or later, you can just write <code>if (length $name) { ... }</code><br>------------------------------------------------------------------ <br><h3> Answer 1480107 Adam Bellaire: </h3><p>As mobrule indicates, you could use the following instead for a small savings:</p>
+
+<pre><code>if (defined $name &amp;&amp; $name ne '') {
+    # do something with $name
+}
+</code></pre>
+
+<p>You could ditch the defined check and get something even shorter, e.g.:</p>
+
+<pre><code>if ($name ne '') {
+    # do something with $name
+}
+</code></pre>
+
+<p>But in the case where <code>$name</code> is not defined, although the logic flow will work just as intended, if you are using <code>warnings</code> (and you should be), then you'll get the following admonishment:</p>
+
+<pre>Use of uninitialized value in string ne</pre>
+
+<p>So, if there's a chance that <code>$name</code> might not be defined, you really do need to check for definedness first and foremost in order to avoid that warning.  As Sinan Ünür points out, you can use <a href="http://search.cpan.org/dist/Scalar-MoreUtils/" rel="noreferrer">Scalar::MoreUtils</a> to get code that does exactly that (checks for definedness, then checks for zero length) out of the box, via the <code>empty()</code> method:</p>
+
+<pre><code>use Scalar::MoreUtils qw(empty);
+if(not empty($name)) {
+    # do something with $name 
+}
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 1480911 Sinan &#220;n&#252;r: </h3><p>First, since <code>length</code> always returns a non-negative number,</p>
+
+<pre><code>if ( length $name )
+</code></pre>
+
+<p>and </p>
+
+<pre><code>if ( length $name &gt; 0 )
+</code></pre>
+
+<p>are equivalent. </p>
+
+<p>If you are OK with replacing an undefined value with an empty string, you can use Perl 5.10's <code>//=</code> operator which assigns the RHS to the LHS unless the LHS is defined:</p>
+
+<pre><code>#!/usr/bin/perl
+
+use feature qw( say );
+use strict; use warnings;
+
+my $name;
+
+say 'nonempty' if length($name //= '');
+say "'$name'";
+</code></pre>
+
+<p>Note the absence of warnings about an uninitialized variable as <code>$name</code> is assigned the empty string if it is undefined.</p>
+
+<p>However, if you do not want to depend on 5.10 being installed, use the functions provided by <a href="http://search.cpan.org/perldoc/Scalar::MoreUtils" rel="noreferrer">Scalar::MoreUtils</a>. For example, the above can be written as:</p>
+
+<pre><code>#!/usr/bin/perl
+
+use strict; use warnings;
+
+use Scalar::MoreUtils qw( define );
+
+my $name;
+
+print "nonempty\n" if length($name = define $name);
+print "'$name'\n";
+</code></pre>
+
+<p>If you don't want to clobber <code>$name</code>, use <code>default</code>.</p>
+<h4> Comment 1332799 brian d foy: </h4>I wouldn&#39;t use //= in this case since it changes the data as a side effect. Instead, use the slightly shorter <code>length( $name &#47;&#47; &#39;&#39; )</code>.<br><h4> Comment 52442176 brian d foy: </h4>As @rjbs pointed out in my answer, with v5.12 and later <code>length</code> can now return something that is not a number (but not NaN ;)<br><h4> Comment 1332232 DVK: </h4>+1 for &quot;//=&quot; mention (how&#39;d I know that&#39;d be Sinan&#39;s answer :)<br><h4> Comment 1332937 Sinan &#220;n&#252;r: </h4>@brian d&#39;foy I think it depends on what is being done in the function.<br><h4> Comment 1337207 Chris Lutz: </h4>+1 The <code>&#47;&#47;</code> and <code>&#47;&#47;=</code> operators are possibly the most useful specialized operators in existence.<br>------------------------------------------------------------------ <br><h3> Answer 1485688 Gaurav: </h3><p>In cases where I don't care whether the variable is <code>undef</code> or equal to <code>''</code>, I usually summarize it as:</p>
+
+<pre><code>$name = "" unless defined $name;
+if($name ne '') {
+  # do something with $name
+}
+</code></pre>
+<h4> Comment 1342575 brian d foy: </h4>@RET: you can&#39;t use the || operator here since it replaces the string &#39;0&#39; with &#39;&#39;. You have to check if it is defined, not true.<br><h4> Comment 1342584 Gaurav: </h4>Chris, RET: Yup, I know. I was specifically trying to suggest that if Jessica was not concerned with the difference between <code>undef</code> and <code>&quot;&quot;</code>, she should just change one to the other and use a single test. This won&#39;t work in the general case, for which the other solutions posted are way better, but in this specific case leads to neat code. Should I rephrase my answer to make this clearer?<br><h4> Comment 1337262 Chris Lutz: </h4>In Perl 5.10, this can be shortened to <code>$name &#47;&#47;= &quot;&quot;;</code> which is exactly what Sinan posted.<br><h4> Comment 1337374 RET: </h4>And even if you don&#39;t have perl 5.10, you can still write <code>$name ||= &quot;&quot;;</code><br>------------------------------------------------------------------ <br><h3> Answer 1480082 mob: </h3><p>You could say</p>
+
+<pre><code> $name ne ""
+</code></pre>
+
+<p>instead of</p>
+
+<pre><code> length $name &gt; 0
+</code></pre>
+<h4> Comment 1332808 brian d foy: </h4>This will still give you a warning. The reason people check definedness first is to avoid the &#39;uninitialized value&#39; warning.<br>------------------------------------------------------------------ <br><h3> Answer 1480194 daotoad: </h3><p>It isn't always possible to do repetitive things in a simple and elegant way.</p>
+
+<p>Just do what you always do when you have common code that gets replicated across many projects:</p>
+
+<p>Search CPAN, someone may have already the code for you.  For this issue I found <a href="http://search.cpan.org/perldoc/Scalar::MoreUtils" rel="nofollow noreferrer">Scalar::MoreUtils</a>.</p>
+
+<p>If you don't find something you like on CPAN, make a module and put the code in a subroutine:</p>
+
+<pre><code>package My::String::Util;
+use strict;
+use warnings;
+our @ISA = qw( Exporter );
+our @EXPORT = ();
+our @EXPORT_OK = qw( is_nonempty);
+
+use Carp  qw(croak);
+
+sub is_nonempty ($) {
+    croak "is_nonempty() requires an argument" 
+        unless @_ == 1;
+
+    no warnings 'uninitialized';
+
+    return( defined $_[0] and length $_[0] != 0 );
+}
+
+1;
+
+=head1 BOILERPLATE POD
+
+blah blah blah
+
+=head3 is_nonempty
+
+Returns true if the argument is defined and has non-zero length.    
+
+More boilerplate POD.
+
+=cut
+</code></pre>
+
+<p>Then in your code call it:</p>
+
+<pre><code>use My::String::Util qw( is_nonempty );
+
+if ( is_nonempty $name ) {
+    # do something with $name
+}
+</code></pre>
+
+<p>Or if you object to prototypes and don't object to the extra parens, skip the prototype in the module, and call it like: <code>is_nonempty($name)</code>.</p>
+<h4> Comment 1331305 Sinan &#220;n&#252;r: </h4>@Zoran No. Factoring code out like this beats having a complicated condition replicated in many different places. That would be like using pinpricks to kill an elephant. @daotoad: I think you should shorten your answer to emphasize the use of <code>Scalar::MoreUtils</code>.<br><h4> Comment 1331037 Zoran Simic: </h4>Isn&#39;t this like using a hammer to kill a fly?<br><h4> Comment 1337434 daotoad: </h4>@Chris Lutz, yeah, I shouldn&#39;t.  But prototypes are semi-broken--there are easy ways to break prototype enforcement.  For example, crappy and/or outdated tutorials continue to encourage the use of the <code>&amp;</code> sigil when calling functions.  So I tend not to rely on prototypes to do all the work.  I suppose I could add &quot;and quit using the &amp; sigil on sub calls unless you really mean it&quot; to the error message.<br><h4> Comment 1340545 brian d foy: </h4>It&#39;s easier to think about prototypes as hints to the perl compiler so it knows how to parse something. They aren&#39;t there to validate arguments. They may be broken in terms of people&#39;s expectations, but so many things are. :)<br><h4> Comment 81360374 Will Sheppard: </h4>The OP asked for a <b>concise</b> way to do it, and in this case there is one. Less code is usuaully better than more code, as long as it&#39;s understandable. This solution is simply unnecessary.<br><h4> Comment 83113080 daotoad: </h4>@WillSheppard, <code>isnonempty $foo</code> is concise. Heck, I added a prototype so you don&#39;t have to type the parenthesis.  It hides complexity of the check inside a function.  In this case, a function defined in a library (ideally one that&#39;s already written).  Some things can never be concise unless you add abstraction. Adding abstraction adds some overhead, so if you are avoiding typing something out only 2 or 3 times, it&#39;s not such a good deal.  But if you are doing <code>is_empty</code> checks all over the place, it is a huge win to simplify all your checks AND keep them consistent at the same time.<br><h4> Comment 1331793 Adam Bellaire: </h4>@Zoran: Scalar::MoreUtils is a very lightweight module with no dependencies.  Its semantics are also well known.  Unless you are allergic to CPAN, there&#39;s not much reason to avoid using it.<br><h4> Comment 1337213 Chris Lutz: </h4>@daotoad - Since you&#39;ve prototyped your <code>is_nonempty</code> to <code>($)</code> Perl will warn <i>at compile time</i> when the function is called with the wrong number of arguments. You shouldn&#39;t need to do that at runtime.<br><h4> Comment 83201403 Will Sheppard: </h4>I agree a library should be used (I now realise I also missed your reference to <a href="https://metacpan.org/pod/release/RKRIMEN/Scalar-MoreUtils-0.02/lib/Scalar/MoreUtils.pm#empty-VALUE" rel="nofollow noreferrer">Scalar::MoreUtils::empty</a>) because your answer quickly skims over the CPAN module and recommends a different custom solution, which I still say is unnecessary, and inferior to the CPAN solution because it has not received the benefit of CPAN testing.<br><h4> Comment 83610425 daotoad: </h4>@Will Sheppard, sadly, many people find themselves at the mercy of an employer who bans use of CPAN or whose dependency management process is so byzantine that it is actually preferable to DIY for simple things rather than struggling to install them.  That&#39;s why I provide some example code for how to do it without CPAN.<br>------------------------------------------------------------------ <br><h3> Answer 48312481 daotoad: </h3><p>The excellent library <a href="http://metacpan.org/pod/Type::Tiny" rel="nofollow noreferrer">Type::Tiny</a> provides an framework with which to build type-checking into your  Perl code.  What I show here is only the thinnest tip of the iceberg and is using Type::Tiny in the most simplistic and manual way.</p>
+
+<p>Be sure to check out the <a href="http://metacpan.org/pod/Type::Tiny::Manual" rel="nofollow noreferrer">Type::Tiny::Manual</a> for more information.</p>
+
+<pre><code>use Types::Common::String qw&lt; NonEmptyStr &gt;;
+
+if ( NonEmptyStr-&gt;check($name) ) {
+    # Do something here.
+}
+
+NonEmptyStr-&gt;($name);  # Throw an exception if validation fails
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 1480905 Dave Sherohman: </h3><p>How about</p>
+
+<pre><code>if (length ($name || '')) {
+  # do something with $name
+}
+</code></pre>
+
+<p>This isn't quite equivalent to your original version, as it will also return false if <code>$name</code> is the numeric value 0 or the string <code>'0'</code>, but will behave the same in all other cases.</p>
+
+<p>In perl 5.10 (or later), the appropriate approach would be to use the defined-or operator instead:</p>
+
+<pre><code>use feature ':5.10';
+if (length ($name // '')) {
+  # do something with $name
+}
+</code></pre>
+
+<p>This will decide what to get the length of based on whether <code>$name</code> is defined, rather than whether it's true, so 0/<code>'0'</code> will handle those cases correctly, but it requires a more recent version of perl than many people have available.</p>
+<h4> Comment 1332803 brian d foy: </h4>Why lead off with a broken solution only to say that it is broken?<br><h4> Comment 1337198 brian d foy: </h4>Even with earlier perls you can have a working solution instead of a broken one.<br><h4> Comment 1333221 Dave Sherohman: </h4>Because, as I also mentioned, 5.10 is &quot;a more recent version of perl than many people have available.&quot;  YMMV, but &quot;this is a 99% solution that I know you can use, but there&#39;s a better one that maybe you can use, maybe you can&#39;t&quot; seems better to me than &quot;here&#39;s the perfect solution, but you probably can&#39;t use it, so here&#39;s an alternative you can probably get by with as a fallback.&quot;<br>------------------------------------------------------------------ <br><h3> Answer 1492523 Joseph: </h3><pre>
+if ($name )
+{
+    #since undef and '' both evaluate to false 
+    #this should work only when string is defined and non-empty...
+    #unless you're expecting someting like $name="0" which is false.
+    #notice though that $name="00" is not false
+}
+</pre>
+<h4> Comment 1345308 user180804: </h4>Unfortunately this will be false when $name = 0;<br>

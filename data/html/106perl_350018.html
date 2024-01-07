@@ -1,0 +1,115 @@
+ <h2> Title: How can I combine hashes in Perl? </h2> <h3> mleykamp, question_id: 350018 </h3>Score: 106, Tags: {perl,dictionary,hash,merge} <br><p>What is the best way to combine both hashes into %hash1?  I always know that %hash2 and %hash1 always have unique keys.  I would also prefer a single line of code if possible.  </p>
+
+<pre><code>$hash1{'1'} = 'red';
+$hash1{'2'} = 'blue';
+$hash2{'3'} = 'green';
+$hash2{'4'} = 'yellow';
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 350038 dreftymac: </h3><h2>Quick Answer (TL;DR)</h2>
+<pre>
+
+    %hash1 = (%hash1, %hash2)
+
+    ## or else ...
+
+    @hash1{keys %hash2} = values %hash2;
+
+    ## or with references ...
+
+    $hash_ref1 = { %$hash_ref1, %$hash_ref2 };
+
+</pre>
+<h2>Overview</h2>
+<ul>
+<li><strong>Context:</strong> Perl 5.x</li>
+<li><strong>Problem:</strong> The user wishes to merge two hashes<sup>1</sup> into a single variable</li>
+</ul>
+<h2>Solution</h2>
+<ul>
+<li>use the syntax above for simple variables</li>
+<li>use Hash::Merge for complex nested variables</li>
+</ul>
+<h2>Pitfalls</h2>
+<ul>
+<li>What do to when both hashes contain one or more duplicate keys
+<ul>
+<li>(see e.g., <a href="https://stackoverflow.com/questions/46945713">Perl - Merge hash containing duplicate keys</a>)</li>
+<li>(see e.g., <a href="https://stackoverflow.com/questions/17216007">Perl hashes: how to deal with duplicate keys and get possible pair</a>)</li>
+</ul>
+</li>
+<li>Should a key-value pair with an empty value ever overwrite a key-value pair with a non-empty value?
+<ul>
+<li>What constitutes an empty vs non-empty value in the first place? (e.g. <code>undef</code>, zero, empty string, <code>false</code>, falsy ...)</li>
+</ul>
+</li>
+</ul>
+<h2>See also</h2>
+<ul>
+<li><a href="http://www.perlmonks.org/?node_id=524456" rel="noreferrer">PM post on merging hashes</a></li>
+<li><a href="http://www.perlmonks.org/?node_id=157715" rel="noreferrer">PM Categorical Q&amp;A hash union</a></li>
+<li><a href="http://pleac.sourceforge.net/pleac_perl/hashes.html" rel="noreferrer">Perl Cookbook 5.10. Merging Hashes</a></li>
+<li>websearch://perlfaq &quot;merge two hashes&quot;</li>
+<li>websearch://perl merge hash</li>
+<li><a href="https://metacpan.org/pod/Hash::Merge" rel="noreferrer">https://metacpan.org/pod/Hash::Merge</a></li>
+</ul>
+<hr />
+<h2>Footnotes</h2>
+<p><sup>1</sup> * (aka <a href="https://stackoverflow.com/questions/tagged/associative-array">associative-array</a>, aka <a href="https://stackoverflow.com/questions/tagged/dictionary">dictionary</a>)</p>
+<h4> Comment 3612875 user102008: </h4>why can&#39;t you just do <code>%hash1 = (%hash1, %hash2)</code><br><h4> Comment 183538 kixx: </h4>Yes, if there are no key collisions, @hash1{keys %hash2} = values %hash2; is the fastest and shortest way, AFAIK.<br><h4> Comment 84527045 M Somerville: </h4>That will set <code>$hash_ref1</code> to <code>$hash_ref2</code>, no merging. You want <code>$hash_ref1 = { %$hash_ref1, %$hash_ref2 };</code>, I&#39;ll edit the answer.<br><h4> Comment 73259135 lepe: </h4>It seems to work with references as well: $hash_ref1 = ($hash_ref1, $hash_ref2);<br><h4> Comment 135145996 U. Windl: </h4>@MSomerville but the merge will create a new hash reference; when references to the has exist, this may not be correct, right? Maybe <code>@$hash_ref1{ keys %$hash_ref2 } = values %$hash_ref2;</code>?<br>------------------------------------------------------------------ <br><h3> Answer 350190 brian d foy: </h3><p>Check out <a href="http://learn.perl.org/faq/perlfaq4.html#How-do-I-merge-two-hashes" rel="noreferrer">perlfaq4: How do I merge two hashes</a>. There is a lot of good information already in the Perl documentation and you can have it right away rather than waiting for someone else to answer it. :)</p>
+
+<hr>
+
+<p>Before you decide to merge two hashes, you have to decide what to do if both hashes contain keys that are the same and if you want to leave the original hashes as they were.</p>
+
+<p>If you want to preserve the original hashes, copy one hash (%hash1) to a new hash (%new_hash), then add the keys from the other hash (%hash2 to the new hash. Checking that the key already exists in %new_hash gives you a chance to decide what to do with the duplicates:</p>
+
+<pre><code>my %new_hash = %hash1; # make a copy; leave %hash1 alone
+
+foreach my $key2 ( keys %hash2 )
+    {
+    if( exists $new_hash{$key2} )
+        {
+        warn "Key [$key2] is in both hashes!";
+        # handle the duplicate (perhaps only warning)
+        ...
+        next;
+        }
+    else
+        {
+        $new_hash{$key2} = $hash2{$key2};
+        }
+    }
+</code></pre>
+
+<p>If you don't want to create a new hash, you can still use this looping technique; just change the %new_hash to %hash1.</p>
+
+<pre><code>foreach my $key2 ( keys %hash2 )
+    {
+    if( exists $hash1{$key2} )
+        {
+        warn "Key [$key2] is in both hashes!";
+        # handle the duplicate (perhaps only warning)
+        ...
+        next;
+        }
+    else
+        {
+        $hash1{$key2} = $hash2{$key2};
+        }
+    }
+</code></pre>
+
+<p>If you don't care that one hash overwrites keys and values from the other, you could just use a hash slice to add one hash to another. In this case, values from %hash2 replace values from %hash1 when they have keys in common:</p>
+
+<pre><code>@hash1{ keys %hash2 } = values %hash2;
+</code></pre>
+<h4> Comment 11381425 Chris: </h4>nice to link to perlfaq, and other resources in other question<br>------------------------------------------------------------------ <br><h3> Answer 14853128 Lee Goddard: </h3><p>This is an old question, but comes out high in my Google search for 'perl merge hashes' - and yet it does not mention the very helpful CPAN module <a href="https://metacpan.org/pod/Hash%3a%3aMerge">Hash::Merge</a></p>
+<h4> Comment 54694910 dreftymac: </h4>the top-voted answer has been updated to include this.<br>------------------------------------------------------------------ <br><h3> Answer 46246279 JeanieJ: </h3><p>For hash references. You should use curly braces like the following: </p>
+
+<pre><code>$hash_ref1 = {%$hash_ref1, %$hash_ref2};
+</code></pre>
+
+<p>and <strong>not</strong> the suggested answer above using parenthesis: </p>
+
+<pre><code>$hash_ref1 = ($hash_ref1, $hash_ref2);
+</code></pre>

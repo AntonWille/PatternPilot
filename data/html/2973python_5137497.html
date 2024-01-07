@@ -1,0 +1,176 @@
+ <h2> Title: Find the current directory and file&#39;s directory </h2> <h3> John Howard, question_id: 5137497 </h3>Score: 2973, Tags: {python,directory} <br><p>How do I determine:</p>
+<ol>
+<li>the current directory (where I was in the shell when I ran the Python script), and</li>
+<li>where the Python file I am executing is?</li>
+</ol>
+<h4> Comment 132015152 Charlie Parker: </h4><code>import os cwd = os.getcwd()</code> to pwd within python<br><h4> Comment 133614353 Karl Knechtel: </h4>This question is <b>blatantly</b> two questions in one and should have been closed as needing more focus. Both questions are simple reference questions, and thus ought to each have separate canonicals that this can be dupe-hammered with. However, I have been absolutely tearing my hair out trying to find a <b>proper</b> canonical for <b>only</b> the first question. I am turning up <b>countless</b> duplicates for the second question, most of which involve OP <b>not realizing there is a difference</b>.<br><h4> Comment 133614937 Karl Knechtel: </h4>I have added the best I could find for &quot;Q. How do I determine the current directory? A. Use <code>os.getcwd()</code>&quot; after <b>literally hours</b> of searching. Ugh.<br>------------------------------------------------------------------ <br><h3> Answer 5137509 Russell Dias: </h3><p>To get the full path to the directory a Python file is contained in, write this in that file:</p>
+
+<pre><code>import os 
+dir_path = os.path.dirname(os.path.realpath(__file__))
+</code></pre>
+
+<p>(Note that the incantation above won't work if you've already used <code>os.chdir()</code> to change your current working directory, since the value of the <code>__file__</code> constant is relative to the current working directory and is not changed by an <code>os.chdir()</code> call.)</p>
+
+<hr>
+
+<p>To get the current working directory use </p>
+
+<pre><code>import os
+cwd = os.getcwd()
+</code></pre>
+
+<hr>
+
+<p>Documentation references for the modules, constants and functions used above:</p>
+
+<ul>
+<li>The <a href="https://docs.python.org/library/os.html"><code>os</code></a> and <a href="https://docs.python.org/library/os.path.html#module-os.path"><code>os.path</code></a> modules.</li>
+<li>The <a href="https://docs.python.org/reference/datamodel.html"><code>__file__</code></a> constant</li>
+<li><a href="https://docs.python.org/library/os.path.html#os.path.realpath"><code>os.path.realpath(path)</code></a> (returns <em>"the canonical path of the specified filename, eliminating any symbolic links encountered in the path"</em>)</li>
+<li><a href="https://docs.python.org/library/os.path.html#os.path.dirname"><code>os.path.dirname(path)</code></a> (returns <em>"the directory name of pathname <code>path</code>"</em>)</li>
+<li><a href="https://docs.python.org/library/os.html#os.getcwd"><code>os.getcwd()</code></a> (returns <em>"a string representing the current working directory"</em>)</li>
+<li><a href="https://docs.python.org/library/os.html#os.chdir"><code>os.chdir(path)</code></a> (<em>"change the current working directory to <code>path</code>"</em>)</li>
+</ul>
+<h4> Comment 28136095 FlipMcF: </h4>I hate it when I use this to append to sys.path.  I feel so dirty right now.<br><h4> Comment 31007244 Neon22: </h4><b>file</b> will not work if invoked from an IDE (say IDLE). Suggest os.path.realpath(&#39;./&#39;) or  os.getcwd(). Best anser in here: <a href="http://stackoverflow.com/questions/2632199/how-do-i-get-the-path-of-the-current-executed-file-in-python?lq=1" title="how do i get the path of the current executed file in python">stackoverflow.com/questions/2632199/&hellip;</a><br><h4> Comment 66705815 Mohammad ElNesr: </h4>It gets an error <code>NameError: name &#39;__file__&#39; is not defined</code>. How to solve this?<br><h4> Comment 40452819 Mark: </h4>@Neon22 might suit some needs, but I feel it should be noted that those things aren&#39;t the same at all - files can be outside the working directory.<br><h4> Comment 46440385 Lekensteyn: </h4>@Moberg Often the paths will be the same when reversing <code>realpath</code> with <code>dirname</code>, but it will differ when the file (or its directory) is actually a symbolic link.<br><h4> Comment 129267178 Hedwin Bonnavaud: </h4><code>os.path.dirname(__file__)</code> do the same that <code>os.path.dirname(os.path.realpath(__file__))</code> in my code<br><h4> Comment 130412408 FaCoffee: </h4>Just make sure you use <code>&quot;__file__&quot;</code><br><h4> Comment 41910122 Moberg: </h4>What about reversing the order, does it matter? <code>os.path.realpath(os.path.dirname(__file__))</code><br><h4> Comment 132466691 theonlygusti: </h4>I don&#39;t think the first parenthesis is correct at all. <code>__file__</code> seems to be absolute, not relative to the CWD<br><h4> Comment 126496167 Brndn: </h4>for jupyter notebooks - try os.path.realpath(os.getcwd()) (when you&#39;re in the right working directory)<br><h4> Comment 79460273 neowulf33: </h4>Apparently prepending to <code>sys.path</code> is acceptable according to the <a href="https://docs.python.org/3.4/tutorial/modules.html#the-module-search-path" rel="nofollow noreferrer">documentation</a>.<br><h4> Comment 94954363 The Elemental of Destruction: </h4>In some versions of python 2 (mainly windows versions) paths that include utf-8 characters (like emojis) will return with two question marks replacing the character from os functions, messing up any further commands that you try.<br><h4> Comment 108248309 Minions: </h4>@RusselDias why do you put <code>realpath</code> inside <code>dirname</code>? I tested each independently and they work like charm!<br><h4> Comment 108248392 Minions: </h4>@MohammadElNesr are you sure that you&#39;re using <code>os.path.realpath</code> and not <code>os.path.abspath</code>? you&#39;re error eften occurs with <code>abspath</code>.<br>------------------------------------------------------------------ <br><h3> Answer 5137507 Nix: </h3><p><a href="https://sourceware.org/gdb/onlinedocs/gdb/Working-Directory.html" rel="noreferrer">Current working directory</a>:  <a href="https://docs.python.org/2/library/os.html#os.getcwd" rel="noreferrer"><code>os.getcwd()</code></a></p>
+<p>And the <a href="http://docs.python.org/reference/datamodel.html" rel="noreferrer"><code>__file__</code> attribute</a> can help you find out where the file you are executing is located. This Stack Overflow post explains everything:  <em><a href="https://stackoverflow.com/questions/2632199/how-do-i-get-the-path-of-the-current-executed-file-in-python">How do I get the path of the current executed file in Python?</a></em></p>
+------------------------------------------------------------------ <br><h3> Answer 13720875 Daniel Reis: </h3><p>You may find this useful as a reference:</p>
+
+<pre><code>import os
+
+print("Path at terminal when executing this file")
+print(os.getcwd() + "\n")
+
+print("This file path, relative to os.getcwd()")
+print(__file__ + "\n")
+
+print("This file full path (following symlinks)")
+full_path = os.path.realpath(__file__)
+print(full_path + "\n")
+
+print("This file directory and name")
+path, filename = os.path.split(full_path)
+print(path + ' --&gt; ' + filename + "\n")
+
+print("This file directory only")
+print(os.path.dirname(full_path))
+</code></pre>
+<h4> Comment 63296938 Daniel Reis: </h4>The <code>__file__</code> is an attribute of the module object. You need run the code inside a Python file, not on the REPL.<br><h4> Comment 63224984 Alex Raj Kaliamoorthy: </h4>what does <code>__file__</code> signifies here? It does not work for me.<br>------------------------------------------------------------------ <br><h3> Answer 46061872 skovorodkin: </h3><p>The <a href="https://docs.python.org/3/library/pathlib.html" rel="noreferrer"><code>pathlib</code></a> module, <a href="https://docs.python.org/3/whatsnew/3.4.html#pathlib" rel="noreferrer">introduced in Python 3.4</a> (<em><a href="https://www.python.org/dev/peps/pep-0428/" rel="noreferrer">PEP 428 — The pathlib module — object-oriented filesystem paths</a></em>), makes the path-related experience much much better.</p>
+<pre class="lang-none prettyprint-override"><code>pwd
+
+/home/skovorodkin/stack
+
+tree
+
+.
+└── scripts
+    ├── 1.py
+    └── 2.py
+</code></pre>
+<p>In order to get the current working directory, use <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path.cwd" rel="noreferrer"><code>Path.cwd()</code></a>:</p>
+<pre><code>from pathlib import Path
+
+print(Path.cwd())  # /home/skovorodkin/stack
+</code></pre>
+<p>To get an absolute path to your script file, use the <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path.resolve" rel="noreferrer"><code>Path.resolve()</code></a> method:</p>
+<pre><code>print(Path(__file__).resolve())  # /home/skovorodkin/stack/scripts/1.py
+</code></pre>
+<p>And to get the path of a directory where your script is located, access <a href="https://docs.python.org/3/library/pathlib.html#pathlib.PurePath.parent" rel="noreferrer"><code>.parent</code></a> (it is recommended to call <code>.resolve()</code> before <code>.parent</code>):</p>
+<pre><code>print(Path(__file__).resolve().parent)  # /home/skovorodkin/stack/scripts
+</code></pre>
+<p>Remember that <code>__file__</code> is not reliable in some situations: <em><a href="https://stackoverflow.com/questions/2632199/how-do-i-get-the-path-of-the-current-executed-file-in-python">How do I get the path of the current executed file in Python?</a></em>.</p>
+<hr />
+<p>Please note, that <code>Path.cwd()</code>, <code>Path.resolve()</code> and other <code>Path</code> methods return path objects (<a href="https://docs.python.org/3/library/pathlib.html#pathlib.PosixPath" rel="noreferrer"><code>PosixPath</code></a> in my case), not strings. In Python 3.4 and 3.5 that caused some pain, because <a href="https://docs.python.org/3.5/library/functions.html#open" rel="noreferrer"><code>open</code></a> built-in function could only work with string or bytes objects, and did not support <code>Path</code> objects, so you had to convert <code>Path</code> objects to strings or use the <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path.open" rel="noreferrer"><code>Path.open()</code></a> method, but the latter option required you to change old code:</p>
+<h2>File <em>scripts/2.py</em></h2>
+<pre><code>from pathlib import Path
+
+p = Path(__file__).resolve()
+
+with p.open() as f: pass
+with open(str(p)) as f: pass
+with open(p) as f: pass
+
+print('OK')
+</code></pre>
+<h3>Output</h3>
+<pre class="lang-none prettyprint-override"><code>python3.5 scripts/2.py
+
+Traceback (most recent call last):
+  File &quot;scripts/2.py&quot;, line 11, in &lt;module&gt;
+    with open(p) as f:
+TypeError: invalid file: PosixPath('/home/skovorodkin/stack/scripts/2.py')
+</code></pre>
+<p>As you can see, <code>open(p)</code> does not work with Python 3.5.</p>
+<p><em><a href="https://www.python.org/dev/peps/pep-0519/" rel="noreferrer">PEP 519 — Adding a file system path protocol</a></em>, implemented in Python 3.6, adds support of <a href="https://docs.python.org/3/library/os.html#os.PathLike" rel="noreferrer"><code>PathLike</code></a> objects to the <a href="https://docs.python.org/3/library/functions.html#open" rel="noreferrer"><code>open</code></a> function, so now you can pass <code>Path</code> objects to the <code>open</code> function directly:</p>
+<pre class="lang-none prettyprint-override"><code>python3.6 scripts/2.py
+
+OK
+</code></pre>
+<h4> Comment 97167393 shacker: </h4>Note also that these methods are chainable, so you can use <code>app_path = Path(__file__).resolve().parent.parent.parent</code> as a parallel to <code>..&#47;..&#47;..&#47;</code> if you need to.<br><h4> Comment 122091184 Peter Mortensen: </h4>What system has executables (or the equivalent) by the name &quot;<code>python3.5</code>&quot; and &quot;<code>python3.6</code>&quot;? Ubuntu <a href="https://en.wikipedia.org/wiki/Ubuntu_MATE#Releases" rel="nofollow noreferrer">Ubuntu MATE 20.04</a> (Focal Fossa) doesn&#39;t (at least not by default). It has executables by the name &quot;<code>python3</code>&quot; and &quot;<code>python2</code>&quot; (but not &quot;<code>python</code>&quot; - which causes <a href="https://pmortensen.eu/world2/2019/12/08/arm-toolchain-ubuntu-19-04-black-magic-probe/#Python_blues_on_Ubuntu" rel="nofollow noreferrer">some things to break</a>)<br><h4> Comment 122111668 skovorodkin: </h4>@PeterMortensen, thanks for the corrections. I don&#39;t remember if I actually had <code>python3.x</code> symlinks that time. Maybe I thought it would make snippets a bit clearer to the reader.<br>------------------------------------------------------------------ <br><h3> Answer 10293159 vinithravit: </h3><ol>
+<li><p>To get the current directory full path</p>
+<pre class="lang-none prettyprint-override"><code>&gt;&gt;import os
+&gt;&gt;print os.getcwd()
+</code></pre>
+<p>Output: &quot;C :\Users\admin\myfolder&quot;</p>
+</li>
+<li><p>To get the current directory folder name alone</p>
+<pre class="lang-none prettyprint-override"><code>&gt;&gt;import os
+&gt;&gt;str1=os.getcwd()
+&gt;&gt;str2=str1.split('\\')
+&gt;&gt;n=len(str2)
+&gt;&gt;print str2[n-1]
+</code></pre>
+<p>Output: &quot;myfolder&quot;</p>
+</li>
+</ol>
+<h4> Comment 19009816 kkurian: </h4>better to use os.sep rather than hardcode for Windows: os.getcwd().split(os.sep)[-1]<br><h4> Comment 16509091 imkost: </h4>better do it in one line, i think: <code>os.getcwd().split(&#39;\\&#39;)[-1]</code><br><h4> Comment 29424204 airstrike: </h4>the problem with this approach is that if you execute the script from a different directory, you will get that directory&#39;s name instead of the scripts&#39;, which may not be what you want.<br><h4> Comment 59198611 f0ster: </h4>Right, the current directory which hosts your file may not be your CWD<br>------------------------------------------------------------------ <br><h3> Answer 33540872 Blairg23: </h3><p><strong>Answer to #1:</strong></p>
+
+<p>If you want the current directory, do this:</p>
+
+<pre><code>import os
+os.getcwd()
+</code></pre>
+
+<p>If you want just any folder name and you have the path to that folder, do this:</p>
+
+<pre class="lang-python prettyprint-override"><code>def get_folder_name(folder):
+    '''
+    Returns the folder name, given a full folder path
+    '''
+    return folder.split(os.sep)[-1]
+</code></pre>
+
+<p><strong>Answer to #2:</strong></p>
+
+<pre><code>import os
+print os.path.abspath(__file__)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 39771209 Mathieu C.: </h3><p><a href="https://docs.python.org/3.8/library/pathlib.html" rel="noreferrer">Pathlib</a> can be used this way to get the directory containing the current script:</p>
+<pre><code>import pathlib
+filepath = pathlib.Path(__file__).resolve().parent
+</code></pre>
+<h4> Comment 73517567 A. Romeu: </h4>For python 3.3 and earlier pathlib has to be installed<br><h4> Comment 88232869 kagronick: </h4>@Kimmo The only reason you should be working in Python 2 code is to convert it to Python 3.<br><h4> Comment 130117646 XYZ: </h4>when i run the code in jupyter notebook, it has the error: <code>NameError: name &#39;__file__&#39; is not defined</code>, how to solve?<br><h4> Comment 97167439 shacker: </h4>Note also that these methods are chainable, so you can use <code>app_path = Path(__file__).resolve().parent.parent.parent</code> as a parallel to <code>..&#47;..&#47;..&#47;</code> if you need to.<br><h4> Comment 71696011 Kimmo Hintikka: </h4>I like this solution. However can cause some Python 2.X issues.<br><h4> Comment 88260646 Kimmo Hintikka: </h4>@kagnirick agreed, but there are still people who don&#39;t. I write all my new stuff with formatted string literals (PEP 498) using Python 3.6 so that someone doesn&#39;t go and push them to Python2.<br>------------------------------------------------------------------ <br><h3> Answer 12767520 Kurt: </h3><p>If you are trying to find the current directory of the file you are currently in:</p>
+
+<p>OS agnostic way:</p>
+
+<pre><code>dirname, filename = os.path.split(os.path.abspath(__file__))
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 28637689 Jazzer: </h3><p>If you're using Python 3.4, there is the brand new higher-level <code>pathlib</code> module which allows you to conveniently call <code>pathlib.Path.cwd()</code> to get a <code>Path</code> object representing your current working directory, along with many other new features.</p>
+
+<p>More info on this new API can be found <a href="https://docs.python.org/3.4/library/pathlib.html" rel="noreferrer">here</a>.</p>
+<h4> Comment 80532862 Eyal Levin: </h4>For Python version &lt; 3.4 you can use <code>pathlib2</code>: <a href="https://pypi.python.org/pypi/pathlib2/" rel="nofollow noreferrer">pypi.python.org/pypi/pathlib2</a><br>------------------------------------------------------------------ <br><h3> Answer 32711758 Ilia S.: </h3><p>To get the current directory full path:<br/></p>
+
+<pre class="lang-py prettyprint-override"><code>os.path.realpath('.')
+</code></pre>
+<h4> Comment 68900967 Oliver Zendel: </h4>This one works from inside a jupyter iPython notebook (&#180;__file__&#180; and getcwd won&#39;t)<br><h4> Comment 95393652 Leevo: </h4>I&#39;m working remotely with a Jupyter Notebook: <code>os.getcwd()</code> and `os.path.realpath(&#39;.&#39;) return exactly the same string path.<br><h4> Comment 88609132 yoann-h: </h4>Still valid. Thanks from the future @OliverZendel!<br><h4> Comment 122090766 Peter Mortensen: </h4>@Leevo: Point being?<br><h4> Comment 134509750 Scott: </h4>This returns the jupyter root directory, not the directory holding the file.<br>------------------------------------------------------------------ <br><h3> Answer 19269546 StormShadow: </h3><p>I think the most succinct way to find just the name of your current execution context would be:</p>
+<pre><code>current_folder_path, current_folder_name = os.path.split(os.getcwd())
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 18185825 Grochni: </h3><p>If you're searching for the location of the currently executed script, you can use <code>sys.argv[0]</code> to get the full path.</p>
+<h4> Comment 64745193 Mark Amery: </h4>This is wrong. <code>sys.argv[0]</code> needn&#39;t contain the <i>full</i> path to the executing script.<br>------------------------------------------------------------------ <br><h3> Answer 44569198 Kotauskas: </h3><p>For question 1, use <code>os.getcwd() # Get working directory</code> and <code>os.chdir(r'D:\Steam\steamapps\common') # Set working directory</code></p>
+<hr />
+<p>I recommend using <code>sys.argv[0]</code> for question 2 because <code>sys.argv</code> is immutable and therefore always returns the current file (module object path) and not affected by <code>os.chdir()</code>. Also you can do like this:</p>
+<pre><code>import os
+this_py_file = os.path.realpath(__file__)
+
+# vvv Below comes your code vvv #
+</code></pre>
+<p>But that snippet and <code>sys.argv[0]</code> will not work or will work weird when compiled by PyInstaller, because magic properties are not set in <code>__main__</code> level and <code>sys.argv[0]</code> is the way your executable was called (it means that it becomes affected by the working directory).</p>

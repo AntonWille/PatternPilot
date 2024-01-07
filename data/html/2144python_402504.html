@@ -1,0 +1,381 @@
+ <h2> Title: How to determine a Python variable&#39;s type? </h2> <h3> user46646, question_id: 402504 </h3>Score: 2144, Tags: {python,types} <br><p>How do I see the type of a variable? (e.g. unsigned 32 bit)</p>
+<h4> Comment 99903180 Georgy: </h4>Possible duplicate of <a href="https://stackoverflow.com/questions/152580/whats-the-canonical-way-to-check-for-type-in-python">What&#39;s the canonical way to check for type in Python?</a><br><h4> Comment 99903187 Georgy: </h4>Also: <a href="https://stackoverflow.com/questions/2225038/determine-the-type-of-an-object">Determine the type of an object?</a><br><h4> Comment 114044039 michael: </h4>Specifically wrt  <i>&quot;whether it&#39;s unsigned 32 bit, signed 16 bit, etc&quot;</i> the answer is &quot;the documentation&quot;.   Python doesn&#39;t have 16/32 bit or signed/unsigned int, it has: (1) integers (unlimited precision: &quot;long integer&quot; was removed in python 3); (2) floating point numbers (typically equivalent to a double in C); and, (3) complex numbers (real + imaginary, both floats). See <a href="https://docs.python.org/3/library/stdtypes.html#typesnumeric" rel="nofollow noreferrer">docs.python.org/3/library/stdtypes.html#typesnumeric</a><br>------------------------------------------------------------------ <br><h3> Answer 41603526 anh_ng8: </h3><p>Examples of simple type checking in Python:</p>
+
+<pre><code>assert type(variable_name) == int
+
+assert type(variable_name) == bool
+
+assert type(variable_name) == list
+</code></pre>
+<h4> Comment 113750750 Synetech: </h4>This should be the accepted answer since it shows how to actually use the returned value. Nobody cares about seeing the result of <code>type()</code> in the terminal, we want it to do type-checking, and it&#39;s not obvious how (I assumed you had to compare to the type as a string: <code>if (type(var)==&#39;str&#39;):</code>)<br>------------------------------------------------------------------ <br><h3> Answer 402704 gregjor: </h3><p>Use the <a href="https://docs.python.org/library/functions.html#type" rel="noreferrer"><code>type()</code></a> builtin function:</p>
+
+<pre><code>&gt;&gt;&gt; i = 123
+&gt;&gt;&gt; type(i)
+&lt;type 'int'&gt;
+&gt;&gt;&gt; type(i) is int
+True
+&gt;&gt;&gt; i = 123.456
+&gt;&gt;&gt; type(i)
+&lt;type 'float'&gt;
+&gt;&gt;&gt; type(i) is float
+True
+</code></pre>
+
+<p>To check if a variable is of a given type, use <a href="https://docs.python.org/library/functions.html#isinstance" rel="noreferrer"><code>isinstance</code></a>:</p>
+
+<pre><code>&gt;&gt;&gt; i = 123
+&gt;&gt;&gt; isinstance(i, int)
+True
+&gt;&gt;&gt; isinstance(i, (float, str, set, dict))
+False
+</code></pre>
+
+<p>Note that Python doesn't have the same types as C/C++, which appears to be your question.</p>
+<h4> Comment 119462964 Ranjit Chawla: </h4>A point to note (since the question asked about numbers) - bool is a subclass of int. So  isinstance(True, int) or isinstance(False, int) will return True.<br><h4> Comment 130696482 Quelklef: </h4>Furthermore, due to <code>bool</code> being a subclass of <code>int</code>, certain surprising things hold true, like <code>0 == False</code> and <code>{1, True} == {True}</code><br>------------------------------------------------------------------ <br><h3> Answer 402516 atzz: </h3><p>Python doesn't have such types as you describe. There are two types used to represent integral values: <code>int</code>, which corresponds to platform's int type in C, and <code>long</code>, which is an arbitrary precision integer (i.e. it grows as needed and doesn't have an upper limit). <code>int</code>s are silently converted to <code>long</code> if an expression produces result which cannot be stored in <code>int</code>.</p>
+------------------------------------------------------------------ <br><h3> Answer 402507 Srikanth: </h3><p>You may be looking for the <a href="https://docs.python.org/3/library/functions.html#type" rel="nofollow noreferrer"><code>type()</code></a> <em>built-in function</em>.</p>
+<p>See the examples below, but there's no &quot;unsigned&quot; type in Python just like Java.</p>
+<p>Positive integer:</p>
+<pre><code>&gt;&gt;&gt; v = 10
+&gt;&gt;&gt; type(v)
+&lt;type 'int'&gt;
+</code></pre>
+<p><em>Large</em> positive integer:</p>
+<pre><code>&gt;&gt;&gt; v = 100000000000000
+&gt;&gt;&gt; type(v)
+&lt;type 'long'&gt;
+</code></pre>
+<p>Negative integer:</p>
+<pre><code>&gt;&gt;&gt; v = -10
+&gt;&gt;&gt; type(v)
+&lt;type 'int'&gt;
+</code></pre>
+<p>Literal sequence of characters:</p>
+<pre><code>&gt;&gt;&gt; v = 'hi'
+&gt;&gt;&gt; type(v)
+&lt;type 'str'&gt;
+</code></pre>
+<p>Floating point number:</p>
+<pre><code>&gt;&gt;&gt; v = 3.14159
+&gt;&gt;&gt; type(v)
+&lt;type 'float'&gt;
+</code></pre>
+<h4> Comment 93838603 dddJewelsbbb: </h4>I had to double take when I saw this. Java SE8 now contains unsigned integers, and I&#39;ve developed so much with it that it seems sinful that Java never had unsigned integers before SE8.<br>------------------------------------------------------------------ <br><h3> Answer 32885953 Vaibhav: </h3><p>It is so simple. You do it like this.</p>
+
+<pre><code>print(type(variable_name))
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 39921486 Russia Must Remove Putin: </h3><blockquote>
+<h1>How to determine the variable type in Python?</h1>
+</blockquote>
+<p>So if you have a variable, for example:</p>
+<pre><code>one = 1
+</code></pre>
+<p>You want to know its type?</p>
+<p>There are right ways and wrong ways to do just about everything in Python. Here's the right way:</p>
+<h2>Use <code>type</code></h2>
+<pre><code>&gt;&gt;&gt; type(one)
+&lt;type 'int'&gt;
+</code></pre>
+<p>You can use the <code>__name__</code> attribute to get the name of the object. (This is one of the few special attributes that you need to use the <code>__dunder__</code> name to get to - there's not even a method for it in the <code>inspect</code> module.)</p>
+<pre><code>&gt;&gt;&gt; type(one).__name__
+'int'
+</code></pre>
+<h2>Don't use <code>__class__</code></h2>
+<p><strong>In Python, names that start with underscores are semantically not a part of the public API, and it's a best practice for users to avoid using them.</strong> (Except when absolutely necessary.)</p>
+<p>Since <code>type</code> gives us the class of the object, we should avoid getting this directly. :</p>
+<pre><code>&gt;&gt;&gt; one.__class__
+</code></pre>
+<p>This is usually the first idea people have when accessing the type of an object in a method - they're already looking for attributes, so type seems weird. For example:</p>
+<pre><code>class Foo(object):
+    def foo(self):
+        self.__class__
+</code></pre>
+<p>Don't. Instead, do type(self):</p>
+<pre><code>class Foo(object):
+    def foo(self):
+        type(self)
+</code></pre>
+<h2>Implementation details of ints and floats</h2>
+<blockquote>
+<p>How do I see the type of a variable whether it is unsigned 32 bit, signed 16 bit, etc.?</p>
+</blockquote>
+<p>In Python, these specifics are implementation details. So, in general, we don't usually worry about this in Python. However, to sate your curiosity...</p>
+<p>In Python 2, int is usually a signed integer equal to the implementation's <a href="https://en.wikipedia.org/wiki/Word_(computer_architecture)" rel="noreferrer">word</a> width (limited by the system). It's usually implemented as a <a href="https://docs.python.org/2/library/stdtypes.html#numeric-types-int-float-long-complex" rel="noreferrer">long in C</a>. When integers get bigger than this, we usually convert them to Python longs (with unlimited precision, not to be confused with C longs).</p>
+<p>For example, in a 32 bit Python 2, we can deduce that int is a signed 32 bit integer:</p>
+<pre><code>&gt;&gt;&gt; import sys
+
+&gt;&gt;&gt; format(sys.maxint, '032b')
+'01111111111111111111111111111111'
+&gt;&gt;&gt; format(-sys.maxint - 1, '032b') # minimum value, see docs.
+'-10000000000000000000000000000000'
+</code></pre>
+<p>In Python 3, the old int goes away, and we just use (Python's) long as int, which has <a href="https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex" rel="noreferrer">unlimited precision.</a></p>
+<p>We can also get some information about Python's floats, which are usually implemented as a <a href="https://docs.python.org/2/library/stdtypes.html#numeric-types-int-float-long-complex" rel="noreferrer">double</a> in C:</p>
+<pre><code>&gt;&gt;&gt; sys.float_info
+sys.floatinfo(max=1.7976931348623157e+308, max_exp=1024, max_10_exp=308, 
+min=2.2250738585072014e-308, min_exp=-1021, min_10_exp=-307, dig=15, 
+mant_dig=53, epsilon=2.2204460492503131e-16, radix=2, rounds=1)
+</code></pre>
+<h2>Conclusion</h2>
+<p>Don't use <code>__class__</code>, a semantically nonpublic API, to get the type of a variable. Use <code>type</code> instead.</p>
+<p>And don't worry too much about the implementation details of Python. I've not had to deal with issues around this myself. You probably won't either, and if you really do, you should know enough not to be looking to this answer for what to do.</p>
+------------------------------------------------------------------ <br><h3> Answer 402508 Redwood: </h3><pre><code>print type(variable_name)
+</code></pre>
+
+<p>I also highly recommend the <a href="http://ipython.scipy.org/" rel="noreferrer">IPython</a> interactive interpreter when dealing with questions like this. It lets you type <code>variable_name?</code> and will return a whole list of information about the object including the type and the doc string for the type.</p>
+
+<p>e.g.</p>
+
+<pre><code>In [9]: var = 123
+
+In [10]: var?
+Type:       int
+Base Class: &lt;type 'int'&gt;
+String Form:    123
+Namespace:  Interactive
+Docstring:
+    int(x[, base]) -&gt; integer
+</code></pre>
+
+<p>Convert a string or number to an integer, if possible.  A floating point argument will be truncated towards zero (this does not include a string
+representation of a floating point number!)  When converting a string, use the optional base.  It is an error to supply a base when converting a
+        non-string. If the argument is outside the integer range a long object
+        will be returned instead.</p>
+<h4> Comment 81745270 jcoppens: </h4>@KolobCanyon that&#39;s because in 3.x, print needs parenthesis: <code>print(type(str))</code><br><h4> Comment 80787880 Kellen Stuart: </h4><code>print type(str)</code> returns an error in Python 3.6. Use <code>type(str)</code><br><h4> Comment 227777 user46646: </h4>I asked for unsigned int,signed int etc<br><h4> Comment 93376342 Han XIAO: </h4>You should really modify the <code>print type(var)</code> erroneous code.<br>------------------------------------------------------------------ <br><h3> Answer 55076382 Ahmed Adewale: </h3><pre><code>a = "cool"
+type(a)
+
+//result 'str'
+&lt;class 'str'&gt;
+or 
+do 
+`dir(a)` 
+to see the list of inbuilt methods you can have on the variable.
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 29113307 Incerteza: </h3><p>One more way using <code>__class__</code>:</p>
+
+<pre><code>&gt;&gt;&gt; a = [1, 2, 3, 4]
+&gt;&gt;&gt; a.__class__
+&lt;type 'list'&gt;
+&gt;&gt;&gt; b = {'key1': 'val1'}
+&gt;&gt;&gt; b.__class__
+&lt;type 'dict'&gt;
+&gt;&gt;&gt; c = 12
+&gt;&gt;&gt; c.__class__
+&lt;type 'int'&gt;
+</code></pre>
+<h4> Comment 91770930 michael: </h4>re: comment <i>&quot;names that start with underscores...&quot;</i>  (single) underscores are very different than double underscores (&quot;dunders&quot;) and they&#39;re definitely part of the public API and it&#39;s certainly fine to use them. This may be of help... <a href="https://youtu.be/wf-BqAjZb8M" rel="nofollow noreferrer">youtu.be/wf-BqAjZb8M</a><br>------------------------------------------------------------------ <br><h3> Answer 18224831 skjoshi: </h3><p>It may be little irrelevant. but you can check types of an object with <code>isinstance(object, type)</code> as mentioned <a href="https://stackoverflow.com/questions/2225038/python-determine-the-type-of-an-object" title="Object type in python">here</a>.</p>
+<h4> Comment 99729426 alkanschtein: </h4>I think this one is way better than type function to use in checking process. If you want to check and act with the result you have to use try catch with type but isinstance returns true or false<br>------------------------------------------------------------------ <br><h3> Answer 402511 cdleary: </h3><p>The question is somewhat ambiguous -- I'm not sure what you mean by "view". If you are trying to <em>query</em> the type of a native Python object, <a href="https://stackoverflow.com/questions/402504/how-to-determine-the-variable-type-in-python#402516">@atzz</a>'s answer will steer you in the right direction.</p>
+
+<p>However, if you are trying to <em>generate</em> Python objects that have the semantics of primitive C-types, (such as <code>uint32_t</code>, <code>int16_t</code>), use the <a href="http://docs.python.org/library/struct.html#struct.calcsize" rel="nofollow noreferrer"><code>struct</code></a> module. You can determine the number of bits in a given C-type primitive thusly:</p>
+
+<pre><code>&gt;&gt;&gt; struct.calcsize('c') # char
+1
+&gt;&gt;&gt; struct.calcsize('h') # short
+2
+&gt;&gt;&gt; struct.calcsize('i') # int
+4
+&gt;&gt;&gt; struct.calcsize('l') # long
+4
+</code></pre>
+
+<p>This is also reflected in the <code>array</code> module, which can make arrays of these lower-level types:</p>
+
+<pre><code>&gt;&gt;&gt; array.array('c').itemsize # char
+1
+</code></pre>
+
+<p>The maximum integer supported (Python 2's <code>int</code>) is given by <a href="http://docs.python.org/library/sys.html#sys.maxsize" rel="nofollow noreferrer">sys.maxint</a>.</p>
+
+<pre><code>&gt;&gt;&gt; import sys, math
+&gt;&gt;&gt; math.ceil(math.log(sys.maxint, 2)) + 1 # Signedness
+32.0
+</code></pre>
+
+<p>There is also <a href="http://docs.python.org/library/sys.html#sys.getsizeof" rel="nofollow noreferrer">sys.getsizeof</a>, which returns the actual size of the <em>Python</em> object in residual memory:</p>
+
+<pre><code>&gt;&gt;&gt; a = 5
+&gt;&gt;&gt; sys.getsizeof(a) # Residual memory.
+12
+</code></pre>
+
+<p>For float data and precision data, use <a href="http://docs.python.org/library/sys.html#sys.float_info" rel="nofollow noreferrer">sys.float_info</a>:</p>
+
+<pre><code>&gt;&gt;&gt; sys.float_info
+sys.floatinfo(max=1.7976931348623157e+308, max_exp=1024, max_10_exp=308, min=2.2250738585072014e-308, min_exp=-1021, min_10_exp=-307, dig=15, mant_dig=53, epsilon=2.2204460492503131e-16, radix=2, rounds=1)
+</code></pre>
+<h4> Comment 228353 tzot: </h4>The question, as I understand it, asks about querying the type of a &quot;variable&quot; in Python. Your answer is generally correct but off-topic.<br>------------------------------------------------------------------ <br><h3> Answer 402515 rob: </h3><p>Do you mean in <a href="http://en.wikipedia.org/wiki/Python_%28programming_language%29" rel="nofollow noreferrer">Python</a> or using <a href="http://docs.python.org/library/ctypes.html" rel="nofollow noreferrer">ctypes</a>?</p>
+<p>In the first case, you simply cannot - because Python does not have signed/unsigned, 16/32 bit integers.</p>
+<p>In the second case, you can use <code>type()</code>:</p>
+<pre><code>&gt;&gt;&gt; import ctypes
+&gt;&gt;&gt; a = ctypes.c_uint() # unsigned int
+&gt;&gt;&gt; type(a)
+&lt;class 'ctypes.c_ulong'&gt;
+</code></pre>
+<p>For more reference on ctypes, an its type, see <a href="http://docs.python.org/library/ctypes.html" rel="nofollow noreferrer">the official documentation</a>.</p>
+------------------------------------------------------------------ <br><h3> Answer 43305231 Priyansh: </h3><p>Simple, for python 3.4 and above</p>
+
+<pre><code>print (type(variable_name))
+</code></pre>
+
+<p>Python 2.7 and above</p>
+
+<pre><code>print type(variable_name)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 403093 Benjamin Peterson: </h3><p>It really depends on what level you mean. In Python 2.x, there are two integer types, <code>int</code> (constrained to <code>sys.maxint</code>) and <code>long</code> (unlimited precision), for historical reasons. In Python code, this shouldn't make a bit of difference because the interpreter automatically converts to long when a number is too large. If you want to know about the actual data types used in the underlying interpreter, that's implementation dependent. (CPython's are located in Objects/intobject.c and Objects/longobject.c.) To find out about the systems types look at cdleary answer for using the struct module.</p>
+------------------------------------------------------------------ <br><h3> Answer 46462807 Prince Dhadwal: </h3><p>For python2.x, use </p>
+
+<pre><code>print type(variable_name)
+</code></pre>
+
+<p>For python3.x, use </p>
+
+<pre><code>print(type(variable_name))
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 73706382 OrrinPants: </h3><p>I saw this one when I was new to Python (I still am):</p>
+<pre><code>x = ...
+print(type(x))
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 69069348 Bluegenic: </h3><p>You should use the <code>type()</code> function. Like so:</p>
+<pre><code>my_variable = 5
+
+print(type(my_variable)) # Would print out &lt;class 'int'&gt;
+</code></pre>
+<p>This function will view the type of any variable, whether it's a list or a class. Check this website for more information: <a href="https://www.w3schools.com/python/ref_func_type.asp" rel="noreferrer">https://www.w3schools.com/python/ref_func_type.asp</a></p>
+<h4> Comment 122072458 Community: </h4>Please add further details to expand on your answer, such as working code or documentation citations.<br>------------------------------------------------------------------ <br><h3> Answer 71313342 Shubhank Gupta: </h3><p>Python is a dynamically typed language. A variable, initially created as a string, can be later reassigned to an integer or a float. And the interpreter won’t complain:</p>
+<pre><code>name = &quot;AnyValue&quot;
+# Dynamically typed language lets you do this:
+name = 21
+name = None
+name = Exception()
+</code></pre>
+<p>To check the type of a variable, you can use either <a href="https://docs.python.org/3/library/functions.html#type" rel="noreferrer">type()</a> or <a href="https://docs.python.org/3/library/functions.html#isinstance" rel="noreferrer">isinstance()</a> built-in function. Let’s see them in action:</p>
+<p>Python3 example:</p>
+<pre><code>variable = &quot;hello_world&quot;
+print(type(variable) is str) # True
+print(isinstance(variable, str)) # True
+</code></pre>
+<p>Let's compare both methods <code>performances</code> in python3</p>
+<pre><code>python3 -m timeit -s &quot;variable = 'hello_world'&quot; &quot;type(variable) is int&quot;
+5000000 loops, best of 5: 54.5 nsec per loop
+
+python3 -m timeit -s &quot;variable = 'hello_world'&quot; &quot;isinstance(variable, str)&quot;
+10000000 loops, best of 5: 39.2 nsec per loop
+</code></pre>
+<p>type is 40% slower approximately (54.5/39.2 = 1.390).</p>
+<p>We could use <code>type(variable) == str</code> instead. It would work, but it’s a bad idea:</p>
+<ul>
+<li><code>==</code> should be used when you want to check the value of a variable. We would use it to see if the value of the variable is equal to &quot;hello_world&quot;. But when we want to check if the variable is a string, is the operator is more appropriate. For a more detailed explanation of when to use one or the other, check this <a href="https://switowski.com/blog/checking-for-true-or-false#is-checks-the-identity--checks-the-value" rel="noreferrer">article</a>.</li>
+<li><code>==</code> is slower: <code>python3 -m timeit -s &quot;variable = 'hello_world'&quot; &quot;type(variable) == str&quot; 5000000 loops, best of 5: 64.4 nsec per loop</code></li>
+</ul>
+<h1>Difference between isinstance and type</h1>
+<p>Speed is not the only difference between these two functions. There is actually an important distinction between how they work:</p>
+<ul>
+<li>type only returns the type of an object (it's class). We can use it to check if the variable is of type str.</li>
+<li><code>isinstance</code> checks if a given object (first parameter) is:
+<ul>
+<li>an instance of a class specified as a second parameter. For example, is variable an instance of the str class?</li>
+<li>or an instance of a subclass of a class specified as a second parameter. In other words - is variable an instance of a subclass of str?</li>
+</ul>
+</li>
+</ul>
+<p>What does it mean in practice? Let’s say we want to have a custom class that acts as a list but has some additional methods. So we might subclass the list type and add custom functions inside:</p>
+<pre><code>class MyAwesomeList(list):
+    # Add additional functions here
+    pass
+</code></pre>
+<p>But now the type and isinstance return different results if we compare this new class to a list!</p>
+<pre><code>my_list = MyAwesomeList()
+print(type(my_list) is list) # False
+print(isinstance(my_list, list)) # True
+</code></pre>
+<p>We get different results because isinstance checks if <code>my_list</code> is an instance of the list (it’s not) or a subclass of the list (it is because <code>MyAwesomeList</code> is a subclass of the list). If you forget about this difference, it can lead to some subtle bugs in your code.</p>
+<h1>Conclusions</h1>
+<p><code>isinstance</code> is usually the preferred way to compare types. It’s not only faster but also considers inheritance, which is often the desired behavior. In Python, you usually want to check if a given object behaves like a string or a list, not necessarily if it’s exactly a string. So instead of checking for string and all its custom subclasses, you can just use isinstance.</p>
+<p>On the other hand, when you want to explicitly check that a given variable is of a specific type (and not its subclass) - use <code>type</code>. And when you use it, use it like this: <code>type(var) is some_type</code> not like this: <code>type(var) == some_type</code>.</p>
+<h4> Comment 126963333 not2qubit: </h4>This is great, but what would you do if (for example) an integer is given as a string, like <code>&quot;123&quot;</code>, and you don&#39;t know in advance what the type is?<br><h4> Comment 127012799 Shubhank Gupta: </h4>Let&#39;s take the value as <code>&quot;123&quot;</code>. It can be checked during type conversion like <code>int(value)</code>. It will throw the <code>ValueError: invalid literal for int() with base 10:</code> if it isn&#39;t an integer value. This exception can also be caught gracefully by using the try-except block like   <code>try:     value = int(value) except ValueError:     print(&quot;Invalid integer value&quot;)</code><br>------------------------------------------------------------------ <br><h3> Answer 70136129 MrFox: </h3><p>There's no 32bit and 64bit and 16bit, python is simple, you don't have to worry about it. See how to check the type:</p>
+<pre><code>integer = 1
+print(type(integer))  # Result: &lt;class 'int'&gt;, and if it's a string then class will be str and so on.
+
+# Checking the type
+float_class = 1.3
+print(isinstance(float_class, float))  # True
+</code></pre>
+<p>But if you really have to, you can use <a href="https://docs.python.org/3/library/ctypes.html" rel="nofollow noreferrer">Ctypes</a> library which has types like unsigned integer.</p>
+<p><a href="https://docs.python.org/3/library/ctypes.html#fundamental-data-types" rel="nofollow noreferrer">Ctypes types documentation</a></p>
+<p>You can use it like this:</p>
+<pre><code>from ctypes import *
+uint = c_uint(1)  # Unsigned integer
+print(uint)  # Output: c_uint(1)
+
+# To actually get the value, you have to call .value
+print(uint.value)
+
+# Change value
+uint.value = 2
+print(uint.value)  # 2
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 73436038 Bhaskar Gupta: </h3><p>There are many data types in python like:</p>
+<pre><code>Text Type:  str
+Numeric Types:  int, float, complex
+Sequence Types: list, tuple, range
+Mapping Type:   dict
+Set Types:  set, frozenset
+Boolean Type:   bool
+Binary Types:   bytes, bytearray, memoryview
+None Type:  NoneType
+</code></pre>
+<p>Here I have written a code having a list containing all type of data types example and printing their type</p>
+<pre><code>L = [
+    &quot;Hello World&quot;,
+    20,
+    20.5,
+    1j,
+    [&quot;apple&quot;, &quot;banana&quot;, &quot;cherry&quot;],
+    (&quot;apple&quot;, &quot;banana&quot;, &quot;cherry&quot;),
+    range(6),
+    {&quot;name&quot; : &quot;John&quot;, &quot;age&quot; : 36},
+    {&quot;apple&quot;, &quot;banana&quot;, &quot;cherry&quot;},
+    frozenset({&quot;apple&quot;, &quot;banana&quot;, &quot;cherry&quot;}),
+    True,
+    b&quot;Hello&quot;,
+    bytearray(5),
+    memoryview(bytes(5)),
+    None
+]
+for _ in range(len(L)):
+    print(type(L[_]))
+</code></pre>
+<p>OUTPUT:</p>
+<pre><code>&lt;class 'str'&gt;
+&lt;class 'int'&gt;
+&lt;class 'float'&gt;
+&lt;class 'complex'&gt;
+&lt;class 'list'&gt;
+&lt;class 'tuple'&gt;
+&lt;class 'range'&gt;
+&lt;class 'dict'&gt;
+&lt;class 'set'&gt;
+&lt;class 'frozenset'&gt;
+&lt;class 'bool'&gt;
+&lt;class 'bytes'&gt;
+&lt;class 'bytearray'&gt;
+&lt;class 'memoryview'&gt;
+&lt;class 'NoneType'&gt;
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 75804388 anbvy: </h3><p>Python got a type() function for this. You can simply use it like:</p>
+<pre><code>variable = &quot;I love apples.&quot;
+print(type(variable))  # Output will be &lt;class 'str'&gt;
+</code></pre>
+<p>That means your variable is a string.</p>
+<p>You can try it yourself with integers, floats, lists etc.</p>
+<p>Also with the usage of libraries like numpy, you can see other data types like:</p>
+<pre><code>import numpy as np
+
+matrix = np.ones(shape=(3,3), dtype=&quot;uint8&quot;)
+print(type(matrix))  # Output will be &lt;class 'numpy.ndarray'&gt;
+print(type(matrix[0][0]))  # Outpu will be &lt;class 'numpy.uint8'&gt;
+</code></pre>
+<p>You can learn more about Data Types in Python from <a href="https://www.w3schools.com/python/python_datatypes.asp" rel="nofollow noreferrer">here</a>.</p>
+------------------------------------------------------------------ <br><h3> Answer 54771749 Sventimir: </h3><p>Just do not do it. Asking for something's type is wrong in itself. Instead use polymorphism. Find or if necessary define by yourself the method that does what you want for any possible type of input and just call it without asking about anything. If you need to work with built-in types or types defined by a third-party library, you can always inherit from them and use your own derivatives instead. Or you can wrap them inside your own class. This is the object-oriented way to resolve such problems.</p>
+
+<p>If you insist on checking exact type and placing some dirty <code>if</code>s here and there, you can use <code>__class__</code> property or <code>type</code> function to do it, but soon you will find yourself updating all these <code>if</code>s with additional cases every two or three commits. Doing it the OO way prevents that and lets you only define a new class for a new type of input instead.</p>
+<h4> Comment 96729962 user2305193: </h4>I don&#39;t really know what this answer added to existing ones (beyond the first sentence maybe?)<br><h4> Comment 135847643 Luuk: </h4>It did add more than this <i>answer</i>: <a href="https://stackoverflow.com/a/43305231/724039">stackoverflow.com/a/43305231/724039</a><br>

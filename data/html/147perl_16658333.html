@@ -1,0 +1,137 @@
+ <h2> Title: grep -P no longer works. How can I rewrite my searches? </h2> <h3> kugyousha, question_id: 16658333 </h3>Score: 147, Tags: {macos,perl,shell} <br><p>It looks like the new version of OS X no longer supports <code>grep -P</code> and as such has made some of my scripts stop working, for example:</p>
+<pre><code>var1=`grep -o -P '(?&lt;=&lt;st:italic&gt;).*(?=&lt;/italic&gt;)' file.txt`
+</code></pre>
+<p>I need to capture grep's result to a variable and I need to use zero-width assertions, as well as <code>\K</code>:</p>
+<pre><code>var2=`grep -P -o '(property:)\K.*\d+(?=end)' file.txt`
+</code></pre>
+<p>Any alternatives would be greatly appreciated.</p>
+<h4> Comment 34838060 Lri: </h4>@AdrianFr&#252;hwirth OS X&#39;s <code>grep</code> actually changed from <code>grep (GNU grep) 2.5.1</code> in 10.7 to <code>grep (BSD grep) 2.5.1-FreeBSD</code> in 10.8. I guess it was because of GPL. The FreeBSD <code>grep</code> is also based on GNU <code>grep</code> and both versions of <code>grep</code> are from 2002. <code>--label</code> and <code>-u</code> / <code>--unix-byte-offets</code> were also removed in 10.8. <code>-z</code> / <code>--decompress</code>, <code>-J</code> / <code>--bz2decompress</code>, <code>--exclude-dir</code>, <code>--include-dir</code>, <code>-S</code>, <code>-O</code>, and <code>-p</code> were added in 10.8. <code>-Z</code> changed from <code>--null</code> to <code>--decompress</code>.<br><h4> Comment 23964211 Kent: </h4>how about installing gnu grep?<br><h4> Comment 23994716 Lri: </h4>@Kevin It was removed in 10.8.<br><h4> Comment 34847503 Lri: </h4>The FreeBSD <code>grep</code> that comes with OS X is from 2002, and <a href="https://wiki.freebsd.org/BSDgrep" rel="nofollow noreferrer">wiki.freebsd.org/BSDgrep</a> still says that &quot;the only TODO item is improving performance&quot;, so yeah. <code>time grep aa &#47;usr&#47;share&#47;dict&#47;words&gt;&#47;dev&#47;null</code> takes about 0.09 seconds with OS X&#39;s grep and about 0.01 seconds with a new GNU grep on repeated runs on my iMac.<br><h4> Comment 34838857 Adrian Fr&#252;hwirth: </h4>@LauriRanta Thanks for the info, that explains it...much appreciated. I don&#39;t have an OS X/*BSD installation handy but read that <code>BSD grep</code> is way slower than <code>GNU grep</code>, can you confirm if this is still the case on 10.8 (compared to <code>GNU grep</code> installed via homebrew, for example)? I&#39;m just curious.<br><h4> Comment 23964559 Kevin: </h4>Are you sure it&#39;s the <code>-P</code>? Mine has it.<br><h4> Comment 23995693 Kevin: </h4>@LauriRanta I have 10.8... Interestingly, it&#39;s still in the usage but actually using it doesn&#39;t work<br><h4> Comment 24026729 kugyousha: </h4>Cannot install anything on these machines unfortunately.<br><h4> Comment 34595273 drevicko: </h4>@Kent care to elaborate on how one might do that?<br><h4> Comment 34601865 Adrian Fr&#252;hwirth: </h4><a href="http://www.dirtdon.com/?p=1452" rel="nofollow noreferrer">It really seems to have been removed</a>, what a dick move of Apple if this happened intentionally.<br>------------------------------------------------------------------ <br><h3> Answer 22704387 drevicko: </h3><p>If your scripts are for your use only, you can install <code>grep</code> from <a href="https://github.com/Homebrew/homebrew-core" rel="noreferrer"><code>homebrew-core</code></a> using <a href="http://brew.sh/" rel="noreferrer"><code>brew</code></a>:</p>
+
+<pre><code>brew install grep 
+</code></pre>
+
+<p>Then it's available as <code>ggrep</code> (GNU <code>grep</code>).
+it doesn't replaces the system <code>grep</code> (you need to put the installed grep before the system one on the <code>PATH</code>). </p>
+
+<p>The version installed by <code>brew</code> includes the <code>-P</code> option, so you don't need to change your scripts.</p>
+
+<p>If you need to use these commands with their normal names, you
+can add a "gnubin" directory to your PATH from your bashrc like:</p>
+
+<pre><code>PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
+</code></pre>
+
+<p>You can export this line on your ~/.bashrc or ~/.zshrc to keep it for new sessions.</p>
+
+<p>Please see <a href="https://stackoverflow.com/users/6368697/patrick-mevzek">here</a> for a discussion of the pro-s and cons of the old <code>--with-default-names</code> option and it's (recent) removal.</p>
+<h4> Comment 52553558 rymo: </h4>an alternative to <code>--with-default-names</code> is to add <code>alias grep=&#39;ggrep&#39;</code> to your bash profile and let brew dupes keep their prefix<br><h4> Comment 100942328 Henge: </h4><code>--with-default-names</code> is removed from brew. I had to <code>brew install grep</code> to get ggrep and then do as @rymo says and do <code>alias grep=&#39;ggrep&#39;</code> .<br><h4> Comment 36053449 drevicko: </h4>@pepper what didn&#39;t work? Likely the path isn&#39;t set properly - what&#39;s the output of <code>which grep</code>? Should be <code>&#47;usr&#47;local&#47;bin&#47;grep</code>. It;s a bit mean to downvote before you&#39;ve checked carefully that there is a problem!<br><h4> Comment 36055270 drevicko: </h4>probably better to add <code>&#47;usr&#47;local&#47;bin</code> to the front of your PATH. Brew is supposed to set that up I believe? Did you use <code>--default-names</code>? Anyway, glad it works (: Not sure about hacking around it, but I think the point system is one of the reasons this site is such a good resource.<br><h4> Comment 36083606 pepper: </h4>yes I did use --default-names and brew. Not sure if putting /usr/local/bin in the front of your path is better than an alias, just an alternative<br><h4> Comment 103954490 NicoKowe: </h4>maybe if your script runs sub-shell an alias would not work. Need to <code>brew install grep</code> and then add to your path, or <code>export PATH=&quot;&#47;usr&#47;local&#47;opt&#47;grep&#47;libexec&#47;gnubin:$PATH&quot;</code><br><h4> Comment 36054543 pepper: </h4>indeed that is it! But it did not put the installed grep before the system one on the PATH as you said. I&#39;m happy to upvote, I really do not understand the fuss about the point system on this website (can&#39;t you just hack around that?). Glad you pointed this out though, I&#39;m setting up an alias for grep ASAP!<br><h4> Comment 46456771 He Hui: </h4>great answer, the only way that makes work. would be great if you can add how to setup an alias to your answer.<br>------------------------------------------------------------------ <br><h3> Answer 16658690 ikegami: </h3><p>If you want to do the minimal amount of work, change</p>
+
+<pre><code>grep -P 'PATTERN' file.txt
+</code></pre>
+
+<p>to</p>
+
+<pre><code>perl -nle'print if m{PATTERN}' file.txt
+</code></pre>
+
+<p>and change</p>
+
+<pre><code>grep -o -P 'PATTERN' file.txt
+</code></pre>
+
+<p>to</p>
+
+<pre><code>perl -nle'print $&amp; while m{PATTERN}g' file.txt
+</code></pre>
+
+<p>So you get:</p>
+
+<pre><code>var1=`perl -nle'print $&amp; while m{(?&lt;=&lt;st:italic&gt;).*(?=&lt;/italic&gt;)}g' file.txt`
+var2=`perl -nle'print $&amp; while m{(property:)\K.*\d+(?=end)}g' file.txt`
+</code></pre>
+
+<hr>
+
+<p>In your specific case, you can achieve simpler code with extra work.</p>
+
+<pre><code>var1=`perl -nle'print for m{&lt;st:italic&gt;(.*)&lt;/italic&gt;}g' file.txt`
+var2=`perl -nle'print for /property:(.*\d+)end/g' file.txt`
+</code></pre>
+<h4> Comment 31099701 ikegami: </h4>@Christian, Would only take 3 lines to do it with a proper XML parser such as XML::LibXML. (Key line: <code>say $_-&gt;textContent for $doc-&gt;findnodes(&#39;&#47;&#47;loc&#39;);</code>)<br><h4> Comment 24026582 kugyousha: </h4>This works great but it returns all matches as where the grep I used only returned the first match. any idea about how to return just the first match?<br><h4> Comment 30652892 Peter: </h4>@ironintention: add <code>| tail -1</code> to the end of the pipeline.<br><h4> Comment 30659091 ikegami: </h4><code>grep</code> always returns all matching lines (unless you use one of the options where it prints none at all). Anyway, <code>if (&#47;...&#47;) { print $1; last; }</code> will cause it to only print the first match.<br><h4> Comment 31096854 Christian: </h4>I used this to get out the urls of a sitemap - thanks mate, would not have made it without your post! perl -nle&#39;print $1 if m{&lt;loc&gt;(.*)&lt;/loc&gt;}&#39; sitemap.xml<br><h4> Comment 31109538 Christian: </h4>@Ikegami I needed this only one time for a specific use case. The result be trashed in the way. I am happy with it right now. Anyway thanks for letting me know about libxml. There are times i regret my lack of perl-fu.<br><h4> Comment 94679598 ikegami: </h4>Adjusted to handle multiple matches per line like <code>grep -o</code><br>------------------------------------------------------------------ <br><h3> Answer 16658687 Michael Carman: </h3><p>Install <a href="http://search.cpan.org/dist/ack/" rel="noreferrer">ack</a> and use it instead. Ack is a grep replacement written in Perl. It has full support for Perl regular expressions.</p>
+<h4> Comment 63432451 William Entriken: </h4>Can you please the ack syntax that replaces the above<br><h4> Comment 63474232 Michael Carman: </h4>@FullDecent: It&#39;s almost identical: <code>ack -o &#39;(property:)\K.*\d+(?=end)&#39; file.txt</code> (<code>-o</code> means the same thing, but you don&#39;t need the <code>-P</code> with ack)<br><h4> Comment 24026698 kugyousha: </h4>I&#39;d like to check this out but this is for work computers so we cannot install anything<br><h4> Comment 24036616 Michael Carman: </h4>@ironintention: If you can install Perl modules, you&#39;re good. Even if you can&#39;t add to the local Perl installation you can always use local::lib.<br><h4> Comment 33568393 tripleee: </h4><code>ack</code> is designed to be self-contained; you don&#39;t need to actually install it. If you can save a file, mark it as exectutable, and update your <code>PATH</code> if necessary, you are good to go.<br>------------------------------------------------------------------ <br><h3> Answer 36310512 nebulous: </h3><p>OS X tends to provide BSD rather than GNU tools. It <strong>does</strong> come with <code>egrep</code> however, which is probably all you need to perform regex searches.</p>
+
+<p>example: <code>egrep 'fo+b?r' foobarbaz.txt</code></p>
+
+<p>A snippet from the OSX grep man page:</p>
+
+<p><code>grep is used for simple patterns and basic regular expressions (BREs); egrep can handle extended regular expressions (EREs).
+</code></p>
+<h4> Comment 67243868 Dewi Morgan: </h4>Direct invocation as egrep is deprecated. The same ability is also available as grep -E. It&#39;s... a sad shadow of Perl, lacking lookaround assertions, most of the backslash escapes, options, conditionals, etc :( Power users will hate it, but it does at least do the job.<br><h4> Comment 102590171 asmaier: </h4>Thanks. <code>grep -E</code> instead of <code>grep -P</code> was exactly what I needed.<br>------------------------------------------------------------------ <br><h3> Answer 16658384 tripleee: </h3><p><code>use perl;</code></p>
+
+<pre><code>perl -ne 'print if /regex/' files ...
+</code></pre>
+
+<p>If you need more <code>grep</code> options (I see you would like <code>-o</code> at least) there are various <code>pgrep</code> implementations floating around the net, many of them in Perl.</p>
+
+<p>If "almost Perl" is good enough, PCRE ships with <code>pcregrep</code>.</p>
+------------------------------------------------------------------ <br><h3> Answer 24980529 Gabor Marton: </h3><p>There is another alternative: <code>pcregrep</code>.</p>
+
+<p><a href="http://unixhelp.ed.ac.uk/CGI/man-cgi?pcregrep" rel="noreferrer">Pcregrep</a> is a grep with Perl-compatible regular expressions.  It has the exactly same usage as <code>grep -P</code>. So it will be compatible with your scripts.</p>
+
+<p>It can be installed with homebrew:</p>
+
+<p><code>brew install pcre</code></p>
+<h4> Comment 53281036 Aaron Brager: </h4><code>Error: No available formula for pcregrep</code><br><h4> Comment 60174933 Daniel Baird: </h4>GaborMarton, I edited your answer to include @Martin &#39;s correcting comment, and had to move the formatting around a bit to get over the minimum changes.<br>------------------------------------------------------------------ <br><h3> Answer 41030504 ZenC: </h3><p>How about using the '-E' option? It works fine for me, 
+for example, if I want to check for a <code>php_zip</code>, <code>php_xml</code>, <code>php_gd2</code> extension from <strong>php -m</strong> I use:</p>
+
+<pre><code>php -m | grep -E '(zip|xml|gd2)'
+</code></pre>
+<h4> Comment 76353112 jimh: </h4>this works.  Mac uses FreeBSD grep and Linux uses GNU grep...so this fix worked on my macOS sierra<br>------------------------------------------------------------------ <br><h3> Answer 37293914 marknuzz: </h3><p>Equivalent of the accepted answer, but without the requirement of the -P switch, which was not present on both machines I had available.  </p>
+
+<pre><code>find . -type f -exec perl -nle 'print $&amp; if m{\r\n}' {} ';' -exec perl -pi -e 's/\r\n/\n/g' {} '+'
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 38962137 petegam: </h3><p>This one worked for me:</p>
+
+<pre><code>    awk  -F":" '/PATTERN/' file.txt
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 16658462 Rory Hunter: </h3><p>Another Perl solution for -P</p>
+
+<pre><code>var1=$( perl -ne 'print $1 if m#&lt;st:italic&gt;([^&lt;]+)&lt;/st:italic&gt;# ' file.txt)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 40229883 Rohit Malgaonkar: </h3><p>use the perl one-liner regex by passing the find output with a pipe.
+I used <strong>lookbehind</strong> (get <strong>src</strong> links in html) and <strong>lookahead</strong> for <strong>"</strong>  and passed the output of curl (html) to it.</p>
+
+<pre><code>bash-3.2# curl stackoverflow.com | perl -0777 -ne '$a=1;while(m/(?&lt;=src\=\")(.*)(?=\")/g){print "Match #".$a." "."$&amp;\n";$a+=1;}'
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  239k  100  239k    0     0  1911k      0 --:--:-- --:--:-- --:--:-- 1919k
+Match #1 //ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js
+Match #2 //cdn.sstatic.net/Js/stub.en.js?v=fb6157e02696
+Match #3 https://ssum-sec.casalemedia.com/usermatch?s=183712&amp;amp;cb=https%3A%2F%2Fengine.adzerk.net%2Fudb%2F22%2Fsync%2Fi.gif%3FpartnerId%3D1%26userId%3D
+Match #4 //i.stack.imgur.com/817gJ.png" height="16" width="18" alt="" class="sponsor-tag-img"&gt;elasticsearch&lt;/a&gt; &lt;a href="/questions/tagged/elasticsearch-2.0" class="post-tag" title="show questions tagged &amp;#39;elasticsearch-2.0&amp;#39;" rel="tag"&gt;elasticsearch-2.0&lt;/a&gt; &lt;a href="/questions/tagged/elasticsearch-dsl" class="post-tag" title="show questions tagged &amp;#39;elasticsearch-dsl&amp;#39;" rel="tag
+Match #5 //i.stack.imgur.com/817gJ.png" height="16" width="18" alt="" class="sponsor-tag-img"&gt;elasticsearch&lt;/a&gt; &lt;a href="/questions/tagged/sharding" class="post-tag" title="show questions tagged &amp;#39;sharding&amp;#39;" rel="tag"&gt;sharding&lt;/a&gt; &lt;a href="/questions/tagged/master" class="post-tag" title="show questions tagged &amp;#39;master&amp;#39;" rel="tag
+Match #6 //i.stack.imgur.com/tKsDb.png" height="16" width="18" alt="" class="sponsor-tag-img"&gt;android&lt;/a&gt; &lt;a href="/questions/tagged/linux" class="post-tag" title="show questions tagged &amp;#39;linux&amp;#39;" rel="tag"&gt;linux&lt;/a&gt; &lt;a href="/questions/tagged/camera" class="post-tag" title="show questions tagged &amp;#39;camera&amp;#39;" rel="tag
+Match #7 //i.stack.imgur.com/tKsDb.png" height="16" width="18" alt="" class="sponsor-tag-img"&gt;android&lt;/a&gt; &lt;a href="/questions/tagged/firebase" class="post-tag" title="show questions tagged &amp;#39;firebase&amp;#39;" rel="tag"&gt;&lt;img src="//i.stack.imgur.com/5d55j.png" height="16" width="18" alt="" class="sponsor-tag-img"&gt;firebase&lt;/a&gt; &lt;a href="/questions/tagged/firebase-authentication" class="post-tag" title="show questions tagged &amp;#39;firebase-authentication&amp;#39;" rel="tag
+Match #8 //i.stack.imgur.com/tKsDb.png" height="16" width="18" alt="" class="sponsor-tag-img"&gt;android&lt;/a&gt; &lt;a href="/questions/tagged/ios" class="post-tag" title="show questions tagged &amp;#39;ios&amp;#39;" rel="tag"&gt;ios&lt;/a&gt; &lt;a href="/questions/tagged/in-app-purchase" class="post-tag" title="show questions tagged &amp;#39;in-app-purchase&amp;#39;" rel="tag"&gt;in-app-purchase&lt;/a&gt; &lt;a href="/questions/tagged/piracy-protection" class="post-tag" title="show questions tagged &amp;#39;piracy-protection&amp;#39;" rel="tag
+Match #9 //i.stack.imgur.com/tKsDb.png" height="16" width="18" alt="" class="sponsor-tag-img"&gt;android&lt;/a&gt; &lt;a href="/questions/tagged/unity3d" class="post-tag" title="show questions tagged &amp;#39;unity3d&amp;#39;" rel="tag"&gt;unity3d&lt;/a&gt; &lt;a href="/questions/tagged/vr" class="post-tag" title="show questions tagged &amp;#39;vr&amp;#39;" rel="tag
+Match #10 http://pixel.quantserve.com/pixel/p-c1rF4kxgLUzNc.gif" alt="" class="dno
+bash-3.2# date
+Mon Oct 24 20:57:11 EDT 2016
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 69220890 Jijo John: </h3><p>I had this same problem with grep suddenly on a docker rebuilt, I found the solution here : <a href="https://github.com/firehol/firehol/issues/325" rel="nofollow noreferrer">https://github.com/firehol/firehol/issues/325</a></p>
+<p>just replaced -oP with -oE</p>
+<p><code>echo $some_var | grep -oE '\b[0-9a-f]{5,40}\b' | head -1</code></p>
+------------------------------------------------------------------ <br><h3> Answer 71071938 torson: </h3><p>Some more options, these also set correct exit status:</p>
+<ul>
+<li><p>equivalent to <code>grep -P PATTERN FILE</code> :</p>
+<p><code>perl -e'while(&lt;&gt;){if( (m!PATTERN!) ){$ok++;print}};if(!($ok)){exit 1}' FILE</code></p>
+</li>
+<li><p>equivalent to <code>grep -P -i PATTERN FILE</code> :</p>
+<p><code>perl -e'while(&lt;&gt;){if( (m!PATTERN!i) ){$ok++;print}};if(!($ok)){exit 1}' FILE</code></p>
+</li>
+<li><p>equivalent to <code>grep -v -P PATTERN FILE</code> :</p>
+<p><code>perl -e'while(&lt;&gt;){if( !(m!PATTERN!) ){$ok++;print}};if(!($ok)){exit 1}' FILE</code></p>
+</li>
+</ul>
+<p>For a more cleaner solution use this gist - implemented switches are: -A , -B , -v , -P , -i : <a href="https://gist.github.com/torson/bd6931bda0035c4884b2a8c4c64a33b2" rel="nofollow noreferrer">https://gist.github.com/torson/bd6931bda0035c4884b2a8c4c64a33b2</a></p>
+<h4> Comment 132228905 tripleee: </h4>Probably lose the <a href="https://stackoverflow.com/questions/11710552/useless-use-of-cat">useless uses of <code>cat</code></a><br>

@@ -1,0 +1,403 @@
+ <h2> Title: Proper way to declare custom exceptions in modern Python? </h2> <h3> Nelson, question_id: 1319615 </h3>Score: 1835, Tags: {python,python-3.x,exception} <br><p>What's the proper way to declare custom exception classes in modern Python? My primary goal is to follow whatever standard other exception classes have, so that (for instance) any extra string I include in the exception is printed out by whatever tool caught the exception.</p>
+<p>By &quot;modern Python&quot; I mean something that will run in Python 2.5 but be 'correct' for the Python 2.6 and Python 3.* way of doing things. And by &quot;custom&quot; I mean an <code>Exception</code> object that can include extra data about the cause of the error: a string, maybe also some other arbitrary object relevant to the exception.</p>
+<p>I was tripped up by the following deprecation warning in Python 2.6.2:</p>
+<pre><code>&gt;&gt;&gt; class MyError(Exception):
+...     def __init__(self, message):
+...         self.message = message
+... 
+&gt;&gt;&gt; MyError(&quot;foo&quot;)
+_sandbox.py:3: DeprecationWarning: BaseException.message has been deprecated as of Python 2.6
+</code></pre>
+<p>It seems crazy that <code>BaseException</code> has a special meaning for attributes named <code>message</code>. I gather from <A href="http://www.python.org/dev/peps/pep-0352/" rel="noreferrer">PEP-352</a> that attribute did have a special meaning in 2.5 they're trying to deprecate away, so I guess that name (and that one alone) is now forbidden? Ugh.</p>
+<p>I'm also fuzzily aware that <code>Exception</code> has some magic parameter <code>args</code>, but I've never known how to use it. Nor am I sure it's the right way to do things going forward; a lot of the discussion I found online suggested they were trying to do away with args in Python 3.</p>
+<p>Update: two answers have suggested overriding <code>__init__</code>, and <code>__str__</code>/<code>__unicode__</code>/<code>__repr__</code>. That seems like a lot of typing, is it necessary?</p>
+<h4> Comment 110770342 Anakhand: </h4>I believe this is one of those cases where Python doesn&#39;t follow one of its own aphorisms: <code>There should be one-- and preferably only one --obvious way to do it.</code><br>------------------------------------------------------------------ <br><h3> Answer 1319675 gahooa: </h3><p>Maybe I missed the question, but why not:</p>
+<pre class="lang-py prettyprint-override"><code>class MyException(Exception):
+    pass
+</code></pre>
+<p>To override something (or pass extra args), do this:</p>
+<pre class="lang-py prettyprint-override"><code>class ValidationError(Exception):
+    def __init__(self, message, errors):            
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+            
+        # Now for your custom code...
+        self.errors = errors
+</code></pre>
+<p>That way you could pass dict of error messages to the second param, and get to it later with <code>e.errors</code>.</p>
+<p>In Python 2, you have to use this slightly more complex form of <code>super()</code>:</p>
+<pre class="lang-py prettyprint-override"><code>super(ValidationError, self).__init__(message)
+</code></pre>
+<h4> Comment 77817522 jiakai: </h4>However an exception defined like this would not be picklable; see the discussion here <a href="https://stackoverflow.com/questions/16244923/how-to-make-a-custom-exception-class-with-multiple-init-args-pickleable" title="how to make a custom exception class with multiple init args pickleable">stackoverflow.com/questions/16244923/&hellip;</a><br><h4> Comment 108575378 asthasr: </h4>That is a misunderstanding, @ddleon. The example in the docs that you are referring to is for a particular use case. There is no significance to the name of the subclass&#39;s constructor arguments (nor their number).<br><h4> Comment 124423646 martineau: </h4>What am I missing about how great it is to able to pass a dict of error messages?<br><h4> Comment 106914529 ddleon: </h4>Following the documentation of python for user-defined exceptions, the names that are mentioned in the __init__ function are incorrect. Instead of (self,message,error) it is (self,expression,message). The attribute expression is the input expression in which the error occurred and the message is an explanation of the error.<br>------------------------------------------------------------------ <br><h3> Answer 10270732 frnknstn: </h3><p>With modern Python Exceptions, you don't need to abuse <code>.message</code>, or override <code>.__str__()</code> or <code>.__repr__()</code> or any of it. If all you want is an informative message when your exception is raised, do this:</p>
+
+<pre><code>class MyException(Exception):
+    pass
+
+raise MyException("My hovercraft is full of eels")
+</code></pre>
+
+<p>That will give a traceback ending with <code>MyException: My hovercraft is full of eels</code>.</p>
+
+<p>If you want more flexibility from the exception, you could pass a dictionary as the argument:</p>
+
+<pre><code>raise MyException({"message":"My hovercraft is full of animals", "animal":"eels"})
+</code></pre>
+
+<p>However, to get at those details in an <code>except</code> block is a bit more complicated. The details are stored in the <code>args</code> attribute, which is a list. You would need to do something like this:</p>
+
+<pre><code>try:
+    raise MyException({"message":"My hovercraft is full of animals", "animal":"eels"})
+except MyException as e:
+    details = e.args[0]
+    print(details["animal"])
+</code></pre>
+
+<p>It is still possible to pass in multiple items to the exception and access them via tuple indexes, but this is <em>highly discouraged</em> (and was even intended for deprecation a while back). If you do need more than a single piece of information and the above method is not sufficient for you, then you should subclass <code>Exception</code> as described in the <a href="https://docs.python.org/3.3/tutorial/errors.html#tut-userexceptions" rel="noreferrer">tutorial</a>.</p>
+
+<pre><code>class MyError(Exception):
+    def __init__(self, message, animal):
+        self.message = message
+        self.animal = animal
+    def __str__(self):
+        return self.message
+</code></pre>
+<h4> Comment 98142890 liberforce: </h4>The relevant section of PEP352 is <a href="https://www.python.org/dev/peps/pep-0352/#retracted-ideas" rel="nofollow noreferrer">&quot;Retracted Ideas&quot;</a>.<br><h4> Comment 87554341 frnknstn: </h4>@neves for a start, using tuples to store exception information has no benefit over using a dictionary to do the same. If you are interested in the reasoning behind the exception changes, take a look at <a href="https://www.python.org/dev/peps/pep-0352/" rel="nofollow noreferrer">PEP352</a><br><h4> Comment 86917798 mtraceur: </h4>&quot;but this will be deprecated in the future&quot; - is this still intended for deprecation? Python 3.7 still seems to happily accept <code>Exception(foo, bar, qux)</code>.<br><h4> Comment 87277916 frnknstn: </h4>It haven&#39;t seen any recent work to depricate it since the last attempt failed due to the pain of transitioning, but that usage is still discouraged. I will update my answer to reflect that.<br><h4> Comment 87496246 neves: </h4>@frnknstn, why it is discouraged? Looks like a nice idiom for me.<br>------------------------------------------------------------------ <br><h3> Answer 26938914 Russia Must Remove Putin: </h3><blockquote>
+<h1 id="what-is-the-proper-way-to-declare-custom-exceptions-in-modern-python-olas">&quot;What is the proper way to declare custom exceptions in modern Python?&quot;</h1>
+</blockquote>
+<p>This is fine unless your exception is really a type of a more specific exception:</p>
+<pre><code>class MyException(Exception):
+    pass
+</code></pre>
+<p>Or better (maybe perfect), instead of <code>pass</code> give a docstring:</p>
+<pre><code>class MyException(Exception):
+    &quot;&quot;&quot;Raise for my specific kind of exception&quot;&quot;&quot;
+</code></pre>
+<h2 id="subclassing-exception-subclasses-npit">Subclassing Exception Subclasses</h2>
+<p>From the <a href="https://docs.python.org/2/library/exceptions.html#exceptions.BaseException" rel="noreferrer">docs</a></p>
+<blockquote>
+<p><code>Exception</code></p>
+<p>All built-in, non-system-exiting exceptions are derived from this class.
+All user-defined exceptions should also be derived from this
+class.</p>
+</blockquote>
+<p>That means that <strong>if</strong> your exception is a type of a more specific exception, subclass that exception instead of the generic <code>Exception</code> (and the result will be that you still derive from <code>Exception</code> as the docs recommend). Also, you can at least provide a docstring (and not be forced to use the <code>pass</code> keyword):</p>
+<pre><code>class MyAppValueError(ValueError):
+    '''Raise when my specific value is wrong'''
+</code></pre>
+<p>Set attributes you create yourself with a custom <code>__init__</code>. Avoid passing a dict as a positional argument, future users of your code will thank you. If you use the deprecated message attribute, assigning it yourself will avoid a <code>DeprecationWarning</code>:</p>
+<pre><code>class MyAppValueError(ValueError):
+    '''Raise when a specific subset of values in context of app is wrong'''
+    def __init__(self, message, foo, *args):
+        self.message = message # without this you may get DeprecationWarning
+        # Special attribute you desire with your Error, 
+        # perhaps the value that caused the error?:
+        self.foo = foo         
+        # allow users initialize misc. arguments as any other builtin Error
+        super(MyAppValueError, self).__init__(message, foo, *args) 
+</code></pre>
+<p>There's really no need to write your own <code>__str__</code> or <code>__repr__</code>. The built-in ones are very nice, and your <strong>cooperative inheritance</strong> ensures that you use them.</p>
+<h2 id="critique-of-the-top-answer-i6ht">Critique of the top answer</h2>
+<blockquote>
+<p><em>Maybe I missed the question, but why not:</em></p>
+</blockquote>
+<pre><code>class MyException(Exception):
+    pass
+</code></pre>
+<p>Again, the problem with the above is that in order to catch it, you'll either have to name it specifically (importing it if created elsewhere) or catch Exception, (but you're probably not prepared to handle all types of Exceptions, and you should only catch exceptions you are prepared to handle). Similar criticism to the below, but additionally that's not the way to initialize via <code>super</code>, and you'll get a <code>DeprecationWarning</code> if you access the message attribute:</p>
+<blockquote>
+<p><em>Edit: to override something (or pass extra args), do this:</em></p>
+</blockquote>
+<pre><code>class ValidationError(Exception):
+    def __init__(self, message, errors):
+
+        # Call the base class constructor with the parameters it needs
+        super(ValidationError, self).__init__(message)
+
+        # Now for your custom code...
+        self.errors = errors
+</code></pre>
+<blockquote>
+<p><em>That way you could pass dict of error messages to the second param, and get to it later with e.errors</em></p>
+</blockquote>
+<p>It also requires exactly two arguments to be passed in (aside from the <code>self</code>.) No more, no less. That's an interesting constraint that future users may not appreciate.</p>
+<p><strong>To be direct - it violates <a href="https://en.wikipedia.org/wiki/Liskov_substitution_principle" rel="noreferrer">Liskov substitutability</a>.</strong></p>
+<p>I'll demonstrate both errors:</p>
+<pre><code>&gt;&gt;&gt; ValidationError('foo', 'bar', 'baz').message
+
+Traceback (most recent call last):
+  File &quot;&lt;pyshell#10&gt;&quot;, line 1, in &lt;module&gt;
+    ValidationError('foo', 'bar', 'baz').message
+TypeError: __init__() takes exactly 3 arguments (4 given)
+
+&gt;&gt;&gt; ValidationError('foo', 'bar').message
+__main__:1: DeprecationWarning: BaseException.message has been deprecated as of Python 2.6
+'foo'
+</code></pre>
+<p>Compared to:</p>
+<pre><code>&gt;&gt;&gt; MyAppValueError('foo', 'FOO', 'bar').message
+'foo'
+</code></pre>
+<h4> Comment 83141813 Russia Must Remove Putin: </h4>@Kos The critique about Liskov Substitutability is still valid. The semantics of the first argument as a &quot;message&quot; are also arguably questionable, but I don&#39;t think I&#39;ll argue the point. I&#39;ll give this more of a look when I have more free time.<br><h4> Comment 110775462 Anakhand: </h4>Related to what @Eugene said, <a href="https://softwareengineering.stackexchange.com/q/302476/330471">does the Liskov substitution principle apply to constructors</a>? (See also: <a href="https://stackoverflow.com/questions/5490824/should-constructors-comply-with-the-liskov-substitution-principle">this</a>, <a href="https://softwareengineering.stackexchange.com/q/270734/330471">this</a>.) Specifically, in the case of exceptions, it could very well be that I decide to replace a generic expression with a more specific one, but in that case, I&#39;ll also make sure to provide the necessary arguments—otherwise, it&#39;s a half-baked job.<br><h4> Comment 106948764 Eugene Yarmash: </h4>I don&#39;t see much sense in following the Liskov substitution principle with custom exceptions. You raise a specific exception to indicate a specific condition. Why would you ever need to substitute an instance of a base exception class with an instance of a derived exception class?<br><h4> Comment 83140542 Kos: </h4>Hello from 2018! <code>BaseException.message</code> is gone in Python 3, so the critique only holds for old versions, right?<br><h4> Comment 106952808 Eugene Yarmash: </h4>@AaronHall I&#39;ve never needed this in practice. Anyway, I guess your example violates LSP as well: if your code uses <code>raise ValueError(msg)</code>, you can&#39;t replace this with <code>raise ValidationError(msg)</code> as the latter requires one more parameter.<br><h4> Comment 91661347 Russia Must Remove Putin: </h4>@ostergaard Can&#39;t answer in full right now, but in short, the user gets the additional option of catching <code>ValueError</code>. This makes sense if it&#39;s in the category of Value Errors. If it&#39;s not in the category of Value Errors, I&#39;d argue against it on the semantics. There&#39;s room for some nuance and reasoning on the part of the programmer, but I much prefer specificity when applicable. I&#39;ll update my answer to better tackle the subject some time soon.<br><h4> Comment 85708162 Jacquot: </h4>FWIW, for Python 3 (at least for 3.6+), one would redefine the <code>__str__</code> method of <code>MyAppValueError</code> instead of relying on the <code>message</code> attribute<br><h4> Comment 89645068 cowbert: </h4>why avoid passing a dict as a positional argument? It retains all of the original semantics, including (<code>__repr__</code>/<code>__str__</code>) and the user can just parse the dict via <code>.args[0]</code> per frnknstn&#39;s answer? (You <i>are</i> noting this in the docstring aren&#39;t you?)<br><h4> Comment 91654200 ostergaard: </h4>@AaronHall Could you expand on the benefit of sub-classing ValueError rather than Exception? You state that this is what is meant by the docs but a direct reading doesn&#39;t support that interpretation and in the Python Tutorial under User-defined Exceptions it clearly makes it the users choice: &quot;Exceptions should typically be derived from the Exception class, either directly or indirectly.&quot; Hence keen to understand if your view is justifiable, please.<br><h4> Comment 106953040 Russia Must Remove Putin: </h4>@EugeneYarmash Now that&#39;s an interesting point that I have long considered! Is a subclass Liskov Substitutable (LS) if it disallows the same invocation of the constructor in the child as in the parent? Maybe it strictly isn&#39;t LS. But in most cases I envisage, it shouldn&#39;t break anyone. However, I suppose it could, if you&#39;re catching and instantiating the <code>type(error)</code> instead of the class by name. Can you find me a source to cite on that? (Any peer-reviewed paper that discusses it is preferable to not.)<br><h4> Comment 106949285 Russia Must Remove Putin: </h4>@EugeneYarmash Why? If you&#39;re raising a general exception, perhaps you later want to raise a subclass and not break users still catching the more general exception, then you want substitutability that doesn&#39;t break the user.<br><h4> Comment 92050791 ostergaard: </h4>@AaronHall thanks, that does make sense and I agree. Though I believe it&#39;s a stretch to ascribe that meaning to the docs.<br>------------------------------------------------------------------ <br><h3> Answer 60465422 Eugene Yarmash: </h3><p>To define your own exceptions correctly, there are a few best practices that you should follow:</p>
+<ul>
+<li><p>Define a <strong>base class</strong> inheriting from <code>Exception</code>. This will allow to easily catch any exceptions related to the project:</p>
+<pre><code>class MyProjectError(Exception):
+    &quot;&quot;&quot;A base class for MyProject exceptions.&quot;&quot;&quot;
+</code></pre>
+<p>Organizing the exception classes in a separate module (e.g. <code>exceptions.py</code>) is generally a good idea.</p>
+</li>
+<li><p>To create a specific exception, subclass the base exception class.</p>
+<pre><code>class CustomError(MyProjectError):
+   &quot;&quot;&quot;A custom exception class for MyProject.&quot;&quot;&quot;
+</code></pre>
+<p>You can subclass custom exception classes as well to create a hierarchy.</p>
+</li>
+<li><p>To add support for extra argument(s) to a custom exception, define an <code>__init__()</code> method with a variable number of arguments. Call the base class's <code>__init__()</code>, passing any positional arguments to it (remember that <a href="https://docs.python.org/3/library/exceptions.html#base-classes" rel="noreferrer"><code>BaseException</code>/<code>Exception</code></a> expect any number of <em>positional arguments</em>). Store extra keyword arguments to the instance, e.g.:</p>
+<pre><code>class CustomError(MyProjectError):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args)
+        self.custom_kwarg = kwargs.get('custom_kwarg')
+</code></pre>
+<p>Usage example:</p>
+<pre><code>try:
+    raise CustomError('Something bad happened', custom_kwarg='value')
+except CustomError as exc:
+    print(f'Сaught CustomError exception with custom_kwarg={exc.custom_kwarg}')
+</code></pre>
+</li>
+</ul>
+<p>This design adheres to the <a href="https://en.wikipedia.org/wiki/Liskov_substitution_principle" rel="noreferrer">Liskov substitution principle</a>, since you can replace an instance of a base exception class with an instance of a derived exception class. Also, it allows you to create an instance of a derived class with the same parameters as the parent.</p>
+<h4> Comment 111210227 LukeSavefrogs: </h4>Really like this design... I feel like it&#39;s a lot cleaner than the ones in the other answers.<br><h4> Comment 111342311 loutre: </h4>LSP adhesion should be mandatory, that&#39;s why I prefer this answer to the others.<br><h4> Comment 124428689 Eugene Yarmash: </h4>@ingyhere: Yes, it should be picklable w/o problems (at least in Python 3, which should be the standard now).<br><h4> Comment 133022155 LukeSavefrogs: </h4>@EugeneYarmash How can one use/print the extra arguments?<br><h4> Comment 133049220 Eugene Yarmash: </h4>@LukeSavefrogs: See an example in the post<br><h4> Comment 135195906 calestyo: </h4>Though I don&#39;t quite understand why, Python recommendation no longer seems to be to generally create an exception base class for a project (see discussion at <a href="https://github.com/python/cpython/issues/78719" rel="nofollow noreferrer">github.com/python/cpython/issues/78719</a>)<br><h4> Comment 135872122 iDen: </h4>What if I want to provide a default message to my custom &quot;child&quot; exception and keep passing *args? Should it look like this: <code>super().__init__(message, *args)</code>?<br><h4> Comment 115542919 james: </h4>How do we test this exception is thrown or not using unittests?<br><h4> Comment 115793323 ingyhere: </h4>Would this be picklable?<br>------------------------------------------------------------------ <br><h3> Answer 53469898 fameman: </h3><p><strong>As of Python 3.8</strong> (2018, <a href="https://docs.python.org/dev/whatsnew/3.8.html" rel="noreferrer">https://docs.python.org/dev/whatsnew/3.8.html</a>), the recommended method is still:</p>
+
+<pre><code>class CustomExceptionName(Exception):
+    """Exception raised when very uncommon things happen"""
+    pass
+</code></pre>
+
+<p><strong>Please don't forget to document, why a custom exception is neccessary!</strong></p>
+
+<p>If you need to, this is the way to go for exceptions with more data:</p>
+
+<pre><code>class CustomExceptionName(Exception):
+    """Still an exception raised when uncommon things happen"""
+    def __init__(self, message, payload=None):
+        self.message = message
+        self.payload = payload # you could add more args
+    def __str__(self):
+        return str(self.message) # __str__() obviously expects a string to be returned, so make sure not to send any other data types
+</code></pre>
+
+<p>and fetch them like:</p>
+
+<pre><code>try:
+    raise CustomExceptionName("Very bad mistake.", "Forgot upgrading from Python 1")
+except CustomExceptionName as error:
+    print(str(error)) # Very bad mistake
+    print("Detail: {}".format(error.payload)) # Detail: Forgot upgrading from Python 1
+</code></pre>
+
+<p><code>payload=None</code> is important to make it pickle-able. Before dumping it, you have to call <code>error.__reduce__()</code>. Loading will work as expected.</p>
+
+<p>You maybe should investigate in finding a solution using pythons <code>return</code> statement if you need much data to be transferred to some outer structure. This seems to be clearer/more pythonic to me. Advanced exceptions are heavily used in Java, which can sometimes be annoying, when using a framework and having to catch all possible errors.</p>
+<h4> Comment 101243083 Roel Schroeven: </h4>Honest question: Why is it important for exceptions to be pickle-able? What are the use cases for dumping and loading exceptions?<br><h4> Comment 97448524 kevlarr: </h4>At the very least, the <a href="https://docs.python.org/3.8/tutorial/errors.html#user-defined-exceptions" rel="nofollow noreferrer">current docs</a> indicate this is the way to do it (at least without the <code>__str__</code>) rather than other answers that use <code>super().__init__(...)</code>.. Just a shame that overrides for <code>__str__</code> and <code>__repr__</code> are probably necessary just for better &quot;default&quot; serializing.<br><h4> Comment 102877606 logicOnAbstractions: </h4>@RoelSchroeven: I had to parallelize code once. Ran fine single process, but aspects of some of its classes were not serializable (lambda function being passed as objects). Took me some time figuring it out &amp; fixing it. Meaning someone later may end up needing your code to be serialize, be unable to do it, and have to dig up why... My issue wasn&#39;t unpickeable errors, but I can see it causing similar problems.<br><h4> Comment 124423740 martineau: </h4>There&#39;s nothing in the (current) linked 3.8 document about the recommended method to define custom exceptions.<br>------------------------------------------------------------------ <br><h3> Answer 18108623 mykhal: </h3><p>see how exceptions work by default if one <em>vs</em> more attributes are used (tracebacks omitted):</p>
+
+<pre><code>&gt;&gt;&gt; raise Exception('bad thing happened')
+Exception: bad thing happened
+
+&gt;&gt;&gt; raise Exception('bad thing happened', 'code is broken')
+Exception: ('bad thing happened', 'code is broken')
+</code></pre>
+
+<p>so you might want to have a sort of "<strong>exception template</strong>", working as an exception itself, in a compatible way:</p>
+
+<pre><code>&gt;&gt;&gt; nastyerr = NastyError('bad thing happened')
+&gt;&gt;&gt; raise nastyerr
+NastyError: bad thing happened
+
+&gt;&gt;&gt; raise nastyerr()
+NastyError: bad thing happened
+
+&gt;&gt;&gt; raise nastyerr('code is broken')
+NastyError: ('bad thing happened', 'code is broken')
+</code></pre>
+
+<p>this can be done easily with this subclass</p>
+
+<pre><code>class ExceptionTemplate(Exception):
+    def __call__(self, *args):
+        return self.__class__(*(self.args + args))
+# ...
+class NastyError(ExceptionTemplate): pass
+</code></pre>
+
+<p>and if you don't like that default tuple-like representation, just add <code>__str__</code> method to the <code>ExceptionTemplate</code> class, like:</p>
+
+<pre><code>    # ...
+    def __str__(self):
+        return ': '.join(self.args)
+</code></pre>
+
+<p>and you'll have</p>
+
+<pre><code>&gt;&gt;&gt; raise nastyerr('code is broken')
+NastyError: bad thing happened: code is broken
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 1319660 M. Utku ALTINKAYA: </h3><p>You should override <code>__repr__</code> or <code>__unicode__</code> methods instead of using message, the args you provide when you construct the exception will be in the <code>args</code> attribute of the exception object.</p>
+------------------------------------------------------------------ <br><h3> Answer 56533234 Yaroslav Nikitenko: </h3><p>See a very good article &quot;<a href="https://web.archive.org/web/20220211170740/https://julien.danjou.info/python-exceptions-guide/" rel="nofollow noreferrer">The definitive guide to Python exceptions</a>&quot;. The basic principles are:</p>
+<ul>
+<li>Always inherit from (at least) Exception.</li>
+<li>Always call <code>BaseException.__init__</code> with only one argument.</li>
+<li>When building a library, define a base class inheriting from Exception.</li>
+<li>Provide details about the error.</li>
+<li>Inherit from builtin exceptions types when it makes sense.</li>
+</ul>
+<p>There is also information on organizing (in modules) and wrapping exceptions, I recommend to read the  guide.</p>
+<h4> Comment 106967751 Eugene Yarmash: </h4><code>Always call BaseException.__init__ with only one argument.</code> Seems like unneeded constraint, since it actually accepts <i>any number</i> of arguments.<br><h4> Comment 136820428 glaucon: </h4>@YaroslavNikitenko - thanks Yaroslav, I&#39;ve done that now.<br><h4> Comment 102872422 logicOnAbstractions: </h4>This is a good example of why on SO I usually check the most upvoted answer, but the most recent ones as well. Usefull addition, thanks.<br><h4> Comment 136773750 glaucon: </h4>The referenced article, &quot;The definitive guide to Python exceptions&quot;. is no longer there but here&#39;s an archive.org link  &quot;<a href="https://web.archive.org/web/20220211170740/https://julien.danjou.info/python-exceptions-guide/" rel="nofollow noreferrer">web.archive.org/web/20220211170740/https://julien.danjou.in&zwnj;&#8203;fo/&hellip;</a><br><h4> Comment 136805935 Yaroslav Nikitenko: </h4>@glaucon thanks, you can simply update the post!<br><h4> Comment 106968347 Yaroslav Nikitenko: </h4>@EugeneYarmash I agree, now I don&#39;t understand that. I don&#39;t use it anyway. Maybe I should reread the article and expand my answer.<br><h4> Comment 107051007 Yaroslav Nikitenko: </h4>@EugeneYarmash I read the article again. It is stated that in case of several arguments the C implementation calls &quot;return PyObject_Str(self-&gt;args);&quot; It means that one string should work better than several ones. Did you check that?<br>------------------------------------------------------------------ <br><h3> Answer 1319680 Lennart Regebro: </h3><p>No, &quot;message&quot; is not forbidden. It's just deprecated. You application will work fine with using message. But you may want to get rid of the deprecation error, of course.</p>
+<p>When you create custom Exception classes for your application, many of them do not subclass just from Exception, but from others, like <code>ValueError</code> or similar. Then you have to adapt to their usage of variables.</p>
+<p>And if you have many exceptions in your application it's usually a good idea to have a common custom base class for all of them, so that users of your modules can do</p>
+<pre><code>try:
+    ...
+except NelsonsExceptions:
+    ...
+</code></pre>
+<p>And in that case you can do <code>__init__</code> and <code>__str__</code> needed there, so you don't have to repeat it for every exception. But simply calling the message variable something else than message does the trick.</p>
+<p>In any case, you only need <code>__init__</code> or <code>__str__</code> if you do something different from what Exception itself does. And because if the deprecation, you then need both, or you get an error. That's not a whole lot of extra code you need per class.</p>
+<h4> Comment 99649006 Yaroslav Nikitenko: </h4>It&#39;s interesting that Django exceptions don&#39;t inherit from a common base. <a href="https://docs.djangoproject.com/en/2.2/_modules/django/core/exceptions/" rel="nofollow noreferrer">docs.djangoproject.com/en/2.2/_modules/django/core/exception&zwnj;&#8203;s</a> Do you have a good example when catching all exceptions from a specific application is needed? (maybe it is useful only for some specific types of applications).<br><h4> Comment 99649768 Yaroslav Nikitenko: </h4>I found a good article on this topic, <a href="https://julien.danjou.info/python-exceptions-guide/" rel="nofollow noreferrer">julien.danjou.info/python-exceptions-guide</a> . I think that Exceptions should be subclassed primarily domain-based, not application-based. When your app is about HTTP protocol, you derive from HTTPError. When part of your app is TCP, you derive that part&#39;s exceptions from TCPError. But if your app spans a lot of domains (file, permissions, etc), the reason to have a MyBaseException diminishes. Or is it to protect from &#39;layer violation&#39;?<br>------------------------------------------------------------------ <br><h3> Answer 72659611 Galuoises: </h3><p>For maximum customisation, to define custom errors,  you may want to define an intermediate class that inherits from <code>Exception</code> class as:</p>
+<pre><code>class BaseCustomException(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __repr__(self):
+        return self.msg
+
+
+class MyCustomError(BaseCustomException):
+    &quot;&quot;&quot;raise my custom error&quot;&quot;&quot;
+
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 69558004 SeekNDstroy: </h3><p>I had issues with the above methods, as of Python 3.9.5.
+However, I found that this works for me:</p>
+<pre><code>class MyException(Exception):
+    &quot;&quot;&quot;Port Exception&quot;&quot;&quot;
+</code></pre>
+<p>And then it could be used in code like:</p>
+<pre><code>try:
+    raise MyException('Message')
+
+except MyException as err:
+    print (err)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 51462309 omkaartg: </h3><p>Try this Example</p>
+
+<pre><code>class InvalidInputError(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+    def __str__(self):
+        return repr(self.msg)
+
+inp = int(input("Enter a number between 1 to 10:"))
+try:
+    if type(inp) != int or inp not in list(range(1,11)):
+        raise InvalidInputError
+except InvalidInputError:
+    print("Invalid input entered")
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 62704673 Macintosh Fan: </h3><p>A really simple approach:</p>
+<pre><code>class CustomError(Exception):
+    pass
+
+raise CustomError(&quot;Hmm, seems like this was custom coded...&quot;)
+</code></pre>
+<p>Or, have the error raise without printing <code>__main__</code> (may look cleaner and neater):</p>
+<pre><code>class CustomError(Exception):
+    __module__ = Exception.__module__
+
+raise CustomError(&quot;Improved CustomError!&quot;)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 76695223 SultanOrazbayev: </h3><p>It's possible to use <code>dataclass</code> to simplify the definition of the custom exception:</p>
+<pre class="lang-py prettyprint-override"><code>from dataclasses import dataclass
+
+@dataclass
+class MyException(Exception):
+    message: str = &quot;This is a custom exception&quot;
+
+    def __str__(self):
+        return f&quot;Custom message: {self.message.upper()}&quot;
+
+raise MyException(&quot;abcdef&quot;)
+# Traceback (most recent call last):
+#   File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+# MyException: Custom message: ABCDEF
+
+raise MyException()
+# Traceback (most recent call last):
+#   File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+# MyException: Custom message: THIS IS A CUSTOM EXCEPTION
+</code></pre>
+<p>This reduces some of the boilerplate, while remaining flexible for further customization.</p>
+------------------------------------------------------------------ <br><h3> Answer 70340570 Francis Cagney: </h3><p>I came across this thread. This is how I do custom exceptions. While the <code>Fault</code> class is slightly complex, it makes declaring custom expressive exceptions with variable arguments trivial.</p>
+<p><code>FinalViolation</code>, <code>SingletonViolation</code> are both sub classes of <code>TypeError</code> so will be caught code below.</p>
+<pre><code>try:
+    &lt;do something&gt;
+except TypeError as ex:
+    &lt;handler&gt;
+</code></pre>
+<p>That's why <code>Fault</code> doesn't inherit from <code>Exception</code>. To allow derivative exceptions to inherit from the exception of their choice.</p>
+<pre><code>class Fault:
+    &quot;&quot;&quot;Generic Exception base class. Note not descendant of Exception
+Inheriting exceptions override formats&quot;&quot;&quot;
+    formats = '' # to be overriden in descendant classes
+
+    def __init__(self, *args):
+        &quot;&quot;&quot;Just save args for __str__&quot;&quot;&quot;
+        self.args = args
+
+    def __str__(self):
+        &quot;&quot;&quot;Use formats declared in descendant classes, and saved args to build exception text&quot;&quot;&quot;
+        return self.formats.format(*self.args)
+
+class TypeFault(Fault, TypeError):
+    &quot;&quot;&quot;Helper class mixing Fault and TypeError&quot;&quot;&quot;
+
+class FinalViolation(TypeFault):
+    &quot;&quot;&quot;Custom exception raised if inheriting from 'final' class&quot;&quot;&quot;
+    formats = &quot;type {} is not an acceptable base type. It cannot be inherited from.&quot;
+
+class SingletonViolation(TypeFault):     
+    &quot;&quot;&quot;Custom exception raised if instancing 'singleton' class a second time&quot;&quot;&quot;
+    formats = &quot;type {} is a singleton. It can only be instanced once.&quot;
+</code></pre>
+<p><code>FinalViolation</code>, <code>SingletonViolation</code> unfortunately only accept 1 argument.</p>
+<p>But one could easily create a multi arg error e.g.</p>
+<pre><code>class VesselLoadingError(Fault, BufferError):
+    formats = &quot;My {} is full of {}.&quot;
+
+raise VesselLoadingError('hovercraft', 'eels')
+</code></pre>
+<blockquote>
+<p><code>__main__.VesselLoadingError: My hovercraft is full of eels.</code></p>
+</blockquote>
+------------------------------------------------------------------ <br><h3> Answer 71160408 Jirayu Kaewprateep: </h3><p>For me it is just <code>__init__</code> and variables but making sometimes testing.</p>
+<p>My sample:</p>
+<pre><code>Error_codes = { 100: &quot;Not enough parameters&quot;, 101: &quot;Number of special characters more than limits&quot;, 102: &quot;At least 18 alphanumeric characters and list of special chars !@#$&amp;*&quot; }
+
+class localbreak( Exception ) :
+    Message = &quot;&quot;
+    
+    def __init__(self, Message):
+        self.Message = Message
+        return
+    def __str__(self):
+        print(self.Message)
+        return &quot;False&quot;
+
+### When calling ...
+raise localbreak(Error_codes[102])
+</code></pre>
+<p>Output:</p>
+<pre><code>Traceback (most recent call last):   File &quot;ASCII.py&quot;, line 150, in &lt;module&gt;
+    main(OldPassword, Newpassword)   File &quot;ASCII.py&quot;, line 39, in main
+    result = read_input(&quot;1&quot;, &quot;2&quot;, Newpassword, &quot;4&quot;)                                     
+    File &quot;ASCII.py&quot;, line 69, in read_input
+    raise localbreak(Error_codes[102]) At least 18 alphanumeric characters and list of special chars !@#$&amp;*
+__main__.localbreak: False
+</code></pre>

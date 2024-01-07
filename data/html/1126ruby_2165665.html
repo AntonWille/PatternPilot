@@ -1,0 +1,271 @@
+ <h2> Title: How do I get the current absolute URL in Ruby on Rails? </h2> <h3> Jakub Arnold, question_id: 2165665 </h3>Score: 1126, Tags: {ruby-on-rails,ruby,url} <br><p>How can I get the current <strong>absolute</strong> URL in my Ruby on Rails view?</p>
+<p>The <code>request.request_uri</code> only returns the <strong>relative</strong> URL.</p>
+<h4> Comment 47534148 user3118220: </h4>You can have a look for rails 4: <a href="http://blog.grepruby.com/2015/04/absolute-url-full-url-in-rails-4.html" rel="nofollow noreferrer">blog.grepruby.com/2015/04/absolute-url-full-url-in-rails-4.h&zwnj;&#8203;tml</a><br>------------------------------------------------------------------ <br><h3> Answer 29280598 Arvind singh: </h3><p><strong>Rails 4.0</strong></p>
+
+<p>you can use <code>request.original_url</code>, output will be as given below example</p>
+
+<pre><code>get "/articles?page=2"
+
+request.original_url # =&gt; "http://www.example.com/articles?page=2"
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 2165727 Jaime Bellmyer: </h3><h3>For Rails 3.2 or Rails 4+</h3>
+<p>You should use <code>request.original_url</code> to get the current URL.  Source code on current repo found <a href="https://pix.realquadrant.com/original_url" rel="noreferrer">here</a>.</p>
+<p>This method is documented at <a href="http://api.rubyonrails.org/classes/ActionDispatch/Request.html#method-i-original_url" rel="noreferrer">original_url method</a>, but if you're curious, the implementation is:</p>
+<pre><code>def original_url
+  base_url + original_fullpath
+end
+</code></pre>
+<hr />
+<h3>For Rails 3:</h3>
+<p>You can write <code>&quot;#{request.protocol}#{request.host_with_port}#{request.fullpath}&quot;</code>, since <code>request.url</code> is now deprecated.</p>
+<hr />
+<h3>For Rails 2:</h3>
+<p>You  can write <code>request.url</code> instead of <code>request.request_uri</code>.  This combines the protocol (usually http://) with the host, and request_uri to give you the full address.</p>
+<h4> Comment 11433656 Nilloc: </h4><code>&quot;http:&#47;&#47;#{request.host+request.fullpath}&quot;</code> will work or otherwise, (if the port is important) <code>&quot;http:&#47;&#47;#{request.host}:#{request.port+request.fullpath}&quot;</code><br><h4> Comment 6642971 giladbu: </h4>as other users pointed: DEPRECATION WARNING: Using #request_uri is deprecated. Use fullpath instead<br><h4> Comment 8222015 Alan H.: </h4>@giladbu <code>fullpath</code> does NOT include the protocol/domain/port! It’s not an absolute URL!<br><h4> Comment 13145367 Sucrenoir: </h4>if port important, this one works right:   <code>&quot;http:&#47;&#47;#{request.host}:#{request.port}#{request.fullpath}&quot;</code><br><h4> Comment 22085535 mhartl: </h4>Can you point to a reference for the claim that <code>request.url</code> is deprecated? The proposed solution is just a long way of saying what <code>request.url</code> already does; the implementation is simply protocol + host_with_port + fullpath (<a href="https://github.com/rails/rails/blob/33841a9db3e560ef062d36d14ea07f7d71dd65ab/actionpack/lib/action_dispatch/http/url.rb#L86" rel="nofollow noreferrer">github.com/rails/rails/blob/&hellip;</a>)<br><h4> Comment 42695806 Paul: </h4>What if there is no <code>request</code> because I am not in controller but in a worker thread?<br><h4> Comment 25938861 collimarco: </h4>This answer is outdated! See @Mike&#39;s answer for a smarter solution (i.e. use <code>request.original_url</code>).<br><h4> Comment 35677614 cwd: </h4>how do you use this with <code>link_to request.original_url</code> and add an extra parameter? somehow with <code>params.merge</code> maybe?<br><h4> Comment 15264339 rogercampos: </h4>You can also use <code>request.host_with_port</code> to make something compatible with both production and dev envs.<br><h4> Comment 19442764 PeppyHeppy: </h4>Its clear that the <code>request.*</code> api has changed a lot between rails versions and may continue to change. However, the api for <code>url_for</code> has remained mostly constant. I would use <code>url_for</code> for that reason. I woud say that @grzuy&#39;s answer is the best one.<br>------------------------------------------------------------------ <br><h3> Answer 17426958 Mike: </h3><p>If you're using <strong>Rails 3.2</strong> or <strong>Rails 4</strong>, you should use <code>request.original_url</code> to get the current URL.</p>
+<hr />
+<p>Documentation for the method is at <a href="http://api.rubyonrails.org/classes/ActionDispatch/Request.html#method-i-original_url" rel="nofollow noreferrer">http://api.rubyonrails.org/classes/ActionDispatch/Request.html#method-i-original_url</a>, but if you're curious, the implementation is:</p>
+<pre><code>def original_url
+  base_url + original_fullpath
+end
+</code></pre>
+<p><strong>EDIT</strong>: This is still the case for <strong>Rails 7</strong> (<a href="https://api.rubyonrails.org/classes/ActionDispatch/Request.html#method-i-original_url" rel="nofollow noreferrer">Docs</a>).</p>
+------------------------------------------------------------------ <br><h3> Answer 4629896 mcr: </h3><p>I think that the Ruby on Rails 3.0 method is now <code>request.fullpath</code>.</p>
+<h4> Comment 23709637 lulalala: </h4>fullpath doesn&#39;t include the domain<br><h4> Comment 109443489 Jake: </h4>I&#39;m glad this was provided as I was actually searching for how to not include the domain.<br>------------------------------------------------------------------ <br><h3> Answer 7690640 grzuy: </h3><p>You could use <code>url_for(only_path: false)</code></p>
+<h4> Comment 38468677 thekingoftruth: </h4>FYI This will not work if you have multiple paths for the same resource.<br><h4> Comment 121869865 Dorian: </h4>For a <code>&#47;activities&#47;:id</code> path I got <code>404?id=:id</code> when doing <code>url_for(only_path: false)</code> from a page handling &quot;not found&quot;, <code>request.original_url</code> works fine<br><h4> Comment 19442702 PeppyHeppy: </h4>In my case I wanted to change host name but keep everything else. I found that url_for(host: &#39;www.newdomain.com&#39;) worked the best for me as a solution to the problem. IMO, its a more robust solution since its the same across all versions of rails.<br><h4> Comment 18257105 Lyuben Todorov: </h4>@David not in the View it doesn&#39;t. But it should&#39;n be used there anyway =)<br><h4> Comment 9596352 Spiralis: </h4>In my (a bit special case) this was almost exactly what I wanted. I just changed the option to true and got the url for the current page, without options. Thanks :)<br>------------------------------------------------------------------ <br><h3> Answer 4380130 ecoologic: </h3><p>DEPRECATION WARNING: <a href="http://apidock.com/rails/ActionDispatch/Http/URL/request_uri" rel="noreferrer">Using #request_uri is deprecated</a>. Use fullpath instead. </p>
+<h4> Comment 11433373 Nilloc: </h4>See notes on answer <a href="http://stackoverflow.com/a/2165727/166279">stackoverflow.com/a/2165727/166279</a>, fullpath doesn&#39;t include the domain.<br><h4> Comment 39835460 ecoologic: </h4>@ManishShrivastava: funny, in spite of all the &quot;original&quot; effort I put answering more complex questions, this copy and paste gave me the highest score, well... better than nothing<br><h4> Comment 11436153 ecoologic: </h4>this line came straight from the log at time of writing when using <code>request.uri</code> and this has already been pointed out several times in this question, but... ok, thanks<br>------------------------------------------------------------------ <br><h3> Answer 3715662 grosser: </h3><p>You can add this <a href="http://grosser.it/2008/11/06/current_url" rel="noreferrer">current_url</a> method in the ApplicationController to return the current URL and allow merging in other parameters</p>
+
+<pre><code># https://x.com/y/1?page=1 
+# + current_url( :page =&gt; 3 )
+# = https://x.com/y/1?page=3
+def current_url(overwrite={})
+    url_for :only_path =&gt; false, :params =&gt; params.merge(overwrite)
+end
+</code></pre>
+
+<p><strong>Example Usage:</strong></p>
+
+<pre><code>current_url --&gt; http://...
+current_url(:page=&gt;4) --&gt; http://...&amp;page=4
+</code></pre>
+<h4> Comment 15241470 montrealmike: </h4>also if you are in a <code>link_to</code> you can just use <code>params.merge</code> and skip the <code>url_for</code> altogether<br><h4> Comment 8222061 Alan H.: </h4>This does not appear to be defined in Rails 3.1.<br><h4> Comment 15241040 montrealmike: </h4>you could do it this way <code>url_for params.merge(:format =&gt; &quot;PDF&quot;, :only_path =&gt; false)</code><br>------------------------------------------------------------------ <br><h3> Answer 7114301 Duke: </h3><p>For Ruby on Rails 3:</p>
+
+<pre><code>request.url
+request.host_with_port
+</code></pre>
+
+<p>I fired up a debugger session and queried the request object:</p>
+
+<pre><code>request.public_methods
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 6680929 Lucas Renan: </h3><p>In Ruby on Rails 3.1.0.rc4:</p>
+
+<pre><code> request.fullpath
+</code></pre>
+<h4> Comment 18096711 Olivier Lacan: </h4><code>fullpath</code> does not provide an <code>absolute URL</code> as the original poster requested.<br>------------------------------------------------------------------ <br><h3> Answer 7935691 Dorian: </h3><p>I needed the application <a href="http://en.wikipedia.org/wiki/Uniform_Resource_Locator" rel="noreferrer">URL</a> but with the subdirectory. I used:</p>
+
+<pre><code>root_url(:only_path =&gt; false)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 10123646 Yuri  Barbashov: </h3><pre><code> url_for(params)
+</code></pre>
+
+<p>And you can easily add some new parameter:</p>
+
+<pre><code>url_for(params.merge(:tag =&gt; "lol"))
+</code></pre>
+<h4> Comment 18096647 Olivier Lacan: </h4>This is far more elegant (if less granular) than the approved answer.<br>------------------------------------------------------------------ <br><h3> Answer 2165734 James M: </h3><p>I think request.domain would work, but what if you're in a sub directory like blah.blah.com? Something like this could work:</p>
+
+<pre><code>&lt;%= request.env["HTTP_HOST"] + page = "/" + request.path_parameters['controller'] + "/" + request.path_parameters['action'] %&gt;
+</code></pre>
+
+<p>Change the parameters based on your path structure. </p>
+
+<p>Hope that helps!</p>
+<h4> Comment 2110579 James M: </h4>Yes Jaime&#39;s answer is way better, but if you want to be really inefficient, you could do it my way.<br>------------------------------------------------------------------ <br><h3> Answer 5157890 Ken Earley: </h3><p>It looks like <code>request_uri</code> is deprecated in Ruby on Rails 3.</p>
+
+<pre><code>Using #request_uri is deprecated. Use fullpath instead.
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 15384689 mikrobi: </h3><p>In Rails 3 you can use</p>
+
+<pre><code>request.original_url
+</code></pre>
+
+<p><a href="http://apidock.com/rails/v3.2.8/ActionDispatch/Request/original_url" rel="noreferrer">http://apidock.com/rails/v3.2.8/ActionDispatch/Request/original_url</a></p>
+------------------------------------------------------------------ <br><h3> Answer 22316939 uma: </h3><p>you can use any one for rails 3.2:</p>
+
+<pre><code>request.original_url
+or
+request.env["HTTP_REFERER"]
+or
+request.env['REQUEST_URI']
+</code></pre>
+
+<p>I think it will work every where</p>
+
+<pre><code>"#{request.protocol}#{request.host}:#{request.port}#{request.fullpath}"
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 11899905 Sergiy Seletskyy: </h3><p>Using Ruby 1.9.3-p194 and Ruby on Rails 3.2.6:</p>
+
+<p>If <strong>request.fullpath</strong> doesn't work for you, try <strong>request.env["HTTP_REFERER"]</strong></p>
+
+<p>Here's my story below.</p>
+
+<p>I got similar problem with detecting current URL (which is shown in address bar for user in her browser) for cumulative pages which combines information from different controllers, for example, <code>http://localhost:3002/users/1/history/issues</code>.</p>
+
+<p>The user can switch to different lists of types of issues. All those lists are loaded via Ajax from different controllers/partials (without reloading).</p>
+
+<p>The problem was to set the correct path for the back button in each item of the list so the back button could work correctly both in its own page and in the cumulative page <em>history</em>.</p>
+
+<p>In case I use <strong>request.fullpath</strong>, it returns the path of last JavaScript request which is definitely not the URL I'm looking for.</p>
+
+<p>So I used <strong>request.env["HTTP_REFERER"]</strong> which stores the URL of the last reloaded request.</p>
+
+<p>Here's an excerpt from the partial to make a decision</p>
+
+<pre><code>- if request.env["HTTP_REFERER"].to_s.scan("history").length &gt; 0
+  - back_url = user_history_issue_path(@user, list: "needed_type")
+- else
+  - back_url = user_needed_type_issue_path(@user)
+- remote ||= false
+=link_to t("static.back"), back_url, :remote =&gt; remote
+</code></pre>
+<h4> Comment 34980305 DDDD: </h4>Works great, just what I needed. This should be in a seperate question and answer though. Kinda hard to find here. :/<br><h4> Comment 15844057 Spencer Rathbun: </h4>Yup, fullpath gets you the url you requested, not the url you <i>came from</i>, which is what I needed as well. Thanks for this!<br>------------------------------------------------------------------ <br><h3> Answer 10151400 Tim Santeford: </h3><p>This works for Ruby on Rails 3.0 and should be supported by most versions of Ruby on Rails:</p>
+
+<pre><code>request.env['REQUEST_URI']
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 11102902 Frans: </h3><p>None of the suggestions here in the thread helped me sadly, except the one where someone said he used the debugger to find what he looked for.</p>
+
+<p>I've created some custom error pages instead of the standard 404 and 500, but <code>request.url</code> ended in <code>/404</code> instead of the expected <code>/non-existing-mumbo-jumbo</code>.</p>
+
+<p>What I needed to use was</p>
+
+<pre><code>request.original_url
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 2165692 ghoppe: </h3><p>If by relative, you mean just without the domain, then look into <code>request.domain</code>.</p>
+------------------------------------------------------------------ <br><h3> Answer 17773504 Idan Wender: </h3><p>You can use the ruby method:</p>
+
+<pre><code>:root_url
+</code></pre>
+
+<p>which will get the full path with base url:</p>
+
+<pre><code>localhost:3000/bla
+</code></pre>
+<h4> Comment 43229780 Kris Khaira: </h4>This is the only solution that works in serializers using active_model_serializers in Rails 4.<br><h4> Comment 72162418 boddhisattva: </h4>Can you please tell me how can I restrict the params I pass to an absolute url when I use somethin like <code>:root_url</code> to get the absolute url ? Assume I&#39;m usin somethin like <code>some_method(:products_brand_url, brand: brand, entity_name: &quot;brand&quot;)</code> and <code>some_method</code> is defined as ` def some_method(route, opts = {}) end ` I don&#39;t want my route to look like - <code>http:&#47;&#47;localhost:3000&#47;brands&#47;brand_name?&amp;entity_name=&quot;brand&quot;</code>&zwnj;&#8203;. I want the route to look like <code>http:&#47;&#47;localhost:3000&#47;brands&#47;brand_name</code>. I just want the <code>entity_name</code> to be a part of the opts hash and not as a params to the absolute url.<br><h4> Comment 99005845 smileart: </h4>Certainly there&#39;s no <i>Ruby</i> method called <code>root_url</code>.<br>------------------------------------------------------------------ <br><h3> Answer 10547141 msroot: </h3><pre><code>(url_for(:only_path =&gt; false) == "/" )? root_url : url_for(:only_path =&gt; false)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 34036789 Robin Garg: </h3><p>You can either use    </p>
+
+<pre><code>request.original_url 
+</code></pre>
+
+<p>or    </p>
+
+<pre><code>"#{request.protocol}#{request.host_with_port}" 
+</code></pre>
+
+<p>to get the current URL.</p>
+------------------------------------------------------------------ <br><h3> Answer 37458542 Amit: </h3><p><strong>For Rails 3.2 or Rails 4</strong>
+Simply get in this way "request.original_url"
+Reference: <a href="http://api.rubyonrails.org/classes/ActionDispatch/Request.html#method-i-original_url" rel="noreferrer">Original URL Method</a></p>
+
+<p><strong>For Rails 3</strong>
+As request.url is deprecated.We can get absolute path by concatenating</p>
+
+<pre><code>"#{request.protocol}#{request.host_with_port}#{request.fullpath}"
+</code></pre>
+
+<p><strong>For Rails 2</strong></p>
+
+<pre><code>request.url
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 14114837 Victor S: </h3><p>if you want to be specific, meaning, you know the path you need: </p>
+
+<pre><code>link_to current_path(@resource, :only_path =&gt; false), current_path(@resource)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 18160196 Pankhuri: </h3><p>For rails 3 :</p>
+
+<blockquote>
+  <p>request.fullpath</p>
+</blockquote>
+------------------------------------------------------------------ <br><h3> Answer 22133574 Satishakumar Awati: </h3><pre><code>request.env["REQUEST_URI"]
+</code></pre>
+
+<p>works in rails 2.3.4 tested and do not know about other versions.</p>
+------------------------------------------------------------------ <br><h3> Answer 29540014 Nerve: </h3><p>To get the request URL without any query parameters.</p>
+
+<pre><code>def current_url_without_parameters
+  request.base_url + request.path
+end
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 35804068 RaK427: </h3><p>You can set a variable to <code>URI.parse(current_url)</code>, I don't see this proposal here yet and it works for me.</p>
+------------------------------------------------------------------ <br><h3> Answer 32064357 Ali Hassan Mirza: </h3><p>You can use:</p>
+
+<pre><code>request.full_path
+</code></pre>
+
+<p>or </p>
+
+<pre><code>request.url
+</code></pre>
+
+<p>Hopefully it will resolve your problem.</p>
+
+<p>Cheers</p>
+------------------------------------------------------------------ <br><h3> Answer 13842110 Ahmad hamza: </h3><p>To get the absolute URL which means that the <code>from the root</code> it can be displayed like this </p>
+
+<pre><code>&lt;%= link_to 'Edit', edit_user_url(user) %&gt;
+</code></pre>
+
+<p>The users_url helper generates a URL that includes the protocol and host 
+name.  The users_path helper generates only the path portion.</p>
+
+<pre><code>users_url: http://localhost/users
+users_path: /users
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 29699171 user3118220: </h3><p><strong>Rails 4</strong></p>
+
+<p>Controller:</p>
+
+<pre><code>def absolute_url
+  request.base_url + request.original_fullpath
+end
+</code></pre>
+
+<p><strong>Action Mailer Notable changes in <a href="http://guides.rubyonrails.org/4_2_release_notes.html" rel="nofollow">4.2 release</a>:</strong></p>
+
+<p>link_to and url_for generate absolute URLs by default in templates, it is no longer needed to pass only_path: false. (Commit)</p>
+
+<p>View:</p>
+
+<p>If you use the <code>_url</code> suffix, the generated URL is absolute. Use <code>_path</code> to get a relative URL.</p>
+
+<pre><code>&lt;%= link_to "Home", root_url %&gt;
+</code></pre>
+
+<p>For More Details, go to:</p>
+
+<p><a href="http://blog.grepruby.com/2015/04/absolute-url-full-url-in-rails-4.html" rel="nofollow">http://blog.grepruby.com/2015/04/absolute-url-full-url-in-rails-4.html</a></p>
+<h4> Comment 47693520 ctc: </h4>A custom method is not needed.  The correct answer is above.<br>------------------------------------------------------------------ <br><h3> Answer 48378463 V K Singh: </h3><p>For Rails 3.x and up:</p>
+
+<pre><code>#{request.protocol}#{request.host_with_port}#{request.fullpath}
+</code></pre>
+
+<p>For Rails 3.2 and up:</p>
+
+<pre><code>request.original_url
+</code></pre>
+
+<p>Because in rails 3.2 and up:</p>
+
+<pre><code>request.original_url = request.base_url + request.original_fullpath
+</code></pre>
+
+<p>For more info, plese visit <a href="http://api.rubyonrails.org/classes/ActionDispatch/Request.html#method-i-original_url" rel="nofollow noreferrer">http://api.rubyonrails.org/classes/ActionDispatch/Request.html#method-i-original_url</a></p>
+------------------------------------------------------------------ <br><h3> Answer 22509130 user3355933: </h3><p>you can get absolute url by calling:</p>
+
+<pre><code>request.original_url
+</code></pre>
+
+<p>or </p>
+
+<pre><code>request.env['HTTP_REFERER']
+</code></pre>

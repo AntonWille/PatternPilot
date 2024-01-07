@@ -1,0 +1,39 @@
+ <h2> Title: Check whether a string contains a substring </h2> <h3> Belgin Fish, question_id: 7283274 </h3>Score: 134, Tags: {string,perl,string-matching} <br><p>How can I check whether a given string contains a certain substring, using Perl?</p>
+<p>More specifically, I want to see whether <code>s1.domain.example</code> is present in the given string variable.</p>
+------------------------------------------------------------------ <br><h3> Answer 7283308 Eugene Yarmash: </h3><p>To find out if a string contains substring you can use the <a href="http://perldoc.perl.org/functions/index.html" rel="noreferrer"><code>index</code></a> function:</p>
+
+<pre><code>if (index($str, $substr) != -1) {
+    print "$str contains $substr\n";
+} 
+</code></pre>
+
+<p>It will return the position of the first occurrence of <code>$substr</code> in <code>$str</code>, or -1 if the substring is not found.</p>
+<h4> Comment 22409624 evgeny9: </h4>This way is especially preferrable, when you are searching using a variable - this way you won&#39;t have to double-escape characters (in this variable string), that are special for regular expressions (like <code>:</code>).<br><h4> Comment 115246398 Sam B: </h4>See this as well - <a href="http://www.troubleshooters.com/codecorn/littperl/perlreg.htm" rel="nofollow noreferrer">troubleshooters.com/codecorn/littperl/perlreg.htm</a><br>------------------------------------------------------------------ <br><h3> Answer 7283835 David W.: </h3><p>Another possibility is to use <a href="http://perldoc.perl.org/perlre.html" rel="nofollow noreferrer">regular expressions</a> which is what Perl is famous for:</p>
+<pre><code>if ($mystring =~ /s1\.domain\.example/) {
+   print qq(&quot;$mystring&quot; contains &quot;s1.domain.example&quot;\n);
+}
+</code></pre>
+<p>The backslashes are needed because a <code>.</code> can match any character. You can get around this by using the <code>\Q</code> and <code>\E</code> operators.</p>
+<pre><code>my $substring = &quot;s1.domain.example&quot;;
+    if ($mystring =~ /\Q$substring\E/) {
+   print qq(&quot;$mystring&quot; contains &quot;$substring&quot;\n);
+}
+</code></pre>
+<p>Or, you can do as <a href="https://stackoverflow.com/users/244297/eugene-y">eugene y</a> stated and use the <a href="http://perldoc.perl.org/functions/index.html" rel="nofollow noreferrer">index</a> function.
+Just a word of warning: Index returns a <code>-1</code> when it can't find a match instead of an <code>undef</code> or <code>0</code>.</p>
+<p>Thus, this is an error:</p>
+<pre><code>my $substring = &quot;s1.domain.example&quot;;
+if (not index($mystring, $substr)) {
+    print qq(&quot;$mystring&quot; doesn't contains &quot;$substring&quot;\n&quot;;
+}
+</code></pre>
+<p>This will be wrong if <code>s1.domain.example</code> is at the beginning of your string. I've personally been burned on this more than once.</p>
+<h4> Comment 58915222 G. Cito: </h4>An attempted perl answer to a question about <a href="http://stackoverflow.com/a/35593275/2019415">removing substrings</a> - I did not compare speed but <code>=~</code>, <code>index()</code>, <code>~~</code> and <a href="https://metacpan.org/pod/match::simple" rel="nofollow noreferrer"><code>match::simple</code></a> all seemed a bit <code>awk</code>-ward ... :-\<br><h4> Comment 68313060 BlueChips23: </h4>You also have to make sure that the strings that you are comparing is not case sensitive. S1.DOMAIN.COM will not work for substring. But if you lc($givendomain), and then compare that with &quot;s1.domain.com&quot;, then that will work. Also, substring is not necessarily the right approach - see my note above to eugene y&#39;s response<br><h4> Comment 68450851 avrono: </h4>@David W. Somehow I can&#39;t get <code>domain.com</code> to match <code>subdomain.domain.com</code> using the REGEX above, any ideas ?<br><h4> Comment 58915151 G. Cito: </h4>I suppose <code>index()</code> is  faster than regexps in the simple case?<br>------------------------------------------------------------------ <br><h3> Answer 27806628 James Oravec: </h3><p><strong>Case Insensitive Substring Example</strong></p>
+
+<p>This is an extension of Eugene's answer, which converts the strings to lower case before checking for the substring:</p>
+
+<pre><code>if (index(lc($str), lc($substr)) != -1) {
+    print "$str contains $substr\n";
+} 
+</code></pre>
+<h4> Comment 101948264 melpomene: </h4>Note that <a href="https://perldoc.pl/functions/fc" rel="nofollow noreferrer"><code>fc</code></a> is recommended over <code>lc</code> for case-insensitive comparisons.<br>

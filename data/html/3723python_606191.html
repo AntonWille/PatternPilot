@@ -1,0 +1,412 @@
+ <h2> Title: Convert bytes to a string in Python 3 </h2> <h3> Tomas Sedovic, question_id: 606191 </h3>Score: 3723, Tags: {python,string,python-3.x} <br><p>I captured the standard output of an external program into a <code>bytes</code> object:</p>
+<pre><code>&gt;&gt;&gt; from subprocess import *
+&gt;&gt;&gt; stdout = Popen(['ls', '-l'], stdout=PIPE).communicate()[0]
+&gt;&gt;&gt; stdout
+b'total 0\n-rw-rw-r-- 1 thomas thomas 0 Mar  3 07:03 file1\n-rw-rw-r-- 1 thomas thomas 0 Mar  3 07:03 file2\n'
+</code></pre>
+<p>I want to convert that to a normal Python string, so that I can print it like this:</p>
+<pre><code>&gt;&gt;&gt; print(stdout)
+-rw-rw-r-- 1 thomas thomas 0 Mar  3 07:03 file1
+-rw-rw-r-- 1 thomas thomas 0 Mar  3 07:03 file2
+</code></pre>
+<p>How do I convert the <code>bytes</code> object to a <code>str</code> with Python 3?</p>
+<hr />
+<p><sub>See <a href="https://stackoverflow.com/questions/7585435">Best way to convert string to bytes in Python 3?</a> for the other way around.</sub></p>
+<h4> Comment 97084916 Charlie Parker: </h4>why doesn&#39;t <code>str(text_bytes)</code> work? This seems bizarre to me.<br><h4> Comment 97602590 Craig Anderson: </h4>@CharlieParker Because <code>str(text_bytes)</code> can&#39;t specify the encoding. Depending on what&#39;s in text_bytes, <code>text_bytes.decode(&#39;cp1250</code>)` might result in a very different string to <code>text_bytes.decode(&#39;utf-8&#39;)</code>.<br><h4> Comment 98273272 Charlie Parker: </h4>so <code>str</code> function does not convert to a real string anymore. One HAS to say an encoding explicitly for some reason I am to lazy to read through why. Just convert it to <code>utf-8</code> and see if ur code works. e.g. <code>var = var.decode(&#39;utf-8&#39;)</code><br><h4> Comment 108208710 jfs: </h4>@CraigAnderson: <code>unicode_text = str(bytestring, character_encoding)</code> works as expected on Python 3. Though <code>unicode_text = bytestring.decode(character_encoding)</code> is more preferable to avoid confusion with just <code>str(bytes_obj)</code> that produces a text representation for <code>bytes_obj</code> instead of decoding it to text: <code>str(b&#39;\xb6&#39;, &#39;cp1252&#39;) == b&#39;\xb6&#39;.decode(&#39;cp1252&#39;) == &#39;&#182;&#39;</code> and <code>str(b&#39;\xb6&#39;) == &quot;b&#39;\\xb6&#39;&quot; == repr(b&#39;\xb6&#39;) != &#39;&#182;&#39;</code><br><h4> Comment 130140738 David Gilbertson: </h4>Also, you can pass <code>text=True</code> to <code>subprocess.run()</code> or <code>.Popen()</code> and then you&#39;ll get a string back, no need to convert bytes. Or specify <code>encoding=&quot;utf-8&quot;</code> to either function.<br><h4> Comment 132488184 NeilG: </h4>@CharlieParker - I don&#39;t think I&#39;ve ever come across a use-case for the string that you get when you <code>str(&lt;bytes&gt;)</code>, but maybe it&#39;s just for consistency with other <code>str</code> calls. I would have thought they could default to UTF-8 encoding, but maybe it&#39;s because Windows has too many funny encodings that it doesn&#39;t default to UTF-8; but I agree with you.<br>------------------------------------------------------------------ <br><h3> Answer 606199 Aaron Maenpaa: </h3><p><a href="https://docs.python.org/3/library/stdtypes.html#bytes.decode" rel="noreferrer">Decode the <code>bytes</code> object</a> to produce a string:</p>
+<pre><code>&gt;&gt;&gt; b&quot;abcde&quot;.decode(&quot;utf-8&quot;) 
+'abcde'
+</code></pre>
+<p>The above example <em>assumes</em> that the <code>bytes</code> object is in UTF-8, because it is a common encoding. However, you should use the encoding your data is actually in!</p>
+<h4> Comment 22881544 Wookie88: </h4>Maybe this will help somebody further: Sometimes you use byte array for e.x. TCP communication. If you want to convert byte array to string cutting off trailing &#39;\x00&#39; characters the following answer is not enough. Use b&#39;example\x00\x00&#39;.decode(&#39;utf-8&#39;).strip(&#39;\x00&#39;) then.<br><h4> Comment 10846586 nikow: </h4>Using <code>&quot;windows-1252&quot;</code> is not reliable either (e.g., for other language versions of Windows), wouldn&#39;t it be best to use <code>sys.stdout.encoding</code>?<br><h4> Comment 7985096 mcherm: </h4>Yes, but given that this is the output from a windows command, shouldn&#39;t it instead be using &quot;.decode(&#39;windows-1252&#39;)&quot; ?<br><h4> Comment 118069617 Gabriel Staples: </h4><b>Official documentation for this:</b> for all <code>bytes</code> and <code>bytearray</code> operations (methods which can be called on these objects), see here: <a href="https://docs.python.org/3/library/stdtypes.html#bytes-methods" rel="nofollow noreferrer">docs.python.org/3/library/stdtypes.html#bytes-methods</a>. For <code>bytes.decode()</code> in particular, see here: <a href="https://docs.python.org/3/library/stdtypes.html#bytes.decode" rel="nofollow noreferrer">docs.python.org/3/library/stdtypes.html#bytes.decode</a>.<br><h4> Comment 137050226 Nam G VU: </h4>just decode() cause utf-8 is default<br>------------------------------------------------------------------ <br><h3> Answer 606205 dF.: </h3><p>Decode the byte string and turn it in to a character (Unicode) string.</p>
+<hr />
+<p>Python 3:</p>
+<pre><code>encoding = 'utf-8'
+b'hello'.decode(encoding)
+</code></pre>
+<p>or</p>
+<pre><code>str(b'hello', encoding)
+</code></pre>
+<hr />
+<p>Python 2:</p>
+<pre><code>encoding = 'utf-8'
+'hello'.decode(encoding)
+</code></pre>
+<p>or</p>
+<pre><code>unicode('hello', encoding)
+</code></pre>
+<h4> Comment 137050227 Nam G VU: </h4>just decode() cause utf-8 is default<br>------------------------------------------------------------------ <br><h3> Answer 12073686 Sisso: </h3><p>This joins together a list of bytes into a string:</p>
+<pre><code>&gt;&gt;&gt; bytes_data = [112, 52, 52]
+&gt;&gt;&gt; &quot;&quot;.join(map(chr, bytes_data))
+'p44'
+</code></pre>
+<h4> Comment 68480868 jfs: </h4>@Sasszem: this method is a perverted way to express: <code>a.decode(&#39;latin-1&#39;)</code> where <code>a = bytearray([112, 52, 52])</code> (<a href="http://www.joelonsoftware.com/articles/Unicode.html" rel="nofollow noreferrer">&quot;There Ain&#39;t No Such Thing as Plain Text&quot;</a>. If you&#39;ve managed to convert bytes into a text string then you used some encoding—<code>latin-1</code> in this case)<br><h4> Comment 40006504 Martijn Pieters: </h4>@leetNightshade: yet it is terribly inefficient. If you have a byte array you only need to decode.<br><h4> Comment 89291312 Martijn Pieters: </h4>@leetNightshade: For completeness sake: <code>bytes(list_of_integers).decode(&#39;ascii&#39;)</code> is about 1/3rd faster than <code>&#39;&#39;.join(map(chr, list_of_integers))</code> on Python 3.6.<br>------------------------------------------------------------------ <br><h3> Answer 27527728 anatoly techtonik: </h3><p>If you don't know the encoding, then to read binary input into string in Python 3 and Python 2 compatible way, use the ancient MS-DOS <a href="https://en.wikipedia.org/wiki/Code_page_437" rel="noreferrer">CP437</a> encoding:</p>
+
+<pre><code>PY3K = sys.version_info &gt;= (3, 0)
+
+lines = []
+for line in stream:
+    if not PY3K:
+        lines.append(line)
+    else:
+        lines.append(line.decode('cp437'))
+</code></pre>
+
+<p>Because encoding is unknown, expect non-English symbols to translate to characters of <code>cp437</code> (English characters are not translated, because they match in most single byte encodings and UTF-8).</p>
+
+<p>Decoding arbitrary binary input to UTF-8 is unsafe, because you may get this:</p>
+
+<pre><code>&gt;&gt;&gt; b'\x00\x01\xffsd'.decode('utf-8')
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 2: invalid
+start byte
+</code></pre>
+
+<p>The same applies to <code>latin-1</code>, which was popular (the default?) for Python 2. See the missing points in <a href="https://en.wikipedia.org/wiki/ISO/IEC_8859-1#Codepage_layout" rel="noreferrer">Codepage Layout</a> - it is where Python chokes with infamous <code>ordinal not in range</code>.</p>
+
+<p><strong>UPDATE 20150604</strong>: There are rumors that Python 3 has the <code>surrogateescape</code> error strategy for encoding stuff into binary data without data loss and crashes, but it needs conversion tests, <code>[binary] -&gt; [str] -&gt; [binary]</code>, to validate both performance and reliability.</p>
+
+<p><strong>UPDATE 20170116</strong>: Thanks to comment by Nearoo - there is also a possibility to slash escape all unknown bytes with <code>backslashreplace</code> error handler. That works only for Python 3, so even with this workaround you will still get inconsistent output from different Python versions:</p>
+
+<pre><code>PY3K = sys.version_info &gt;= (3, 0)
+
+lines = []
+for line in stream:
+    if not PY3K:
+        lines.append(line)
+    else:
+        lines.append(line.decode('utf-8', 'backslashreplace'))
+</code></pre>
+
+<p>See <em><a href="https://docs.python.org/3/howto/unicode.html#python-s-unicode-support" rel="noreferrer">Python’s Unicode Support</a></em> for details.</p>
+
+<p><strong>UPDATE 20170119</strong>: I decided to implement slash escaping decode that works for both Python&nbsp;2 and Python&nbsp;3. It should be slower than the <code>cp437</code> solution, but it should produce <strong>identical results</strong> on every Python version.</p>
+
+<pre><code># --- preparation
+
+import codecs
+
+def slashescape(err):
+    """ codecs error handler. err is UnicodeDecode instance. return
+    a tuple with a replacement for the unencodable part of the input
+    and a position where encoding should continue"""
+    #print err, dir(err), err.start, err.end, err.object[:err.start]
+    thebyte = err.object[err.start:err.end]
+    repl = u'\\x'+hex(ord(thebyte))[2:]
+    return (repl, err.end)
+
+codecs.register_error('slashescape', slashescape)
+
+# --- processing
+
+stream = [b'\x80abc']
+
+lines = []
+for line in stream:
+    lines.append(line.decode('utf-8', 'slashescape'))
+</code></pre>
+<h4> Comment 128630888 Karl Knechtel: </h4>This answer is incorrect. The latin-1, i.e. ISO-8859-1 encoding is perfectly capable of handling arbitrary binary data - <code>bytes(range(256)).decode(&#39;latin-1&#39;)</code> runs without error on modern Python versions, and I can&#39;t come up with a reason why it ever would have failed. The <i>entire point</i> of Latin-1 is that it maps each byte to the first 256 code points in Unicode - or rather, the ordering of Unicode was chosen, ever since the first version in 1991, so that the first 256 code points would match Latin-1. You could run into problems <b>printing</b> the string, but that&#39;s entirely orthogonal.<br>------------------------------------------------------------------ <br><h3> Answer 38102444 lmiguelvargasf: </h3><p><a href="https://docs.python.org/3/library/stdtypes.html#bytes.decode" rel="noreferrer">In Python 3</a>, the default encoding is <code>"utf-8"</code>, so you can directly use:</p>
+
+<pre><code>b'hello'.decode()
+</code></pre>
+
+<p>which is equivalent to</p>
+
+<pre><code>b'hello'.decode(encoding="utf-8")
+</code></pre>
+
+<p>On the other hand, <a href="https://docs.python.org/2.7/library/stdtypes.html#str.decode" rel="noreferrer">in Python 2</a>, encoding defaults to the default string encoding. Thus, you should use:</p>
+
+<pre><code>b'hello'.decode(encoding)
+</code></pre>
+
+<p>where <code>encoding</code> is the encoding you want.</p>
+
+<p><a href="https://docs.python.org/2.7/library/stdtypes.html#str.decode" rel="noreferrer"><strong>Note:</strong></a> support for keyword arguments was added in Python&nbsp;2.7.</p>
+<h4> Comment 137050229 Nam G VU: </h4>Great to point out decode() w/ utf-8 is default<br>------------------------------------------------------------------ <br><h3> Answer 6738578 mcherm: </h3><p>I think you actually want this:</p>
+
+<pre><code>&gt;&gt;&gt; from subprocess import *
+&gt;&gt;&gt; command_stdout = Popen(['ls', '-l'], stdout=PIPE).communicate()[0]
+&gt;&gt;&gt; command_text = command_stdout.decode(encoding='windows-1252')
+</code></pre>
+
+<p>Aaron's answer was correct, except that you need to know <em>which</em> encoding to use. And I believe that Windows uses 'windows-1252'. It will only matter if you have some unusual (non-ASCII) characters in your content, but then it will make a difference.</p>
+
+<p>By the way, the fact that it <em>does</em> matter is the reason that Python moved to using two different types for binary and text data: it can't convert magically between them, because it doesn't know the encoding unless you tell it! The only way YOU would know is to read the Windows documentation (or read it here).</p>
+------------------------------------------------------------------ <br><h3> Answer 50630091 wim: </h3><p>Since this question is actually asking about <code>subprocess</code> output, you have more direct approaches available. The most modern would be using <a href="https://docs.python.org/3/library/subprocess.html#subprocess.check_output" rel="noreferrer"><code>subprocess.check_output</code></a> and passing <code>text=True</code> (Python 3.7+) to automatically decode stdout using the system default coding:</p>
+<pre><code>text = subprocess.check_output([&quot;ls&quot;, &quot;-l&quot;], text=True)
+</code></pre>
+<p>For Python 3.6, <code>Popen</code> accepts an <a href="https://docs.python.org/3/library/subprocess.html#frequently-used-arguments" rel="noreferrer"><em>encoding</em></a> keyword:</p>
+<pre><code>&gt;&gt;&gt; from subprocess import Popen, PIPE
+&gt;&gt;&gt; text = Popen(['ls', '-l'], stdout=PIPE, encoding='utf-8').communicate()[0]
+&gt;&gt;&gt; type(text)
+str
+&gt;&gt;&gt; print(text)
+total 0
+-rw-r--r-- 1 wim badger 0 May 31 12:45 some_file.txt
+</code></pre>
+<p>The general answer to the question in the title, if you're not dealing with subprocess output, is to <em>decode</em> bytes to text:</p>
+<pre><code>&gt;&gt;&gt; b'abcde'.decode()
+'abcde'
+</code></pre>
+<p>With no argument, <a href="https://docs.python.org/3/library/sys.html#sys.getdefaultencoding" rel="noreferrer"><code>sys.getdefaultencoding()</code></a> will be used.  If your data is not <code>sys.getdefaultencoding()</code>, then you must specify the encoding explicitly in the <a href="https://docs.python.org/3/library/stdtypes.html#bytes.decode" rel="noreferrer"><code>decode</code></a> call:</p>
+<pre><code>&gt;&gt;&gt; b'caf\xe9'.decode('cp1250')
+'café'
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 21262396 ContextSwitch: </h3><p>Set universal_newlines to True, i.e.</p>
+
+<pre><code>command_stdout = Popen(['ls', '-l'], stdout=PIPE, universal_newlines=True).communicate()[0]
+</code></pre>
+<h4> Comment 95171212 user3064538: </h4><a href="https://docs.python.org/3/whatsnew/3.7.html#subprocess" rel="nofollow noreferrer">On 3.7</a> you can (and should) do <code>text=True</code> instead of <code>universal_newlines=True</code>.<br>------------------------------------------------------------------ <br><h3> Answer 40628661 jfs: </h3><p>To interpret a byte sequence as a text, you have to know the
+corresponding character encoding:</p>
+
+<pre><code>unicode_text = bytestring.decode(character_encoding)
+</code></pre>
+
+<p>Example:</p>
+
+<pre><code>&gt;&gt;&gt; b'\xc2\xb5'.decode('utf-8')
+'µ'
+</code></pre>
+
+<p><code>ls</code> command may produce output that can't be interpreted as text. File names
+on Unix may be any sequence of bytes except slash <code>b'/'</code> and zero
+<code>b'\0'</code>:</p>
+
+<pre><code>&gt;&gt;&gt; open(bytes(range(0x100)).translate(None, b'\0/'), 'w').close()
+</code></pre>
+
+<p>Trying to decode such byte soup using utf-8 encoding raises <code>UnicodeDecodeError</code>.</p>
+
+<p>It can be worse. The decoding may fail silently and produce <a href="https://en.wikipedia.org/wiki/Mojibake" rel="noreferrer">mojibake</a>
+if you use a wrong incompatible encoding:</p>
+
+<pre><code>&gt;&gt;&gt; '—'.encode('utf-8').decode('cp1252')
+'â€”'
+</code></pre>
+
+<p>The data is corrupted but your program remains unaware that a failure
+has occurred.</p>
+
+<p>In general, what character encoding to use is not embedded in the byte sequence itself. You have to communicate this info out-of-band. Some outcomes are more likely than others and therefore <code>chardet</code> module exists that can <em>guess</em> the character encoding. A single Python script may use multiple character encodings in different places.</p>
+
+<hr>
+
+<p><code>ls</code> output can be converted to a Python string using <code>os.fsdecode()</code>
+function that succeeds even for <a href="https://www.python.org/dev/peps/pep-0383/" rel="noreferrer">undecodable
+filenames</a> (it uses
+<code>sys.getfilesystemencoding()</code> and <code>surrogateescape</code> error handler on
+Unix):</p>
+
+<pre><code>import os
+import subprocess
+
+output = os.fsdecode(subprocess.check_output('ls'))
+</code></pre>
+
+<p>To get the original bytes, you could use <code>os.fsencode()</code>.</p>
+
+<p>If you pass <code>universal_newlines=True</code> parameter then <code>subprocess</code> uses
+<code>locale.getpreferredencoding(False)</code> to decode bytes e.g., it can be
+<code>cp1252</code> on Windows.</p>
+
+<p>To decode the byte stream on-the-fly,
+<a href="https://docs.python.org/3/library/io.html#io.TextIOWrapper" rel="noreferrer"><code>io.TextIOWrapper()</code></a>
+could be used: <a href="https://stackoverflow.com/a/25945031/4279">example</a>.</p>
+
+<p>Different commands may use different character encodings for their
+output e.g., <code>dir</code> internal command (<code>cmd</code>) may use cp437. To decode its
+output, you could pass the encoding explicitly (Python 3.6+):</p>
+
+<pre><code>output = subprocess.check_output('dir', shell=True, encoding='cp437')
+</code></pre>
+
+<p>The filenames may differ from <code>os.listdir()</code> (which uses Windows
+Unicode API) e.g., <code>'\xb6'</code> can be substituted with <code>'\x14'</code>—Python's
+cp437 codec maps <code>b'\x14'</code> to control character U+0014 instead of
+U+00B6 (¶). To support filenames with arbitrary Unicode characters, see  <a href="https://stackoverflow.com/q/33936074/4279">Decode PowerShell output possibly containing non-ASCII Unicode characters into a Python string</a></p>
+------------------------------------------------------------------ <br><h3> Answer 33690538 serv-inc: </h3><p>While <a href="https://stackoverflow.com/a/33688948/1587329">@Aaron Maenpaa's answer</a> just works, a user <a href="https://stackoverflow.com/questions/33688837/urllib-for-python-3/33688948#comment55151210_33688948">recently asked</a>:</p>
+
+<blockquote>
+  <p>Is there any more simply way? 'fhand.read().decode("ASCII")' [...] It's so long!</p>
+</blockquote>
+
+<p>You can use:</p>
+
+<pre><code>command_stdout.decode()
+</code></pre>
+
+<p><code>decode()</code> has a <a href="https://docs.python.org/3/library/stdtypes.html#bytes-and-bytearray-operations" rel="noreferrer">standard argument</a>:</p>
+
+<blockquote>
+  <p><code>codecs.decode(obj, encoding='utf-8', errors='strict')</code></p>
+</blockquote>
+------------------------------------------------------------------ <br><h3> Answer 69656994 Yasser M: </h3><p>If you have had this error:</p>
+<blockquote>
+<p>utf-8 codec can't decode byte 0x8a,</p>
+</blockquote>
+<p>then it is better to use the following code to convert bytes to a string:</p>
+<pre class="lang-py prettyprint-override"><code>bytes = b&quot;abcdefg&quot;
+string = bytes.decode(&quot;utf-8&quot;, &quot;ignore&quot;) 
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 47426743 Broper: </h3><p>If you should get the following by trying <code>decode()</code>:</p>
+
+<blockquote>
+  <p>AttributeError: 'str' object has no attribute 'decode'</p>
+</blockquote>
+
+<p>You can also specify the encoding type straight in a cast:</p>
+
+<pre><code>&gt;&gt;&gt; my_byte_str
+b'Hello World'
+
+&gt;&gt;&gt; str(my_byte_str, 'utf-8')
+'Hello World'
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 72701513 Supergamer: </h3><h2>Bytes</h2>
+<pre><code>m=b'This is bytes'
+</code></pre>
+<h2><em><strong>Converting to string</strong></em></h2>
+<h2>Method 1</h2>
+<pre><code>m.decode(&quot;utf-8&quot;)
+</code></pre>
+<p>or</p>
+<pre><code>m.decode()
+</code></pre>
+<h2>Method 2</h2>
+<pre><code>import codecs
+codecs.decode(m,encoding=&quot;utf-8&quot;)
+</code></pre>
+<p>or</p>
+<pre><code>import codecs
+codecs.decode(m)
+</code></pre>
+<h2>Method 3</h2>
+<pre><code>str(m,encoding=&quot;utf-8&quot;)
+</code></pre>
+<p>or</p>
+<pre><code>str(m)[2:-1]
+</code></pre>
+<h2>Result</h2>
+<pre><code>'This is bytes'
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 71237288 Shubhank Gupta: </h3><p>We can decode the bytes object to produce a string using <code>bytes.decode(encoding='utf-8', errors='strict')</code>.
+For documentation see <em><a href="https://docs.python.org/3/library/stdtypes.html#bytes.decode" rel="noreferrer">bytes.decode</a></em>.</p>
+<p>Python 3 example:</p>
+<pre><code>byte_value = b&quot;abcde&quot;
+print(&quot;Initial value = {}&quot;.format(byte_value))
+print(&quot;Initial value type = {}&quot;.format(type(byte_value)))
+string_value = byte_value.decode(&quot;utf-8&quot;)
+# utf-8 is used here because it is a very common encoding, but you need to use the encoding your data is actually in.
+print(&quot;------------&quot;)
+print(&quot;Converted value = {}&quot;.format(string_value))
+print(&quot;Converted value type = {}&quot;.format(type(string_value)))
+</code></pre>
+<p>Output:</p>
+<pre class="lang-none prettyprint-override"><code>Initial value = b'abcde'
+Initial value type = &lt;class 'bytes'&gt;
+------------
+Converted value = abcde
+Converted value type = &lt;class 'str'&gt;
+</code></pre>
+<p>Note: In Python 3, by default the encoding type is UTF-8. So, <code>&lt;byte_string&gt;.decode(&quot;utf-8&quot;)</code> can be also written as <code>&lt;byte_string&gt;.decode()</code></p>
+------------------------------------------------------------------ <br><h3> Answer 41713500 Taufiq Rahman: </h3><p>For Python 3, this is a much safer and <em>Pythonic</em> approach to convert from <code>byte</code> to <code>string</code>:</p>
+
+<pre><code>def byte_to_str(bytes_or_str):
+    if isinstance(bytes_or_str, bytes): # Check if it's in bytes
+        print(bytes_or_str.decode('utf-8'))
+    else:
+        print("Object not of byte type")
+
+byte_to_str(b'total 0\n-rw-rw-r-- 1 thomas thomas 0 Mar  3 07:03 file1\n-rw-rw-r-- 1 thomas thomas 0 Mar  3 07:03 file2\n')
+</code></pre>
+
+<p>Output:</p>
+
+<pre><code>total 0
+-rw-rw-r-- 1 thomas thomas 0 Mar  3 07:03 file1
+-rw-rw-r-- 1 thomas thomas 0 Mar  3 07:03 file2
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 49321964 bers: </h3><p>When working with data from Windows systems (with <code>\r\n</code> line endings), my answer is</p>
+
+<pre><code>String = Bytes.decode("utf-8").replace("\r\n", "\n")
+</code></pre>
+
+<p>Why? Try this with a multiline Input.txt:</p>
+
+<pre><code>Bytes = open("Input.txt", "rb").read()
+String = Bytes.decode("utf-8")
+open("Output.txt", "w").write(String)
+</code></pre>
+
+<p>All your line endings will be doubled (to <code>\r\r\n</code>), leading to extra empty lines. Python's text-read functions usually normalize line endings so that strings use only <code>\n</code>. If you receive binary data from a Windows system, Python does not have a chance to do that. Thus,</p>
+
+<pre><code>Bytes = open("Input.txt", "rb").read()
+String = Bytes.decode("utf-8").replace("\r\n", "\n")
+open("Output.txt", "w").write(String)
+</code></pre>
+
+<p>will replicate your original file.</p>
+------------------------------------------------------------------ <br><h3> Answer 57396484 user3064538: </h3><p>For your <em>specific</em> case of "run a shell command and get its output as text instead of bytes", on Python 3.7, you should use <a href="https://docs.python.org/3/library/subprocess.html#subprocess.run" rel="noreferrer"><code>subprocess.run</code></a> and pass in <code>text=True</code> (as well as <code>capture_output=True</code> to capture the output)</p>
+
+<pre><code>command_result = subprocess.run(["ls", "-l"], capture_output=True, text=True)
+command_result.stdout  # is a `str` containing your program's stdout
+</code></pre>
+
+<p><code>text</code> used to be called <code>universal_newlines</code>, and was changed (well, aliased) in Python 3.7. If you want to support Python versions before 3.7, pass in <code>universal_newlines=True</code> instead of <code>text=True</code></p>
+------------------------------------------------------------------ <br><h3> Answer 21059713 Zhichang Yu: </h3><p>From <em><a href="http://docs.python.org/3/library/sys.html" rel="nofollow noreferrer">sys — System-specific parameters and functions</a></em>:</p>
+
+<p>To write or read binary data from/to the standard streams, use the underlying binary buffer. For example, to write bytes to stdout, use <code>sys.stdout.buffer.write(b'abc')</code>.</p>
+<h4> Comment 40008090 Martijn Pieters: </h4>The pipe to the subprocess is <i>already</i> a binary buffer. Your answer fails to address how to get a string value from the resulting <code>bytes</code> value.<br>------------------------------------------------------------------ <br><h3> Answer 59808347 Victor Choy: </h3><p>Try this:</p>
+<pre><code>bytes.fromhex('c3a9').decode('utf-8') 
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 50671646 Leonardo Filipe: </h3><pre><code>def toString(string):    
+    try:
+        return v.decode("utf-8")
+    except ValueError:
+        return string
+
+b = b'97.080.500'
+s = '97.080.500'
+print(toString(b))
+print(toString(s))
+</code></pre>
+<h4> Comment 88357472 Dev-iL: </h4>While this code may answer the question, providing additional <a href="https://meta.stackexchange.com/q/114762">context</a> regarding <i>how</i> and/or <i>why</i> it solves the problem would improve the answer&#39;s long-term value. Remember that you are answering the question for readers in the future, not just the person asking now! Please <a href="https://stackoverflow.com/posts/50671646/edit">edit</a> your answer to add an explanation, and give an indication of what limitations and assumptions apply. It also doesn&#39;t hurt to mention why this answer is more appropriate than others.<br><h4> Comment 132494011 Dev-iL: </h4>@NeilG I&#39;m not a moderator (note that I have no diamond next to my nickname). If you think a post is low quality, you should report it, and if the community agrees with you - it will be deleted.<br><h4> Comment 132488250 NeilG: </h4>Hi @Dev-iL, if you are a moderator, can you tell me if it&#39;s possible for moderators to delete pointless empty incoherent answers like this one: <a href="https://stackoverflow.com/a/68310461/134044">stackoverflow.com/a/68310461/134044</a><br>------------------------------------------------------------------ <br><h3> Answer 56403437 HCLivess: </h3><p>If you want to convert any bytes, not just string converted to bytes:</p>
+
+<pre><code>with open("bytesfile", "rb") as infile:
+    str = base64.b85encode(imageFile.read())
+
+with open("bytesfile", "rb") as infile:
+    str2 = json.dumps(list(infile.read()))
+</code></pre>
+
+<p>This is not very efficient, however. It will turn a 2 MB picture into 9 MB.</p>
+------------------------------------------------------------------ <br><h3> Answer 76500188 Suyog Shimpi: </h3><p>One of the best ways to convert to string without caring about any encoding type is as follows -</p>
+<pre class="lang-py prettyprint-override"><code>import json
+
+
+b_string = b'test string'
+string = b_string.decode(
+    json.detect_encoding(b_string)  # detect_encoding - used to detect encoding
+)
+print(string)
+</code></pre>
+<p>Here, we used <code>json.detect_encoding</code> method to detect the encoding.</p>
+------------------------------------------------------------------ <br><h3> Answer 67592546 Ratul Hasan: </h3><p>Try using this one; this function will ignore all the non-character sets (like UTF-8) binaries and return a clean string. It is tested for Python 3.6 and above.</p>
+<pre class="lang-py prettyprint-override"><code>def bin2str(text, encoding = 'utf-8'):
+    &quot;&quot;&quot;Converts a binary to Unicode string by removing all non Unicode char
+    text: binary string to work on
+    encoding: output encoding *utf-8&quot;&quot;&quot;
+
+    return text.decode(encoding, 'ignore')
+</code></pre>
+<p>Here, the function will take the binary and decode it (converts binary data to characters using the Python predefined character set and the <code>ignore</code> argument ignores all non-character set data from your binary and finally returns your desired <code>string</code> value.</p>
+<p>If you are not sure about the encoding, use <code>sys.getdefaultencoding()</code> to get the default encoding of your device.</p>
+------------------------------------------------------------------ <br><h3> Answer 76082146 Toothpick Anemone: </h3><p>A potential answer:</p>
+<pre><code>#input string
+istring = b'pomegranite'
+
+# output string
+ostring = str(istring)
+</code></pre>
+<h4> Comment 134178906 jonrsharpe: </h4>Without an encoding that gives <code>&quot;b&#39;pomegranite&#39;&quot;</code>. Hard to see how that adds to the 30+ existing answers. Also it&#39;s pomegranate.<br>

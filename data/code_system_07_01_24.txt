@@ -1,0 +1,37 @@
+Liste der Codes	Memo	Häufigkeit
+Codesystem		287
+Comparison to other programming language	When a direct comparison to features, conventions or culture of another programming language is made	31
+We love one liners	The goal of keeping code as short as possible has a long tradition in programming circle. A parrticular love for one-liners is often attributed to the Perl community. Tracking mentions of this can be done with this code.	4
+Pragmatism vs. Purity	A (language) community might have rules, norms, and preferences, but does it follow them when they are impractical? Discussion on this can be marked with this code.	3
+Quick and dirty	When people suggest a maybe non-optimal but simple or easy solution	2
+Importance of Backwards Compatibility	Backwards compatibility is a very important issue in maintenance, however it often collides with making a language more concise or moving it forward. Thus, opinions on backwards compatibility can offer some insights on the communities holding them	3
+Explicit mention of idiomatic code	Pythonic or rubyesque or perl-ish (Perl users usually rather say idiomatic code)	14
+Calling something bad practice	Calling out or defining bad practice in code-style / coding	2
+Mentioning of implicit rules or conventions	When people talk about conventions / rules within the community	5
+Disapproval of Convention	When someone criticises a convention or implicit rule within a community.	7
+Conversational Tone	Codes about how people communicate with each other fall within this category	1
+Talk of magic	This is very common in the rails community, talking about hidden/underlying behavior that is supposed to make things easier as magic. Curious as to how much this holds true for the other two	1
+Humorous Remark	A joke in broader sense	15
+Statement of Disapproval	Statement of disapproval of people present in the discussion, others not present, or possible imaginary strawmen. Some general statements of vaguer discontent might fall under this code as well.	17
+Statement of Appreciation	Expressing, appreciation, gratefulness, happiness or other positive feelings towards people present in or subject of the discussion, or of a broader community as such. Vaguer feelings of appreciation can also fall in this category.	40
+Statement of Group Belonging	When people explicitly mention a feeling of group-belonging, or what it means to be part of this programming language community, or define an out-group as different,	4
+Is this the way	Based on the idea of "there is more than one way to do it" vs. "there should be one preferred way of doing things"	9
+Neutral way of mentioning multiple options	-	6
+Referencing authorative sources	Mentioning authorative sources like Documentation, Books, or opinions of community leaders	18
+Mentioning of "common wisdom"	This can be a reference to some kind of common wisdom like "so many men, so many minds", or an abstract idea of how things are similar to unwritten rules	2
+Unwritten Rules	-	5
+Rebel against authority	When people disgree with authorative sources, it might be an indicator of a more "freedom loving" community or at least individual	2
+Don't reinvent the wheel	In a sense, this is also an appeal to authority. It implies that there is a commonly accepted way of doing things, so do not deviate from the given path.	1
+Do things DRY	DRY is one of the often used acronyms telling you how to write good code. It was especially popular  in the early 2000s, but  is still popular today.	1
+Don't do the deprecated	In a sense this is also an appeal to authority - telling people not to use deprecated options.	3
+Approval of multiple options	Some people might like the freedom of more choices, or defend specific new choices that are added in addition to old ones since they offer certain advantages. This is the code for them.	4
+Disapproval of multiple options	Americans might say "My way or the highway", Mandalorians say "This is the way", Pythonistas like to say "There should be one way to do it". This is the code for all of them and others.	12
+culture categories	Grouping text by culture categories defined as conceptions of waht is true, good, beautiful, and efficient.	0
+Efficiency	Statements on memory usage, execution time, mental load, maintainability and other similar things fall under this category	24
+Goodness	Goodness, as in morality, applying normative values, be that on coding, software engineering or community interaction. Statements such as "You must...", "Never do..." or "We should..." generally fall in this category.	11
+truth	Statement of truths are obviously abundant in relatively factual discussions like the ones subject of this exploration. Sentences like 1+1==2 might be true - but rather uninteresting in our context, thus only less obvious statements of or about truth, especially those meta-truths, shall be encoded with this.	2
+beauty	Even programmers are visual animals, and often hold surprisingly strong views about beauty. Discussions on how code, output or other things should look can be marked with this.	14
+There's something here - not sure yet what	-	6
+Geographical Culture Mention	When people connect their community to a geographical community, like Ruby people with Japan, Python people with the Netherlands/Europe and Perl people with the US	0
+There's a package/module for this	When people suggest using packages or modules instead of self-writing new code. Closely connected to not "reinventing the wheel"	15
+Don't use a package/module for this	-	3

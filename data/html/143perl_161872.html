@@ -1,0 +1,1309 @@
+ <h2> Title: Hidden features of Perl? </h2> <h3> Adam Bellaire, question_id: 161872 </h3>Score: 143, Tags: {perl,hidden-features} <br><p>What are some really useful but esoteric language features in Perl that you've actually been able to employ to do useful work?</p>
+
+<p>Guidelines:</p>
+
+<ul>
+<li>Try to limit answers to the Perl core and not CPAN</li>
+<li>Please give an example and a short description</li>
+</ul>
+
+<hr>
+
+<h2>Hidden Features also found in other languages' Hidden Features:</h2>
+
+<p>(These are all from <a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#162257">Corion's answer</a>)</p>
+
+<ul>
+<li><a href="https://stackoverflow.com/questions/132241/hidden-features-of-c#">C</a>
+
+<ul>
+<li>Duff's Device</li>
+<li>Portability and Standardness</li>
+</ul></li>
+<li><a href="https://stackoverflow.com/questions/9033/hidden-features-of-c">C#</a>
+
+<ul>
+<li>Quotes for whitespace delimited lists and strings</li>
+<li>Aliasable namespaces</li>
+</ul></li>
+<li><a href="https://stackoverflow.com/questions/15496/hidden-features-of-java">Java</a>
+
+<ul>
+<li>Static Initalizers</li>
+</ul></li>
+<li><a href="https://stackoverflow.com/questions/61088/hidden-features-of-javascript">JavaScript</a>
+
+<ul>
+<li>Functions are First Class citizens</li>
+<li>Block scope and closure</li>
+<li>Calling methods and accessors indirectly through a variable</li>
+</ul></li>
+<li><a href="https://stackoverflow.com/questions/63998/hidden-features-of-ruby">Ruby</a>
+
+<ul>
+<li>Defining methods through code</li>
+</ul></li>
+<li><a href="https://stackoverflow.com/questions/61401/hidden-features-of-php">PHP</a>
+
+<ul>
+<li>Pervasive online documentation</li>
+<li>Magic methods</li>
+<li>Symbolic references</li>
+</ul></li>
+<li><a href="https://stackoverflow.com/questions/101268/hidden-features-of-python">Python</a>
+
+<ul>
+<li>One line value swapping</li>
+<li>Ability to replace even core functions with your own functionality</li>
+</ul></li>
+</ul>
+
+<h2>Other Hidden Features:</h2>
+
+<p>Operators:</p>
+
+<ul>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#162094">The bool quasi-operator</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#162058">The flip-flop operator</a>
+
+<ul>
+<li>Also used for <a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#205627">list construction</a></li>
+</ul></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#162004">The <code>++</code> and unary <code>-</code> operators work on strings</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#162075">The repetition operator</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#161943">The spaceship operator</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#162239">The || operator (and // operator) to select from a set of choices</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#162152">The diamond operator</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#162249">Special cases of the <code>m//</code> operator</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#162060">The tilde-tilde "operator"</a></li>
+</ul>
+
+<p>Quoting constructs:</p>
+
+<ul>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#163416">The qw operator</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#162094">Letters can be used as quote delimiters in q{}-like constructs</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#163374">Quoting mechanisms</a></li>
+</ul>
+
+<p>Syntax and Names:</p>
+
+<ul>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#162094">There can be a space after a sigil</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#162094">You can give subs numeric names with symbolic references</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#163416">Legal trailing commas</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#162601">Grouped Integer Literals</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#168925">hash slices</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#195254">Populating keys of a hash from an array</a></li>
+</ul>
+
+<p>Modules, Pragmas, and command-line options:</p>
+
+<ul>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#163440">use strict and use warnings</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#163440">Taint checking</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#162085">Esoteric use of -n and -p</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#163541">CPAN</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#162601"><code>overload::constant</code></a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#164255">IO::Handle module</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#163725">Safe compartments</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#310083">Attributes</a></li>
+</ul>
+
+<p>Variables:</p>
+
+<ul>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#162357">Autovivification</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#161985">The <code>$[</code> variable</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#168947">tie</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#172118">Dynamic Scoping</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#205627">Variable swapping with a single statement</a></li>
+</ul>
+
+<p>Loops and flow control:</p>
+
+<ul>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#163440">Magic goto</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#163481"><code>for</code> on a single variable</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#169592">continue clause</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#205104">Desperation mode</a></li>
+</ul>
+
+<p>Regular expressions:</p>
+
+<ul>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#162565">The <code>\G</code> anchor</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#161976"><code>(?{})</code> and '(??{})` in regexes</a></li>
+</ul>
+
+<p>Other features:</p>
+
+<ul>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#163440">The debugger</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#162206">Special code blocks such as BEGIN, CHECK, and END</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#163700">The <code>DATA</code> block</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#162601">New Block Operations</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#162601">Source Filters</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#162601">Signal Hooks</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#167309">map</a> (<a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#167809">twice</a>)</li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#162842">Wrapping built-in functions</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl/189883#189883">The <code>eof</code> function</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#194796">The <code>dbmopen</code> function</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#205104">Turning warnings into errors</a></li>
+</ul>
+
+<p>Other tricks, and meta-answers:</p>
+
+<ul>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#163532">cat files, decompressing gzips if needed</a></li>
+<li><a href="https://stackoverflow.com/questions/161872/hidden-features-of-perl#162271">Perl Tips</a></li>
+</ul>
+
+<hr>
+
+<p><strong>See Also:</strong></p>
+
+<ul>
+<li><a href="https://stackoverflow.com/questions/132241/hidden-features-of-c">Hidden features of C</a></li>
+<li><a href="https://stackoverflow.com/questions/9033/hidden-features-of-c">Hidden features of C#</a></li>
+<li><a href="https://stackoverflow.com/questions/75538/hidden-features-of-c">Hidden features of C++</a></li>
+<li><a href="https://stackoverflow.com/questions/15496/hidden-features-of-java">Hidden features of Java</a></li>
+<li><a href="https://stackoverflow.com/questions/61088/hidden-features-of-javascript">Hidden features of JavaScript</a></li>
+<li><a href="https://stackoverflow.com/questions/63998/hidden-features-of-ruby">Hidden features of Ruby</a></li>
+<li><a href="https://stackoverflow.com/questions/61401/hidden-features-of-php">Hidden features of PHP</a></li>
+<li><a href="https://stackoverflow.com/questions/101268/hidden-features-of-python">Hidden features of Python</a></li>
+<li><a href="https://stackoverflow.com/questions/2493996/hidden-features-of-clojure">Hidden features of Clojure</a></li>
+</ul>
+<h4> Comment 2962425 reinierpost: </h4>Most of these features are in everyday use, some occur in the majority of Perl scripts, and most listed under &quot;Other&quot; still stem from other languages, calling these &quot;hidden&quot; changes the intent of the question.<br>------------------------------------------------------------------ <br><h3> Answer 162004 Leon Timmermans: </h3><p>The operators ++ and unary - don't only work on numbers, but also on strings. </p>
+
+<pre><code>my $_ = "a"
+print -$_
+</code></pre>
+
+<p>prints <em>-a</em></p>
+
+<pre><code>print ++$_
+</code></pre>
+
+<p>prints <em>b</em></p>
+
+<pre><code>$_ = 'z'
+print ++$_
+</code></pre>
+
+<p>prints <em>aa</em></p>
+<h4> Comment 736786 Copas: </h4>When new to Perl I implemented this feature myself with the exact z to aa behavior then showed it to a co-worker who laughed and me and said &quot;let me show you something&quot;. I cried a bit but learned something.<br><h4> Comment 474060 Barry Brown: </h4>Don&#39;t ask a programmer what comes after &quot;z&quot;; ask a human. This feature is great for numbering items in a long list.<br><h4> Comment 51078 moritz: </h4>To quote perlvar: &quot;The auto-decrement operator is not magical.&quot; So <code>--</code> doesn&#39;t work on strings.<br><h4> Comment 1153022 Chris Lutz: </h4>@Ether - If you want that, use numbers and autoconvert them to ASCII with <code>ord()</code>. Or, write a small class and overload the operators to do it for you.<br><h4> Comment 794420 Andrija: </h4>I wish I had this in C#, great feature<br><h4> Comment 391700 Ether: </h4>&quot;aa&quot; doesn&#39;t seem to be the natural element following &quot;z&quot;. I would expect the next highest ascii value, which is &quot;{&quot;.<br>------------------------------------------------------------------ <br><h3> Answer 162257 Corion: </h3><p>As Perl has almost all  "esoteric" parts from the other lists, I'll tell you the one thing that Perl can't:</p>
+
+<p><strike>The one thing Perl can't do is have bare arbitrary URLs in your code, because the <code>//</code> operator is used for regular expressions.</strike></p>
+
+<p>Just in case it wasn't obvious to you what features Perl offers, here's a selective list of the maybe not totally obvious entries:</p>
+
+<p><a href="https://stackoverflow.com/questions/132241/hidden-features-of-c#132274">Duff's Device</a> - <a href="http://perlmonks.org/?node=388976" rel="nofollow noreferrer">in Perl</a></p>
+
+<p><a href="https://stackoverflow.com/questions/132241/hidden-features-of-c#132269">Portability and Standardness</a> - <a href="http://activestate.com" rel="nofollow noreferrer">There are likely more computers with Perl than with a C compiler</a></p>
+
+<p><a href="https://stackoverflow.com/questions/9033/hidden-features-of-c#9401">A file/path manipulation class</a> - <a href="http://search.cpan.org/perldoc?File::Find" rel="nofollow noreferrer">File::Find works on even more operating systems than .Net does</a></p>
+
+<p><a href="https://stackoverflow.com/questions/9033/hidden-features-of-c#9406">Quotes for whitespace delimited lists</a> <a href="https://stackoverflow.com/questions/9033/hidden-features-of-c#9114">and strings</a> - <a href="http://perldoc.org/perlop.html" rel="nofollow noreferrer">Perl allows you to choose almost arbitrary quotes for your list and string delimiters</a></p>
+
+<p><a href="https://stackoverflow.com/questions/75538/hidden-features-of-c#78484">Aliasable namespaces</a> - Perl has these through glob assignments: </p>
+
+<pre><code>*My::Namespace:: = \%Your::Namespace
+</code></pre>
+
+<p><a href="https://stackoverflow.com/questions/15496/hidden-features-of-java#47493">Static initializers</a> - Perl can run code in almost every phase of compilation and object instantiation, from <code>BEGIN</code> (code parse) to <code>CHECK</code> (after code parse) to <code>import</code> (at module import) to <code>new</code> (object instantiation) to <code>DESTROY</code> (object destruction) to <code>END</code> (program exit)</p>
+
+<p><a href="https://stackoverflow.com/questions/61088/hidden-features-of-javascript#61094">Functions are First Class citizens</a> - just like in Perl</p>
+
+<p><a href="https://stackoverflow.com/questions/61088/hidden-features-of-javascript#61173">Block scope and closure</a> - Perl has both</p>
+
+<p><a href="https://stackoverflow.com/questions/61088/hidden-features-of-javascript#61125">Calling methods and accessors indirectly through a variable</a> - Perl does that too:</p>
+
+<pre><code>my $method = 'foo';
+my $obj = My::Class-&gt;new();
+$obj-&gt;$method( 'baz' ); # calls $obj-&gt;foo( 'baz' )
+</code></pre>
+
+<p><a href="https://stackoverflow.com/questions/63998/hidden-features-of-ruby#64080">Defining methods through code</a> - <a href="http://perldoc.perl.org/functions/sub.html" rel="nofollow noreferrer">Perl allows that too</a>:</p>
+
+<pre><code>*foo = sub { print "Hello world" };
+</code></pre>
+
+<p><a href="https://stackoverflow.com/questions/61401/hidden-features-of-php#61491">Pervasive online documentation</a> - <a href="http://perldoc.com/" rel="nofollow noreferrer">Perl documentation is online and likely on your system too</a></p>
+
+<p><a href="https://stackoverflow.com/questions/61401/hidden-features-of-php#61482">Magic methods</a> that get called whenever you call a "nonexisting" function - Perl implements that in the AUTOLOAD function</p>
+
+<p><a href="https://stackoverflow.com/questions/61401/hidden-features-of-php#62525">Symbolic references</a> - you are well advised to stay away from these. <a href="http://perl.plover.com/varvarname.html" rel="nofollow noreferrer">They will eat your children.</a> But of course, Perl allows you to offer your children to blood-thirsty demons.</p>
+
+<p><a href="https://stackoverflow.com/questions/101268/hidden-features-of-python#102037">One line value swapping</a> - Perl allows list assignment</p>
+
+<p><a href="https://stackoverflow.com/questions/101268/hidden-features-of-python#101744">Ability to replace even core functions with your own functionality</a></p>
+
+<pre><code>use subs 'unlink'; 
+sub unlink { print 'No.' }
+</code></pre>
+
+<p>or</p>
+
+<pre><code>BEGIN{
+    *CORE::GLOBAL::unlink = sub {print 'no'}
+};
+
+unlink($_) for @ARGV
+</code></pre>
+<h4> Comment 1406080 jrockway: </h4>Nobody would want that, it&#39;s just a Java meme.  &quot;<a href="http://foo.com" rel="nofollow noreferrer">foo.com</a>&quot; is the label http: and then &quot;foo.com&quot; in a comment.  Some people find this interesting because... they are dumb.<br><h4> Comment 72553 Account deleted: </h4>&quot;The one thing Perl can&#39;t do is have bare arbitrary URLs in your code, because the // operator is used for regular expressions.&quot; - this is utter nonsense.<br><h4> Comment 910934 castaway: </h4>Why/where would you <i>want</i> bare URLs in your code? I can&#39;t think of an example.<br><h4> Comment 74261 Corion: </h4>Thanks for your insight.I&#39;ve looked at some ways to have a bare http://... URL in Perl code without using a source filter,and didn&#39;t find a way.Maybe you can show how this is possible? // is used for regular expressions in Perl versions up to 5.8.x.In 5.10 it&#39;s repurposed for defined-or assignment.<br><h4> Comment 89821 Hugh Allen: </h4>bare URL: why would you expect <a href="http://example.com/" rel="nofollow noreferrer">example.com</a> to be a single token, let alone a string, in <i>any</i> language? (besides one delimited solely by whitespace and parenthetheth :)<br><h4> Comment 9733486 Kent Fredric: </h4>Well, .... actually <a href="https://metacpan.org/module/Acme::URL" rel="nofollow noreferrer">metacpan.org/module/Acme::URL</a> , seems you <i>can</i> have bareword URLs =)<br><h4> Comment 51453 John Ferguson: </h4>I&#39;m a fan of Perl&#39;s documentation compared to other languages, but I still think that for Regexes and references it could be rationalised a whole lot. e.g. the best primer for regexes is not Perlre, but Perlop<br>------------------------------------------------------------------ <br><h3> Answer 162058 John Siracusa: </h3><p>The flip-flop operator is useful for skipping the first iteration when looping through the records (usually lines) returned by a file handle, without using a flag variable:</p>
+
+<pre><code>while(&lt;$fh&gt;)
+{
+  next if 1..1; # skip first record
+  ...
+}
+</code></pre>
+
+<p>Run <code>perldoc perlop</code> and search for "flip-flop" for more information and examples.</p>
+<h4> Comment 51238 Michael Carman: </h4>To clarify, the &quot;hidden&quot; aspect of this is that if either operand to scalar &#39;..&#39; is a constant the value is implicitly compared to the input line number ($.)<br><h4> Comment 51061 Bruno De Fraine: </h4>Actually that&#39;s taken from Awk, where you can do flip-flop between two patterns by writing pattern1, pattern2<br>------------------------------------------------------------------ <br><h3> Answer 162094 moritz: </h3><p>There are many non-obvious features in Perl.</p>
+
+<p>For example, did you know that there can be a space after a sigil?</p>
+
+<pre><code> $ perl -wle 'my $x = 3; print $ x'
+ 3
+</code></pre>
+
+<p>Or that you can give subs numeric names if you use symbolic references?</p>
+
+<pre><code>$ perl -lwe '*4 = sub { print "yes" }; 4-&gt;()' 
+yes
+</code></pre>
+
+<p>There's also the "bool" quasi operator, that return 1 for true expressions and the empty string for false:</p>
+
+<pre><code>$ perl -wle 'print !!4'
+1
+$ perl -wle 'print !!"0 but true"'
+1
+$ perl -wle 'print !!0'
+(empty line)
+</code></pre>
+
+<p>Other interesting stuff: with <code>use overload</code> you can overload string literals and numbers (and for example make them BigInts or whatever).</p>
+
+<p>Many of these things are actually documented somewhere, or follow logically from the documented features, but nonetheless some are not very well known.</p>
+
+<p><em>Update</em>: Another nice one. Below the <code>q{...}</code> quoting constructs were mentioned, but did you know that you can use letters as delimiters?</p>
+
+<pre><code>$ perl -Mstrict  -wle 'print q bJet another perl hacker.b'
+Jet another perl hacker.
+</code></pre>
+
+<p>Likewise you can write regular expressions:</p>
+
+<pre><code>m xabcx
+# same as m/abc/
+</code></pre>
+<h4> Comment 1153000 Chris Lutz: </h4>I think your example of using letters to delimit strings should be &quot;<i>Just</i> another perl hacker&quot; rather than &quot;Jet another perl hacker&quot; =P<br><h4> Comment 52322 Aristotle Pagaltzis: </h4>“Did you know that there can be a space after a sigil?” I am utterly flabbergasted. Wow.<br><h4> Comment 52588 Axeman: </h4>Cool! !!$undef_var doesn&#39;t create a warning.<br><h4> Comment 1502845 Ryan C. Thompson: </h4>The worst part is that you can use other things as delimiters, too. Even closing brackets. The following are valid: s}regex}replacement}xsmg; q]string literal];<br>------------------------------------------------------------------ <br><h3> Answer 163532 timkay: </h3><p>Add support for compressed files via <em>magic ARGV</em>:</p>
+
+<pre><code>s{ 
+    ^            # make sure to get whole filename
+    ( 
+      [^'] +     # at least one non-quote
+      \.         # extension dot
+      (?:        # now either suffix
+          gz
+        | Z 
+       )
+    )
+    \z           # through the end
+}{gzcat '$1' |}xs for @ARGV;
+</code></pre>
+
+<p><em>(quotes around $_ necessary to handle filenames with shell metacharacters in)</em></p>
+
+<p>Now the <code>&lt;&gt;</code> feature will decompress any <code>@ARGV</code> files that end with ".gz" or ".Z":</p>
+
+<pre><code>while (&lt;&gt;) {
+    print;
+}
+</code></pre>
+<h4> Comment 1152993 Chris Lutz: </h4>I don&#39;t think you need to escape the <code>|</code> in the replacement.<br><h4> Comment 3040328 Eric Strom: </h4>@Ether =&gt; detecting pipes is a feature of the two argument open, which the diamond operator uses as it opens each file in <code>@ARGV</code><br><h4> Comment 3021888 Ether: </h4>I&#39;m staring at this and I can&#39;t figure out how it works. At what point is <code>zcat |</code> parsed as a command to pipe through?<br>------------------------------------------------------------------ <br><h3> Answer 162239 pjf: </h3><p>One of my favourite features in Perl is using the boolean <code>||</code> operator to select between a set of choices.</p>
+
+<pre><code> $x = $a || $b;
+
+ # $x = $a, if $a is true.
+ # $x = $b, otherwise
+</code></pre>
+
+<p>This means one can write:</p>
+
+<pre><code> $x = $a || $b || $c || 0;
+</code></pre>
+
+<p>to take the first true value from <code>$a</code>, <code>$b</code>, and <code>$c</code>, or a default of <code>0</code> otherwise.</p>
+
+<p>In Perl 5.10, there's also the <code>//</code> operator, which returns the left hand side if it's defined, and the right hand side otherwise.  The following selects the first <em>defined</em> value from <code>$a</code>, <code>$b</code>, <code>$c</code>, or <code>0</code> otherwise:</p>
+
+<pre>
+$x = $a // $b // $c // 0;
+</pre>
+
+<p>These can also be used with their short-hand forms, which are very useful for providing defaults:</p>
+
+<pre>
+$x ||= 0;   # If $x was false, it now has a value of 0.
+
+$x //= 0;   # If $x was undefined, it now has a value of zero.
+</pre>
+
+<p>Cheerio,</p>
+
+<p><em>Paul</em></p>
+<h4> Comment 51875 dland: </h4>// is in there by default, no special tweaks needed. You can also backport it into 5.8.x with the dor-patch... see the authors/id/H/HM/HMBRAND/ directory on any CPAN mirror. FreeBSD 6.x and beyond does this for you in their perl package.<br><h4> Comment 51190 Michael Carman: </h4>This is such a common idiom that it hardly qualifies as a &quot;hidden&quot; feature.<br><h4> Comment 51410 John Ferguson: </h4>shame the pretty printer thinks // is a comment :)<br><h4> Comment 51626 J.J.: </h4>Question, is there a &quot;use feature&quot; to use these new operators, or are they default enabled? I am still leaning Perl 5.10&#39;s features.<br><h4> Comment 53163 RET: </h4>When || or // is combined with do { }, you can encapsulate a more complex assignment, ie $x = $a || do { my $z; 3 or 4 lines of derivation; $z };<br><h4> Comment 3458698 hobbs: </h4>@J.J. to clarify, the <code>feature</code> pragma guards access to new <i>keywords</i> that might otherwise step on user-defined subs -- like <code>say</code>, <code>state</code>, and <code>given</code>/<code>when</code>. Since that issue doesn&#39;t apply to symbolic operators like <code>&#47;&#47;</code> and <code>~~</code> they&#39;re accessible even without <code>feature</code> (but you might want to throw in a <code>use 5.010</code> or similar declaration on code that uses them, so as to produce a more <i>useful</i> error message if someone tries to run that code on older perls).<br><h4> Comment 4485144 tchrist: </h4>@John Ferguson: fixed the ugly printer.<br>------------------------------------------------------------------ <br><h3> Answer 162357 J.J.: </h3><p><a href="http://en.wikipedia.org/wiki/Autovivification" rel="nofollow noreferrer">Autovivification</a>. AFAIK <strong>no other language has it</strong>.</p>
+<h4> Comment 4485374 Omnifarious: </h4>@tchrist - a = [ [x*y for y in xrange(1,11)] for x in xrange(1,11) ]<br><h4> Comment 1153020 Chris Lutz: </h4>@Gregg Lind - Given that Python automatically creates variables whenever you first assign to them, autovivification would create monstrous problems out of a single typo.<br><h4> Comment 869218 Alexandr Ciornii: </h4>And there is a module to disable autovivication<br><h4> Comment 8679819 Owen: </h4>Matlab actually has this, to a significant degree.<br><h4> Comment 4485195 tchrist: </h4>@Omnifarious, @Chris Lutz, @Gregg Lind: Autovivification is not a bug but a feature! I challenge you to write <b>this</b> in Python just as easily: <code>for $i (1..10) { for $j (1 .. 10) { $a[$i][$j] = $i * $j } }</code>.<br><h4> Comment 1525221 Omnifarious: </h4>I find myself relieved that this feature has been confined to perl.<br><h4> Comment 54686 skiphoppy: </h4>I had no idea that Python, et al, didn&#39;t support this.<br><h4> Comment 56261 J.J.: </h4>@davidnicol: Really? Can you provide a link? My quick search on google didn&#39;t return anything. For those that don&#39;t know ECMAscript is the correct name for Javascript. <a href="http://en.wikipedia.org/wiki/ECMAScript" rel="nofollow noreferrer">en.wikipedia.org/wiki/ECMAScript</a><br><h4> Comment 429898 Gregg Lind: </h4>I thought I would miss this more when I moved to Python, but I think it&#39;s a blessing in disguise there.<br>------------------------------------------------------------------ <br><h3> Answer 163374 Robert P: </h3><p>It's simple to quote almost any kind of strange string in Perl.</p>
+
+<pre><code>my $url = q{http://my.url.com/any/arbitrary/path/in/the/url.html};
+</code></pre>
+
+<p>In fact, the various quoting mechanisms in Perl are quite interesting.  The Perl regex-like quoting mechanisms allow you to quote anything, specifying the delimiters.  You can use almost any special character like #, /, or open/close characters like (), [], or {}.  Examples:</p>
+
+<pre><code>my $var  = q#some string where the pound is the final escape.#;
+my $var2 = q{A more pleasant way of escaping.};
+my $var3 = q(Others prefer parens as the quote mechanism.);
+</code></pre>
+
+<p>Quoting mechanisms:</p>
+
+<p>q  : literal quote; only character that needs to be escaped is the end character.
+qq : an interpreted quote; processes variables and escape characters.  Great for strings that you need to quote:</p>
+
+<pre><code>my $var4 = qq{This "$mechanism" is broken.  Please inform "$user" at "$email" about it.};
+</code></pre>
+
+<p>qx : Works like qq, but then executes it as a system command, non interactively.  Returns all the text generated from the standard out.  (Redirection, if supported in the OS, also comes out)  Also done with back quotes (the ` character).</p>
+
+<pre><code>my $output  = qx{type "$path"};      # get just the output
+my $moreout = qx{type "$path" 2&gt;&amp;1}; # get stuff on stderr too
+</code></pre>
+
+<p>qr : Interprets like qq, but then compiles it as a regular expression.  Works with the various options on the regex as well.  You can now pass the regex around as a variable:</p>
+
+<pre><code>sub MyRegexCheck {
+    my ($string, $regex) = @_;
+    if ($string)
+    {
+       return ($string =~ $regex);
+    }
+    return; # returns 'null' or 'empty' in every context
+}
+
+my $regex = qr{http://[\w]\.com/([\w]+/)+};
+@results = MyRegexCheck(q{http://myurl.com/subpath1/subpath2/}, $regex);
+</code></pre>
+
+<p>qw : A very, very useful quote operator.  Turns a quoted set of whitespace separated words into a list.  Great for filling in data in a unit test.</p>
+
+<pre><code>
+   my @allowed = qw(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z { });
+   my @badwords = qw(WORD1 word2 word3 word4);
+   my @numbers = qw(one two three four 5 six seven); # works with numbers too
+   my @list = ('string with space', qw(eight nine), "a $var"); # works in other lists
+   my $arrayref = [ qw(and it works in arrays too) ]; 
+</code></pre>
+
+<p>They're great to use them whenever it makes things clearer.  For qx, qq, and q, I most likely use the {} operators.  The most common habit of people using qw is usually the () operator, but sometimes you also see qw//.</p>
+<h4> Comment 52903 Brad Gilbert: </h4>I sometimes use qw&quot;&quot; so that syntax highlighters will highlight it correctly.<br><h4> Comment 3103757 Brad Gilbert: </h4>@fengshaun, The editors I generally use <b>do</b> highlight these correctly. I was referring, in part to the syntax highlighter on StackOverflow.<br><h4> Comment 8054588 dland: </h4><code>my $moreout = qx{type &quot;$path&quot; 2&gt;&amp;1};</code> ... I didn&#39;t know you could do that! [TM]<br><h4> Comment 4485228 tchrist: </h4>@Brad Gilbert: Stack Overflow can’t (well, (doesn’t) parse Perl worth diddly squat. ☹<br><h4> Comment 266814 Robert P: </h4>Works for me in SlickEdit.  :)<br>------------------------------------------------------------------ <br><h3> Answer 163481 timkay: </h3><p>The "for" statement can be used the same way "with" is used in Pascal:</p>
+
+<pre><code>for ($item)
+{
+    s/&amp;‎nbsp;/ /g;
+    s/&lt;.*?&gt;/ /g;
+    $_ = join(" ", split(" ", $_));
+}
+</code></pre>
+
+<p>You can apply a sequence of s/// operations, etc. to the same variable without having to repeat the variable name.</p>
+
+<p>NOTE: the non-breaking space above (&amp;‎nbsp;) has hidden Unicode in it to circumvent the Markdown. Don't copy paste it :)</p>
+<h4> Comment 528111 Robert P: </h4>Also, for has the item being manipulated listed before the code doing the manipulating, leading to better readability.<br><h4> Comment 4485402 tchrist: </h4>@RobertP: That’s quite right. A topicalizer is useful in discourse.<br><h4> Comment 52436 draegtun: </h4>And &quot;map&quot; does the same trick as well...    map { .... } $item;  One advantage of using &quot;for&quot; over &quot;map&quot; would be that you could use next to break out.<br>------------------------------------------------------------------ <br><h3> Answer 163541 mpeters: </h3><p>Not really hidden, but many every day Perl programmers don't know about <a href="http://search.cpan.org" rel="nofollow noreferrer">CPAN</a>. This especially applies to people who aren't full time programmers or don't program in Perl full time.</p>
+------------------------------------------------------------------ <br><h3> Answer 163416 dland: </h3><p>The quoteword operator is one of my favourite things. Compare:</p>
+
+<pre><code>my @list = ('abc', 'def', 'ghi', 'jkl');
+</code></pre>
+
+<p>and</p>
+
+<pre><code>my @list = qw(abc def ghi jkl);
+</code></pre>
+
+<p>Much less noise, easier on the eye. Another really nice thing about Perl, that one really misses when writing SQL, is that a trailing comma is legal:</p>
+
+<pre><code>print 1, 2, 3, ;
+</code></pre>
+
+<p>That looks odd, but not if you indent the code another way:</p>
+
+<pre><code>print
+    results_of_foo(),
+    results_of_xyzzy(),
+    results_of_quux(),
+    ;
+</code></pre>
+
+<p>Adding an additional argument to the function call does not require you to fiddle around with commas on previous or trailing lines. The single line change has no impact on its surrounding lines.</p>
+
+<p>This makes it very pleasant to work with variadic functions. This is perhaps one of the most under-rated features of Perl.</p>
+<h4> Comment 53299 ephemient: </h4>An interesting corner case of Perl&#39;s syntax is that the following is valid: for $_ qw(a list of stuff) {...}<br><h4> Comment 4485329 tchrist: </h4>@ephemient, @fengshaun, @moritz, @dland: That’s “fixed” in <i>blead</i>; see <a href="http://www.nntp.perl.org/group/perl.perl5.porters/2010/08/msg163360.html" rel="nofollow noreferrer">this p5p thread</a>.<br><h4> Comment 61666 moritz: </h4>You can even abuse glob syntax for quoting words, as long as you don&#39;t use special characters such as *?. So you can write <code>for (&lt;a list of stuff&gt;) { ... }</code><br><h4> Comment 63869 dland: </h4>@ephemient: nearly. That only works with lexicals: for my $x qw(a b c) {...} For instance: for $_ qw(a b c) {print} # prints nothing<br><h4> Comment 8001144 Robert P: </h4>And now released as part of 5.14.<br><h4> Comment 3068434 fengshaun: </h4>why add that extra lexical when you can enjoy perl&#39;s favourite default? for (qw/a b c d/) {     print; }<br><h4> Comment 3248238 dland: </h4>@fengshaun: it depends on how large the block is. A named lexical helps document the narrative. I tend to only use an implicit $_ as a statement modifier: print for qw(a b c);<br>------------------------------------------------------------------ <br><h3> Answer 163700 allan: </h3><p>The ability to parse data directly pasted into a <strong>DATA</strong> block. No need to save to a test file to be opened in the program or similar. For example:</p>
+
+<pre><code>my @lines = &lt;DATA&gt;;
+for (@lines) {
+    print if /bad/;
+}
+
+__DATA__
+some good data
+some bad data
+more good data 
+more good data 
+</code></pre>
+<h4> Comment 4485387 tchrist: </h4>@Hai: No it is <b>not</b> ugly — in fact, it’s precisely the opposite of ugly: it’s clean, svelte, minimal, and beautiful; in a word, it’s wonderful, and languages without it are a PITA. @peter mortensen, @toad: One answer to how to have multiple data blocks in the same program is to use the <a href="http://search.cpan.org/search?query=inline%3A%3Afiles&amp;mode=module" rel="nofollow noreferrer">Inline::Files</a> module off CPAN.<br><h4> Comment 11040251 Prakash K: </h4><a href="https://metacpan.org/module/Inline::Files" rel="nofollow noreferrer">Inline::Files</a> is implemented using source filters. There&#39;s also <a href="https://metacpan.org/module/Data::Section" rel="nofollow noreferrer">Data::Section</a> that provides multiple inline blocks and does not use source filters.<br><h4> Comment 3068462 fengshaun: </h4>And very useful in little tests!<br><h4> Comment 4080899 Toad: </h4>@peter mortensen how would you have multiple blocks? And how do you end a block?<br><h4> Comment 4081144 Peter Mortensen: </h4>@Toad: it is allan&#39;s answer (see the revision list). It is better to address that user. Or, as that user has left Stack Overflow, maybe address no one in particular (so a real Perl expert can straighten it out later).<br>------------------------------------------------------------------ <br><h3> Answer 161943 Sec: </h3><p>Let's start easy with the <a href="http://en.wikipedia.org/wiki/Spaceship_operator" rel="nofollow noreferrer">Spaceship Operator</a>.</p>
+
+<pre><code>$a = 5 &lt;=&gt; 7;  # $a is set to -1
+$a = 7 &lt;=&gt; 5;  # $a is set to 1
+$a = 6 &lt;=&gt; 6;  # $a is set to 0
+</code></pre>
+<h4> Comment 3458756 hobbs: </h4>It&#39;s worth mentioning what&#39;s so useful about -1/0/1 comparison operators, since not everyone might know: you can chain them together with the or-operator to do primary/secondary/etc. sorts. So <code>($a-&gt;lname cmp $b-&gt;lname) || ($a-&gt;fname cmp $b-&gt;fname)</code> sorts people by their last names, but if two people have the same last name then they will be ordered by their first name.<br><h4> Comment 51493 J.J.: </h4>@Leon: C/C++ doesn&#39;t do a 3 value return for numbers. If memory serves String comapre functions are the only 3 value return that I know of in the whole STL language. AFAIK Python doesn&#39;t have a 3 return numeric compare. Java doesn&#39;t have a number specific 3 return compare either.<br><h4> Comment 3487944 bukzor: </h4>@J.J. Python does have a 3-value compare: cmp()  &gt;&gt;&gt; print (cmp(5,7), cmp(6,6), cmp(7,5)) (-1, 0, 1)<br>------------------------------------------------------------------ <br><h3> Answer 162075 Bruno De Fraine: </h3><p>Binary "x" is the <a href="http://perldoc.perl.org/perlop.html#Multiplicative-Operators" rel="nofollow noreferrer">repetition operator</a>:</p>
+
+<pre><code>print '-' x 80;     # print row of dashes
+</code></pre>
+
+<p>It also works with lists:</p>
+
+<pre><code>print for (1, 4, 9) x 3; # print 149149149
+</code></pre>
+<h4> Comment 54693 skiphoppy: </h4>My favorite use for this is generating placeholders for the last part of an SQL INSERT statement: @p = (&#39;?&#39;) x $n; $p = join(&quot;, &quot;, @p); $sql = &quot;INSERT ... VALUES ($p)&quot;;<br><h4> Comment 51603 J.J.: </h4>This is one reason why Perl has been so popular with hackers. perl -e &#39;print 0x000 x 25&#39;;<br>------------------------------------------------------------------ <br><h3> Answer 162601 Axeman: </h3><h3>New Block Operations</h3>
+
+<p>I'd say the ability to expand the language, creating pseudo block operations is one.</p>
+
+<ol>
+<li><p>You declare the prototype for a sub indicating that it takes a code reference first:</p>
+
+<pre><code>sub do_stuff_with_a_hash (&amp;\%) {
+    my ( $block_of_code, $hash_ref ) = @_;
+    while ( my ( $k, $v ) = each %$hash_ref ) { 
+        $block_of_code-&gt;( $k, $v );
+    }
+}
+</code></pre></li>
+<li><p>You can then call it in the body like so </p>
+
+<pre><code>use Data::Dumper;
+
+do_stuff_with_a_hash {
+    local $Data::Dumper::Terse = 1;
+    my ( $k, $v ) = @_;
+    say qq(Hey, the key   is "$k"!);
+    say sprintf qq(Hey, the value is "%v"!), Dumper( $v );
+
+} %stuff_for
+;
+</code></pre></li>
+</ol>
+
+<p>(<code>Data::Dumper::Dumper</code> is another semi-hidden gem.) Notice how you don't need the <code>sub</code> keyword in front of the block, or the comma before the hash. It ends up looking a lot like: <code>map { } @list</code></p>
+
+<h3>Source Filters</h3>
+
+<p>Also, there are source filters. Where Perl will pass you the code so you can manipulate it. Both this, and the block operations, are pretty much don't-try-this-at-home type of things. </p>
+
+<p>I have done some neat things with source filters, for example like creating a very simple language to check the time, allowing short Perl one-liners for some decision making:</p>
+
+<pre><code>perl -MLib::DB -MLib::TL -e 'run_expensive_database_delete() if $hour_of_day &lt; AM_7';
+</code></pre>
+
+<p><code>Lib::TL</code> would just scan for both the "variables" and the constants, create them and substitute them as needed. </p>
+
+<p>Again, source filters can be messy, but are powerful. But they can mess debuggers up something terrible--and even warnings can be printed with the wrong line numbers. I stopped using Damian's <a href="http://search.cpan.org/perldoc?Switch" rel="nofollow noreferrer">Switch</a> because the debugger would lose all ability to tell me where I really was. But I've found that you can minimize the damage by modifying small sections of code, keeping them on the same line. </p>
+
+<h3>Signal Hooks</h3>
+
+<p>It's often enough done, but it's not all that obvious. Here's a die handler that piggy backs on the old one.  </p>
+
+<pre><code>my $old_die_handler = $SIG{__DIE__};
+$SIG{__DIE__}       
+    = sub { say q(Hey! I'm DYIN' over here!); goto &amp;$old_die_handler; }
+    ;
+</code></pre>
+
+<p>That means whenever some other module in the code wants to die, they gotta come to you (unless someone else does a destructive overwrite on <code>$SIG{__DIE__}</code>). And you can be notified that somebody things something is an error. </p>
+
+<p>Of course, for enough things you can just use an <code>END { }</code> block, if all you want to do is clean up. </p>
+
+<h3><code>overload::constant</code></h3>
+
+<p>You can inspect literals of a certain type in packages that include your module. For example, if you use this in your <code>import</code> sub:</p>
+
+<pre><code>overload::constant 
+    integer =&gt; sub { 
+        my $lit = shift;
+        return $lit &gt; 2_000_000_000 ? Math::BigInt-&gt;new( $lit ) : $lit 
+    };
+</code></pre>
+
+<p>it will mean that every integer greater than 2 billion in the calling packages will get changed to a <code>Math::BigInt</code> object. (See <a href="http://search.cpan.org/perldoc?overload#Overloading_constants" rel="nofollow noreferrer">overload::constant</a>).</p>
+
+<h3>Grouped Integer Literals</h3>
+
+<p>While we're at it. Perl allows you to break up large numbers into groups of three digits and still get a parsable integer out of it. Note <code>2_000_000_000</code> above for 2 billion. </p>
+<h4> Comment 52882 pjf: </h4>When using $SIG{<b>DIE</b>} handlers, its strongly recommended that you inspect $^S to see if your program is actually dying, or just throwing an exception which is going to be caught.  Usually you don&#39;t want to interfere with the latter.<br><h4> Comment 1914332 ZeroCool: </h4>The new block is very instructive ! I was thinking It was a language semantic! many thanks.<br><h4> Comment 6825337 Joel Berger: </h4>An instructive use of the source filter is pdl&#39;s NiceSlice (<a href="http://pdl.perl.org/?docs=NiceSlice&amp;title=PDL::NiceSlice" rel="nofollow noreferrer">pdl.perl.org/?docs=NiceSlice&amp;title=PDL::NiceSlice</a>) so that one doesn&#39;t need to use the <code>-&gt;slice</code> as a method every time a slice is needed.<br>------------------------------------------------------------------ <br><h3> Answer 163440 Andru Luvisi: </h3><p>Taint checking.  With taint checking enabled, perl will die (or warn, with <code>-t</code>) if you try to pass tainted data (roughly speaking, data from outside the program) to an unsafe function (opening a file, running an external command, etc.).  It is very helpful when writing setuid scripts or CGIs or anything where the script has greater privileges than the person feeding it data.</p>
+
+<p>Magic goto.  <code>goto &amp;sub</code> does an optimized tail call.</p>
+
+<p>The debugger.</p>
+
+<p><code>use strict</code> and <code>use warnings</code>.  These can save you from a bunch of typos.</p>
+<h4> Comment 1730843 Matthew Lock: </h4>Why don&#39;t other languages have this feature? This feature used makes perl web scripts an order of magnitude more secure.<br>------------------------------------------------------------------ <br><h3> Answer 162085 Sec: </h3><p>Based on the way the <code>"-n"</code> and <code>"-p"</code> switches are implemented in Perl 5, you can write a seemingly incorrect program including <code>}{</code>:</p>
+
+<pre><code>ls |perl -lne 'print $_; }{ print "$. Files"'
+</code></pre>
+
+<p>which is converted internally to this code:</p>
+
+<pre><code>LINE: while (defined($_ = &lt;ARGV&gt;)) {
+    print $_; }{ print "$. Files";
+}
+</code></pre>
+<h4> Comment 4485436 tchrist: </h4>@martin clayton: Why is it called that?<br><h4> Comment 4491161 martin clayton: </h4>@tchrist - because it, supposedly, looks like two people rubbing noses. In profile, if you see what I mean.<br>------------------------------------------------------------------ <br><h3> Answer 162271 pjf: </h3><p>This is a meta-answer, but the <a href="http://perltraining.com.au/tips/" rel="nofollow noreferrer">Perl Tips</a> archives contain all sorts of interesting tricks that can be done with Perl.  The archive of previous tips is on-line for browsing, and can be subscribed to via mailing list or atom feed.</p>
+
+<p>Some of my favourite tips include <a href="http://perltraining.com.au/tips/2008-05-23.html" rel="nofollow noreferrer">building executables with PAR</a>, <a href="http://perltraining.com.au/tips/2008-08-20.html" rel="nofollow noreferrer">using autodie to throw exceptions automatically</a>, and the use of the <a href="http://perltraining.com.au/tips/2008-03-12.html" rel="nofollow noreferrer">switch</a> and <a href="http://perltraining.com.au/tips/2008-04-18.html" rel="nofollow noreferrer">smart-match</a> constructs in Perl 5.10.</p>
+
+<p><em>Disclosure:</em> I'm one of the authors and maintainers of Perl Tips, so I obviously think very highly of them. ;)</p>
+<h4> Comment 52786 Axeman: </h4>It&#39;s probably one of the best documented languages out there, and set the pattern for tools to search documentation. That the list in this question is probably not as needed as for other languages.<br>------------------------------------------------------------------ <br><h3> Answer 167309 brunorc: </h3><p><a href="http://perldoc.perl.org/functions/map.html" rel="nofollow noreferrer">map</a> - not only because it makes one's code more expressive, but because it gave me an impulse to read a little bit more about this "functional programming".</p>
+------------------------------------------------------------------ <br><h3> Answer 161976 Leon Timmermans: </h3><p>My vote would go for the (?{}) and (??{}) groups in Perl's regular expressions. The first executes Perl code, ignoring the return value, the second executes code, using the return value as a regular expression.</p>
+<h4> Comment 51022 Sec: </h4>perl invented so many regexp extensions that other programs now often use pcre (perl compatible regex) instead of the original regex language.<br><h4> Comment 51606 J.J.: </h4>Read the little blurb here <a href="http://perldoc.perl.org/perlfaq6.html#Are-Perl-regexes-DFAs-or-NFAs%3f--Are-they-POSIX-compliant%3f" rel="nofollow noreferrer">perldoc.perl.org/&hellip;</a>  :-D<br><h4> Comment 52813 Brad Gilbert: </h4>Perl really has ( as far as I know ), lead the pack, when it comes to regexps.<br><h4> Comment 343470 Chris Lutz: </h4>This, as far as I&#39;m aware, is still experimental, and may not work the same way in future Perls. Not to say that it isn&#39;t useful, but a slightly safer and just as useable version can be found in the s/// command&#39;s /e flag: <code>s&#47;(pattern)&#47;reverse($1);&#47;ge;</code> # reverses all <code>patterns</code>.<br><h4> Comment 4485490 tchrist: </h4>@Chris Lutz, @Leon Timmerman: Note that those two constructs are now re&#235;ntrant. Also note that the second one need no longer be used to effect recursive patterns, now that we can recurse on capture groups. @Brad Gilbert: That’s right, although PCRE does a decent job of tracking us; one area of regex excellence where Perl is completely unchallenged is its access to Unicode properties; see my unitrio distribution of <code>uninames</code>, <code>unichars</code>, and especially <code>uniprops</code> to see just part of what I mean.<br>------------------------------------------------------------------ <br><h3> Answer 169592 Shawn H Corey: </h3><p>The continue clause on loops.  It will be executed at the bottom of every loop, even those which are next'ed.</p>
+
+<pre><code>while( &lt;&gt; ){
+  print "top of loop\n";
+  chomp;
+
+  next if /next/i;
+  last if /last/i;
+
+  print "bottom of loop\n";
+}continue{
+  print "continue\n";
+}
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 162249 Michael Carman: </h3><p>The <code>m//</code> operator has some obscure special cases:</p>
+
+<ul>
+<li>If you use <code>?</code> as the delimiter it only matches once unless you call <code>reset</code>.</li>
+<li>If you use <code>'</code> as the delimiter the pattern is not interpolated.</li>
+<li>If the pattern is empty it uses the pattern from the last successful match.</li>
+</ul>
+<h4> Comment 54954 Sundar R: </h4>I can&#39;t imagine a Perl programmer being unable to remember (or even guess) that single quotes stand for no interpolation. Its usage with this semantics is almost universal in the language that I&#39;d rather <i>expect</i> this to be so...<br><h4> Comment 51861 dland: </h4>These are more like hidden gotchas than hidden features! I don&#39;t know anyone who likes them. A thread on p5p some time back discussed the usefulness of a putative m/$foo/r flag, where /r would mean no interpolation (the letter isn&#39;t important) since no-one can ever remember the single quotes thing.<br><h4> Comment 51926 Michael Carman: </h4>@dland: Agreed; I&#39;d call these hidden <i>mis</i>features and would never use them in production code.<br><h4> Comment 2898334 Matthew S: </h4>I think the empty pattern behaviour has been deprecated. Primarily because a pattern like m/$foo/ becomes a nasty bug when $foo is empty.<br><h4> Comment 4485548 tchrist: </h4>@sundar: yeah, pretty much. But <code>qq&#39;...&#39;</code> and <code>q&quot;...&quot;</code> will throw you for a loop because of the cognitive dissonance, and because the quotes do not there override what really happens. <code>qx&#39;...&#39;</code> behaves right though.<br><h4> Comment 55575 davidnicol: </h4>and if the pattern is empty and the last successful match was compiled with the /o modifier, from then on it will be stuck on that pattern.<br>------------------------------------------------------------------ <br><h3> Answer 162565 J.J.: </h3><pre><code>while(/\G(\b\w*\b)/g) {
+     print "$1\n";
+}
+</code></pre>
+
+<p>the \G anchor. It's <strong>hot</strong>.</p>
+<h4> Comment 51753 Dave Sherohman: </h4>...and it indicates the position of the end of the previous match.<br><h4> Comment 55553 davidnicol: </h4>But you have to call your regex in scalar context.<br><h4> Comment 56263 J.J.: </h4>@davidnicol: The above code works. Can you clarify what you mean?<br>------------------------------------------------------------------ <br><h3> Answer 162152 spoulson: </h3><p>The null filehandle <a href="http://perldoc.perl.org/perlop.html#I%2fO-Operators" rel="nofollow noreferrer">diamond operator</a> <code>&lt;&gt;</code> has its place in building command line tools.  It acts like <code>&lt;FH&gt;</code> to read from a handle, except that it magically selects whichever is found first: command line filenames or STDIN.  Taken from perlop:</p>
+
+<pre><code>while (&lt;&gt;) {
+...         # code for each line
+}
+</code></pre>
+<h4> Comment 1502947 Ryan C. Thompson: </h4>It also follows the UNIX semantics of using &quot;-&quot; to mean &quot;read from stdin. So you could do <code>perl myscript.pl file1.txt - file2.txt</code>, and perl would process the first file, then stdin, then the second file.<br><h4> Comment 6204546 dolmen: </h4>You can <a href="http://perldoc.perl.org/overload.html#Calling-Conventions-for-Unary-Operations" rel="nofollow noreferrer"><code>overload</code></a> the <code>&lt;&gt;</code> operator on your own objects (<code>&lt;$var&gt;</code>) to work like an iterator. However it does not work as you could expect in list context.<br>------------------------------------------------------------------ <br><h3> Answer 162206 Bruno De Fraine: </h3><p><a href="http://perldoc.perl.org/perlmod.html#BEGIN%2c-UNITCHECK%2c-CHECK%2c-INIT-and-END" rel="nofollow noreferrer">Special code blocks</a> such as <code>BEGIN</code>, <code>CHECK</code> and <code>END</code>. They come from Awk, but work differently in Perl, because it is not record-based.</p>
+
+<p>The <code>BEGIN</code> block can be used to specify some code for the parsing phase; it is also executed when you do the syntax-and-variable-check <code>perl -c</code>. For example, to load in configuration variables:</p>
+
+<pre><code>BEGIN {
+    eval {
+        require 'config.local.pl';
+    };
+    if ($@) {
+        require 'config.default.pl';
+    }
+}
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 163488 timkay: </h3><pre><code>rename("$_.part", $_) for "data.txt";
+</code></pre>
+
+<p>renames data.txt.part to data.txt without having to repeat myself.</p>
+------------------------------------------------------------------ <br><h3> Answer 162060 Sec: </h3><p>A bit obscure is the tilde-tilde "operator" which forces scalar context.</p>
+
+<pre><code>print ~~ localtime;
+</code></pre>
+
+<p>is the same as</p>
+
+<pre><code>print scalar localtime;
+</code></pre>
+
+<p>and different from</p>
+
+<pre><code>print localtime;
+</code></pre>
+<h4> Comment 51533 Leon Timmermans: </h4>This is not correct! ~~ is not safe on references! It stringifies them.<br><h4> Comment 51065 moritz: </h4>This is especially obscure because perl5.10.0 also introduces the &quot;smart match operator&quot; <code>~~</code>, which can do regex matches, can look if an item is contained in an array and so on.<br><h4> Comment 51957 Michael Carman: </h4>@Nomad Dervish: Scalar context /= stringification. e.g. &quot;$n = @a&quot; is scalar context. &quot;$s = qq&#39;@a&#39;&quot; is stringification. With regard to references, &quot;$ref1 = $ref2&quot; is scalar context, but does not stringify.<br><h4> Comment 51147 Michael Carman: </h4>That&#39;s not obscure, that&#39;s obfuscated (and useful for golf and JAPHs).<br><h4> Comment 51740 Dave Sherohman: </h4>Well, yes.  Stringification is what happens to references when forced into scalar context.  How does that make &quot;~~ forces scalar context&quot; incorrect?<br>------------------------------------------------------------------ <br><h3> Answer 163498 timkay: </h3><pre><code>sub load_file
+{
+    local(@ARGV, $/) = shift;
+    &lt;&gt;;
+}
+</code></pre>
+
+<p>and a version that returns an array as appropriate:</p>
+
+<pre><code>sub load_file
+{
+    local @ARGV = shift;
+    local $/ = wantarray? $/: undef;
+    &lt;&gt;;
+}
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 168947 davidnicol: </h3><p>tie, the variable tying interface.</p>
+------------------------------------------------------------------ <br><h3> Answer 205104 Schwern: </h3><p>The "desperation mode" of Perl's loop control constructs which causes them to look up the stack to find a matching label allows some curious behaviors which Test::More takes advantage of, for better or worse.</p>
+
+<pre><code>SKIP: {
+    skip() if $something;
+
+    print "Never printed";
+}
+
+sub skip {
+    no warnings "exiting";
+    last SKIP;
+}
+</code></pre>
+
+<p>There's the little known .pmc file.  "use Foo" will look for Foo.pmc in @INC before Foo.pm.  This was intended to allow compiled bytecode to be loaded first, but <a href="http://search.cpan.org/dist/Module-Compile" rel="nofollow noreferrer">Module::Compile</a> takes advantage of this to cache source filtered modules for faster load times and easier debugging.</p>
+
+<p>The ability to turn warnings into errors.</p>
+
+<pre><code>local $SIG{__WARN__} = sub { die @_ };
+$num = "two";
+$sum = 1 + $num;
+print "Never reached";
+</code></pre>
+
+<p>That's what I can think of off the top of my head that hasn't been mentioned.</p>
+------------------------------------------------------------------ <br><h3> Answer 931169 Chas. Owens: </h3><p>The goatse operator<code>*</code>:</p>
+
+<pre><code>$_ = "foo bar";
+my $count =()= /[aeiou]/g; #3
+</code></pre>
+
+<p>or </p>
+
+<pre><code>sub foo {
+    return @_;
+}
+
+$count =()= foo(qw/a b c d/); #4
+</code></pre>
+
+<p>It works because list assignment in scalar context yields the number of elements in the list being assigned.</p>
+
+<p><code>*</code> Note, not really an operator</p>
+<h4> Comment 1159295 Chris Lutz: </h4>That is the most (well, least) beautiful &quot;operator&quot; ever.<br>------------------------------------------------------------------ <br><h3> Answer 1026982 shmem: </h3><p>The input record separator can be set to a reference to a number to read fixed length records:</p>
+
+<pre><code>$/ = \3; print $_,"\n" while &lt;&gt;; # output three chars on each line
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 168925 Vince Veselosky: </h3><p>I don't know how esoteric it is, but one of my favorites is the <a href="http://www.webquills.net/scroll/2008/05/perl-5-hash-slices-can-replace.html" rel="nofollow noreferrer">hash slice</a>. I use it for all kinds of things. For example to merge two hashes:</p>
+
+<pre>
+my %number_for = (one => 1, two => 2, three => 3);
+my %your_numbers = (two => 2, four => 4, six => 6);
+@number_for{keys %your_numbers} = values %your_numbers;
+print sort values %number_for; # 12346
+</pre>
+<h4> Comment 1638775 ijw: </h4>%number_for = ( %number_for, %your_numbers );<br>------------------------------------------------------------------ <br><h3> Answer 530460 Schwern: </h3><p>This one isn't particularly useful, but it's extremely esoteric.  I stumbled on this while digging around in the Perl parser.</p>
+
+<p>Before there was POD, perl4 had a trick to allow you to embed the man page, as nroff, straight into your program so it wouldn't get lost.  perl4 used a program called <a href="http://www.cpan.org/scripts/nutshell/ch6/wrapman" rel="nofollow noreferrer">wrapman</a> (see Pink Camel page 319 for some details) to cleverly embed an nroff man page into your script.</p>
+
+<p>It worked by telling nroff to ignore all the code, and then put the meat of the man page after an <strong>END</strong> tag which tells Perl to stop processing code.  Looked something like this:</p>
+
+<pre><code>#!/usr/bin/perl
+'di';
+'ig00';
+
+...Perl code goes here, ignored by nroff...
+
+.00;        # finish .ig
+
+'di         \" finish the diversion
+.nr nl 0-1  \" fake up transition to first page
+.nr % 0     \" start at page 1
+'; __END__
+
+...man page goes here, ignored by Perl...
+</code></pre>
+
+<p>The details of the roff magic escape me, but you'll notice that the roff commands are strings or numbers in void context.  Normally a constant in void context produces a warning.  There are special exceptions in <code>op.c</code> to allow void context strings which start with certain roff commands.</p>
+
+<pre><code>              /* perl4's way of mixing documentation and code
+                 (before the invention of POD) was based on a
+                 trick to mix nroff and perl code. The trick was
+                 built upon these three nroff macros being used in
+                 void context. The pink camel has the details in
+                 the script wrapman near page 319. */
+                const char * const maybe_macro = SvPVX_const(sv);
+                if (strnEQ(maybe_macro, "di", 2) ||
+                    strnEQ(maybe_macro, "ds", 2) ||
+                    strnEQ(maybe_macro, "ig", 2))
+                        useless = NULL;
+</code></pre>
+
+<p>This means that <code>'di';</code> doesn't produce a warning, but neither does <code>'die';</code> <code>'did you get that thing I sentcha?';</code> or <code>'ignore this line';</code>.</p>
+
+<p>In addition, there are exceptions for the numeric constants <code>0</code> and <code>1</code> which allows the bare <code>.00;</code>.  The code claims this was for more general purposes.</p>
+
+<pre><code>            /* the constants 0 and 1 are permitted as they are
+               conventionally used as dummies in constructs like
+                    1 while some_condition_with_side_effects;  */
+            else if (SvNIOK(sv) &amp;&amp; (SvNV(sv) == 0.0 || SvNV(sv) == 1.0))
+                useless = NULL;
+</code></pre>
+
+<p>And what do you know, <code>2 while condition</code> does warn!</p>
+<h4> Comment 6213073 dolmen: </h4>This one is really a hidden feature of Perl!<br>------------------------------------------------------------------ <br><h3> Answer 931133 user105090: </h3><p>You can use @{[...]} to get an interpolated result of complex perl expressions</p>
+
+<pre><code>$a = 3;
+$b = 4;
+
+print "$a * $b = @{[$a * $b]}";
+</code></pre>
+
+<p>prints: <code>3 * 4 = 12</code></p>
+------------------------------------------------------------------ <br><h3> Answer 686725 Robert P: </h3><pre><code>use diagnostics;
+</code></pre>
+
+<p>If you are starting to work with Perl and have never done so before, this module will save you tons of time and hassle.  For almost every basic error message you can get, this module will give you a lengthy explanation as to why your code is breaking, including some helpful hints as to how to fix it.  For example:</p>
+
+<pre><code>use strict;
+use diagnostics;
+
+$var = "foo";
+</code></pre>
+
+<p>gives you this helpful message:</p>
+
+<pre>
+Global symbol "$var" requires explicit package name at - line 4.
+Execution of - aborted due to compilation errors (#1)
+    (F) You've said "use strict vars", which indicates that all variables
+    must either be lexically scoped (using "my"), declared beforehand using
+    "our", or explicitly qualified to say which package the global variable
+    is in (using "::").
+
+Uncaught exception from user code:
+        Global symbol "$var" requires explicit package name at - line 4.
+Execution of - aborted due to compilation errors.
+ at - line 5
+</pre>
+
+<pre><code>use diagnostics;
+use strict;
+
+sub myname {
+    print { " Some Error " };
+};
+</code></pre>
+
+<p>you get this large, helpful chunk of text:</p>
+
+<pre>
+syntax error at - line 5, near "};"
+Execution of - aborted due to compilation errors (#1)
+(F) Probably means you had a syntax error.  Common reasons include:
+
+    A keyword is misspelled.
+    A semicolon is missing.
+    A comma is missing.
+    An opening or closing parenthesis is missing.
+    An opening or closing brace is missing.
+    A closing quote is missing.
+
+Often there will be another error message associated with the syntax
+error giving more information.  (Sometimes it helps to turn on -w.)
+The error message itself often tells you where it was in the line when
+it decided to give up.  Sometimes the actual error is several tokens
+before this, because Perl is good at understanding random input.
+Occasionally the line number may be misleading, and once in a blue moon
+the only way to figure out what's triggering the error is to call
+perl -c repeatedly, chopping away half the program each time to see
+if the error went away.  Sort of the cybernetic version of S.
+
+Uncaught exception from user code:
+    syntax error at - line 5, near "};"
+Execution of - aborted due to compilation errors.
+at - line 7
+</pre>
+
+<p>From there you can go about deducing what might be wrong with your program (in this case, print is formatted entirely wrong).  There's a large number of known errors with diagnostics.  Now, while this would not be a good thing to use in production, it can serve as a great learning aid for those who are new to Perl.</p>
+------------------------------------------------------------------ <br><h3> Answer 161985 Sec: </h3><p>There also is $[ the variable which decides at which index an array starts.
+Default is 0 so an array is starting at 0. 
+By setting </p>
+
+<pre><code>$[=1;
+</code></pre>
+
+<p>You can make Perl behave more like <a href="http://en.wikipedia.org/wiki/AWK" rel="nofollow noreferrer">AWK</a> (or Fortran) if you really want to.</p>
+<h4> Comment 51142 pjf: </h4>Although to quote from the perlvar documentuation: &quot;Its use is highly discouraged.&quot;.  Not many people expect the starting subscript of an array to change.<br><h4> Comment 52845 Brad Gilbert: </h4>I would only use this feature in a one-liner, if ever.<br><h4> Comment 55571 davidnicol: </h4>be warned: if you do this in a CPAN module, chromatic will find you and spray-paint your car. (this is a joke; chromatic has not been consulted regarding it.)<br>------------------------------------------------------------------ <br><h3> Answer 205627 Daniel: </h3><p>($x, $y) = ($y, $x) is what made me want to learn Perl.</p>
+
+<p>The list constructor 1..99 or 'a'..'zz' is also very nice.</p>
+------------------------------------------------------------------ <br><h3> Answer 3526979 wolverian: </h3><p>@Schwern mentioned turning warnings into errors by localizing <code>$SIG{__WARN__}</code>. You can do also do this (lexically) with <code>use warnings FATAL =&gt; "all";</code>. See <code>perldoc lexwarn</code>.</p>
+
+<p>On that note, since Perl 5.12, you've been able to say <code>perldoc foo</code> instead of the full <code>perldoc perlfoo</code>. Finally! :)</p>
+------------------------------------------------------------------ <br><h3> Answer 163725 melo: </h3><p>Safe compartments.</p>
+
+<p>With the Safe module you can build your own sandbox-style environment using nothing but perl. You would then be able to load perl scripts into the sandbox.</p>
+
+<p>Best regards,</p>
+------------------------------------------------------------------ <br><h3> Answer 164255 Alexandr Ciornii: </h3><p>Core <a href="http://search.cpan.org/perldoc?IO::Handle" rel="nofollow noreferrer"><code>IO::Handle</code></a> module. Most important thing for me is that it allows autoflush on filehandles. Example:</p>
+
+<pre><code>use IO::Handle;    
+$log-&gt;autoflush(1);
+</code></pre>
+<h4> Comment 4579911 tchrist: </h4>Not like we didn’t know how to do it before <code>IO::Handle</code>, you know.<br>------------------------------------------------------------------ <br><h3> Answer 167809 talexb: </h3><p>How about the ability to use</p>
+
+<p><pre><code>my @symbols = map { +{ 'key' => $_ } } @things;</code></pre></p>
+
+<p>to generate an array of hashrefs from an array -- the + in front of the hashref disambiguates the block so the interpreter knows that it's a hashref and not a code block. Awesome.</p>
+
+<p>(Thanks to Dave Doyle for explaining this to me at the last Toronto Perlmongers meeting.)</p>
+------------------------------------------------------------------ <br><h3> Answer 172118 J.J.: </h3><p>All right. Here is another. <a href="http://en.wikipedia.org/wiki/Scope_(programming)#Static_versus_dynamic_scoping" rel="nofollow noreferrer">Dynamic Scoping</a>. It was talked about a little in a different post, but I didn't see it here on the hidden features. </p>
+
+<p>Dynamic Scoping like Autovivification has a very limited amount of languages that use it. <strong>Perl and Common Lisp are the only two I know of that use Dynamic Scoping.</strong></p>
+<h4> Comment 57560 J.J.: </h4>Ohh ya, &quot;local&quot; designates a dynamically scoped variable, while &quot;my&quot; designates a variable in a static scope.<br>------------------------------------------------------------------ <br><h3> Answer 302384 Jeteve: </h3><p>Use lvalues to make your code really confusing:</p>
+
+<pre><code>my $foo = undef ;
+sub bar:lvalue{ return $foo ;}
+
+# Then later
+
+bar = 5 ;
+print bar ;
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 1270366 None: </h3><p>The <a href="http://en.wikipedia.org/wiki/Schwartzian_transform" rel="nofollow noreferrer">Schwartzian Transform</a> is a technique that allows you to efficiently sort by a computed, secondary index.  Let's say that you wanted to sort a list of strings by their md5 sum.  The comments below are best read backwards (that's the order I always end up writing these anyways):</p>
+
+<pre><code>my @strings = ('one', 'two', 'three', 'four');
+
+my $md5sorted_strings = 
+    map { $_-&gt;[0] }               # 4) map back to the original value
+    sort { $a-&gt;[1] cmp $b-&gt;[1] }  # 3) sort by the correct element of the list
+    map { [$_, md5sum_func($_)] } # 2) create a list of anonymous lists
+    @strings                      # 1) take strings
+</code></pre>
+
+<p>This way, you only have to do the expensive md5 computation N times, rather than N log N times.</p>
+------------------------------------------------------------------ <br><h3> Answer 1653812 Eric Strom: </h3><p>One useful composite operator for conditionally adding strings or lists into other lists is the <code>x!!</code>operator:</p>
+
+<pre><code> print 'the meaning of ', join ' ' =&gt;  
+     'life,'                x!! $self-&gt;alive,
+     'the universe,'        x!! ($location ~~ Universe),
+     ('and', 'everything.') x!! 42; # this is added as a list
+</code></pre>
+
+<p>this operator allows for a reversed syntax similar to</p>
+
+<pre><code> do_something() if test();
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 6244313 maasha: </h3><p>This one-liner illustrates how to use glob to generate all word combinations of an alphabet (A, T, C, and G -> DNA) for words of a specified length (4):</p>
+
+<pre><code>perl -MData::Dumper -e '@CONV = glob( "{A,T,C,G}" x 4 ); print Dumper( \@CONV )'
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 189883 Telemachus: </h3><p>My favorite semi-hidden feature of Perl is the <code>eof</code> function. Here's an example pretty much directly from <code>perldoc -f eof</code> that shows how you can use it to reset the file name and <code>$.</code> (the current line number) easily across multiple files loaded up at the command line:  </p>
+
+<pre><code>while (&lt;&gt;) {
+  print "$ARGV:$.\t$_";
+} 
+continue {
+  close ARGV if eof
+}
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 243146 Guillaume Gervais: </h3><p>You can replace the delimiter in regexes and strings with just about anything else.  This is particularly useful for "leaning toothpick syndrome", exemplified here:</p>
+
+<pre><code>$url =~ /http:\/\/www\.stackoverflow\.com\//;
+</code></pre>
+
+<p>You can eliminate most of the back-whacking by changing the delimiter.  <code>/bar/</code> is shorthand for <code>m/bar/</code> which is the same as <code>m!bar!</code>.</p>
+
+<pre><code>$url =~ m!http://www\.stackoverflow\.com/!;
+</code></pre>
+
+<p>You can even use balanced delimiters like {} and [].  I personally love these.  <code>q{foo}</code> is the same as <code>'foo'</code>.</p>
+
+<pre><code>$code = q{
+    if( this is awesome ) {
+        print "Look ma, no escaping!";
+    }
+};
+</code></pre>
+
+<p>To confuse your friends (and your syntax highlighter) try this:</p>
+
+<pre><code>$string = qq'You owe me $1,000 dollars!';
+</code></pre>
+<h4> Comment 1159313 Chris Lutz: </h4>You should explicitly mention that, when using <code>{}</code> (and friends) as quote delimiters, Perl <i>will</i> balance the delimiters.<br>------------------------------------------------------------------ <br><h3> Answer 310083 Joe McMahon: </h3><p>Very late to the party, but: attributes.</p>
+
+<p>Attributes essentially let you define arbitrary code to be associated with the declaration of a variable or subroutine. The best way to use these is with <a href="http://search.cpan.org/perldoc?Attribute::Handlers" rel="nofollow noreferrer">Attribute::Handlers</a>; this makes it easy to define attributes (in terms of, what else, attributes!).</p>
+
+<p>I did a presentation on using them to declaratively assemble a pluggable class and its plugins at YAPC::2006, online <a href="http://www.ibiblio.org/mcmahon/talks/designing4pluggability/" rel="nofollow noreferrer">here</a>. This is a pretty unique feature.</p>
+------------------------------------------------------------------ <br><h3> Answer 530538 Chris Lutz: </h3><p>I personally love the /e modifier to the s/// operation:</p>
+
+<pre><code>while(&lt;&gt;) {
+  s/(\w{0,4})/reverse($1);/e; # reverses all words between 0 and 4 letters
+  print;
+}
+</code></pre>
+
+<p>Input:</p>
+
+<pre><code>This is a test of regular expressions
+^D
+</code></pre>
+
+<p>Output (I think):</p>
+
+<pre><code>sihT si a tset fo regular expressions
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 1105711 Dario: </h3><p><a href="http://search.cpan.org/~dconway/Quantum-Superpositions-1.03/lib/Quantum/Superpositions.pm" rel="nofollow noreferrer"><code>Quantum::Superpositions</code></a></p>
+
+<pre><code>use Quantum::Superpositions;
+
+if ($x == any($a, $b, $c)) { ...  }
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 2628795 Alexey: </h3><p>There is a more powerful way to check program for syntax errors:</p>
+
+<pre><code>perl -w -MO=Lint,no-context myscript.pl
+</code></pre>
+
+<p>The most important thing that it can do is reporting for 'unexistant subroutine' errors.</p>
+------------------------------------------------------------------ <br><h3> Answer 2655810 dawg: </h3><p><code>use re debug</code><br>
+<a href="http://perldoc.perl.org/re.html" rel="nofollow noreferrer">Doc on use re debug</a></p>
+
+<p>and </p>
+
+<p><code>perl -MO=Concise[,OPTIONS]</code><br>
+<a href="http://perldoc.perl.org/B/Concise.html" rel="nofollow noreferrer">Doc on Concise</a></p>
+
+<p>Besides being exquisitely flexible, expressive and amenable to programing in the style of C, Pascal, Python and other languages, there are several pragmas command switches that make Perl my 'goto' language for initial kanoodling on an algorithm, regex, or quick problems that needs to be solved. These two are unique to Perl I believe, and are among my favorites. </p>
+
+<p><code>use re debug</code>:
+Most modern flavors of regular expressions owe their current form and function to Perl. While there are many Perl forms of regex that cannot be expressed in other languages, there are almost no forms of other languages' flavor of regex that cannot be expressed in Perl. Additionally, Perl has a wonderful regex debugger built in to show how the regex engine is interpreting your regex and matching against the target string. </p>
+
+<p>Example: I recently was trying to write a simple CSV routine. (Yes, yes, I know, I should have been using <a href="http://search.cpan.org/~ALANCITT/Text-CSV-0.01/CSV.pm" rel="nofollow noreferrer">Text::CSV...</a>) but the CSV values were not quoted and simple. </p>
+
+<p>My first take was <code>/^(^(?:(.*?),){$i}/</code> to extract the i record on n CSV records. That works fine -- except for the last record or n of n. I could see that without the debugger.</p>
+
+<p>Next I tried <code>/^(?:(.*?),|$){$i}/</code> This did not work, and I could not see immediately why. I thought I was saying <code>(.*?)</code> followed by a comma or EOL. Then I added <code>use re debug</code> at the top of a small test script. Ahh yes, the alteration between <code>,|$</code> was not being interpreted that way; it was being interpreted as <code>((.*?),) | ($)</code> -- not what I wanted. </p>
+
+<p><a href="http://perldoc.perl.org/perlrequick.html#Grouping-things-and-hierarchical-matching" rel="nofollow noreferrer">A new grouping was needed</a>. So I arrived at the working <code>/^(?:(.*?)(?:,|$)){$i}/</code>. While I was in the regex debugger, I was surprised how many loops it took for a match towards the end of the string. It is the <code>.*?</code> term that is quite ambiguous and requires excessive backtracking to satisfy. So I tried <code>/^(?:(?:^|,)([^,]*)){$i}/</code> This does two things: 1) reduces backtracking because of the greedy match of all but a comma 2) allowed the regex optimizer to only use the alteration once on the first field. Using Benchmark, this is 35% faster than the first regex. The regex debugger is wonderful and few use it.</p>
+
+<p><code>perl -MO=Concise[,OPTIONS]</code>:
+The B and Concise frameworks are tremendous tools to see how Perl is interpreting your masterpiece. Using the <code>-MO=Concise</code> prints the result of the Perl interpreters translation of your source code. There are many options to Concise and in B, you can write your own presentation of the OP codes. </p>
+
+<p>As <a href="https://stackoverflow.com/questions/885908/while-1-vs-for-is-there-a-speed-difference/885951#885951">in this post</a>, you can use Concise to compare different code structures. You can interleave your source lines with the OP codes those lines generate. Check it out.</p>
+------------------------------------------------------------------ <br><h3> Answer 2913693 Justin: </h3><p>You can use different quotes on HEREDOCS to get different behaviors.</p>
+
+<pre><code>my $interpolation = "We will interpolated variables";
+print &lt;&lt;"END";
+With double quotes, $interpolation, just like normal HEREDOCS.
+END
+
+print &lt;&lt;'END';
+With single quotes, the variable $foo will *not* be interpolated.
+(You have probably seen this in other languages.)
+END
+
+## this is the fun and "hidden" one
+my $shell_output = &lt;&lt;`END`;
+echo With backticks, these commands will be executed in shell.
+echo The output is returned.
+ls | wc -l
+END
+
+print "shell output: $shell_output\n";
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 162842 J.J.: </h3><p>Axeman reminded me of how easy it is to wrap some of the built-in functions.</p>
+
+<p>Before Perl 5.10 Perl didn't have a pretty print(say) like Python.</p>
+
+<p>So in your local program you could do something like:</p>
+
+<pre><code>sub print {
+     print @_, "\n";
+}
+</code></pre>
+
+<p>or add in some debug.</p>
+
+<pre><code>sub print {
+    exists $ENV{DEVELOPER} ?
+    print Dumper(@_) :
+    print @_;
+}
+</code></pre>
+<h4> Comment 52875 pjf: </h4>It&#39;s also very easy to accidentally change the context!  Your print subroutine (using . to concatenate) will print the number of items to be printed, rather than the items themselves.  Using <code>print @_, &quot;\n&quot;</code> (note the comma) will preserve the context.<br><h4> Comment 53178 J.J.: </h4>:-D tks for the clarification. I will edit accordingly. :-D teach me to write code without running it :-P<br><h4> Comment 528105 Robert P: </h4>Er...except I don&#39;t think you can override print this way.  Most other builtins I think you can, but not print.  :|<br><h4> Comment 1159360 Chris Lutz: </h4>This is true - <code>print</code> cannot be overridden.<br><h4> Comment 1242157 J.J.: </h4>@Chris: It&#39;s true print cannot be overridden in this manner. But not that it cannot be overridden absolutely. Using some sub modules of B and some tricks you can find on <a href="http://perlmonks.com" rel="nofollow noreferrer">perlmonks.com</a> you can override it.<br>------------------------------------------------------------------ <br><h3> Answer 1059420 ikegami: </h3><p>The following are just as short but more meaningful than "~~" since they indicate what is returned, and there's no confusion with the smart match operator:</p>
+
+<pre><code>print "".localtime;   # Request a string
+
+print 0+@array;       # Request a number
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 2911357 Danny Woods: </h3><p>Two things that work well together: IO handles on in-core strings, and using function prototypes to enable you to write your own functions with grep/map-like syntax.</p>
+
+<pre><code>sub with_output_to_string(&amp;) {           # allows compiler to accept "yoursub {}" syntax.
+  my $function = shift;
+  my $string   = '';
+  my $handle   = IO::Handle-&gt;new();
+  open($handle, '&gt;', \$string) || die $!; # IO handle on a plain scalar string ref
+  my $old_handle = select $handle;
+  eval { $function-&gt;() };
+  select $old_handle;
+  die $@ if $@;
+  return $string;
+}
+
+my $greeting = with_output_to_string {
+  print "Hello, world!";
+};
+
+print $greeting, "\n";
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 2912104 Jauder Ho: </h3><p>The ability to use a hash as a seen filter in a loop. I have yet to see something quite as nice in a different language. For example, I have not been able to duplicate this in python.</p>
+
+<p>For example, I want to print a line if it has not been seen before. </p>
+
+<pre><code>my %seen;
+
+for (&lt;LINE&gt;) {
+  print $_ unless $seen{$_}++;
+}
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 2912459 knb: </h3><p>The new -E option on the command line: </p>
+
+<pre><code>&gt; perl -e "say 'hello"" # does not work 
+
+String found where operator expected at -e line 1, near "say 'hello'"
+        (Do you need to predeclare say?)
+syntax error at -e line 1, near "say 'hello'"
+Execution of -e aborted due to compilation errors.
+
+&gt; perl -E "say 'hello'" 
+hello
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 2913535 trapd00r: </h3><p>You can expand function calls in a string, for example;</p>
+
+<pre><code>print my $foo = "foo @{[scalar(localtime)]} bar";
+</code></pre>
+
+<blockquote>
+  <p>foo Wed May 26 15:50:30 2010 bar</p>
+</blockquote>
+------------------------------------------------------------------ <br><h3> Answer 5630109 gdey: </h3><p>The feature I like the best is statement modifiers.</p>
+
+<p>Don't know how many times I've wanted to do:</p>
+
+<pre><code>say 'This will output' if 1;
+say 'This will not output' unless 1;
+say 'Will say this 3 times. The first Time: '.$_ for 1..3;
+</code></pre>
+
+<p>in other languages.
+etc...</p>
+
+<p>The 'etc' reminded me of another 5.12 feature, the Yada Yada operator.</p>
+
+<p>This is great, for the times when you just want a place holder.</p>
+
+<pre><code>sub something_really_important_to_implement_later {
+    ...
+} 
+</code></pre>
+
+<p>Check it out: <a href="http://perldoc.perl.org/perlop.html#The-Triple-Dot-Operator" rel="nofollow">Perl Docs on Yada Yada Operator</a>.</p>
+<h4> Comment 8787055 tchrist: </h4>It’s an <i>ellipsis</i>, actually.<br>------------------------------------------------------------------ <br><h3> Answer 194796 AmbroseChapel: </h3><p>I'm a bit late to the party, but a vote for the built-in tied-hash function <code>dbmopen()</code> -- it's helped me a lot. It's not exactly a database, but if you need to save data to disk it takes away a lot of the problems and Just Works. It helped me get started when I didn't have a database, didn't understand Storable.pm, but I knew I wanted to progress beyond reading and writing to text files.</p>
+------------------------------------------------------------------ <br><h3> Answer 547210 timkay: </h3><p>You might think you can do this to save memory:</p>
+
+<pre><code>@is_month{qw(jan feb mar apr may jun jul aug sep oct nov dec)} = undef;
+
+print "It's a month" if exists $is_month{lc $mon};
+</code></pre>
+
+<p>but it doesn't do that.  Perl still assigns a different scalar value to each key.  <a href="http://search.cpan.org/perldoc?Devel::Peek" rel="nofollow noreferrer">Devel::Peek</a> shows this.  <code>PVHV</code> is the hash.  <code>Elt</code> is a key and the <code>SV</code> that follows is its value.  Note that each SV has a different memory address indicating they're not being shared.</p>
+
+<pre><code>Dump \%is_month, 12;
+
+SV = RV(0x81c1bc) at 0x81c1b0
+  REFCNT = 1
+  FLAGS = (TEMP,ROK)
+  RV = 0x812480
+  SV = PVHV(0x80917c) at 0x812480
+    REFCNT = 2
+    FLAGS = (SHAREKEYS)
+    ARRAY = 0x206f20  (0:8, 1:4, 2:4)
+    hash quality = 101.2%
+    KEYS = 12
+    FILL = 8
+    MAX = 15
+    RITER = -1
+    EITER = 0x0
+    Elt "feb" HASH = 0xeb0d8580
+    SV = NULL(0x0) at 0x804b40
+      REFCNT = 1
+      FLAGS = ()
+    Elt "may" HASH = 0xf2290c53
+    SV = NULL(0x0) at 0x812420
+      REFCNT = 1
+      FLAGS = ()
+</code></pre>
+
+<p>An undef scalar takes as much memory as an integer scalar, so you might ask well just assign them all to 1 and avoid the trap of forgetting to check with <code>exists</code>.</p>
+
+<pre><code>my %is_month = map { $_ =&gt; 1 } qw(jan feb mar apr may jun jul aug sep oct nov dec);
+
+print "It's a month" if $is_month{lc $mon});
+</code></pre>
+<h4> Comment 1906916 timkay: </h4>Also, note that the &quot;1&quot; method <i>does</i> use more RAM than &quot;undef&quot;!  Try creating a program that initialzes a million elements this way and then look at the memory footprint using ps.  You&#39;ll see that the &quot;1&quot; method uses more memory.  I think it&#39;s true that the data structures are the same size, but the initializer uses more memory.<br><h4> Comment 388656 Schwern: </h4>This doesn&#39;t save memory, and it generates a nice trap for the unsuspecting programmer.  Perl still assigns an undef scalar value to each key and undef doesn&#39;t take less memory than 1.  Use Devel::Peek to see.<br><h4> Comment 1906914 timkay: </h4>You might be right that the &quot;undef&quot; construct doesn&#39;t save memory.  However, in my opinion, it&#39;s better than your solution for several reasons:  1. the &quot;undef&quot; method tells the reader that the value isn&#39;t used 2. the &quot;1&quot; initializer is more complicated for no good reason 3. requiring &quot;exists&quot; is no more trap than many other things in Perl<br>------------------------------------------------------------------ <br><h3> Answer 1548716 Kiffin: </h3><p>The expression <code>defined &amp;DB::DB</code> returns true if the program is running from within the debugger.</p>
+------------------------------------------------------------------ <br><h3> Answer 1681732 Erick: </h3><p>Interpolation of match regular expressions. A useful application of this is when matching on a blacklist. Without using interpolation it is written like so:</p>
+
+<pre><code>#detecting blacklist words in the current line
+/foo|bar|baz/;
+</code></pre>
+
+<p>Can instead be written</p>
+
+<pre><code>@blacklistWords = ("foo", "bar", "baz");
+$anyOfBlacklist = join "|", (@blacklistWords);
+/$anyOfBlacklist/;
+</code></pre>
+
+<p>This is more verbose, but allows for population from a datafile. Also if the list is maintained in the source for whatever reason, it is easier to maintain the array then the RegExp.</p>
+------------------------------------------------------------------ <br><h3> Answer 1762916 Nick Dixon: </h3><p>Using hashes (where keys are unique) to obtain the unique elements of a list:</p>
+
+<pre><code>my %unique = map { $_ =&gt; 1 } @list;
+my @unique = keys %unique;
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 2136296 Peter: </h3><p>Add one for the unpack() and pack() functions, which are great if you need to import and/or export data in a format which is used by other programs.</p>
+
+<p>Of course these days most programs will allow you to export data in XML, and many commonly used proprietary document formats have associated Perl modules written for them. But this is one of those features that is incredibly useful when you need it, and pack()/unpack() are probably the <em>reason</em> that people have been able to write CPAN modules for so many proprietary data formats.</p>
+------------------------------------------------------------------ <br><h3> Answer 2911882 Mark Maunder: </h3><p>Next time you're at a geek party pull out this one-liner in a bash shell and the women will swarm you and your friends will worship you:</p>
+
+<p>find . -name "*.txt"|xargs perl -pi -e 's/1:(\S+)/uc($1)/ge'</p>
+
+<p>Process all *.txt files and do an in-place find and replace using perl's regex. This one converts text after a '1:' to upper case and removes the '1:'. Uses Perl's 'e' modifier to treat the second part of the find/replace regex as executable code. Instant one-line template system. Using xargs lets you process a huge number of files without running into bash's command line length limit. </p>
+------------------------------------------------------------------ <br><h3> Answer 164217 Toby: </h3><p>@Corion - Bare URLs in Perl? Of course you can, even in interpolated strings. The only time it would matter is in a string that you were actually USING as a regular expression.</p>
+<h4> Comment 1159369 Chris Lutz: </h4>It comes from a joke where, in C++, you could embed, raw and without quotes or comments, a URL in your program: <code>http:&#47;&#47;www.example.com</code> (the <code>http:</code> is a label, and the <code>&#47;&#47;</code> makes the rest a comment). This is what everyone is referring to.<br>------------------------------------------------------------------ <br><h3> Answer 166230 Tomasz: </h3><p>Showing progress in the script by printing on the same line:</p>
+
+<pre><code>$| = 1; # flush the buffer on the next output 
+
+for $i(1..100) {
+    print "Progress $i %\r"
+}
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 479046 On Elpeleg: </h3><p>One more...</p>
+
+<p>Perl cache:</p>
+
+<pre><code>my $processed_input = $records || process_inputs($records_file);
+</code></pre>
+
+<p>On Elpeleg
+Open Source, Perl CMS
+<a href="http://www.web-app.net/" rel="nofollow noreferrer">http://www.web-app.net/</a></p>
+------------------------------------------------------------------ <br><h3> Answer 1380565 mob: </h3><p>$0 is the name of the perl script being executed. It can be used to get the context from which a module is being run.</p>
+
+<pre><code># MyUsefulRoutines.pl
+
+sub doSomethingUseful {
+  my @args = @_;
+  # ...
+}
+
+if ($0 =~ /MyUsefulRoutines.pl/) {
+  # someone is running  perl MyUsefulRoutines.pl [args]  from the command line
+  &amp;doSomethingUseful (@ARGV);
+} else {
+  # someone is calling  require "MyUsefulRoutines.pl"  from another script
+  1;
+}
+</code></pre>
+
+<p>This idiom is helpful for treating a standalone script with some useful subroutines into a library that can be imported into other scripts. Python has similar functionality with the <code>object.__name__ == "__main__"</code> idiom.</p>
+<h4> Comment 6213772 dolmen: </h4>What you need is <a href="http://www252.pair.com/comdog/mastering_perl/Chapters/18.modulinos.html" rel="nofollow noreferrer">modulinos</a>.<br>------------------------------------------------------------------ <br><h3> Answer 2062632 Eric Strom: </h3><p>using bare blocks with <code>redo</code> or other control words to create custom looping constructs.</p>
+
+<p>traverse a linked list of objects returning the first <code>-&gt;can('print')</code> method:</p>
+
+<pre><code>sub get_printer {
+    my $self = shift;
+    {$self-&gt;can('print') or $self = $self-&gt;next and redo}
+}
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 2911832 Terry: </h3><p>Perl is great as a flexible awk/sed. </p>
+
+<p>For example lets use a simple replacement for <code>ls | xargs stat</code>, naively done like: </p>
+
+<pre><code>$ ls | perl -pe 'print "stat "' | sh 
+</code></pre>
+
+<p>This doesn't work well when the input (filenames) have spaces or shell special characters like  <code>|$\</code>. So single quotes are frequently required in the Perl output.</p>
+
+<p>One complication with calling perl via the command line <code>-ne</code> is that the shell  gets first nibble at your one-liner. This often leads to torturous escaping to satisfy it.</p>
+
+<p>One 'hidden' feature that I use all the time is <strong><code>\x27</code></strong> to include a single quote instead of trying to use shell escaping <code>'\''</code></p>
+
+<p>So:</p>
+
+<pre><code>$ ls | perl -nle 'chomp; print "stat '\''$_'\''"' | sh
+</code></pre>
+
+<p>can be more safely written:</p>
+
+<pre><code>$ ls | perl -pe 's/(.*)/stat \x27$1\x27/' | sh
+</code></pre>
+
+<p>That won't work with funny characters in the filenames, even quoted like that.  But this will:</p>
+
+<pre><code>$ ls | perl -pe 's/\n/\0/' | xargs -0 stat
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 3653228 Jet: </h3><p>"now"</p>
+
+<pre><code>sub _now { 
+        my ($now) = localtime() =~ /([:\d]{8})/;
+        return $now;
+}
+
+print _now(), "\n"; #  15:10:33
+</code></pre>
+<h4> Comment 3846789 Olfan: </h4>That&#39;s been answered at <a href="http://stackoverflow.com/questions/161872/hidden-features-of-perl/162060#162060" title="hidden features of perl">stackoverflow.com/questions/161872/hidden-features-of-perl/&hellip;</a> already.<br>------------------------------------------------------------------ <br><h3> Answer 8842278 Prakash K: </h3><p><a href="http://search.cpan.org/~flora/perl-5.14.2/dist/B-Deparse/Deparse.pm" rel="nofollow">B::Deparse</a> - Perl compiler backend to produce perl code. Not something you'd use in your daily Perl coding, but could be useful in special circumstances.</p>
+
+<p>If you come across some piece of code that is obfuscated, or a complex expression, pass it through <code>Deparse</code>. Useful to figure out a JAPH or a Perl code that is golfed.</p>
+
+<pre><code>$ perl -e '$"=$,;*{;qq{@{[(A..Z)[qq[0020191411140003]=~m[..]g]]}}}=*_=sub{print/::(.*)/};$\=$/;q&lt;Just another Perl Hacker&gt;-&gt;();'
+Just another Perl Hacker
+
+$ perl -MO=Deparse -e '$"=$,;*{;qq{@{[(A..Z)[qq[0020191411140003]=~m[..]g]]}}}=*_=sub{print/::(.*)/};$\=$/;q&lt;Just another Perl Hacker&gt;-&gt;();'
+$" = $,;
+*{"@{[('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z')['0020191411140003' =~ /../g]];}";} = *_ = sub {
+    print /::(.*)/;
+}
+;
+$\ = $/;
+'Just another Perl Hacker'-&gt;();
+-e syntax OK
+</code></pre>
+
+<p>A more useful example is to use deparse to find out the code behind a coderef, that you might have received from another module, or</p>
+
+<pre><code>use B::Deparse;
+my $deparse = B::Deparse-&gt;new;
+$code = $deparse-&gt;coderef2text($coderef);
+print $code;
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 6631997 Balbir Singh: </h3><p>I like the way we can insert a element in any place in the array, such as</p>
+
+<p>=> Insert $x in position $i in array @a</p>
+
+<pre><code>@a = ( 11, 22, 33, 44, 55, 66, 77 );
+$x = 10;
+$i = 3;
+
+@a = ( @a[0..$i-1], $x, @a[$i..$#a] );
+</code></pre>

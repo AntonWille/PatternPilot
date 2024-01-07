@@ -1,0 +1,194 @@
+ <h2> Title: How can I print the contents of a hash in Perl? </h2> <h3> Kys, question_id: 1162245 </h3>Score: 189, Tags: {perl,hash,printing} <br><p>I keep printing my hash as # of buckets / # allocated.
+How do I print the contents of my hash? </p>
+
+<p>Without using a <code>while</code> loop would be most preferable (for example, a <a href="https://en.wikipedia.org/wiki/One-liner_program" rel="noreferrer">one-liner</a> would be best).</p>
+------------------------------------------------------------------ <br><h3> Answer 1162289 tetromino: </h3><p><a href="http://perldoc.perl.org/Data/Dumper.html" rel="noreferrer">Data::Dumper</a> is your friend.</p>
+
+<pre><code>use Data::Dumper;
+my %hash = ('abc' =&gt; 123, 'def' =&gt; [4,5,6]);
+print Dumper(\%hash);
+</code></pre>
+
+<p>will output</p>
+
+<pre><code>$VAR1 = {
+          'def' =&gt; [
+                     4,
+                     5,
+                     6
+                   ],
+          'abc' =&gt; 123
+        };
+</code></pre>
+<h4> Comment 57806205 tetromino: </h4>@shampoo slash operator creates a reference, a bit like the <code>&amp;</code> operator in C and C++. The reason it matters in this context is that in Perl, if you call a function with a hash value as the argument, that hash value gets listified and expanded into multiple arguments - so <code>%hsh=(&quot;a&quot; =&gt; 1, &quot;b&quot; =&gt; 2); foo(%hsh);</code> would be equivalent to <code>foo(&quot;a&quot;, 1, &quot;b&quot;, 2)</code>. If you instead want the function to operate on the hash itself, you need to pass a reference to the hash: <code>foo(\%hsh);</code> See <a href="http://perldoc.perl.org/perlsub.html#Pass-by-Reference" rel="nofollow noreferrer">perldoc.perl.org/perlsub.html#Pass-by-Reference</a><br><h4> Comment 57711438 shampoo: </h4>What does it mean to add a slash in front of the % ?<br><h4> Comment 983040 plusplus: </h4>the original poster might also want to look into the various Data::Dumper options, in particular turning on &#39;Sortkeys&#39; can be very useful<br><h4> Comment 34842808 Sos: </h4>@JonathanDay I was missing that detail and it was helpful! Thanks!<br>------------------------------------------------------------------ <br><h3> Answer 1162278 Jonathan Graehl: </h3><p>Easy: </p>
+
+<pre><code>print "$_ $h{$_}\n" for (keys %h);
+</code></pre>
+
+<p>Elegant, but actually 30% slower (!):</p>
+
+<pre><code>while (my ($k,$v)=each %h){print "$k $v\n"}
+</code></pre>
+<h4> Comment 982219 FMc: </h4>Sleazy: print &quot;@_\n&quot; while @_ = each %h<br><h4> Comment 982321 Chas. Owens: </h4>Also, benchmark before making claims about efficiency (or at least qualify the type of efficiency you are talking about).  The <code>for</code> loop is faster than the <code>while</code> up to at least 10,000 keys: <a href="http://gist.github.com/151792" rel="nofollow noreferrer">gist.github.com/151792</a><br><h4> Comment 983052 Jonathan Graehl: </h4>Of course you&#39;re right re: $k.    But it&#39;s more efficient in Perl 6! :)  Yes, you&#39;re right on that too.  I would never have thought to actually optimize or profile my Perl, but I&#39;m glad to learn this.  Of course, each <i>should</i> be more efficient (because there&#39;s no extra hash lookup on the key).  But it&#39;s ~30% slower!<br><h4> Comment 982300 Chas. Owens: </h4>I think you mean <code>print &quot;$_ $h{$_}\n&quot; for (keys %h);</code>, <code>$k</code> doesn&#39;t exist in that example.<br><h4> Comment 111177945 U. Windl: </h4>I wonder: Is the <code>while</code> loop slower because of introducing <code>my</code> variables for each iteration? If so, how is the speed when declaring <code>my ($k, $v)</code> before <code>while</code>?<br><h4> Comment 81899602 Carlos S&#225;: </h4>Hi, Jonathan Graehl. Sorry, still not understanding. You&#39;re saying that each is ~30% slower based on what? Is everytime, for every situation, a gap of 30% ?<br>------------------------------------------------------------------ <br><h3> Answer 9715131 user966588: </h3><p>Here how you can print without using <a href="https://metacpan.org/pod/Data::Dump" rel="noreferrer"><code>Data::Dumper</code></a>  </p>
+
+<pre><code>print "@{[%hash]}";
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 1166010 Brad Gilbert: </h3><p>For debugging purposes I will often use <a href="http://metacpan.org/module/YAML" rel="noreferrer"><code>YAML</code></a>.</p>
+
+<pre><code>use strict;
+use warnings;
+
+use YAML;
+
+my %variable = ('abc' =&gt; 123, 'def' =&gt; [4,5,6]);
+
+print "# %variable\n", Dump \%variable;
+</code></pre>
+
+<p>Results in:</p>
+
+<pre><code># %variable
+---
+abc: 123
+def:
+  - 4
+  - 5
+  - 6
+</code></pre>
+
+<hr>
+
+<p>Other times I will use <a href="http://metacpan.org/module/Data::Dump" rel="noreferrer"><code>Data::Dump</code></a>. You don't need to set as many variables to get it to output it in a nice format than you do for <a href="http://metacpan.org/module/Data::Dumper" rel="noreferrer"><code>Data::Dumper</code></a>.</p>
+
+<pre><code>use Data::Dump = 'dump';
+
+print dump(\%variable), "\n";
+</code></pre>
+
+
+
+<pre><code>{ abc =&gt; 123, def =&gt; [4, 5, 6] }
+</code></pre>
+
+<hr>
+
+<p>More recently I have been using <a href="http://metacpan.org/module/Data::Printer" rel="noreferrer"><code>Data::Printer</code></a> for debugging.</p>
+
+<pre><code>use Data::Printer;
+p %variable;
+</code></pre>
+
+
+
+<pre><code>{
+    abc   123,
+    def   [
+        [0] 4,
+        [1] 5,
+        [2] 6
+    ]
+}
+</code></pre>
+
+<p>( Result can be much more colorful on a terminal )</p>
+
+<p>Unlike the other examples I have shown here, this one is designed explicitly to be for display purposes only. Which shows up more easily if you dump out the structure of a tied variable or that of an object.</p>
+
+<pre><code>use strict;
+use warnings;
+
+use MTie::Hash;
+use Data::Printer;
+
+my $h = tie my %h, "Tie::StdHash";
+@h{'a'..'d'}='A'..'D';
+p %h;
+print "\n";
+p $h;
+</code></pre>
+
+
+
+<pre><code>{
+    a   "A",
+    b   "B",
+    c   "C",
+    d   "D"
+} (tied to Tie::StdHash)
+
+Tie::StdHash  {
+    public methods (9) : CLEAR, DELETE, EXISTS, FETCH, FIRSTKEY, NEXTKEY, SCALAR, STORE, TIEHASH
+    private methods (0)
+    internals: {
+        a   "A",
+        b   "B",
+        c   "C",
+        d   "D"
+    }
+}
+</code></pre>
+<h4> Comment 34843210 Sos: </h4>having the colors is &quot;neat&quot;, but either I am doing something wrong, or  using &quot;use Data::Printer; p %var;&quot; doesn&#39;t print the arrows in hashes, and for a newbie like me that helps<br><h4> Comment 34849255 Brad Gilbert: </h4>@Sosi If you look at the output in the answer, you will see that it doesn&#39;t output the <code>=&gt;</code> like you expect. It instead always prints the key, several spaces, and then the value. Which helps a human scan over the output.<br><h4> Comment 129587860 grjash: </h4>I can&#39;t get Data::Dump to work in 5.32.  I have to call CORE::dump(), but there is still an error: Can&#39;t find label HASH ...<br>------------------------------------------------------------------ <br><h3> Answer 1163051 Chas. Owens: </h3><p>The answer depends on what is in your hash.  If you have a simple hash a simple</p>
+
+<pre><code>print map { "$_ $h{$_}\n" } keys %h;
+</code></pre>
+
+<p>or</p>
+
+<pre><code>print "$_ $h{$_}\n" for keys %h;
+</code></pre>
+
+<p>will do, but if you have a hash that is populated with references you will something that can walk those references and produce a sensible output.  This walking of the references is normally called serialization.  There are many modules that implement different styles, some of the more popular ones are:</p>
+
+<ul>
+<li><a href="http://perldoc.perl.org/Data/Dumper.html" rel="noreferrer"><code>Data::Dumper</code></a></li>
+<li><a href="http://search.cpan.org/dist/Data-Dump-Streamer/lib/Data/Dump/Streamer.pm" rel="noreferrer"><code>Data::Dump::Streamer</code></a></li>
+<li><a href="http://search.cpan.org/dist/YAML-LibYAML/lib/YAML/XS.pm" rel="noreferrer"><code>YAML::XS</code></a></li>
+<li><a href="http://search.cpan.org/dist/JSON-XS/XS.pm" rel="noreferrer"><code>JSON::XS</code></a></li>
+<li><a href="http://search.cpan.org/dist/XML-Dumper/Dumper.pm" rel="noreferrer"><code>XML::Dumper</code></a></li>
+</ul>
+
+<p>Due to the fact that <code>Data::Dumper</code> is part of the core Perl library, it is probably the most popular; however, some of the other modules have very good things to offer.</p>
+------------------------------------------------------------------ <br><h3> Answer 1162713 Axeman: </h3><p>My favorite: <a href="http://search.cpan.org/perldoc?Smart::Comments" rel="noreferrer">Smart::Comments</a></p>
+
+<pre><code>use Smart::Comments;
+# ...
+
+### %hash
+</code></pre>
+
+<p>That's it.</p>
+<h4> Comment 31451809 MikeKulls: </h4>I&#39;m not saying they don&#39;t have a responsibility but it&#39;s not likely to be the first thing they look for. Not ever having seen Smart Comments module before I wouldn&#39;t know why the above code was printing something out. I could spend days skipping over the comment and not even process it because comments should do nothing. Making them do something is very bad imo. They can be used for generating documentation etc as long as they don&#39;t alter the behaviour of the program.<br><h4> Comment 30913292 MikeKulls: </h4>Sorry, down vote from me for stuff that hijacks comments for actual functionality. A maintenance programmer could spend all day trying to work out why code like that was printing out unexpected stuff.<br><h4> Comment 30934279 Axeman: </h4>@MikeKulls, np. It&#39;s a source filter, so I understand. Also, having written scripts that check every module that I put into production prep that it doesn&#39;t <code>use</code> <code>Smart::Comments</code>, I see it from that perspective too. But to the counter, <code>Smart::Comments</code> is pretty well behaved as a <i>scoped</i> module, there shouldn&#39;t be output behavior in any module that doesn&#39;t also <i>use</i> SC. So, the problem would be isolated to those scopes with a <i>use</i> statement. If you&#39;re saying that a maintenance programmer has no responsibility to read the doc on included modules, I can&#39;t agree. Still, thanks for commenting<br>------------------------------------------------------------------ <br><h3> Answer 1162382 Paul Nathan: </h3><p>Looping:</p>
+
+<pre><code>foreach(keys %my_hash) { print "$_ / $my_hash{$_}\n"; }
+</code></pre>
+
+<p>Functional</p>
+
+<pre><code>map {print "$_ / $my_hash{$_}\n"; } keys %my_hash;
+</code></pre>
+
+<p>But for sheer elegance, I'd have to choose wrang-wrang's. For my own code, I'd choose my foreach. Or tetro's Dumper use.</p>
+<h4> Comment 981713 friedo: </h4>There&#39;s no functional difference between your uses of <code>foreach</code> and <code>map</code>. <code>map</code> should be used for list transformations, not in void context to emulate a for-loop<br><h4> Comment 982032 Ape-inago: </h4>it would be interesting to see the &#39;byte code&#39; results of each... I wonder if map is more or less efficient.<br>------------------------------------------------------------------ <br><h3> Answer 45164219 labist: </h3><p>I really like to sort the keys in one liner code:</p>
+
+<pre><code>print "$_ =&gt; $my_hash{$_}\n" for (sort keys %my_hash);
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 1162321 Kyle Walsh: </h3><p>If you want to be pedantic and keep it to one line (without use statements and shebang), then I'll sort of piggy back off of tetromino's answer and suggest:</p>
+
+<pre><code>print Dumper( { 'abc' =&gt; 123, 'def' =&gt; [4,5,6] } );
+</code></pre>
+
+<p>Not doing anything special other than using the anonymous hash to skip the temp variable ;)</p>
+<h4> Comment 983174 justintime: </h4>The OP says he has &quot;my hash&quot; that needs printing. This answer is just cleverness for its own sake<br><h4> Comment 983986 Kyle Walsh: </h4>OP was hoping to do it in one line. Was just showing a one-line way of doing it. So that&#39;s worthy of a down-vote?<br>------------------------------------------------------------------ <br><h3> Answer 1163283 Weegee: </h3><p>The easiest way in my experiences is to just use <a href="http://perldoc.perl.org/Dumpvalue.html" rel="nofollow noreferrer">Dumpvalue</a>.</p>
+
+<pre><code>use Dumpvalue;
+...
+my %hash = { key =&gt; "value", foo =&gt; "bar" };
+my $dumper = new DumpValue();
+$dumper-&gt;dumpValue(\%hash);
+</code></pre>
+
+<p>Works like a charm and you don't have to worry about formatting the hash, as it outputs it like the Perl debugger does (great for debugging).  Plus, Dumpvalue is included with the stock set of Perl modules, so you don't have to mess with CPAN if you're behind some kind of draconian proxy (like I am at work).</p>
+<h4> Comment 129587588 grjash: </h4>The above code does not work in Perl 5.32.  There&#39;s a conflict between &quot;Dumpvalue&quot;,  &quot;DumpValue&quot;, and &quot;dumpValue&quot;. If all three use upper or lower case &quot;v&#39;, the error message is like the following:    Reference found where even-sized list expected ... Can&#39;t locate object method &quot;new&quot; via package &quot;DumpValue&quot; (perhaps you forgot to load &quot;DumpValue&quot;?) ...<br>------------------------------------------------------------------ <br><h3> Answer 29525762 carlos_lm: </h3><p>I append one space for every element of the hash to see it well:</p>
+
+<pre><code>print map {$_ . " "} %h, "\n";
+</code></pre>

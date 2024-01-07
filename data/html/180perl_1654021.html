@@ -1,0 +1,289 @@
+ <h2> Title: How can I delete a newline if it is the last character in a file? </h2> <h3> Todd Partridge &#39;Gen2ly&#39;, question_id: 1654021 </h3>Score: 180, Tags: {linux,perl,shell,awk,sed} <br><p>I have some files that I'd like to delete the last newline if it is the last character in a file.  <code>od -c</code> shows me that the command I run does write the file with a trailing new line:</p>
+
+<pre><code>0013600   n   t  &gt;  \n
+</code></pre>
+
+<p>I've tried a few tricks with sed but the best I could think of isn't doing the trick:</p>
+
+<pre><code>sed -e '$s/\(.*\)\n$/\1/' abc
+</code></pre>
+
+<p>Any ideas how to do this?</p>
+<h4> Comment 46889866 Cory Mawhorter: </h4>@ThomasPadron-McCarthy &quot;In computing, for every good reason there is to do something there exists a good reason not to do it and visa versa.&quot;  -Jesus -- &quot;you shouldn&#39;t do that&quot; is a horrible answer no matter the question.  The correct format is:  [how to do it] but [why it <i>may</i> be bad idea]. #sacrilege<br><h4> Comment 1525513 Thomas Padron-McCarthy: </h4>Can you elaborate on why you want to do this? Text files are <i>supposed</i> to end with an end-of-line, unless they are entirely empty. It seems strange to me that you&#39;d want to have such a truncated file?<br><h4> Comment 24954116 tchrist: </h4>Please never delete the final newline in a file of newline-terminated lines. It screws up all kinds of things.<br><h4> Comment 1525467 Dennis Williamson: </h4>newline is only one character for unix newlines. DOS newlines are two characters. Of course, literal &quot;\n&quot; is two characters. Which are you actually looking for?<br><h4> Comment 1525470 pavium: </h4>Although the representation might be <code>\n</code>, in linux is is <i>one</i> character<br><h4> Comment 91046522 wisbucky: </h4>One reason to remove the trailing newline is if you&#39;re piping the string to somewhere else, and you can&#39;t have a trailing newline.<br><h4> Comment 1525535 pavium: </h4>The usual reason for doing <i>something</i> like this is to delete a trailing comma from the last line of a CSV file. Sed works well, but newlines have to be treated differently.<br><h4> Comment 1525604 Todd Partridge &#39;Gen2ly&#39;: </h4>Yeah this is for Linux so thanks for correcting that newline is just one character.  Fixed in post.<br>------------------------------------------------------------------ <br><h3> Answer 1654042 pavium: </h3><pre><code>perl -pe 'chomp if eof' filename &gt;filename2
+</code></pre>
+
+<p>or, to edit the file in place:</p>
+
+<pre><code>perl -pi -e 'chomp if eof' filename
+</code></pre>
+
+<p><sup>[Editor's note: <code>-pi -e</code> was originally <code>-pie</code>, but, as noted by several commenters and explained by @hvd, the latter doesn't work.]</sup></p>
+
+<p>This was described as a 'perl blasphemy' on the awk website I saw.</p>
+
+<p>But, in a test, it worked.</p>
+<h4> Comment 1526426 Ether: </h4>The funny thing about blasphemy and heresy is it&#39;s usually hated because it&#39;s correct. :)<br><h4> Comment 1525541 Sinan &#220;n&#252;r: </h4>You can make it safer by using <code>chomp</code>. And it beats slurping the file.<br><h4> Comment 15921955 Romuald Brunet: </h4>Small correction: you can use <code>perl -pi -e &#39;chomp if eof&#39; filename</code>, to edit a file in-place instead of creating a temporary file<br><h4> Comment 23355289 aditsu quit because SE is EVIL: </h4><code>perl -pie &#39;chomp if eof&#39; filename</code> -&gt; Can&#39;t open perl script &quot;chomp if eof&quot;: No such file or directory; <code>perl -pi -e &#39;chomp if eof&#39; filename</code> -&gt; works<br><h4> Comment 1525866 Todd Partridge &#39;Gen2ly&#39;: </h4>Blasphemy though it is, it works very well. perl -i -pe &#39;chomp if eof&#39; filename. Thank you.<br><h4> Comment 47139019 user743382: </h4>@KyleStrand I don&#39;t know about the &quot;blasphemy&quot; part other than perhaps the mere fact of recommending perl could be considered blasphemy on an awk website, but the reason <code>-pie</code> and <code>-pi -e</code> don&#39;t work the same way is that the <code>-i</code> option takes an optional argument. <code>-pie</code> uses <code>e</code> as the argument to <code>-i</code>, specifying the backup suffix, and then interprets <code>&#39;chomp if eof&#39;</code> as a filename, since it isn&#39;t preceded by an <code>-e</code> option. <code>-pi -e</code> omits the argument for <code>-i</code>, and allows <code>-e</code> to be treated as an option.<br><h4> Comment 86711170 pkaeding: </h4>isn&#39;t all of Perl blasphemy? ;)<br><h4> Comment 15261153 Olumide: </h4>Its not pretty but it works. Give it up for the swiss army chainsaw.<br><h4> Comment 104547052 Heath Borders: </h4><code>cat foo | perl -pe &#39;chomp if eof&#39;</code> removes the newline from <code>foo</code>, but <code>git status</code> still reports a diff. Maybe the file was <code>\r\n</code> and <code>perl</code> just removes the <code>\n</code>?<br><h4> Comment 46643231 Kyle Strand: </h4>Why is <code>-pie</code> &quot;blasphemy,&quot; and why doesn&#39;t it behave the same as <code>-pi -e</code>? Anyone know?<br><h4> Comment 110574386 Nathan majicvr.com: </h4>@Ether <a href="http://www.paulgraham.com/say.html" rel="nofollow noreferrer">A fun read</a> about that<br><h4> Comment 74314384 m13r: </h4>This also turns <code>\r\n</code> to <code>\n</code><br>------------------------------------------------------------------ <br><h3> Answer 12148703 mklement0: </h3><p>You can take advantage of the fact that <strong>shell <a href="http://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html#tag_02_06_03" rel="noreferrer">command substitutions</a> remove trailing newline characters</strong>:</p>
+<p>Simple form that works in bash, ksh, zsh:</p>
+<pre><code>printf %s &quot;$(&lt; in.txt)&quot; &gt; out.txt
+</code></pre>
+<p>Portable (POSIX-compliant) alternative (slightly less efficient):</p>
+<pre><code>printf %s &quot;$(cat in.txt)&quot; &gt; out.txt
+</code></pre>
+<p>Note:</p>
+<ul>
+<li><strong>If <code>in.txt</code> ends with <em>multiple</em> newline characters, the command substitution removes <em>all</em> of them</strong>.<sup>Thanks, <a href="https://stackoverflow.com/users/1944384/sparhawk">Sparhawk</a></sup> (It doesn't remove whitespace characters other than trailing newlines.)</li>
+<li>Since this approach <strong>reads the entire input file into memory</strong>, it is only advisable for smaller files.</li>
+<li><code>printf %s</code> ensures that no newline is appended to the output (it is the POSIX-compliant alternative to the nonstandard <code>echo -n</code>; see <a href="http://pubs.opengroup.org/onlinepubs/009696799/utilities/echo.html" rel="noreferrer">http://pubs.opengroup.org/onlinepubs/009696799/utilities/echo.html</a> and <a href="https://unix.stackexchange.com/a/65819">https://unix.stackexchange.com/a/65819</a>)</li>
+</ul>
+<hr />
+<p>A <strong>guide to the other answers</strong>:</p>
+<ul>
+<li><p>If <strong>Perl</strong> is available, go for the <a href="https://stackoverflow.com/a/1654042/45375">accepted answer</a> - it is <strong>simple and memory-efficient</strong> (doesn't read the whole input file at once).</p>
+</li>
+<li><p>Otherwise, consider <a href="https://stackoverflow.com/a/1654115/45375">ghostdog74's <strong>Awk</strong> answer</a> - it's <strong>obscure, but also memory-efficient</strong>; a <strong>more readable equivalent</strong> (POSIX-compliant) is:</p>
+</li>
+<li><p><code>awk 'NR &gt; 1 { print prev } { prev=$0 } END { ORS=&quot;&quot;; print }' in.txt</code></p>
+</li>
+<li><p>Printing is delayed by one line so that the final line can be handled in the <code>END</code> block, where it is printed without a trailing <code>\n</code> due to setting the output-record separator (<code>OFS</code>) to an empty string.</p>
+</li>
+<li><p>If you want a <strong>verbose, but fast and robust solution that <em>truly edits in-place</em></strong> (as opposed to creating a temp. file that then replaces the original), consider <a href="https://stackoverflow.com/a/1658873/45375">jrockway's <strong>Perl script</strong></a>.</p>
+</li>
+</ul>
+------------------------------------------------------------------ <br><h3> Answer 12579554 Thor: </h3><p>You can do this with <code>head</code> from GNU coreutils, it supports arguments that are relative to the end of the file. So to leave off the last byte use:</p>
+<pre><code>head -c -1
+</code></pre>
+<p>To test for an ending newline you can use <code>tail</code> and <code>wc</code>. The following example saves the result to a temporary file and subsequently overwrites the original:</p>
+<pre class="lang-sh prettyprint-override"><code>if [[ $(tail -c1 file | wc -l) == 1 ]]; then
+  head -c -1 file &gt; file.tmp
+  mv file.tmp file
+fi
+</code></pre>
+<p>You could also use <code>sponge</code> from <code>moreutils</code> to do &quot;in-place&quot; editing:</p>
+<pre class="lang-sh prettyprint-override"><code>[[ $(tail -c1 file | wc -l) == 1 ]] &amp;&amp; head -c -1 file | sponge file
+</code></pre>
+<hr />
+<p>You can also make a general reusable function by stuffing this in your <code>.bashrc</code> file:</p>
+<pre class="lang-sh prettyprint-override"><code># Example:  remove-last-newline &lt; multiline.txt
+function remove-last-newline(){
+    local file=$(mktemp)
+    cat &gt; $file
+    if [[ $(tail -c1 $file | wc -l) == 1 ]]; then
+        head -c -1 $file &gt; $file.tmp
+        mv $file.tmp $file
+    fi
+    cat $file
+}
+</code></pre>
+<h3>Update</h3>
+<p>As noted by <em>KarlWilbur</em> in the comments and used in <a href="https://stackoverflow.com/a/40569742/1331399"><em>Sorentar's</em> answer</a>, <code>truncate --size=-1</code> can replace <code>head -c-1</code> and supports in-place editing.</p>
+<h4> Comment 52997193 Dakkaron: </h4>Best solution of all so far. Uses a standard tool that really every Linux distribution has, and is concise and clear, without any sed or perl wizardry.<br><h4> Comment 91044729 wisbucky: </h4>Note that <code>head -c -1</code> will remove the last character regardless if it is a newline or not, that&#39;s why you have to check whether the last character is a newline before you remove it.<br><h4> Comment 82516641 Karl Wilbur: </h4>Nice solution. One change is that I think I&#39;d use <code>truncate --size=-1</code> instead of <code>head -c -1</code> since it just resizes the input file rather than reading in the input file, writing it out to another file, then replacing the original with the output file.<br><h4> Comment 107323408 Edward Falk: </h4>Unfortunately does not work on Mac. I suspect it doesn&#39;t work on any BSD variant.<br>------------------------------------------------------------------ <br><h3> Answer 1654049 Dennis Williamson: </h3><pre><code>head -n -1 abc &gt; newfile
+tail -n 1 abc | tr -d '\n' &gt;&gt; newfile
+</code></pre>
+
+<p><s> Edit 2: </s></p>
+
+<p><s>Here is an <code>awk</code> version <em>(corrected)</em> that doesn't accumulate a potentially huge array:</s></p>
+
+<p><s>    awk '{if (line) print line; line=$0} END {printf $0}' abc</s></p>
+<h4> Comment 22971582 rudimeier: </h4>Using -c instead of -n for head and tail should be even faster.<br><h4> Comment 34877100 ChrisV: </h4>For me, head -n -1 abc removed the last actual line of the file, leaving a trailing newline; head -c -1 abc seemed to work better<br><h4> Comment 11344111 BCoates: </h4>you can make the output a pipe with process substitution: <code>head -n -1 abc | cat &lt;(tail -n 1 abc | tr -d &#39;\n&#39;) | ...</code><br><h4> Comment 11348884 Dennis Williamson: </h4>@BCoates: That doesn&#39;t do the same thing. Yours only gives the last line (without a newline). The OP wants the <i>whole</i> file with only the last newline removed. Your pipeline would work like this: <code>head -n -1 ifscomma &amp;&amp; cat &lt;(tail -n 1 ifscomma | tr -d &#39;\n&#39;)</code> or <code>head -n -1 ifscomma | cat - &lt;(tail -n 1 ifscomma | tr -d &#39;\n&#39;)</code>. In the latter one, the hyphen causes <code>cat</code> to concatenate what comes across the pipe with the output of the process substitution. Otherwise, the output of <code>head</code> would be ignored.<br><h4> Comment 11354105 Dennis Williamson: </h4>I forgot to edit the name of the file in my previous comment to change it from the test file I was using to the sample name &quot;abc&quot;: <code>s&#47;ifscomma&#47;abc&#47;g</code><br><h4> Comment 13338381 hese: </h4>This worked faster than the perl command on a 1MB file for me.  Great thanks!<br><h4> Comment 1525863 Todd Partridge &#39;Gen2ly&#39;: </h4>Good original way to think about it.  Thanks Dennis.<br><h4> Comment 1527797 Dennis Williamson: </h4>You are correct. I defer to your <code>awk</code> version. It takes <i>two</i> offsets (and a different test) and I only used one. However, you could use <code>printf</code> instead of <code>ORS</code>.<br><h4> Comment 93055002 michael: </h4>just another variant on the &quot;one liner&quot; with <code>cat</code> examples show in the comments (no pipe necessary, using only process substitution, feel free to change the <code>head</code> or <code>tail</code> options as necessary): <code>cat &lt;(head -n -1 abc) &lt;(tail -n 1 abc | tr -d &#39;\n&#39;)</code><br>------------------------------------------------------------------ <br><h3> Answer 1654115 ghostdog74: </h3><p>gawk</p>
+<pre><code>awk '{q=p;p=$0}NR&gt;1{print q}END{ORS = &quot;&quot;; print p}' file
+</code></pre>
+<h4> Comment 23534790 Yevhen Pavliuk: </h4><code>awk &#39;{ prev_line = line; line = $0; } NR &gt; 1 { print prev_line; } END { ORS = &quot;&quot;; print line; }&#39; file</code> this should be easier to read.<br><h4> Comment 1525891 Todd Partridge &#39;Gen2ly&#39;: </h4>Still looks like a lot of characters to me... learning it slowly :).  Does the job though.  Thanks ghostdog.<br><h4> Comment 103054143 Robin A. Meade: </h4>@sorontar The first argument to <code>printf</code> is the <i>format</i> argument. Thus if the input file had something that could be interpreted as a format specifier like <code>%d</code>, you&#39;d get an error. A fix would be to change it to <code>printf &quot;%s&quot; $0</code><br><h4> Comment 68372775 user8017719: </h4>How about: <code>awk &#39;NR&gt;1 {print p} {p=$0} END {printf $0}&#39; file</code>.<br>------------------------------------------------------------------ <br><h3> Answer 40569742 user8017719: </h3><p>A fast solution is using the gnu utility <code>truncate</code>:</p>
+
+<pre><code>[ -z $(tail -c1 file) ] &amp;&amp; truncate -s-1 file
+</code></pre>
+
+<p>The test will be true if the file does have a trailing new line.</p>
+
+<p>The removal is very fast, truly in place, no new file is needed and the search is also reading from the end just one byte (<code>tail -c1</code>).</p>
+<h4> Comment 93055268 michael: </h4>it&#39;s just missing the trailing filename in the example, i.e., <code>[ -z $(tail -c1 filename) ] &amp;&amp; truncate -s -1 filename</code> (also, in reply to the other comment, the <code>truncate</code> command does not work with stdin, a filename is required)<br><h4> Comment 88225920 Brian Hannay: </h4>truncate: missing file operand<br>------------------------------------------------------------------ <br><h3> Answer 37823116 anotheral: </h3><p>A very simple method for single-line files, requiring GNU echo from coreutils:</p>
+
+<pre><code>/bin/echo -n $(cat $file)
+</code></pre>
+<h4> Comment 65413108 user4401178: </h4>This is a decent way if it&#39;s not too expensive (repetitive).<br><h4> Comment 77357966 Chris Stryczynski: </h4>This has issues when <code>\n</code> is present. As it gets converted to a new line.<br><h4> Comment 79821312 Thor: </h4>Also seems to work for multi-line files it the <code>$(...)</code> is  quoted<br><h4> Comment 93055463 michael: </h4>definitely need to quote that... <code>&#47;bin&#47;echo -n &quot;$(cat infile)&quot;</code>  Also, I&#39;m not sure what the max len of <code>echo</code> or the shell would be across os/shell versions/distros (I was just googling this &amp; it was a rabbit hole), so I&#39;m not sure how portable (or performant) it actually would be for anything other than small files -- but for small files, great.<br>------------------------------------------------------------------ <br><h3> Answer 1658873 jrockway: </h3><p>If you want to do it right, you need something like this:</p>
+
+<pre><code>use autodie qw(open sysseek sysread truncate);
+
+my $file = shift;
+open my $fh, '+&gt;&gt;', $file;
+my $pos = tell $fh;
+sysseek $fh, $pos - 1, 0;
+sysread $fh, my $buf, 1 or die 'No data to read?';
+
+if($buf eq "\n"){
+    truncate $fh, $pos - 1;
+}
+</code></pre>
+
+<p>We open the file for reading and appending; opening for appending means that we are already <code>seek</code>ed to the end of the file.  We then get the numerical position of the end of the file with <code>tell</code>.  We use that number to seek back one character, and then we read that one character.  If it's a newline, we truncate the file to the character before that newline, otherwise, we do nothing.</p>
+
+<p>This runs in constant time and constant space for any input, and doesn't require any more disk space, either.</p>
+<h4> Comment 1531661 ysth: </h4>but that has the disadvantage of not reseting ownership/permissions for the file...err, wait...<br><h4> Comment 47194782 mklement0: </h4>Verbose, but both fast and robust - seems to be the only <i>true</i> in-place file-editing answer here (and since it may not be obvious to everyone: this is a <i>Perl</i> script).<br>------------------------------------------------------------------ <br><h3> Answer 1663283 steveha: </h3><p>Here is a nice, tidy Python solution.  I made no attempt to be terse here.</p>
+
+<p>This modifies the file in-place, rather than making a copy of the file and stripping the newline from the last line of the copy.  If the file is large, this will be much faster than the Perl solution that was chosen as the best answer.</p>
+
+<p>It truncates a file by two bytes if the last two bytes are CR/LF, or by one byte if the last byte is LF.  It does not attempt to modify the file if the last byte(s) are not (CR)LF.  It handles errors.  Tested in Python 2.6.</p>
+
+<p>Put this in a file called "striplast" and <code>chmod +x striplast</code>.</p>
+
+<pre><code>#!/usr/bin/python
+
+# strip newline from last line of a file
+
+
+import sys
+
+def trunc(filename, new_len):
+    try:
+        # open with mode "append" so we have permission to modify
+        # cannot open with mode "write" because that clobbers the file!
+        f = open(filename, "ab")
+        f.truncate(new_len)
+        f.close()
+    except IOError:
+        print "cannot write to file:", filename
+        sys.exit(2)
+
+# get input argument
+if len(sys.argv) == 2:
+    filename = sys.argv[1]
+else:
+    filename = "--help"  # wrong number of arguments so print help
+
+if filename == "--help" or filename == "-h" or filename == "/?":
+    print "Usage: %s &lt;filename&gt;" % sys.argv[0]
+    print "Strips a newline off the last line of a file."
+    sys.exit(1)
+
+
+try:
+    # must have mode "b" (binary) to allow f.seek() with negative offset
+    f = open(filename, "rb")
+except IOError:
+    print "file does not exist:", filename
+    sys.exit(2)
+
+
+SEEK_EOF = 2
+f.seek(-2, SEEK_EOF)  # seek to two bytes before end of file
+
+end_pos = f.tell()
+
+line = f.read()
+f.close()
+
+if line.endswith("\r\n"):
+    trunc(filename, end_pos)
+elif line.endswith("\n"):
+    trunc(filename, end_pos + 1)
+</code></pre>
+
+<p>P.S. In the spirit of "Perl golf", here's my shortest Python solution.  It slurps the whole file from standard input into memory, strips all newlines off the end, and writes the result to standard output.  Not as terse as the Perl; you just can't beat Perl for little tricky fast stuff like this.</p>
+
+<p>Remove the "\n" from the call to <code>.rstrip()</code> and it will strip all white space from the end of the file, including multiple blank lines.</p>
+
+<p>Put this into "slurp_and_chomp.py" and then run <code>python slurp_and_chomp.py &lt; inputfile &gt; outputfile</code>.</p>
+
+<pre><code>import sys
+
+sys.stdout.write(sys.stdin.read().rstrip("\n"))
+</code></pre>
+<h4> Comment 20760831 Denis Barmenkov: </h4>os.path.isfile() will tell you about file presence. Using try/except might catch a lot of different errors :)<br>------------------------------------------------------------------ <br><h3> Answer 1656218 ysth: </h3><p>Yet another perl WTDI:</p>
+
+<pre><code>perl -i -p0777we's/\n\z//' filename
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 15568555 Vijay: </h3><pre><code>perl -pi -e 's/\n$// if(eof)' your_file
+</code></pre>
+<h4> Comment 47193830 mklement0: </h4>Effectively the same as the accepted answer, but arguably clearer in concept to non-Perl users. Note that there&#39;s no need for the <code>g</code> or the parentheses around <code>eof</code>: <code>perl -pi -e &#39;s&#47;\n$&#47;&#47; if eof&#39; your_file</code>.<br>------------------------------------------------------------------ <br><h3> Answer 1654040 Sinan &#220;n&#252;r: </h3><pre>
+$  perl -e 'local $/; $_ = &lt;>; s/\n$//; print' a-text-file.txt
+</pre>
+
+<p>See also <a href="https://stackoverflow.com/questions/1164925/match-any-character-including-newlines-in-sed">Match any character (including newlines) in sed</a>.</p>
+<h4> Comment 1525502 Dennis Williamson: </h4>That takes out all the newlines. Equivalent to <code>tr -d &#39;\n&#39;</code><br><h4> Comment 1525623 Todd Partridge &#39;Gen2ly&#39;: </h4>This works good too, probably less blasphemous than paviums&#39;s.<br><h4> Comment 1530149 Rob Kennedy: </h4>Sinan, although Linux and Unix might define text files to end with a newline, Windows poses no such requirement. Notepad, for example, will write only the characters you type without adding anything extra at the end. C compilers might require a source file to end with a line break, but C source files aren&#39;t &quot;just&quot; text files, so they can have extra requirements.<br><h4> Comment 1531672 ysth: </h4>in that vein, most javascript/css minifiers will remove trailing newlines, and yet produce text files.<br><h4> Comment 1532664 Sinan &#220;n&#252;r: </h4>@Rob Kennedy and @ysth: There is an interesting argument there as to why such files are not actually text files and such.<br>------------------------------------------------------------------ <br><h3> Answer 2759611 cpit: </h3><p>Using dd:</p>
+
+<pre><code>file='/path/to/file'
+[[ "$(tail -c 1 "${file}" | tr -dc '\n' | wc -c)" -eq 1 ]] &amp;&amp; \
+    printf "" | dd  of="${file}" seek=$(($(stat -f "%z" "${file}") - 1)) bs=1 count=1
+    #printf "" | dd  of="${file}" seek=$(($(wc -c &lt; "${file}") - 1)) bs=1 count=1
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 2759674 LoranceStinson: </h3><p>Assuming Unix file type and you only want the last newline this works.</p>
+
+<pre><code>sed -e '${/^$/d}'
+</code></pre>
+
+<p>It will not work on multiple newlines...</p>
+
+<p><strong>*</strong> <em>Works only if the last line is a blank line.</em></p>
+<h4> Comment 91046482 wisbucky: </h4>Here&#39;s a <code>sed</code> solution that works even for a non-blank last line: <a href="https://stackoverflow.com/a/52047796">stackoverflow.com/a/52047796</a><br>------------------------------------------------------------------ <br><h3> Answer 52047796 wisbucky: </h3><p>This is a good solution if you need it to work with pipes/redirection instead of reading/output from or to a file. This works with single or multiple lines. It works whether there is a trailing newline or not.</p>
+
+<pre><code># with trailing newline
+echo -en 'foo\nbar\n' | sed '$s/$//' | head -c -1
+
+# still works without trailing newline
+echo -en 'foo\nbar' | sed '$s/$//' | head -c -1
+
+# read from a file
+sed '$s/$//' myfile.txt | head -c -1
+</code></pre>
+
+<p>Details:</p>
+
+<ul>
+<li><code>head -c -1</code> truncates the last character of the string, regardless of what the character is. So if the string does not end with a newline, then you would be losing a character.</li>
+<li>So to address that problem, we add another command that will add a trailing newline if there isn't one: <code>sed '$s/$//'</code> . The first <code>$</code> means only apply the command to the last line. <code>s/$//</code> means substitute the "end of the line" with "nothing", which is basically doing nothing. But it has a side effect of adding a trailing newline is there isn't one.</li>
+</ul>
+
+<p>Note: Mac's default <code>head</code> does not support the <code>-c</code> option. You can do <code>brew install coreutils</code> and use <code>ghead</code> instead.</p>
+------------------------------------------------------------------ <br><h3> Answer 10107400 Nicholas Wilson: </h3><p>Yet another answer FTR (and my favourite!): echo/cat the thing you want to strip and capture the output through backticks. The final newline will be stripped. For example:</p>
+
+<pre><code># Sadly, outputs newline, and we have to feed the newline to sed to be portable
+echo thingy | sed -e 's/thing/sill/'
+
+# No newline! Happy.
+out=`echo thingy | sed -e 's/thing/sill/'`
+printf %s "$out"
+
+# Similarly for files:
+file=`cat file_ending_in_newline`
+printf %s "$file" &gt; file_no_newline
+</code></pre>
+<h4> Comment 28170286 technosaurus: </h4>I found the cat-printf combo out by accident (was trying to get the opposite behavior).  Note that this will remove <i>ALL</i> trailing newlines, not just the last.<br>------------------------------------------------------------------ <br><h3> Answer 37302409 peak: </h3><p>ruby:</p>
+
+<pre><code>ruby -ne 'print $stdin.eof ? $_.strip : $_'
+</code></pre>
+
+<p>or:</p>
+
+<pre><code>ruby -ane 'q=p;p=$_;puts q if $.&gt;1;END{print p.strip!}'
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 39142246 Oleg Mazko: </h3><p>POSIX SED:</p>
+
+<p><a href="http://sed.js.org/?gist=82a50915abacbaf9d36801d5ad3d9665" rel="nofollow">'${/^$/d}'</a></p>
+
+<pre><code>$ - match last line
+
+
+{ COMMANDS } - A group of commands may be enclosed between { and } characters. This is particularly useful when you want a group of commands to be triggered by a single address (or address-range) match.
+</code></pre>
+<h4> Comment 91045078 wisbucky: </h4>I think this will only remove it if the last line is blank. It will not remove the trailing newline if the last line is not blank. For example, <code>echo -en &#39;a\nb\n&#39; | sed &#39;${&#47;^$&#47;d}&#39;</code> will not remove anything. <code>echo -en &#39;a\nb\n\n&#39; | sed &#39;${&#47;^$&#47;d}&#39;</code> will remove since the entire last line is blank.<br>------------------------------------------------------------------ <br><h3> Answer 19769053 NeronLeVelu: </h3><pre><code>sed -n "1 x;1 !H
+$ {x;s/\n*$//p;}
+" YourFile
+</code></pre>
+
+<p>Should remove any last occurence of \n in file. Not working on huge file (due to sed buffer limitation)</p>
+------------------------------------------------------------------ <br><h3> Answer 1656988 dlamblin: </h3><p>The only time I've wanted to do this is for code golf, and then I've just copied my code out of the file and pasted it into an <code>echo -n 'content'&gt;file</code> statement.</p>
+<h4> Comment 16254136 mklement0: </h4>Halfway there; complete approach <a href="http://stackoverflow.com/a/12148703/45375">here</a>.<br>------------------------------------------------------------------ <br><h3> Answer 2482346 ghostdog74: </h3><pre><code>sed ':a;/^\n*$/{$d;N;};/\n$/ba' file
+</code></pre>
+<h4> Comment 47193715 mklement0: </h4>Works, but removes <i>all</i> trailing newlines.<br>------------------------------------------------------------------ <br><h3> Answer 11154296 cadrian: </h3><p>I had a similar problem, but was working with a windows file and need to keep those CRLF -- my solution on linux:</p>
+
+<pre><code>sed 's/\r//g' orig | awk '{if (NR&gt;1) printf("\r\n"); printf("%s",$0)}' &gt; tweaked
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 72138792 lenny: </h3><p>Here's a simple solution that uses sed.
+Your versions of sed needs to support the <code>-z</code> option.</p>
+<pre><code>       -z, --null-data
+
+              separate lines by NUL characters
+</code></pre>
+<p>It can either be used in a pipe or used to edit the file in place with the <code>-i</code> option</p>
+<pre><code>sed -ze 's/\n$//' file
+</code></pre>

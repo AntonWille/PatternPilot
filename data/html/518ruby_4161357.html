@@ -1,0 +1,179 @@
+ <h2> Title: How to reverse a &#39;rails generate&#39; </h2> <h3> marcamillion, question_id: 4161357 </h3>Score: 518, Tags: {ruby,ruby-on-rails-3,rails-generate} <br><p>I want to delete all the files it created and roll back any changes made, but not necessarily to the database, but more to the config files.</p>
+
+<p>I'd like to automatically delete all the resource mappings for the model/controller deleted in the routes.rb file and everywhere else that changes might have been made?</p>
+------------------------------------------------------------------ <br><h3> Answer 4161385 F&#225;bio Batista: </h3><pre><code>rails destroy controller lalala
+rails destroy model yadayada
+rails destroy scaffold hohoho
+</code></pre>
+
+<p>Rails 3.2 adds a new <code>d</code> shortcut to the command, so now you can write:</p>
+
+<pre><code>rails d controller lalala
+rails d model yadayada
+rails d scaffold hohoho
+</code></pre>
+<h4> Comment 14270400 varatis: </h4>@marcamillion Must&#39;ve been that extra &#39;L&#39;.<br><h4> Comment 4493480 marcamillion: </h4>Ok, I figured it out. Perhaps I was mistyping something. I just ran <code>rails destroy scaffold lalalal</code> and that worked.<br><h4> Comment 22568936 F&#225;bio Batista: </h4>@doug, I don&#39;t think that&#39;s possible. Your best bet is to just rerun the generator with the <code>-f</code> flag to force it to recreate/reedit the files… Then you can see which files it created/changed, and proceed on manually deleting them.<br><h4> Comment 19945108 doug: </h4>What about removing files associated with a gem install such as <code>rails generate &lt;gemname&gt;:install</code><br><h4> Comment 4493260 marcamillion: </h4>Btw, how do I use this command to delete a scaffold? The model and controller work fine...but how do I completely reverse a scaffold?<br><h4> Comment 59669946 gbutters: </h4>You yadayada&#39;d over the best part.<br><h4> Comment 85498120 Kristis: </h4>To destoy generated gem install need to type -&gt; rails destroy &lt;gemname&gt;:install<br><h4> Comment 63298831 xamenrax: </h4>Note that you will have to rollback any migrations created with scaffold before deleting the scaffold itself.<br><h4> Comment 45405725 vitdes: </h4>For destroying controller write plural name (rails d controller comments)<br><h4> Comment 54214302 Ben G: </h4>Wow I wasn&#39;t expecting this functionality!  Thought you had to use Git commits throughout<br><h4> Comment 54456857 Boon: </h4>Why do the steps not include db rollback as well and schema.rb update?<br>------------------------------------------------------------------ <br><h3> Answer 27440814 Maikon: </h3><p>It's worth mentioning the <code>-p</code> flag here ("p" for <em>pretend</em>). </p>
+
+<p>If you add this to the command it will simply do a "test" run and show you what files will be deleted without actually deleting them.</p>
+
+<pre><code>$ rails d controller welcome -p
+
+  remove  app/controllers/welcome_controller.rb
+  invoke  erb
+  remove    app/views/welcome
+  invoke  test_unit
+  remove    test/controllers/welcome_controller_test.rb
+  invoke  helper
+  remove    app/helpers/welcome_helper.rb
+  invoke    test_unit
+  remove      test/helpers/welcome_helper_test.rb
+  invoke  assets
+  invoke    coffee
+  remove      app/assets/javascripts/welcome.js.coffee
+  invoke    scss
+  remove      app/assets/stylesheets/welcome.css.scss
+</code></pre>
+
+<p>If you're happy with it, run the command again without the <code>-p</code> flag.</p>
+<h4> Comment 61053057 Emil Re&#241;a Enriquez: </h4>I think this is the best answer<br>------------------------------------------------------------------ <br><h3> Answer 8185211 Maikel: </h3><p><code>rails destroy controller Controller_name</code> was returning a bunch of errors. To be able to destroy controller I had to remove related routes in routes.rb. P.S. I'm using rails 3.1</p>
+<h4> Comment 105936936 the Tin Man: </h4>Please don&#39;t summarize your actions unless you intend for this answer to be the selected correct answer.<br>------------------------------------------------------------------ <br><h3> Answer 21776405 uma: </h3><p>This is a prototype to generate or destroy a controller or model in Rails:</p>
+
+<pre><code>rails generate/destroy controller/model [controller/model Name]
+</code></pre>
+
+<p>For example, if you need to generate a User Controller:</p>
+
+<pre><code>rails generate controller User
+</code></pre>
+
+<p>or</p>
+
+<pre><code>rails g controller User
+</code></pre>
+
+<p>If you want to destroy the User controller or revert to above action
+then use:</p>
+
+<pre><code>rails destroy controller User
+</code></pre>
+
+<p>or:</p>
+
+<pre><code>rails d controller User
+</code></pre>
+
+<p><img src="https://i.stack.imgur.com/TN857.png" alt="enter image description here"></p>
+------------------------------------------------------------------ <br><h3> Answer 16987139 kishore: </h3><p>You could use <code>rails d model/controller/migration ...</code> to destroy or remove the changes generated by using the <code>rails generate</code> command.</p>
+
+<p>For example:</p>
+
+<pre><code>rails g model Home name:string
+</code></pre>
+
+<p>creates a model named <code>home</code> with attribute <code>name</code>. To remove the files and code generated from that command we can use </p>
+
+<pre><code>rails d model Home
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 24993200 Santanu: </h3><p>If you use Rails, use <code>rails d controller Users</code>.</p>
+
+<p>And, if you use Zeus, use <code>zeus d controller Users</code>. </p>
+
+<p>On the other hand, if you are using git or SVN, revert your changes with the commit number. This is much faster.</p>
+------------------------------------------------------------------ <br><h3> Answer 42173152 Manoj Kumar: </h3><p>Before reverting the <code>rails generate</code>, please make sure you <strong>rollback the migration</strong> first.</p>
+
+<p>Case 1: if you want to revert scaffold then run this command:</p>
+
+<pre><code>rails destroy scaffold MODEL_NAME
+</code></pre>
+
+<p>Case 2: if you want to revert model then run this command:</p>
+
+<pre><code>rails destroy model MODEL_NAME
+</code></pre>
+
+<p>Case 3: if you want to revert controller then run this command:</p>
+
+<pre><code>rails destroy controller CONTROLLER_NAME
+</code></pre>
+
+<p>Note: you can also use shortcut <code>d</code> instead of <code>destroy</code>.</p>
+------------------------------------------------------------------ <br><h3> Answer 22508694 user3412661: </h3><p>You can revert your</p>
+
+<pre><code>rails g/generate controller/model/migration xxx
+</code></pre>
+
+<p>output by using:</p>
+
+<pre><code> rails d/destroy controller/model/migration xxx
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 32895583 Patrick G.: </h3><p>If you prefer to delete the controller manually:</p>
+
+<p>For controller <code>welcome</code></p>
+
+<pre><code>rm app/controllers/welcome_controller.rb
+rm app/views/welcome
+rm test/controllers/welcome_controller_test.rb
+rm app/helpers/welcome_helper.rb
+rm test/helpers/welcome_helper_test.rb
+rm app/assets/javascripts/welcome.js.coffee
+rm app/assets/stylesheets/welcome.css.scss
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 33540823 Vipul Lawande: </h3><p>You can undo a <code>rails generate</code> in the following ways:</p>
+
+<ul>
+<li>For the model: <code>rails destroy MODEL</code> </li>
+<li>For the controller: <code>rails destroy controller_name</code></li>
+</ul>
+------------------------------------------------------------------ <br><h3> Answer 47936121 L11: </h3><p>Suppose I have created a controller named "sample" like:</p>
+
+<pre><code>rails generate controller sample
+</code></pre>
+
+<p>If I have to destroy this controller, all I have to do is swap <code>generate</code> with <code>destroy</code>, as in </p>
+
+<pre><code>rails destroy controller sample.
+</code></pre>
+
+<p>If you want to reverse the generation, all you have to do is swap  <code>generate</code> with <code>destroy</code>.</p>
+------------------------------------------------------------------ <br><h3> Answer 52989314 purge: </h3><p>To reverse <code>rails generate</code>, use <code>rails destroy</code>:</p>
+
+<pre><code>rails destroy Model
+</code></pre>
+
+<p>See "<a href="https://guides.rubyonrails.org/command_line.html#rails-destroy" rel="nofollow noreferrer"><code>rails destroy</code></a>" for more information.</p>
+------------------------------------------------------------------ <br><h3> Answer 54033938 Foram: </h3><p>You can destroy all things that was created same way except little thing change.
+For controller,</p>
+
+<pre><code>rails d controller_name (d stands for destroy)
+</code></pre>
+
+<p>For Model</p>
+
+<pre><code>rails d model_name
+</code></pre>
+
+<p>you just put <code>d(destroy)</code> instead of <code>g(generate)</code> in your migration.</p>
+------------------------------------------------------------------ <br><h3> Answer 38789723 Flautarian: </h3><p>All versions of rails have a "destroy", so-, if you create a (for example) scaffold named "tasks" using a generator, to destroy all the changes of that generate step you will have to type:</p>
+
+<pre><code>rails destroy scaffold Tasks
+</code></pre>
+
+<p>Hope it helps you.</p>
+------------------------------------------------------------------ <br><h3> Answer 31767917 Chutipong Roobklom: </h3><p>To reverse that, we just destroy it. Open the Terminal application and go to the project directory, then, type this:</p>
+
+<pre><code>rails destroy model CamelCase
+rails destroy controller CamelCase
+</code></pre>
+
+<p>Where <code>CamelCase</code> is a name of any model or controller.
+It will remove the model, migration and some of the related test files. (You can see the result in the Terminal window after you have run the command.) </p>
+------------------------------------------------------------------ <br><h3> Answer 44105310 Dinesh Vaitage: </h3><p>Removed scaffolding for selected model:</p>
+
+<pre><code>bin/rails d scaffold &lt;AccessControl&gt; //model name
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 48513760 Krishnaraj Rajendran Nair: </h3><p>We use generate as 
+                          <code>rails generate app</code>. 
+So regenerating any <code>generate</code> statement can be reversed using <code>destroy</code> statement.
+Just replace <code>generate</code> with <code>destroy</code> 
+i.e.      <code>rails generate app</code> can be written as   <code>rails destroy app'
+</code>rails generate ____<code>as</code>rails destroy ____`</p>

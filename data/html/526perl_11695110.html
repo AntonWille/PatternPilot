@@ -1,0 +1,104 @@
+ <h2> Title: Why is this program valid? I was trying to create a syntax error </h2> <h3> Bill Ruppert, question_id: 11695110 </h3>Score: 526, Tags: {perl} <br><p>I'm running ActiveState's 32 bit <a href="https://www.activestate.com/activeperl" rel="noreferrer">ActivePerl</a> 5.14.2 on Windows 7. I wanted to mess around with a Git pre-commit hook to detect programs being checked in with syntax errors. (Somehow I just managed to do such a bad commit.) So as a test program I randomly jotted this:</p>
+
+<pre><code>use strict;
+use warnings;
+
+Syntax error!
+
+exit 0;
+</code></pre>
+
+<p>However, it compiles and executes with no warnings, and errorlevel is zero on exit. How is this valid syntax?</p>
+<h4> Comment 15853182 Peter M: </h4>Did you just prove that typing random words into perl produces working programs??!?!?!?!<br><h4> Comment 15875552 Bill Ruppert: </h4>@PeterM Hardly random words.  I proved I don&#39;t know enough about Perl syntax.  Now I know a bit more.<br><h4> Comment 33936360 LeoNerd: </h4>You probably want <code>no indirect</code> to stop those ones from happening<br><h4> Comment 72369081 clt60: </h4>This is the <b>most famous</b> perl question ever. Even better as <a href="http://www.perlmonks.org/?node_id=663393" rel="nofollow noreferrer">Schwartz&#39;s snippet</a>: <code>whatever  &#47; 25 ; # &#47; ; die &quot;this dies!&quot;;</code><br><h4> Comment 116532674 bbaassssiiee: </h4>Written by linguist Larry Wall, Perl allows authors a lot of creative space. There is a sub-category in perl programming called Perl Poetry, valid Perl expressing stuff beyond computer interpretation: <a href="https://www.perlmonks.org/?node_id=1111395" rel="nofollow noreferrer">perlmonks.org/?node_id=1111395</a><br>------------------------------------------------------------------ <br><h3> Answer 11695310 ikegami: </h3><p>Perl has a syntax called &quot;indirect method notation&quot;. It allows</p>
+<pre><code>Foo-&gt;new($bar)
+</code></pre>
+<p>to be written as</p>
+<pre><code>new Foo $bar
+</code></pre>
+<p>So that means</p>
+<pre><code>Syntax error ! exit 0;
+</code></pre>
+<p>is the same as</p>
+<pre><code>error-&gt;Syntax(! exit 0);
+</code></pre>
+<p>or</p>
+<pre><code>error-&gt;Syntax(!exit(0));
+</code></pre>
+<p>Not only is it valid syntax, it doesn't result in a run-time error because the first thing executed is <code>exit(0)</code>.</p>
+<hr />
+<p>This feature can be disabled using any of the following:</p>
+<pre class="lang-perl prettyprint-override"><code>no feature qw( indirect );  # Perl 5.32+
+
+use v5.36;                  # Perl 5.36+
+
+no indirect;                # CPAN module
+</code></pre>
+<h4> Comment 15510016 ikegami: </h4>@Hassan, The language has types. Specifically, values have types. Operators and subs are simply not confined to returning specific types of values. This turns out to be <i>very</i> useful at little cost (thanks to warnings).<br><h4> Comment 15519789 ikegami: </h4>@Nawaz, It&#39;s actually quite popular. It&#39;s used by everyone that constructs objects in Java and C++, and a large body of Perl programmers that uses <code>new Class</code> and <code>print $fh ...</code> instead of <code>Class-&gt;new(...)</code> and <code>$fh-&gt;print(...)</code>. I will grant you that it causes a weird error messages, though<br><h4> Comment 15509412 ikegami: </h4>@Hassan, Think of it this way, <code>!exit(0)</code> can no more be a type error than <code>!$x</code> since neither are typed.<br><h4> Comment 15509221 Bill Ruppert: </h4>I got as far as reading it as &quot;Syntax error !exit 0;&quot;, but I didn&#39;t think about indirect invocation.  Spent a lot of time forgetting that!<br><h4> Comment 15509301 ikegami: </h4>@Hassan, When <code>exit</code> returns (never), it does return a boolean, just like every single other op and sub in scalar context. That&#39;s wouldn&#39;t be a syntax error anyway, that would be a type error.<br><h4> Comment 15509144 ikegami: </h4>@Hassan, Why? It&#39;s followed by an expression.<br><h4> Comment 15509213 user377628: </h4>Okay, maybe because I don&#39;t know perl, but in many other languages, that would only work if <code>exit</code>&#39;s return value is a boolean (or something else that can be the operand of <code>!</code>), ie simply being an expression is not enough.<br><h4> Comment 15509591 user377628: </h4>Non-typed languages give me the jitters.<br><h4> Comment 15509340 user377628: </h4>Ahh, I see. Again, I&#39;m pretty perl-ignorant, so sorry about that.<br><h4> Comment 15509134 user377628: </h4>Good explanation! But shouldn&#39;t the not operator (<code>!</code>) cause a syntax error?<br>------------------------------------------------------------------ <br><h3> Answer 11695199 pavel: </h3><p>I don't know why, but this is what Perl makes of it:</p>
+
+<pre><code>perl -MO=Deparse -w yuck
+BEGIN { $^W = 1; }
+use warnings;
+use strict 'refs';
+'error'-&gt;Syntax(!exit(0));
+yuck syntax OK
+</code></pre>
+
+<p>It seems that the parser thinks you're calling the method <code>Syntax</code> on the <code>error</code>-object... Strange indeed!</p>
+<h4> Comment 15508977 mob: </h4>Congratulations. You found a program where you need to add a semi-colon in order do get the compile to fail.<br><h4> Comment 15508927 amon: </h4>Perl seems to assume the &quot;indirect (object) syntax&quot;, usually used like <code>new Class</code> instead of <code>Class-&gt;new()</code>. To call the method <code>Syntax</code>, the <code>exit</code> function is executed, so the run-time error never occures.<br><h4> Comment 15508926 user149341: </h4>That&#39;s indirect method call syntax. It&#39;s (sort of) working here because the <code>exit(0)</code> is evaluated first, making the program exit before it tries to pass the result to <code>&#39;error&#39;-&gt;Syntax()</code>.<br><h4> Comment 56260292 user4401178: </h4><code>use strict; use warnings;  error-&gt;Syntax(! print &quot;hi&quot;);</code>  Yields: Syntax Ok on perl -MO=Deparse as well, but with <code>use warnings</code> it should probably say something since it can figure out that its not being loaded. Instead it throws a runtime error &quot;Can&#39;t locate object method .. &quot;.<br>------------------------------------------------------------------ <br><h3> Answer 11695318 TLP: </h3><p>The reason you do not get an error is that the first executed code is </p>
+
+<pre><code>exit(0);
+</code></pre>
+
+<p>Because you did not have a semicolon on the first line:</p>
+
+<pre><code>Syntax error!
+</code></pre>
+
+<p>The compiler will guess (incorrectly) that this is a subroutine call with a <code>not</code> operator <code>!</code> thrown in. It will then execute the arguments to this subroutine, which happens to be <code>exit(0)</code>, at which point the program exits and sets errorlevel to 0. Nothing else is executed, so no more runtime errors are reported.</p>
+
+<p>You will notice that if you change <code>exit(0)</code> to something like <code>print "Hello world!"</code> you do get an error:</p>
+
+<pre class="lang-none prettyprint-override"><code>Can't locate object method "Syntax" via package "error" ...
+</code></pre>
+
+<p>and your error level will be set:</p>
+
+<pre><code>&gt; echo %errorlevel%
+255
+</code></pre>
+<h4> Comment 46202080 TLP: </h4>@LiamLaverty Yes, it can. It can guess incorrectly what the human meant.<br><h4> Comment 46197690 Liam Laverty: </h4><code>&gt;The compiler will guess (incorrectly)</code>  The compiler can&#39;t do anything incorrectly.<br><h4> Comment 46202242 Liam Laverty: </h4>The human is the incorrect one in the equation. The compiler can only be &quot;correct&quot; or &quot;broken&quot;. It doesn&#39;t get an opinion on the definition of the language or a user&#39;s intention.<br><h4> Comment 46204686 TLP: </h4>@LiamLaverty It would be a pretty neat compiler if it could guess the user&#39;s intention in this case, yes. Hence, the compiler cannot guess correctly. You might be doing some technical jargon analysis of my statement, which is, I might add, the incorrect way to read it.<br><h4> Comment 65951432 Rikki: </h4>Isn&#39;t it an interpretater? ;-)<br><h4> Comment 65955211 TLP: </h4>@Rikki Possibly an interpreter. :P<br>------------------------------------------------------------------ <br><h3> Answer 22840240 Mark Fowler: </h3><p>As noted above this is caused by the indirect method calling notation.  You can warn on this:</p>
+
+<pre><code>use strict;
+use warnings;
+no indirect;
+
+Syntax error!
+
+exit 0;
+</code></pre>
+
+<p>Produces:</p>
+
+<pre><code>Indirect call of method "Syntax" on object "error" at - line 5.
+</code></pre>
+
+<p>This requires the <a href="http://metacpan.org/module/indirect">indirect CPAN module</a>.</p>
+
+<p>You can also use <code>no indirect "fatal";</code> to cause the program to die (this is what I do)</p>
+<h4> Comment 114353274 Rsh: </h4>From Perl 5.32 onwards you can disable indirect feature and you longer need to add a CPAN module: <code>use v.5:32; no feature &#39;indirect&#39;;</code><br>------------------------------------------------------------------ <br><h3> Answer 35233397 moritz: </h3><p>Try <a href="https://perl6.org/">Perl 6</a>, it seems to fulfill your expectations more readily:</p>
+
+<pre><code>===SORRY!=== Error while compiling synerror.p6
+Negation metaoperator not followed by valid infix
+at synerror.p6:1
+------&gt; Syntax error!⏏&lt;EOL&gt;
+    expecting any of:
+        infix
+        infix stopper
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 59600789 Holli: </h3><blockquote>
+  <p>In this <a href="https://famicol.in/sigbovik/" rel="nofollow noreferrer">paper</a>, we aim to answer a long-standing open problem in the
+  programming languages community: is it possible to smear paint on the
+  wall without creating valid Perl?</p>
+</blockquote>
+
+<p>TLDR; Hardly</p>

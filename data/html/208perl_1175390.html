@@ -1,0 +1,205 @@
+ <h2> Title: How do I compare two strings in Perl? </h2> <h3> PJT, question_id: 1175390 </h3>Score: 208, Tags: {perl,string-comparison} <br><p>How do I compare two strings in Perl?</p>
+
+<p>I am learning Perl, I had this basic question looked it up here on StackOverflow and found no good answer so I thought I would ask.</p>
+<h4> Comment 999828 brian d foy: </h4>You might want to check out a book such as <i>Learning Perl</i> (which I co-authored). There weren&#39;t good answers to this question because it&#39;s very basic.  A tutorial will help you pick up the basics quickly.<br><h4> Comment 995835 Sinan &#220;n&#252;r: </h4>You should first consult the excellent documentation that comes with Perl.<br>------------------------------------------------------------------ <br><h3> Answer 1175398 Sinan &#220;n&#252;r: </h3><p>See <a href="https://metacpan.org/pod/perlop#Equality-Operators" rel="noreferrer">perldoc perlop</a>. Use <code>lt</code>, <code>gt</code>, <code>eq</code>, <code>ne</code>, and <code>cmp</code> as appropriate for string comparisons:</p>
+<blockquote>
+<p>Binary <code>eq</code> returns true if the left argument is stringwise equal to the right argument.</p>
+<p>Binary <code>ne</code> returns true if the left argument is stringwise not equal to the right argument.</p>
+<p>Binary <code>cmp</code> returns -1, 0, or 1 depending on whether the left argument is stringwise less than, equal to, or greater than the right argument.</p>
+<p>Binary <code>~~</code> does a smartmatch between its arguments. ...</p>
+<p><code>lt</code>, <code>le</code>, <code>ge</code>, <code>gt</code> and <code>cmp</code> use the collation (sort) order specified by the current locale if a legacy use locale (but not <code>use locale ':not_characters'</code>) is in effect. See <a href="https://metacpan.org/pod/perllocale" rel="noreferrer">perllocale</a>. Do not mix these with Unicode, only with legacy binary encodings. The standard <a href="https://metacpan.org/pod/Unicode::Collate" rel="noreferrer">Unicode::Collate</a> and <a href="https://metacpan.org/pod/Unicode::Collate::Locale" rel="noreferrer">Unicode::Collate::Locale</a> modules offer much more powerful solutions to collation issues.</p>
+</blockquote>
+<h4> Comment 995887 PJT: </h4>Just one more, ne for not equal.<br><h4> Comment 995974 Daniel C. Sobral: </h4>You might want to mention that $str1 =~ &quot;$str2&quot; (not /$str2/) will check if $str2 is a substring of $str1.<br><h4> Comment 996580 ysth: </h4>@Daniel: there&#39;s not much practical difference between =~&quot;$str2&quot; and =~/$str2/ (or just =~$str2 for that matter); index is the right tool, but if you need to use a regex for some reason, do =~/\Q$str2\E/.<br><h4> Comment 44629411 Sinan &#220;n&#252;r: </h4>@IliaRostovtsev <code>!=</code> and <code>ne</code> are not the same, because <code>!=</code> and <code>ne</code> are defined to be different. How hard is that?! Being a numeric comparison operator, <code>!=</code> converts both its operands to numbers <code>perl -E &#39;say &quot;equal&quot; if not &quot;a&quot; != &quot;b&quot;&#39;</code>.<br><h4> Comment 996011 Sinan &#220;n&#252;r: </h4>@Daniel use <code>index</code> to see if a string is a substring of another one.<br><h4> Comment 44570610 Ilia Ross: </h4>Can&#39;t understand why  <code>!=</code> is not the same as <code>ne</code> - or at least (and for sure) it doesn&#39;t always work the same way. Most of the time only <code>ne</code> works reliable enough? Any idea why?<br><h4> Comment 44631714 Ilia Ross: </h4>@Sinan&#220;n&#252;r Thank you very much for your explanation. It seems a bit different than it&#39;s in <code>JavaScript</code> or <code>PHP</code>. Cheers.<br><h4> Comment 57206692 zsltg: </h4>I think it would worth briefly describing what <a href="http://perldoc.perl.org/perlop.html#Smartmatch-Operator" rel="nofollow noreferrer">smartmatch</a> is as in the other cases, it is also good to know that it is experimental and its behavior might change. <i>&quot;The <code>~~</code> operator compares its operands &quot;polymorphically&quot;, determining how to compare them according to their actual types (numeric, string, array, hash, etc.)&quot;</i><br><h4> Comment 57248869 zsltg: </h4>@Sinan&#220;n&#252;r: I&#39;m not suggesting you should recommend it. However I think a brief description about it would be beneficial.<br><h4> Comment 57262715 Sinan &#220;n&#252;r: </h4>@Zsolt Maybe <a href="http://www.nntp.perl.org/group/perl.perl5.porters/2015/09/msg230881.html" rel="nofollow noreferrer">you can figure it out and post your own answer</a>. There is absolutely no need to bring smartmatch into this question, or, IMNSHO, use it in any program.<br><h4> Comment 120256428 FantomX1: </h4>I am not sure, how is perl &#39;sort&#39; exactly supposed to work, but it seems, it worked only with cmp not with  lt or gt operators.<br>------------------------------------------------------------------ <br><h3> Answer 1175418 Brad Gilbert: </h3><ul>
+<li><p><code>cmp</code> Compare</p>
+
+<pre><code>'a' cmp 'b' # -1
+'b' cmp 'a' #  1
+'a' cmp 'a' #  0
+</code></pre></li>
+<li><p><code>eq</code> Equal to</p>
+
+<pre><code>'a' eq  'b' #  0
+'b' eq  'a' #  0
+'a' eq  'a' #  1
+</code></pre></li>
+<li><p><code>ne</code> Not-Equal to</p>
+
+<pre><code>'a' ne  'b' #  1
+'b' ne  'a' #  1
+'a' ne  'a' #  0
+</code></pre></li>
+<li><p><code>lt</code> Less than</p>
+
+<pre><code>'a' lt  'b' #  1
+'b' lt  'a' #  0
+'a' lt  'a' #  0
+</code></pre></li>
+<li><p><code>le</code> Less than or equal to</p>
+
+<pre><code>'a' le  'b' #  1
+'b' le  'a' #  0
+'a' le  'a' #  1
+</code></pre></li>
+<li><p><code>gt</code> Greater than</p>
+
+<pre><code>'a' gt  'b' #  0
+'b' gt  'a' #  1
+'a' gt  'a' #  0
+</code></pre></li>
+<li><p><code>ge</code> Greater than or equal to</p>
+
+<pre><code>'a' ge  'b' #  0
+'b' ge  'a' #  1
+'a' ge  'a' #  1
+</code></pre></li>
+</ul>
+
+<p>See <a href="http://perldoc.perl.org/perlop.html#Equality-Operators" rel="noreferrer"><code>perldoc perlop</code></a> for more information.</p>
+
+<p>( I'm simplifying this a little bit as all but <code>cmp</code> return a value that is both an empty string, and a numerically zero value instead of <code>0</code>, and a value that is both the string <code>'1'</code> and the numeric value <code>1</code>. These are the same values you will always get from boolean operators in Perl. You should really only be using the return values for boolean or numeric operations, in which case the difference doesn't really matter. )</p>
+<h4> Comment 28985286 Zon: </h4>I like this answer more. Short simple examples are usually more helpful for newbies, than only banal multipage docs reference.<br><h4> Comment 46969390 Sinan &#220;n&#252;r: </h4>@Zon except that return values for <code>eq</code>, <code>gt</code>, <code>lt</code> etc are not correct ... They return true or false. Only <code>cmp</code> returns specific numeric values.<br><h4> Comment 51193309 Brad Gilbert: </h4>Perl 6 uses the same operators except it uses <code>leg</code> instead of <code>cmp</code> which is used for generic comparisons instead.<br>------------------------------------------------------------------ <br><h3> Answer 1175799 Chas. Owens: </h3><p>In addtion to Sinan Ünür comprehensive listing of string comparison operators, Perl 5.10 adds the smart match operator.</p>
+
+<p>The smart match operator compares two items based on their type.  See the chart below for the 5.10 behavior (I believe this behavior is changing slightly in 5.10.1):</p>
+
+<h3><a href="http://perldoc.perl.org/perlsyn.html#Smart-matching-in-detail" rel="noreferrer"><code>perldoc perlsyn</code> "Smart matching in detail"</a>:</h3>
+
+<blockquote><p>
+The behaviour of a smart match depends on what type of thing its arguments are. It is always commutative, i.e. <code>$a ~~ $b</code> behaves the same as <code>$b ~~ $a</code> . The behaviour is determined by the following table: the first row that applies, in either order, determines the match behaviour.
+<p>
+<pre>
+  $a      $b        Type of Match Implied    Matching Code
+  ======  =====     =====================    =============
+  (overloading trumps everything)
+
+  Code[+] Code[+]   referential equality     $a == $b   
+  Any     Code[+]   scalar sub truth         $b−>($a)   
+
+  Hash    Hash      hash keys identical      [sort keys %$a]~~[sort keys %$b]
+  Hash    Array     hash slice existence     grep {exists $a−>{$_}} @$b
+  Hash    Regex     hash key grep            grep /$b/, keys %$a
+  Hash    Any       hash entry existence     exists $a−>{$b}
+
+  Array   Array     arrays are identical[*]
+  Array   Regex     array grep               grep /$b/, @$a
+  Array   Num       array contains number    grep $_ == $b, @$a 
+  Array   Any       array contains string    grep $_ eq $b, @$a 
+
+  Any     undef     undefined                !defined $a
+  Any     Regex     pattern match            $a =~ /$b/ 
+  Code()  Code()    results are equal        $a−>() eq $b−>()
+  Any     Code()    simple closure truth     $b−>() # ignoring $a
+  Num     numish[!] numeric equality         $a == $b   
+  Any     Str       string equality          $a eq $b   
+  Any     Num       numeric equality         $a == $b   
+
+  Any     Any       string equality          $a eq $b   
+
++ − this must be a code reference whose prototype (if present) is not ""
+(subs with a "" prototype are dealt with by the 'Code()' entry lower down) 
+* − that is, each element matches the element of same index in the other
+array. If a circular reference is found, we fall back to referential 
+equality.   
+! − either a real number, or a string that looks like a number
+</pre>
+<p>
+The "matching code" doesn't represent the real matching code, of course: it's just there to explain the intended meaning. Unlike grep, the smart match operator will short-circuit whenever it can.
+<p>
+Custom matching via overloading
+You can change the way that an object is matched by overloading the <code>~~</code> operator. This trumps the usual smart match semantics. See <a href="http://perldoc.perl.org/overload.html" rel="noreferrer"><code>overload</code></a>.
+</p>
+</blockquote>
+<h4> Comment 21352178 Brad Gilbert: </h4>The link should probly change since the docs have changed in the mean time. <a href="http://perldoc.perl.org/5.14.2/perlsyn.html#Smart-matching-in-detail" rel="nofollow noreferrer">5.14.2</a> <a href="http://perldoc.perl.org/perlop.html#Smartmatch-Operator" rel="nofollow noreferrer">current</a><br><h4> Comment 999817 brian d foy: </h4>It&#39;s not changing slightly: it&#39;s changing radically. Smart matching for anything un-simple is seriously broken.<br>------------------------------------------------------------------ <br><h3> Answer 33770447 Brent Bradburn: </h3><p>The obvious subtext of this question is:</p>
+
+<blockquote>
+  <p><a href="https://stackoverflow.com/questions/14046669/perl-string-compare-with-eq-vs">why can't you just use <code>==</code> to check if two strings are the same?</a></p>
+</blockquote>
+
+<p>Perl doesn't have distinct data types for text vs. numbers.  They are both represented by the type <a href="http://perldoc.perl.org/perldata.html#Scalar-values" rel="noreferrer">"scalar"</a>.  Put another way, strings <em>are</em> numbers <a href="http://perldoc.perl.org/perlnumber.html#Numeric-operators-and-numeric-conversions" rel="noreferrer">if you use them as such</a>.</p>
+
+<pre><code>if ( 4 == "4" ) { print "true"; } else { print "false"; }
+true
+
+if ( "4" == "4.0" ) { print "true"; } else { print "false"; }
+true
+
+print "3"+4
+7
+</code></pre>
+
+<p>Since text and numbers aren't differentiated by the language, we can't simply overload the <code>==</code> operator to do the right thing for both cases.  Therefore, Perl provides <code>eq</code> to compare values as text:</p>
+
+<pre><code>if ( "4" eq "4.0" ) { print "true"; } else { print "false"; }
+false
+
+if ( "4.0" eq "4.0" ) { print "true"; } else { print "false"; }
+true
+</code></pre>
+
+<hr>
+
+<p><strong>In short:</strong></p>
+
+<ul>
+<li>Perl doesn't have a data-type exclusively for text strings</li>
+<li>use <code>==</code> or <code>!=</code>, to compare two operands as numbers</li>
+<li>use <code>eq</code> or <code>ne</code>, to compare two operands as text</li>
+</ul>
+
+<p>There are many other functions and operators that can be used to compare scalar values, but knowing the distinction between these two forms is an important first step.</p>
+<h4> Comment 109710496 Brent Bradburn: </h4>Java has the same problem, but for a different reason (and with different implications).<br>------------------------------------------------------------------ <br><h3> Answer 1175401 Matthew Scharley: </h3><pre><code>print "Matched!\n" if ($str1 eq $str2)
+</code></pre>
+
+<p>Perl has seperate string comparison and numeric comparison operators to help with the loose typing in the language. You should read <a href="http://perldoc.perl.org/perlop.html" rel="noreferrer">perlop</a> for all the different operators.</p>
+------------------------------------------------------------------ <br><h3> Answer 17182405 Helen Craigman: </h3><p>And if you'd like to extract the differences between the two strings, you can use <a href="http://search.cpan.org/perldoc/String%3a%3aDiff" rel="nofollow">String::Diff</a>.</p>
+<h4> Comment 32958499 Brad Gilbert: </h4>If you are going to link to Perl documentation, it is usually recommended to use Permalinks which will always link to the newest version of the module. <a href="http://search.cpan.org/perldoc/String::Diff" rel="nofollow noreferrer">search.cpan.org/perldoc/String::Diff</a> <a href="http://search.cpan.org/perldoc?String::Diff" rel="nofollow noreferrer">search.cpan.org/perldoc?String::Diff</a> <a href="http://p3rl.org/String::Diff" rel="nofollow noreferrer">p3rl.org/String::Diff</a> <a href="http://metacpan.org/module/String::Diff" rel="nofollow noreferrer">metacpan.org/module/String::Diff</a> <a href="http://metacpan.org/pod/String::Diff" rel="nofollow noreferrer">metacpan.org/pod/String::Diff</a> <b>Done</b><br>------------------------------------------------------------------ <br><h3> Answer 67119020 Sam B: </h3><p>I came looking for a solution where in perl I could compare if A &gt; B or Z &lt; AA. Nothing here worked reliably for me so I came up with my own solution. The tricks is to assign a number for each letter</p>
+<p>For example</p>
+<pre><code>A=1
+B=2
+C=3 and so on
+</code></pre>
+<p>Then when time comes to compare if A &gt; B you get the corresponding numbers and compare them in this case 1 &gt; 2</p>
+<p>Heres working perl code.</p>
+<pre><code># header
+use warnings;
+use strict;
+
+#create a hash of letters
+my %my_hash_lookup;
+my $letter_counter=0;
+foreach my $letters ('A'..'ZZ')
+{
+    #print &quot;$letters \n&quot;;
+    
+    $letter_counter++;
+    my $key = $letters;
+    my $keyValue = $letter_counter;
+    $my_hash_lookup{$key}=$keyValue;
+}
+
+
+my $size = keys %my_hash_lookup;
+print &quot;hash size: $size ...\n&quot;;
+
+#get number value of string letters
+        my $my_hash_value1 = $my_hash_lookup{&quot;A&quot;};
+        my $my_hash_value2 = $my_hash_lookup{&quot;B&quot;};
+        
+        if  ( (defined $my_hash_value1) &amp;&amp; (defined $my_hash_value2))
+        {
+
+            if ($my_hash_value1 == $my_hash_value2)
+            {
+                #equal
+            }
+            elsif ($my_hash_value1 &gt; $my_hash_value2)
+            {
+                #greater than
+                
+            }
+            elsif ($my_hash_value1 &lt; $my_hash_value2)
+            {
+                #less than
+            }
+            
+        }
+</code></pre>

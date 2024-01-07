@@ -1,0 +1,249 @@
+ <h2> Title: How to understand nil vs. empty vs. blank in Ruby </h2> <h3> Arrel, question_id: 885414 </h3>Score: 1212, Tags: {ruby-on-rails,ruby} <br><p>I find myself repeatedly looking for a clear definition of the differences of <code>nil?</code>, <code>blank?</code>, and <code>empty?</code> in Ruby on Rails.  Here's the closest I've come:</p>
+
+<ul>
+<li><p><code>blank?</code> objects are false, empty, or a whitespace string. For example, <code>""</code>, <code>" "</code>, <code>nil</code>, <code>[]</code>, and <code>{}</code> are blank.</p></li>
+<li><p><code>nil?</code> objects are instances of NilClass.</p></li>
+<li><p><code>empty?</code> objects are class-specific, and the definition varies from class to class. A string is empty if it has no characters, and an array is empty if it contains no items.</p></li>
+</ul>
+
+<p>Is there anything missing, or a tighter comparison that can be made?</p>
+<h4> Comment 13276029 Kris: </h4>One gotcha is an empty array returns false for <code>present?</code>. Which is because <code>blank?</code> returns true for an empty array.<br><h4> Comment 59939509 rewritten: </h4>One nice thing is to see that <code>:nil?</code> is defined on <code>::Kernel</code> and overridden on <code>::NilClass</code>, while <code>:empty?</code> is implemented separately on many classes (natively on <code>::String</code>, <code>::Array</code>, <code>::Hash</code>, and non-natively on other classes like <code>::Set</code> from stdlib and <code>::ActiveRecord::Relation</code> from rails). So <code>:nil?</code> is available in all subclasses of <code>::Object</code> and also in every class that includes <code>::Kernel</code> by itself, where <code>:empty?</code> must be implemented or included specifically in your classes.<br><h4> Comment 88690731 totymedli: </h4>If you try to understand the whole <code>nil</code> concept <a href="https://lukaszwrobel.pl/blog/ruby-is-nil/" rel="nofollow noreferrer">start here</a>.<br><h4> Comment 97348431 Michael: </h4><code>[1] pry(main)&gt; [].blank? =&gt; true</code><br>------------------------------------------------------------------ <br><h3> Answer 888877 Corban Brook: </h3><p><code>.nil?</code> can be used on any object and is true if the object is nil.</p>
+
+<p><code>.empty?</code> can be used on strings, arrays and hashes and returns true if:</p>
+
+<ul>
+<li>String length == 0</li>
+<li>Array length == 0</li>
+<li>Hash length == 0</li>
+</ul>
+
+<p>Running <code>.empty?</code> on something that is nil will throw a <code>NoMethodError</code>.</p>
+
+<p>That is where <code>.blank?</code> comes in. It is <a href="http://apidock.com/rails/Object/blank%3F" rel="noreferrer">implemented by Rails</a> and will operate on any object as well as work like <code>.empty?</code> on strings, arrays and hashes.</p>
+
+<pre><code>nil.blank? == true
+false.blank? == true
+[].blank? == true
+{}.blank? == true
+"".blank? == true
+5.blank? == false
+0.blank? == false
+</code></pre>
+
+<p><code>.blank?</code> also evaluates true on strings which are non-empty but contain only whitespace:</p>
+
+<pre><code>"  ".blank? == true
+"  ".empty? == false
+</code></pre>
+
+<p><a href="http://apidock.com/rails/Object/presence" rel="noreferrer">Rails also provides</a> <code>.present?</code>, which returns the negation of <code>.blank?</code>.</p>
+
+<p>Array gotcha: <code>blank?</code> will return <code>false</code> even if all <em>elements</em> of an array are blank. To determine blankness in this case, use <code>all?</code> with <code>blank?</code>, for example:</p>
+
+<pre><code>[ nil, '' ].blank? == false
+[ nil, '' ].all? &amp;:blank? == true 
+</code></pre>
+<h4> Comment 18034397 Shannon: </h4>Also: <code>false.blank? == true</code><br><h4> Comment 697800 Andrew Grimm: </h4>As mentioned in the question, some non-empty strings count as blank.<br><h4> Comment 38948112 Houen: </h4>As an addition to the all-blank-array gotcha that Tom is mentioning in his answer, be aware that this can lead to security issues where an attacker can use unprepared code that simply checks for unless params.nil? or unless params.blank?, and is the cause of much discussion and work currently in Rails. See here for more information: <a href="https://github.com/rails/rails/issues/13420" rel="nofollow noreferrer">github.com/rails/rails/issues/13420</a><br><h4> Comment 5812844 tillda: </h4>Why haven&#39;t they overwritter nil&#39;s .empty? if they could add .blank?<br><h4> Comment 22662466 TrinitronX: </h4>I&#39;ve seen <code>blank?</code> erroneously used in non-rails contexts before.  If you <b>really</b> need it you can <a href="http://stackoverflow.com/a/4239625/645491">include it</a>: <code>require &#39;active_support&#47;core_ext&#47;object&#47;blank&#39;</code><br><h4> Comment 92308598 Brett: </h4>I&#39;ve used <code>x.to_s.empty?</code>  on a number of occasions where I want to do the same thing whether a variable is nil or a string / array that is empty. <code>nil.to_s == &quot;&quot;</code><br><h4> Comment 104633381 vishless: </h4><code>[ nil, &#39;&#39; ].all? &amp;:blank? == true</code> returns <code>TypeError (wrong argument type FalseClass (expected Proc))</code> for ruby ruby 2.5.0p0<br><h4> Comment 21435010 Factor Mystic: </h4>is <code>nil.blank?</code> something added by Rails? In <code>1.9.3p194</code> I get <code>NoMethodError: undefined method &#39;blank?&#39; for nil:NilClass</code> in irb.  E: Yep, here it is: <a href="http://api.rubyonrails.org/classes/Object.html#method-i-blank-3F" rel="nofollow noreferrer">api.rubyonrails.org/classes/Object.html#method-i-blank-3F</a><br><h4> Comment 34383473 2called-chaos: </h4>When talking about <code>present?</code> don&#39;t forget to mention <code>presence</code>. <a href="http://blog.bmonkeys.net/2014/overview-about-nil-blank-present-presence-try-and-other-basic-things" rel="nofollow noreferrer">blog.bmonkeys.net/2014/&hellip;</a><br><h4> Comment 55354154 jcpennypincher: </h4>I am using something like this to avoid crashes on nil objects if (myString.to_s.strip.length != 0)     # do something end<br>------------------------------------------------------------------ <br><h3> Answer 20663389 Julian Popov: </h3><p>I made this useful table with all the cases:</p>
+
+<p><img src="https://i.stack.imgur.com/oXuhJ.png" alt="enter image description here"></p>
+
+<p><code>blank?</code>, <code>present?</code> are provided by Rails.</p>
+<h4> Comment 33204621 Lonny Eachus: </h4>It should be noted that blank? and present? are Rails-only. They return Exception: NoMethodError in Ruby 2.0.0.<br><h4> Comment 40153543 Dennis: </h4>Consider adding <code>any?</code> if you ever update the table.<br><h4> Comment 106028618 the Tin Man: </h4><code>blank?</code> and <code>present?</code> are not &quot;<i>Rails-only</i>&quot;, they&#39;re automatically included by Rails but can easily be included in non-Rails code by using ActiveSupport&#39;s Core extensions. See <a href="https://stackoverflow.com/questions/4238867/how-do-i-use-active-support-core-extensions?noredirect=1&amp;lq=1" title="how do i use active support core extensions">stackoverflow.com/questions/4238867/&hellip;</a><br>------------------------------------------------------------------ <br><h3> Answer 3236703 Alexander Malfait: </h3><p>Quick tip: <code>!obj.blank? == obj.present?</code></p>
+
+<p>Can be handy/easier on the eyes in some expressions</p>
+<h4> Comment 34348039 Ajedi32: </h4>@MohamedHafez No it&#39;s not. <code>!!false</code><br><h4> Comment 30396399 Mohamed Hafez: </h4>@Kirk: !!obj is equivalent to !obj.nil?<br><h4> Comment 16855585 Kirk: </h4>is there something equivalent to !obj.nil?<br><h4> Comment 21013756 Factor Mystic: </h4><code>present?</code> is part of active_support, check here on what to include to get it: <a href="http://stackoverflow.com/a/4648704/1569">stackoverflow.com/a/4648704/1569</a><br><h4> Comment 85609180 k00ka: </h4>To built on this answer...Corollary: <code>if obj.present?</code> and <code>unless obj.blank?</code> are the same. Hint: An excellent <i>guard clause</i> is <code>return unless obj.present?</code>.<br><h4> Comment 34356199 Mohamed Hafez: </h4>Agh, @Ajedi32 good catch! equivalent with that one exception.<br>------------------------------------------------------------------ <br><h3> Answer 13380172 Alan H: </h3><p>A special case is when trying to assess if a boolean value is nil:</p>
+
+<pre><code>false.present? == false
+false.blank? == true
+false.nil? == false
+</code></pre>
+
+<p>In this case the recommendation would be to use <code>.nil?</code></p>
+------------------------------------------------------------------ <br><h3> Answer 26877095 Sibevin Wang: </h3><p>Just extend Julian's table:</p>
+
+<p><a href="https://i.stack.imgur.com/qbe46.png"><img src="https://i.stack.imgur.com/qbe46.png" alt="enter image description here"></a></p>
+
+<p>Ref: <a href="http://sibevin.github.io/posts/2014-11-11-103928-rails-empty-vs-blank-vs-nil">empty?blank?nil?傻傻分不清楚</a></p>
+<h4> Comment 65965896 daniero: </h4><code>Enumerable#any?</code> is vanilla Ruby, it shouldn&#39;t be listed under &quot;rails only&quot;<br><h4> Comment 65967507 Sibevin Wang: </h4>@daniero Thanks for your reminder, the table is updated.<br><h4> Comment 70298959 DaveMongoose: </h4>Numeric types also have <code>.zero?</code> and <code>.nonzero?</code><br><h4> Comment 64392374 Lahiru Jayaratne: </h4>@Sibevin Wang, I have downloaded this table and used it in some of my answers adding the credits to you. Hope you won&#39;t mind :) Kudos to this great effort!<br>------------------------------------------------------------------ <br><h3> Answer 48268628 steve: </h3><p><a href="https://i.stack.imgur.com/BdN1t.png" rel="noreferrer"><img src="https://i.stack.imgur.com/BdN1t.png" alt="enter image description here"></a></p>
+
+<ul>
+<li>Everything that is <code>nil?</code> is <code>blank?</code></li>
+<li>Everything that is <code>empty?</code> is <code>blank?</code></li>
+<li>Nothing that is <code>empty?</code> is <code>nil?</code></li>
+<li>Nothing that is <code>nil?</code> is <code>empty?</code></li>
+</ul>
+
+<p>tl;dr -- only use <code>blank?</code> &amp; <code>present?</code> unless you want to distinguish between <code>""</code> and <code>"  "</code></p>
+------------------------------------------------------------------ <br><h3> Answer 885583 Andrew Grimm: </h3><p>One difference is that <code>.nil?</code> and <code>.empty?</code> are methods that are provided by the programming language Ruby, whereas <code>.blank?</code> is something <a href="http://www.ruby-forum.com/topic/160638#706469" rel="noreferrer">added</a> by the web development framework Rails. </p>
+------------------------------------------------------------------ <br><h3> Answer 1121550 davemyron: </h3><p>Just a little note about the <code>any?</code> recommendation: He's right that it's <em>generally</em> equivalent to <code>!empty?</code>. However, <code>any?</code> will return <code>true</code> to a string of just whitespace (ala <code>" "</code>).</p>
+
+<p>And of course, see the 1.9 comment above, too.</p>
+<h4> Comment 33204374 Lonny Eachus: </h4>In Rails, any string containing just whitespace characters is &quot;blank&quot;:      &quot; \n\r\t&quot;.blank?  #=&gt; true<br>------------------------------------------------------------------ <br><h3> Answer 885603 Andy: </h3><p>Don't forget <code>any?</code> which is generally <code>!empty?</code>. In Rails I typically check for the presence of something at the end of a statement with <code>if something</code> or <code>unless something</code> then use <code>blank?</code> where needed since it seems to work everywhere.  </p>
+<h4> Comment 692646 Andrew Grimm: </h4>.any? doesn&#39;t work with strings in ruby 1.9, as .any? requires enumerable, and string#each by itself doesn&#39;t work in ruby 1.9.<br><h4> Comment 23378613 Kelvin: </h4>Careful about <code>any?</code> for checking non-emptiness. It returns false if you have an array of falsy values. A way to get around that is to pass a always-true block: <code>[nil, false].any?{ true }</code>, but <code>!empty?</code> is shorter and you don&#39;t have remember the weird behavior.<br>------------------------------------------------------------------ <br><h3> Answer 27597103 neha: </h3><p><code>nil?</code> is a standard Ruby method that can be called on all objects and returns <code>true</code> if the object is <code>nil</code>:</p>
+
+<pre><code>b = nil
+b.nil? # =&gt; true
+</code></pre>
+
+<p><code>empty?</code> is a standard Ruby method that can be called on some objects such as Strings, Arrays and Hashes and returns <code>true</code> if these objects contain no element:</p>
+
+<pre><code>a = []
+a.empty? # =&gt; true
+
+b = ["2","4"]
+b.empty? # =&gt; false
+</code></pre>
+
+<p><code>empty?</code> cannot be called on <code>nil</code> objects.</p>
+
+<p><code>blank?</code> is a Rails method that can be called on <code>nil</code> objects as well as empty objects.</p>
+------------------------------------------------------------------ <br><h3> Answer 30343553 Manish Shrivastava: </h3><p>Everybody else has explained well what is the difference. </p>
+
+<p>I would like to add in Ruby On Rails, it is better to use <code>obj.blank?</code> or <code>obj.present?</code> instead of <code>obj.nil?</code> or <code>obj.empty?</code>.</p>
+
+<p><code>obj.blank?</code> handles all types <code>nil</code>, <code>''</code>, <code>[]</code>, <code>{}</code>,  and returns <code>true</code> if values are not available and returns <code>false</code> if values are  available on any type of object.</p>
+------------------------------------------------------------------ <br><h3> Answer 66600720 shahjapan: </h3><p>Though there n-number of answers available to this question but I liked the way its being explained here so posted one more answer :-)</p>
+<p><strong>Look at the data metric below</strong> - Its self explanatory with the various data-types used across available methods for it.</p>
+<div class="s-table-container">
+<table class="s-table">
+<thead>
+<tr>
+<th></th>
+<th>#nil?</th>
+<th>#empty?</th>
+<th>#blank?</th>
+<th>#present?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5</td>
+<td>false</td>
+<td>NoMethodError</td>
+<td>false</td>
+<td>true</td>
+</tr>
+<tr>
+<td>&quot;&quot;</td>
+<td>false</td>
+<td>true</td>
+<td>true</td>
+<td>false</td>
+</tr>
+<tr>
+<td>&quot; &quot;</td>
+<td>false</td>
+<td>false</td>
+<td>true</td>
+<td>false</td>
+</tr>
+<tr>
+<td>&quot;\t\n&quot;</td>
+<td>false</td>
+<td>false</td>
+<td>true</td>
+<td>false</td>
+</tr>
+<tr>
+<td>[]</td>
+<td>false</td>
+<td>true</td>
+<td>true</td>
+<td>false</td>
+</tr>
+<tr>
+<td>[&quot;a&quot;]</td>
+<td>false</td>
+<td>false</td>
+<td>false</td>
+<td>true</td>
+</tr>
+<tr>
+<td>{}</td>
+<td>false</td>
+<td>true</td>
+<td>true</td>
+<td>false</td>
+</tr>
+<tr>
+<td>{a: &quot;b&quot;}</td>
+<td>false</td>
+<td>false</td>
+<td>false</td>
+<td>true</td>
+</tr>
+<tr>
+<td>Set.new</td>
+<td>false</td>
+<td>true</td>
+<td>true</td>
+<td>false</td>
+</tr>
+<tr>
+<td>nil</td>
+<td>true</td>
+<td>NoMethodError</td>
+<td>true</td>
+<td>false</td>
+</tr>
+<tr>
+<td>true</td>
+<td>false</td>
+<td>NoMethodError</td>
+<td>false</td>
+<td>true</td>
+</tr>
+<tr>
+<td>false</td>
+<td>false</td>
+<td>NoMethodError</td>
+<td>true</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Reference: <a href="https://blog.appsignal.com/2018/09/11/differences-between-nil-empty-blank-and-present.html" rel="nofollow noreferrer">https://blog.appsignal.com/2018/09/11/differences-between-nil-empty-blank-and-present.html</a></p>
+------------------------------------------------------------------ <br><h3> Answer 35455359 kelvin: </h3><p><code>exists?</code> method can be used to check whether the data exists in the database or not. It returns boolean values either <code>true</code> or <code>false</code>. </p>
+<h4> Comment 69346307 Roger: </h4>Works only on model class!<br>------------------------------------------------------------------ <br><h3> Answer 32097524 mahatmanich: </h3><p>Rails 4</p>
+
+<p>an alternative to @corban-brook 's <em>'Array gotcha: blank?'</em> for checking if an arrays only holds empty values and can be regarded as blank? true:</p>
+
+<pre><code>[ nil, '' ].all? &amp;:blank? == true
+</code></pre>
+
+<p>one could also do:</p>
+
+<pre><code>[nil, '', "", " ",' '].reject(&amp;:blank?).blank? == true
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 32585672 Chitra: </h3><p><code>nil?</code> can be used on any object. It determines if the object has any value or not, including 'blank' values.</p>
+
+<p>For example:</p>
+
+<pre><code>example = nil
+example.nil?  # true
+
+"".nil?  # false
+</code></pre>
+
+<p>Basically <code>nil?</code> will only ever return true if the object is in fact equal to 'nil'.</p>
+
+<p><code>empty?</code> is only called on objects that are considered a collection. This includes things like strings (a collection of characters), hashes (a collection of key/value pairs) and arrays (a collection of arbitrary objects). <code>empty?</code> returns true is there are no items in the collection.</p>
+
+<p>For example:</p>
+
+<pre><code>"".empty? # true
+"hi".empty?   # false
+{}.empty?  # true
+{"" =&gt; ""}.empty?   # false
+[].empty?   # true
+[nil].empty?  # false
+
+nil.empty?  # NoMethodError: undefined method `empty?' for nil:NilClass
+</code></pre>
+
+<p>Notice that <code>empty?</code> can't be called on nil objects as nil objects are not a collection and it will raise an exception.</p>
+
+<p>Also notice that even if the items in a collection are blank, it does not mean a collection is empty.</p>
+
+<p><code>blank?</code> is basically a combination of <code>nil?</code> and <code>empty?</code> It's useful for checking objects that you assume are collections, but could also be nil.</p>

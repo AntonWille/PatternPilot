@@ -1,0 +1,202 @@
+ <h2> Title: What is the difference between include and extend in Ruby? </h2> <h3> Gishu, question_id: 156362 </h3>Score: 483, Tags: {ruby,module,include,extend} <br><p>Just getting my head around Ruby metaprogramming. The mixin/modules always manage to confuse me. </p>
+
+<ul>
+<li><strong>include</strong>: mixes in specified module methods as <strong>instance methods</strong> in the target class</li>
+<li><strong>extend</strong>: mixes in specified module methods as <strong>class methods</strong> in the target class</li>
+</ul>
+
+<p><em>So is the major difference just this or is a bigger dragon lurking?</em>
+e.g.</p>
+
+<pre><code>module ReusableModule
+  def module_method
+    puts "Module Method: Hi there!"
+  end
+end
+
+class ClassThatIncludes
+  include ReusableModule
+end
+class ClassThatExtends
+  extend ReusableModule
+end
+
+puts "Include"
+ClassThatIncludes.new.module_method       # "Module Method: Hi there!"
+puts "Extend"
+ClassThatExtends.module_method            # "Module Method: Hi there!"
+</code></pre>
+<h4> Comment 69696887 Daniel Viglione: </h4>Check this link out too: <a href="http://juixe.com/techknow/index.php/2006/06/15/mixins-in-ruby/" rel="nofollow noreferrer">juixe.com/techknow/index.php/2006/06/15/mixins-in-ruby</a><br>------------------------------------------------------------------ <br><h3> Answer 5008349 John Douthat: </h3><p><strong>extend</strong> - adds the specified module's methods and constants to the target's metaclass (i.e. the singleton class) 
+  e.g. </p>
+
+<ul>
+<li>if you call <code>Klazz.extend(Mod)</code>, now Klazz has Mod's methods (as class methods)</li>
+<li>if you call <code>obj.extend(Mod)</code>, now obj has Mod's methods (as instance methods), but no other instance of of <code>obj.class</code> has those methods added.</li>
+<li><code>extend</code> is a public method</li>
+</ul>
+
+<p><strong>include</strong> - By default, it mixes in the specified module's methods as instance methods in the target module/class. 
+  e.g.</p>
+
+<ul>
+<li>if you call <code>class Klazz; include Mod; end;</code>, now all instances of Klazz have access to Mod's methods (as instance methods)</li>
+<li><code>include</code> is a private method, because it's intended to be called from within the container class/module.</li>
+</ul>
+
+<p><strong>However</strong>, modules very often <em>override</em> <code>include</code>'s behavior by monkey-patching the <code>included</code> method. This is very prominent in legacy Rails code. <a href="http://yehudakatz.com/2009/11/12/better-ruby-idioms/" rel="noreferrer">more details from Yehuda Katz</a>. </p>
+
+<p>Further details about <code>include</code>, with its default behavior, assuming you've run the following code</p>
+
+<pre><code>class Klazz
+  include Mod
+end
+</code></pre>
+
+<ul>
+<li>If Mod is already included in Klazz, or one of its ancestors, the include statement has no effect</li>
+<li>It also includes Mod's constants in Klazz, as long as they don't clash</li>
+<li>It gives Klazz access to Mod's module variables, e.g. <code>@@foo</code> or <code>@@bar</code></li>
+<li>raises ArgumentError if there are cyclic includes</li>
+<li>Attaches the module as the caller's immediate ancestor (i.e. It adds Mod to Klazz.ancestors, but Mod is not added to the chain of Klazz.superclass.superclass.superclass. So, calling <code>super</code> in Klazz#foo will check for Mod#foo before checking to Klazz's real superclass's foo method. See the RubySpec for details.).</li>
+</ul>
+
+<p>Of course, <a href="http://www.ruby-doc.org/core-1.9.3/" rel="noreferrer">the ruby core documentation</a> is always the best place to go for these things. <a href="https://en.wikipedia.org/wiki/RubySpec" rel="noreferrer">The RubySpec project</a> was also a fantastic resource, because they documented the functionality precisely.</p>
+
+<ul>
+<li><code>#include</code> <a href="https://github.com/ruby/rubyspec/blob/master/core/module/include_spec.rb" rel="noreferrer">RubySpec</a> <a href="http://www.ruby-doc.org/core-1.9.3/Module.html#method-i-include" rel="noreferrer">rubydoc</a></li>
+<li><code>#included</code> <a href="https://github.com/ruby/rubyspec/blob/master/core/module/included_spec.rb" rel="noreferrer">RubySpec</a> <a href="http://www.ruby-doc.org/core-1.9.3/Module.html#method-i-included" rel="noreferrer">rubydoc</a></li>
+<li><code>#extend</code> <a href="https://github.com/ruby/rubyspec/blob/master/core/kernel/extend_spec.rb" rel="noreferrer">RubySpec</a> <a href="http://www.ruby-doc.org/core-1.9.3/Object.html#method-i-extend" rel="noreferrer">rubydoc</a></li>
+<li><code>#extended</code> <a href="https://github.com/ruby/rubyspec/blob/master/core/module/extended_spec.rb" rel="noreferrer">RubySpec</a> <a href="http://www.ruby-doc.org/core-1.9.3/Module.html#method-i-extended" rel="noreferrer">rubydoc</a></li>
+<li><code>#extend_object</code> <a href="https://github.com/ruby/rubyspec/blob/master/core/module/extend_object_spec.rb" rel="noreferrer">RubySpec</a> <a href="http://www.ruby-doc.org/core-1.9.3/Module.html#method-i-extend_object" rel="noreferrer">rubydoc</a></li>
+<li><code>#append_features</code> <a href="https://github.com/ruby/rubyspec/blob/master/core/module/append_features_spec.rb" rel="noreferrer">RubySpec</a> <a href="http://www.ruby-doc.org/core-1.9.3/Module.html#method-i-append_features" rel="noreferrer">rubydoc</a> </li>
+</ul>
+<h4> Comment 10716928 MohamedSanaulla: </h4>I know this is pretty old post, but the clarity of the reply couldn&#39;t hold me back from commenting. Thanks a lot for a nice explanation.<br><h4> Comment 59435204 systho: </h4>@anwar Obviously, but now I can comment and I managed to find the article again. It is available here : <a href="http://aaronlasseigne.com/2012/01/17/explaining-include-and-extend/" rel="nofollow noreferrer">aaronlasseigne.com/2012/01/17/explaining-include-and-extend</a>  and I still think the schema make the understanding much easier<br><h4> Comment 84307654 Frank Koehl: </h4>The big win in this response is how <code>extend</code> can apply methods as class <i>or</i> instance methods, depending on utilization. <code>Klass.extend</code> = class methods, <code>objekt.extend</code> = instance methods. I always (wrongly) assumed class methods came from <code>extend</code>, and instance from <code>include</code>.<br><h4> Comment 136591299 OuttaSpaceTime: </h4>Everything as said above, just one nit detail: <code>extend</code> does include a module on the inheritance chain of the singleton class (for more details on this see <a href="https://makandracards.com/makandra/611847-ruby-extend-extends-the-singleton-class-s-inheritance-chain" rel="nofollow noreferrer">here</a>) Also as display within the article in the comment of @systho<br>------------------------------------------------------------------ <br><h3> Answer 156927 domgblackwell: </h3><p>What you have said is correct. However, there is more to it than that.</p>
+<p>If you have a class <code>Klazz</code> and module <code>Mod</code>, including <code>Mod</code> in <code>Klazz</code> gives instances of <code>Klazz</code> access to <code>Mod</code>'s methods. Or you can extend <code>Klazz</code> with <code>Mod</code> giving the <em>class</em> <code>Klazz</code> access to <code>Mod</code>'s methods. But you can also extend an arbitrary object with <code>o.extend Mod</code>. In this case the individual object gets <code>Mod</code>'s methods even though all other objects with the same class as <code>o</code> do not.</p>
+<h4> Comment 111488053 lkahtz: </h4>terse like Confucius.<br>------------------------------------------------------------------ <br><h3> Answer 156659 Toby Hede: </h3><p>That's correct.</p>
+
+<p>Behind the scenes, include is actually an alias for <strong>append_features</strong>, which (from the docs):</p>
+
+<blockquote>
+  <p>Ruby's default implementation is to
+  add the constants, methods, and module
+  variables of this module to aModule if
+  this module has not already been added
+  to aModule or one of its ancestors.</p>
+</blockquote>
+------------------------------------------------------------------ <br><h3> Answer 58022371 Chintan: </h3><p>When you <strong><code>include</code></strong> a module into a class, the module methods are imported as <strong>instance methods</strong>. </p>
+
+<p>However, when you <strong><code>extend</code></strong> a module into a class, the module methods are imported as <strong>class methods</strong>.</p>
+
+<p>For example, if we have a module <code>Module_test</code> defined as follows:</p>
+
+<pre><code>module Module_test
+  def func
+    puts "M - in module"
+  end
+end
+</code></pre>
+
+<p>Now, for <strong><code>include</code></strong> module. If we define the class <code>A</code> as follows:</p>
+
+<pre><code>class A
+  include Module_test
+end
+
+a = A.new
+a.func
+</code></pre>
+
+<p>The output will be: <code>M - in module</code>.</p>
+
+<p>If we replace the line <code>include Module_test</code> with <code>extend Module_test</code> and run the code again, we receive the following error: <code>undefined method 'func' for #&lt;A:instance_num&gt; (NoMethodError)</code>.</p>
+
+<p>Changing the method call <code>a.func</code> to <code>A.func</code>, the output changes to: <code>M - in module</code>.</p>
+
+<p>From the above code execution, it is clear that when we <strong><code>include</code></strong> a module, its methods become <strong>instance methods</strong> and when we <strong><code>extend</code></strong> a module, its methods become <strong>class methods</strong>.</p>
+<h4> Comment 133723284 ultrajohn: </h4>the instance methods are included as instance methods, while module methods are not... from <a href="https://ruby-doc.org/3.2.1/Module.html" rel="nofollow noreferrer">ruby-doc.org/3.2.1/Module.html</a><br>------------------------------------------------------------------ <br><h3> Answer 7521476 Ho-Sheng Hsiao: </h3><p>All the other answers are good, including the tip to dig through RubySpecs:</p>
+
+<p><a href="https://github.com/rubyspec/rubyspec/blob/master/core/module/include_spec.rb" rel="nofollow">https://github.com/rubyspec/rubyspec/blob/master/core/module/include_spec.rb</a></p>
+
+<p><a href="https://github.com/rubyspec/rubyspec/blob/master/core/module/extend_object_spec.rb" rel="nofollow">https://github.com/rubyspec/rubyspec/blob/master/core/module/extend_object_spec.rb</a></p>
+
+<p>As for use cases:</p>
+
+<p>If you <em>include</em> module ReusableModule in class ClassThatIncludes, the methods, constants, classes, submodules, and other declarations gets referenced. </p>
+
+<p>If you <em>extend</em> class ClassThatExtends with module ReusableModule, then the methods and constants gets <em>copied</em>. Obviously, if you are not careful, you can waste a lot of memory by dynamically duplicating definitions.</p>
+
+<p>If you use ActiveSupport::Concern, the .included() functionality lets you rewrite the including class directly. module ClassMethods inside a Concern gets <em>extended</em> (copied) into the including class.</p>
+------------------------------------------------------------------ <br><h3> Answer 36247164 user1136228: </h3><p>I would also like to explain the mechanism as it works. If I am not right please correct.</p>
+
+<p>When we use <code>include</code> we are adding a linkage from our class to a module which contains some methods.</p>
+
+<pre><code>class A
+include MyMOd
+end
+
+a = A.new
+a.some_method
+</code></pre>
+
+<p>Objects don't have methods, only clases and modules do.
+So when <code>a</code> receives mesage <code>some_method</code> it begin search method <code>some_method</code> in <code>a</code>'s eigen class, then in <code>A</code> class and then in linked to <code>A</code> class modules if there are some (in reverse order, last included wins).</p>
+
+<p>When we use <code>extend</code> we are adding linkage to a module in object's eigen class.
+So if we use A.new.extend(MyMod) we are adding linkage to our module to A's instance eigen class or <code>a'</code> class.
+And if we use A.extend(MyMod) we are adding linkage to A(object's, classes are also objects) eigenclass <code>A'</code>.</p>
+
+<p>so method lookup path for <code>a</code> is as follows:
+a => a' => linked modules to a' class => A.</p>
+
+<p>also there is a prepend method which changes lookup path:</p>
+
+<p>a => a' => prepended modulesto A => A => included module to A</p>
+
+<p>sorry for my bad english.</p>
+------------------------------------------------------------------ <br><h3> Answer 70124407 Abdullah Numan: </h3><p>I came across a very useful <a href="https://dev.to/abbiecoghlan/ruby-modules-include-vs-extend-vs-prepend-4gmc" rel="nofollow noreferrer">article</a> that compares <code>include</code>, <code>extend</code> and <code>prepend</code> methods used <strong>inside a class</strong>:</p>
+<p><code>include</code> adds module methods as instance methods to the class, whereas <code>extend</code> adds module methods as class methods. The module being included or extended must be defined accordingly</p>
+------------------------------------------------------------------ <br><h3> Answer 77149206 Rafid Rabbii: </h3><p><strong>include</strong> provides a class with access to a module's methods as an instance</p>
+<pre><code>methods
+module Plant
+  def poisonous?
+    true
+  end
+end
+
+class PlantKingdom
+end
+
+class Hemlock &lt; PlantKingdom
+  include Plant
+end
+
+obj = Hemlock.new()
+
+obj.poisonous?
+=&gt; true
+
+Hemlock.poisonous?
+=&gt; NoMethodError: undefined method `poisonous?' for Hemlock:Class
+</code></pre>
+<p><strong>extend</strong> provides a class with access to a module's methods as class methods</p>
+<pre><code>module Plant
+  def poisonous?
+    true
+  end
+end
+
+class PlantKingdom
+end
+
+class Hemlock &lt; PlantKingdom
+  extend Plant
+end
+
+obj = Hemlock.new()
+
+obj.poisonous?
+=&gt; NoMethodError: undefined method `poisonous?' for #&lt;Hemlock:0x00007fa84389c748&gt;
+
+Hemlock.poisonous?
+=&gt; true
+</code></pre>

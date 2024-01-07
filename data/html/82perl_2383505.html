@@ -1,0 +1,343 @@
+ <h2> Title: Perl: if ( element in list ) </h2> <h3> Jonathan, question_id: 2383505 </h3>Score: 82, Tags: {perl,arrays} <br><p>I'm looking for presence of an element in a list.  </p>
+
+<p>In Python there is an <code>in</code> keyword and I would do something like:</p>
+
+<pre><code>if element in list:
+    doTask
+</code></pre>
+
+<p>Is there something equivalent in Perl without having to manually iterate through the entire list?</p>
+------------------------------------------------------------------ <br><h3> Answer 2385454 Brad Gilbert: </h3><h2>UPDATE:</h2>
+
+<blockquote>
+  <p><a href="https://metacpan.org/pod/release/RJBS/perl-5.18.0/pod/perldelta.pod#The-smartmatch-family-of-features-are-now-experimental" rel="noreferrer">The smartmatch family of features are now experimental</a></p>
+  
+  <p>Smart match, added in v5.10.0 and significantly revised in v5.10.1, has been a regular point of complaint. Although there are a number of ways in which it is useful, it has also proven problematic and confusing for both users and implementors of Perl. There have been a number of proposals on how to best address the problem. It is clear that smartmatch is almost certainly either going to change or go away in the future. Relying on its current behavior is not recommended.</p>
+  
+  <p>Warnings will now be issued when the parser sees ~~, given, or when. </p>
+</blockquote>
+
+<hr>
+
+<hr>
+
+<hr>
+
+<h2>If you can get away with requiring Perl v5.10, then you can use any of the following examples.</h2>
+
+<ul>
+<li><p>The <a href="http://perldoc.perl.org/perlsyn.html#Smart-matching-in-detail" rel="noreferrer">smart match <code>~~</code></a> operator.</p>
+
+<pre><code>if( $element ~~ @list ){ ... }
+if( $element ~~ [ 1, 2, 3 ] ){ ... }
+</code></pre></li>
+<li><p>You could also use the <a href="http://perldoc.perl.org/perlsyn.html#Switch-statements" rel="noreferrer" title="Perl 5 &amp; 6 version of switch/case"><code>given</code>/<code>when</code></a> construct. Which uses the smart match functionality internally.</p>
+
+<pre><code>given( $element ){
+   when( @list ){ ... }
+}
+</code></pre></li>
+<li><p>You can also use a <code>for</code> loop as a "topicalizer" ( meaning it sets <code>$_</code> ).</p>
+
+<pre><code>for( @elements ){
+   when( @list ){ ... }
+}
+</code></pre></li>
+</ul>
+
+<p>One thing that will come out in Perl 5.12 is the ability to use the post-fix version of <code>when</code>. Which makes it even more like <code>if</code> and <code>unless</code>.</p>
+
+<pre><code>given( $element ){
+  ... when @list;
+}
+</code></pre>
+
+<hr>
+
+<h2>If you have to be able to run on older versions of Perl, there still are several options.</h2>
+
+<ul>
+<li><p>You might think you can get away with using <a href="http://perldoc.perl.org/List/Util.html#first-BLOCK-LIST" rel="noreferrer">List::Util::first</a>, but there are some edge conditions that make it problematic.</p>
+
+<p>In this example it is fairly obvious that we want to successfully match against <code>0</code>. Unfortunately this code will print <code>failure</code> every time.</p>
+
+<pre><code>use List::Util qw'first';
+my $element = 0;
+if( first { $element eq $_ } 0..9 ){
+  print "success\n";
+} else {
+  print "failure\n";
+}
+</code></pre>
+
+<p>You could check the return value of <a href="http://perldoc.perl.org/List/Util.html#first-BLOCK-LIST" rel="noreferrer"><code>first</code></a> for defined-ness, but that will fail if we actually want a match against <code>undef</code> to succeed.</p></li>
+<li><p>You can safely use <a href="http://perldoc.perl.org/functions/grep.html" rel="noreferrer"><code>grep</code></a> however.</p>
+
+<pre><code>if( grep { $element eq $_ } 0..9 ){ ... }
+</code></pre>
+
+<p>This is safe because <code>grep</code> gets called in a scalar context. Arrays return the number of elements when called in scalar context. So this will continue to work even if we try to match against <code>undef</code>.</p></li>
+<li><p>You could use an enclosing <code>for</code> loop. Just make sure you call <code>last</code>, to exit out of the loop on a successful match. Otherwise you might end up running your code more than once.</p>
+
+<pre><code>for( @array ){
+  if( $element eq $_ ){
+    ...
+    last;
+  }
+}
+</code></pre></li>
+<li><p>You could put the <code>for</code> loop inside the condition of the <code>if</code> statement ...</p>
+
+<pre><code>if(
+  do{
+    my $match = 0;
+    for( @list ){
+      if( $element eq $_ ){
+        $match = 1;
+        last;
+      }
+    }
+    $match; # the return value of the do block
+  }
+){
+  ...
+}
+</code></pre></li>
+<li><p>... but it might be more clear to put the <code>for</code> loop before the <code>if</code> statement.</p>
+
+<pre><code>my $match = 0;
+for( @list ){
+  if( $_ eq $element ){
+    $match = 1;
+    last;
+  }
+}
+
+if( $match ){ ... }
+</code></pre></li>
+<li><p>If you're only matching against strings, you could also use a hash. This can speed up your program if <code>@list</code> is large <strong>and</strong>, you are going to match against <code>%hash</code> several times. Especially if <code>@array</code> doesn't change, because then you only have to load up <code>%hash</code> once.</p>
+
+<pre><code>my %hash = map { $_, 1 } @array;
+if( $hash{ $element } ){ ... }
+</code></pre></li>
+<li><p>You could also make your own subroutine. This is one of the cases where it is useful to use <a href="http://perldoc.perl.org/perlsub.html#Prototypes" rel="noreferrer">prototypes</a>.</p>
+
+<pre><code>sub in(&amp;@){
+  local $_;
+  my $code = shift;
+  for( @_ ){ # sets $_
+    if( $code-&gt;() ){
+      return 1;
+    }
+  }
+  return 0;
+}
+
+if( in { $element eq $_ } @list ){ ... }
+</code></pre></li>
+</ul>
+<h4> Comment 42822015 Peter V. M&#248;rch: </h4>Be aware that &quot;given&quot;, &quot;when&quot; and the &quot;smart match operator&quot; are now <a href="http://search.cpan.org/dist/perl-5.18.0/pod/perldelta.pod#The_smartmatch_family_of_features_are_now_experimental" rel="nofollow noreferrer">marked as &quot;experimental&quot; since perl 5.18</a> and will generate warnings. The answer&#39;s <a href="http://perldoc.perl.org/perlsyn.html#Smart-matching-in-detail" rel="nofollow noreferrer">smart match ~~</a> link also no longer has any <code>#Smart-matching-in-detail</code> fragment.<br><h4> Comment 24041202 Brad Gilbert: </h4>@xxxxxxx You say that, but my highest voted answers are generally also the longest.<br><h4> Comment 135132841 Jeff Spaulding: </h4>Looks like smart matching will be removed in Perl 5.42.0, according to the <a href="https://perldoc.perl.org/perl5380delta" rel="nofollow noreferrer">changelog for Perl 5.38.0</a>.<br><h4> Comment 24612026 gaussblurinc: </h4>@BradGilbert wow! I like operator <code>~~</code>! it is so wavy and helpful! :)<br><h4> Comment 51193363 Brad Gilbert: </h4>Next edit should switch the smart match link to <a href="http://perldoc.perl.org/perlop.html#Smartmatch-Operator" rel="nofollow noreferrer">perldoc.perl.org/perlop.html#Smartmatch-Operator</a><br>------------------------------------------------------------------ <br><h3> Answer 2383527 jrockway: </h3><pre><code>if( $element ~~ @list ){
+   do_task
+}
+</code></pre>
+
+<p><code>~~</code> is the "smart match operator", and does more than just list membership detection.</p>
+<h4> Comment 42822028 Peter V. M&#248;rch: </h4>Be aware that the &quot;smart match operator&quot; is now <a href="http://search.cpan.org/dist/perl-5.18.0/pod/perldelta.pod#The_smartmatch_family_of_features_are_now_experimental" rel="nofollow noreferrer">marked as &quot;experimental&quot; since perl 5.18</a> and will generate warnings. The answer&#39;s <a href="http://perldoc.perl.org/perlsyn.html#Smart-matching-in-detail" rel="nofollow noreferrer">smart match ~~</a> link also no longer has any <code>#Smart-matching-in-detail</code> fragment.<br>------------------------------------------------------------------ <br><h3> Answer 2383512 mob: </h3><p><a href="http://perldoc.perl.org/functions/grep.html" rel="noreferrer"><code>grep</code></a> is helpful here</p>
+
+<pre><code>if (grep { $_ eq $element } @list) {
+    ....
+}
+</code></pre>
+<h4> Comment 2360996 jrockway: </h4><code>List::Util::first</code> is probably a slightly more efficient way of doing this.<br><h4> Comment 2361407 jrockway: </h4>I tested this with a large list, and both are pretty fast.  By the time the speed difference is noticeable, my machine had burned through 6 gigs of RAM.  If your list is qw(foo bar baz), it probably doesn&#39;t matter much.<br><h4> Comment 2361065 MkV: </h4>or vastly more efficient, if @list is of significant size, since List::Util::first won&#39;t continue past the first match, but grep will.<br><h4> Comment 69842539 josch: </h4>@jrockway But <code>List::Util::first</code> is not a drop-in replacement for <code>grep</code>. Since grep is called in scalar context here, you get the number of matching elements. If you use <code>List::Util::first</code> instead, then you might retrieve an element of <code>@list</code> which compares as false...<br><h4> Comment 119135588 FantomX1: </h4>thanks, this was first, and shorter answer, imo should have the most votes. It is also good  to note that similar syntax <code>if (grep { &#47;$_&#47; } @list) {</code> won&#39;t work as expected, as here the $_ sign denotes the internal iterator attribute, not the one from outside, as one could perhaps expect if used inside additional $_ context eg inside map<br><h4> Comment 2365548 mleykamp: </h4>Large datasets aside where the matching element is not near the end, this is a great/easy way to get the answer.<br>------------------------------------------------------------------ <br><h3> Answer 2383609 DVK: </h3><p><a href="http://search.cpan.org/perldoc/List::Util" rel="nofollow noreferrer">List::Util::first</a></p>
+
+<pre><code>$foo = first { ($_ &amp;&amp; $_ eq "value" } @list;    # first defined value in @list
+</code></pre>
+
+<p>Or for hand-rolling types:</p>
+
+<pre><code>my $is_in_list = 0;
+foreach my $elem (@list) {
+    if ($elem &amp;&amp; $elem eq $value_to_find) {
+        $is_in_list = 1;
+        last;
+    }
+}
+if ($is_in_list) {
+   ...
+</code></pre>
+
+<p>A slightly different version MIGHT be somewhat faster on very long lists:</p>
+
+<pre><code>my $is_in_list = 0;
+for (my $i = 0; i &lt; scalar(@list); ++$i) {
+    if ($list[i] &amp;&amp; $list[i] eq $value_to_find) {
+        $is_in_list = 1;
+        last;
+    }
+}
+if ($is_in_list) {
+   ...
+</code></pre>
+<h4> Comment 2400885 xxxxxxx: </h4>this is pretty half-assed. -1<br>------------------------------------------------------------------ <br><h3> Answer 2383644 Sinan &#220;n&#252;r: </h3><p>If you plan to do this many times, you can trade-off space for lookup time:</p>
+
+<pre><code>#!/usr/bin/perl
+
+use strict; use warnings;
+
+my @array = qw( one ten twenty one );
+my %lookup = map { $_ =&gt; undef } @array;
+
+for my $element ( qw( one two three ) ) {
+    if ( exists $lookup{ $element }) {
+        print "$element\n";
+    }
+}
+</code></pre>
+
+<p>assuming that the number of times the element appears in <code>@array</code> is not important and the contents of <code>@array</code> are simple scalars.</p>
+<h4> Comment 2361409 jrockway: </h4>Good technique that is definitely worth mentioning.<br><h4> Comment 2400877 xxxxxxx: </h4>good technique with the mention that it pays off only when multiple lookups are made. +1<br>------------------------------------------------------------------ <br><h3> Answer 2388905 Hynek -Pichi- Vychodil: </h3><p>TIMTOWTDI</p>
+
+<pre><code>sub is (&amp;@) {
+  my $test = shift;
+  $test-&gt;() and return 1 for @_;
+  0
+}
+
+sub in (@) {@_}
+
+if( is {$_ eq "a"} in qw(d c b a) ) {
+  print "Welcome in perl!\n";
+}
+</code></pre>
+<h4> Comment 2370893 Hynek -Pichi- Vychodil: </h4>I don&#39;t like it, I hate Perl.<br>------------------------------------------------------------------ <br><h3> Answer 8260804 emazep: </h3><h1>List::MoreUtils</h1>
+
+<p>On perl >= 5.10 the smart match operator is surely the easiest way, as many others have already said.</p>
+
+<p>On older versions of perl, I would instead suggest <a href="http://search.cpan.org/dist/List-MoreUtils/lib/List/MoreUtils.pm" rel="noreferrer">List::MoreUtils::any</a>.</p>
+
+<p><code>List::MoreUtils</code> is not a core module (some say it should be) but it's very popular and it's included in major perl distributions.</p>
+
+<p>It has the following advantages:</p>
+
+<ul>
+<li>it returns true/false (as Python's <code>in</code> does) and not the value of the element, as <code>List::Util::first</code> does (which makes it hard to test, as noted above);</li>
+<li>unlike <code>grep</code>, it stops at the first element which passes the test (perl's smart match operator <em>short circuits</em> as well);</li>
+<li>it works with any perl version (well, >= 5.00503 at least).</li>
+</ul>
+
+<p>Here is an example which works with any searched (scalar) value, including <code>undef</code>:</p>
+
+<pre class="lang-perl prettyprint-override"><code>use List::MoreUtils qw(any);
+
+my $value = 'test'; # or any other scalar
+my @array = (1, 2, undef, 'test', 5, 6);
+
+no warnings 'uninitialized';
+
+if ( any { $_ eq $value } @array ) {
+    print "$value present\n"
+}
+</code></pre>
+
+<h1>P.S.</h1>
+
+<p>(In production code it's better to narrow the scope of <code>no warnings 'uninitialized'</code>).</p>
+<h4> Comment 42822193 Peter V. M&#248;rch: </h4>Be aware the that the &quot;smart match operator&quot; is now <a href="http://search.cpan.org/dist/perl-5.18.0/pod/perldelta.pod#The_smartmatch_family_of_features_are_now_experimental" rel="nofollow noreferrer">marked as &quot;experimental&quot; since perl 5.18</a> and will generate warnings. The answer&#39;s <a href="http://perldoc.perl.org/perlsyn.html#Smart-matching-in-detail" rel="nofollow noreferrer">smart match ~~</a> link also no longer has any <code>#Smart-matching-in-detail</code> fragment.<br><h4> Comment 60046068 Andy Mikhailenko: </h4><code>List::Util</code> seems to have <code>any</code> as well.<br>------------------------------------------------------------------ <br><h3> Answer 39129464 drjumper: </h3><p>Probably <code>Perl6::Junction</code> is the clearest way to do. No XS dependencies, no mess and no new perl version required.</p>
+
+<pre><code>use Perl6::Junction qw/ any /;
+
+if (any(@grant) eq 'su') {
+    ...
+}
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 16691232 mascip: </h3><p><a href="http://blogs.perl.org/users/mascip/2013/05/the-clearest-ways-to-check-if-a-list-contains.html" rel="nofollow">This blog post</a> discusses the best answers to this question.</p>
+
+<p>As a short summary, if you can install CPAN modules then the best solutions are:</p>
+
+<pre><code>if any(@ingredients) eq 'flour';
+</code></pre>
+
+<p>or</p>
+
+<pre><code>if @ingredients-&gt;contains('flour');
+</code></pre>
+
+<p>However, a more usual idiom is: </p>
+
+<pre><code>if @any { $_ eq 'flour' } @ingredients
+</code></pre>
+
+<p>which i find less clear.</p>
+
+<p>But please don't use the first() function! It doesn't express the intent of your code at all. Don't use the "Smart match" operator: it is broken. And don't use grep() nor the solution with a hash: they iterate through the whole list. While any() will stop as soon as it finds your value.</p>
+
+<p>Check out the blog post for more details.</p>
+
+<p>PS: i'm answering for people who will have the same question in the future.</p>
+<h4> Comment 24022339 gpojd: </h4>I think the usual idiom is <code>if any { $_ eq &#39;flour&#39; } @ingredients</code>, but you have to remember to <code>use List::MoreUtils qw&#47; any &#47;;</code>.<br>------------------------------------------------------------------ <br><h3> Answer 41891533 delias: </h3><p>You can accomplish a similar enough syntax in Perl if you do some <a href="http://perldoc.perl.org/perlsub.html#Autoloading" rel="nofollow noreferrer">Autoload</a> hacking.</p>
+
+<p>Create a small package to handle the autoload:</p>
+
+<pre><code>package Autoloader;
+use strict;
+use warnings;
+
+our $AUTOLOAD;
+
+sub AUTOLOAD {
+    my $self     = shift;
+    my ($method) = (split(/::/, $AUTOLOAD))[-1];
+
+    die "Object does not contain method '$method'" if not ref $self-&gt;{$method} eq 'CODE';
+
+    goto &amp;{$self-&gt;{$method}};
+}
+
+1;
+</code></pre>
+
+<p>Then your other package or main script will contain a subroutine that returns the blessed object which gets handled by Autoload when its method attempts to be called.</p>
+
+<pre><code>sub element {
+    my $elem = shift;
+
+    my $sub = {
+        in =&gt; sub {
+            return if not $_[0];
+
+            # you could also implement this as any of the other suggested grep/first/any solutions already posted.
+            my %hash; @hash{@_} = ();
+            return (exists $hash{$elem}) ? 1 : ();
+        }
+    };
+
+    bless($sub, 'Autoloader');
+}
+</code></pre>
+
+<p>This leaves you with usage looking like:</p>
+
+<pre><code>doTask if element('something')-&gt;in(@array);
+</code></pre>
+
+<p>If you reorganize the closure and its arguments, you can switch the syntax around the other way to make it look like this, which is a bit closer to the autobox style:</p>
+
+<pre><code>doTask if search(@array)-&gt;contains('something');
+</code></pre>
+
+<p>function to do that:</p>
+
+<pre><code>sub search {
+    my @arr = @_;
+
+    my $sub = {
+        contains =&gt; sub {
+            my $elem = shift or return;
+            my %hash; @hash{@arr} = ();
+            return (exists $hash{$elem}) ? 1 : ();
+        }
+    };
+
+    bless($sub, 'Autoloader');
+}
+</code></pre>

@@ -1,0 +1,419 @@
+ <h2> Title: How do I make a time delay? </h2> <h3> user46646, question_id: 510348 </h3>Score: 3206, Tags: {python,delay,sleep,timedelay} <br><p>How do I put a time delay in a Python script?</p>
+<h4> Comment 98106647 Peter Mortensen: </h4>Possible duplicate of <i><a href="https://stackoverflow.com/questions/377454/how-do-i-get-my-python-program-to-sleep-for-50-milliseconds">How do I get my Python program to sleep for 50 milliseconds?</a></i><br><h4> Comment 135030956 user16217248: </h4>Voting to reopen because this seems to be a better canonical than the linked dupe.<br>------------------------------------------------------------------ <br><h3> Answer 510351 Evan Fosmark: </h3><p>This delays for 2.5 seconds:</p>
+<pre><code>import time
+
+time.sleep(2.5)
+</code></pre>
+<hr />
+<p>Here is another example where something is run approximately once a minute:</p>
+<pre><code>import time
+
+while True:
+    print(&quot;This prints once a minute.&quot;)
+    time.sleep(60) # Delay for 1 minute (60 seconds).
+</code></pre>
+<h4> Comment 35645993 ssj: </h4>if you need some conditions to happen. It better to user threading.Event.wait.<br><h4> Comment 77924068 DonGru: </h4>when using tkinter as graphical user interface, sleep() won&#39;t do the job - use after() instead: <i>tkinter.Tk.after(yourrootwindow,60000)</i> or <i>yourrootwindow.after(60000)</i><br><h4> Comment 49840295 Parthian Shot: </h4>Well... it&#39;ll print less frequently than that, because it takes time to print and handle all the buffers that entails (possibly doing a kernel context switch), and to register the alarm signal, but... yeah. A little under once per minute.<br><h4> Comment 86174068 SDsolar: </h4>It is worth mentioning that in Windows the best granularity you can hope for is about 0.015 seconds (15 ms) accuracy.  Most versions of Linux on modern processors can get down to 0.001 seconds (1 ms) granularity.<br><h4> Comment 86530032 SDsolar: </h4>Indeed.  The tkinter comment would be better presented as an answer instead of in a comment.  We&#39;re building a database here that will be around for years to come, with people finding answers via Google, and lots of people never get around to reading the comments.  This would make a great new question, even.  Something along the lines of &quot;How to make a time delay in Python while using tkinter&quot; or similar.<br><h4> Comment 88734238 Peter Mortensen: </h4>Yes, but what can be said about the actual time resolution on different platforms? Are there some guarantees? Could the resolution be 16.666 ms?<br><h4> Comment 86513257 Miriam: </h4>@SDsolar What is wrong with sleep: You can&#39;t do any processing while it is sleeping, it basically puts the program on hold.<br><h4> Comment 99109875 user3064538: </h4>@PeterMortensen did you see SDsolar&#39;s comment? If you need guarantees you should be using a real time operating system and shouldn&#39;t be using a garbage collected language.<br>------------------------------------------------------------------ <br><h3> Answer 64486 pobk: </h3><p>Use <a href="https://docs.python.org/library/time.html#time.sleep" rel="noreferrer"><code>sleep()</code></a> from the <code>time</code> module. It can take a float argument for sub-second resolution.</p>
+<pre><code>from time import sleep
+sleep(0.1)  # Time in seconds
+</code></pre>
+<h4> Comment 104390504 Peter Mortensen: </h4>What about the time resolution? E.g., is there a risk of it being a multiple of 16.66 ms (though in the example it would happen to be exactly 0.1 second, 6 multiples of 16.66 ms)? Or is e.g. at least 1 ms guaranteed? For example, could a specified delay of 3 ms actually result in a 17 ms delay?<br><h4> Comment 132531387 William Martens: </h4>maybe printing out some precision (verbose) would be great too? as a future * thing perhaps<br>------------------------------------------------------------------ <br><h3> Answer 44666336 Russia Must Remove Putin: </h3><blockquote>
+  <h1>How can I make a time delay in Python?</h1>
+</blockquote>
+
+<p>In a single thread I suggest the <a href="https://docs.python.org/3/library/time.html#time.sleep" rel="noreferrer">sleep function</a>:</p>
+
+<pre><code>&gt;&gt;&gt; from time import sleep
+
+&gt;&gt;&gt; sleep(4)
+</code></pre>
+
+<p>This function actually suspends the processing of the thread in which it is called by the operating system, allowing other threads and processes to execute while it sleeps.</p>
+
+<p>Use it for that purpose, or simply to delay a function from executing. For example:</p>
+
+<pre><code>&gt;&gt;&gt; def party_time():
+...     print('hooray!')
+...
+&gt;&gt;&gt; sleep(3); party_time()
+hooray!
+</code></pre>
+
+<p>"hooray!" is printed 3 seconds after I hit <kbd>Enter</kbd>.</p>
+
+<h3>Example using <code>sleep</code> with multiple threads and processes</h3>
+
+<p>Again, <code>sleep</code> suspends your thread - it uses next to zero processing power.</p>
+
+<p>To demonstrate, create a script like this (I first attempted this in an interactive Python 3.5 shell, but sub-processes can't find the <code>party_later</code> function for some reason):</p>
+
+<pre><code>from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
+from time import sleep, time
+
+def party_later(kind='', n=''):
+    sleep(3)
+    return kind + n + ' party time!: ' + __name__
+
+def main():
+    with ProcessPoolExecutor() as proc_executor:
+        with ThreadPoolExecutor() as thread_executor:
+            start_time = time()
+            proc_future1 = proc_executor.submit(party_later, kind='proc', n='1')
+            proc_future2 = proc_executor.submit(party_later, kind='proc', n='2')
+            thread_future1 = thread_executor.submit(party_later, kind='thread', n='1')
+            thread_future2 = thread_executor.submit(party_later, kind='thread', n='2')
+            for f in as_completed([
+              proc_future1, proc_future2, thread_future1, thread_future2,]):
+                print(f.result())
+            end_time = time()
+    print('total time to execute four 3-sec functions:', end_time - start_time)
+
+if __name__ == '__main__':
+    main()
+</code></pre>
+
+<p>Example output from this script:</p>
+
+<pre><code>thread1 party time!: __main__
+thread2 party time!: __main__
+proc1 party time!: __mp_main__
+proc2 party time!: __mp_main__
+total time to execute four 3-sec functions: 3.4519670009613037
+</code></pre>
+
+<h2>Multithreading</h2>
+
+<p>You can trigger a function to be called at a later time in a separate thread with the <code>Timer</code> <a href="https://docs.python.org/3/library/threading.html" rel="noreferrer">threading</a> object:</p>
+
+<pre><code>&gt;&gt;&gt; from threading import Timer
+&gt;&gt;&gt; t = Timer(3, party_time, args=None, kwargs=None)
+&gt;&gt;&gt; t.start()
+&gt;&gt;&gt;
+&gt;&gt;&gt; hooray!
+
+&gt;&gt;&gt;
+</code></pre>
+
+<p>The blank line illustrates that the function printed to my standard output, and I had to hit <kbd>Enter</kbd> to ensure I was on a prompt.</p>
+
+<p>The upside of this method is that while the <code>Timer</code> thread was waiting, I was able to do other things, in this case, hitting <kbd>Enter</kbd> one time - before the function executed (see the first empty prompt).</p>
+
+<p>There isn't a respective object in the <a href="https://docs.python.org/3/library/multiprocessing.html" rel="noreferrer">multiprocessing library</a>. You can create one, but it probably doesn't exist for a reason. A sub-thread makes a lot more sense for a simple timer than a whole new subprocess.</p>
+------------------------------------------------------------------ <br><h3> Answer 48111882 Humble_boy: </h3><p>Delays can be also implemented by using the following methods.</p>
+
+<p>The first method:</p>
+
+<pre><code>import time
+time.sleep(5) # Delay for 5 seconds.
+</code></pre>
+
+<p>The second method to delay would be using the implicit wait method:</p>
+
+<pre><code> driver.implicitly_wait(5)
+</code></pre>
+
+<p>The third method is more useful when you have to wait until a particular action is completed or until an element is found:</p>
+
+<pre><code>self.wait.until(EC.presence_of_element_located((By.ID, 'UserName'))
+</code></pre>
+<h4> Comment 87391302 alexandernst: </h4>The second and the third method are not Python per-se, but selenium related. And you&#39;d use them when you&#39;re doing E2E tests. OP hasn&#39;t mentioned about any of those.<br>------------------------------------------------------------------ <br><h3> Answer 51199666 Trooper Z: </h3><p>There are five methods which I know: <code>time.sleep()</code>, <code>pygame.time.wait()</code>, matplotlib's <code>pyplot.pause()</code>, <code>.after()</code>, and <code>asyncio.sleep()</code>.</p>
+<hr />
+<p><code>time.sleep()</code> example (do not use if using tkinter):</p>
+<pre><code>import time
+print('Hello')
+time.sleep(5) # Number of seconds
+print('Bye')
+</code></pre>
+<hr />
+<p><code>pygame.time.wait()</code> example (not recommended if you are not using the pygame window, but you could exit the window instantly):</p>
+<pre><code>import pygame
+# If you are going to use the time module
+# don't do &quot;from pygame import *&quot;
+pygame.init()
+print('Hello')
+pygame.time.wait(5000) # Milliseconds
+print('Bye')
+</code></pre>
+<hr />
+<p>matplotlib's function <code>pyplot.pause()</code> example (not recommended if you are not using the graph, but you could exit the graph instantly):</p>
+<pre><code>import matplotlib
+print('Hello')
+matplotlib.pyplot.pause(5) # Seconds
+print('Bye')
+</code></pre>
+<hr />
+<p>The <code>.after()</code> method (best with Tkinter):</p>
+<pre><code>import tkinter as tk # Tkinter for Python&amp;nbsp;2
+root = tk.Tk()
+print('Hello')
+def ohhi():
+    print('Oh, hi!')
+root.after(5000, ohhi) # Milliseconds and then a function
+print('Bye')
+</code></pre>
+<hr />
+<p>Finally, the <code>asyncio.sleep()</code> method (has to be in an async loop):</p>
+<pre><code>await asyncio.sleep(5)
+</code></pre>
+<h4> Comment 102509233 Corey Goldberg: </h4><code>driver.implicitly_wait()</code> is a selenium webdriver method that sets the default wait time for finding elements on a web page. It is totally irrelevant to the question asked.<br><h4> Comment 128723659 MisterMiyagi: </h4>That&#39;s not how <code>asyncio.sleep</code> works. One has to <code>await</code> it while inside an event loop. It is not a general purpose delay.<br>------------------------------------------------------------------ <br><h3> Answer 23665492 Jan Vlcinsky: </h3><p>A bit of fun with a sleepy <a href="https://wiki.python.org/moin/Generators" rel="noreferrer">generator</a>.</p>
+
+<p>The question is about time delay. It can be fixed time, but in some cases we might need a delay measured since last time. Here is one possible solution:</p>
+
+<h1>Delay measured since last time (waking up regularly)</h1>
+
+<p>The situation can be, we want to do something as regularly as possible and we do not want to bother with all the <code>last_time</code>, <code>next_time</code> stuff all around our code.</p>
+
+<h2>Buzzer generator</h2>
+
+<p>The following code (<strong>sleepy.py</strong>) defines a <code>buzzergen</code> generator:</p>
+
+<pre><code>import time
+from itertools import count
+
+def buzzergen(period):
+    nexttime = time.time() + period
+    for i in count():
+        now = time.time()
+        tosleep = nexttime - now
+        if tosleep &gt; 0:
+            time.sleep(tosleep)
+            nexttime += period
+        else:
+            nexttime = now + period
+        yield i, nexttime
+</code></pre>
+
+<h2>Invoking regular buzzergen</h2>
+
+<pre><code>from sleepy import buzzergen
+import time
+buzzer = buzzergen(3) # Planning to wake up each 3 seconds
+print time.time()
+buzzer.next()
+print time.time()
+time.sleep(2)
+buzzer.next()
+print time.time()
+time.sleep(5) # Sleeping a bit longer than usually
+buzzer.next()
+print time.time()
+buzzer.next()
+print time.time()
+</code></pre>
+
+<p>And running it we see:</p>
+
+<pre><code>1400102636.46
+1400102639.46
+1400102642.46
+1400102647.47
+1400102650.47
+</code></pre>
+
+<p>We can also use it directly in a loop:</p>
+
+<pre><code>import random
+for ring in buzzergen(3):
+    print "now", time.time()
+    print "ring", ring
+    time.sleep(random.choice([0, 2, 4, 6]))
+</code></pre>
+
+<p>And running it we might see:</p>
+
+<pre><code>now 1400102751.46
+ring (0, 1400102754.461676)
+now 1400102754.46
+ring (1, 1400102757.461676)
+now 1400102757.46
+ring (2, 1400102760.461676)
+now 1400102760.46
+ring (3, 1400102763.461676)
+now 1400102766.47
+ring (4, 1400102769.47115)
+now 1400102769.47
+ring (5, 1400102772.47115)
+now 1400102772.47
+ring (6, 1400102775.47115)
+now 1400102775.47
+ring (7, 1400102778.47115)
+</code></pre>
+
+<p>As we see, this buzzer is not too rigid and allow us to catch up with regular sleepy intervals even if we oversleep and get out of regular schedule.</p>
+------------------------------------------------------------------ <br><h3> Answer 42517469 Parallax Sugar: </h3><p>The <a href="http://en.wikipedia.org/wiki/Tkinter" rel="noreferrer">Tkinter</a> library in the Python standard library is an interactive tool which you can import. Basically, you can create buttons and boxes and popups and stuff that appear as windows which you manipulate with code.</p>
+
+<p>If you use Tkinter, <strong><em>do not use <code>time.sleep()</code></em></strong>, because it will muck up your program. This happened to me. Instead, use <code>root.after()</code> and replace the values for however many seconds, with a milliseconds. For example, <code>time.sleep(1)</code> is equivalent to <code>root.after(1000)</code> in Tkinter.</p>
+
+<p>Otherwise, <code>time.sleep()</code>, which many answers have pointed out, which is the way to go.</p>
+------------------------------------------------------------------ <br><h3> Answer 44529622 Matthew Miles: </h3><p>Delays are done with the <a href="https://docs.python.org/2/library/time.html" rel="nofollow noreferrer">time library</a>, specifically the <a href="https://docs.python.org/2/library/time.html#time.sleep" rel="nofollow noreferrer"><code>time.sleep()</code></a> function.</p>
+
+<p>To just make it wait for a second:</p>
+
+<pre><code>from time import sleep
+sleep(1)
+</code></pre>
+
+<p>This works because by doing:</p>
+
+<pre><code>from time import sleep
+</code></pre>
+
+<p>You extract the <a href="https://docs.python.org/2/library/time.html#time.sleep" rel="nofollow noreferrer">sleep function</a> <strong>only</strong> from the <a href="https://docs.python.org/2/library/time.html" rel="nofollow noreferrer">time library</a>, which means you can just call it with:</p>
+
+<pre><code>sleep(seconds)
+</code></pre>
+
+<p>Rather than having to type out</p>
+
+<pre><code>time.sleep()
+</code></pre>
+
+<p>Which is awkwardly long to type.</p>
+
+<p>With this method, you wouldn't get access to the other features of the <a href="https://docs.python.org/2/library/time.html" rel="nofollow noreferrer">time library</a> and you can't have a variable called <code>sleep</code>. But you could create a variable called <code>time</code>.</p>
+
+<p>Doing <a href="https://docs.python.org/2/tutorial/modules.html#more-on-modules" rel="nofollow noreferrer"><code>from [library] import [function] (, [function2])</code></a> is great if you just want certain parts of a module.</p>
+
+<p>You could equally do it as:</p>
+
+<pre><code>import time
+time.sleep(1)
+</code></pre>
+
+<p>and you would have access to the other features of the <a href="https://docs.python.org/2/library/time.html" rel="nofollow noreferrer">time library</a> like <a href="https://docs.python.org/2/library/time.html#time.clock" rel="nofollow noreferrer"><code>time.clock()</code></a> as long as you type <code>time.[function]()</code>, but you couldn't create the variable time because it would overwrite the import. A solution to this to do</p>
+
+<pre><code>import time as t
+</code></pre>
+
+<p>which would allow you to reference the <a href="https://docs.python.org/2/library/time.html" rel="nofollow noreferrer">time library</a> as <code>t</code>, allowing you to do:</p>
+
+<pre><code>t.sleep()
+</code></pre>
+
+<p>This works on any library.</p>
+<h4> Comment 102509207 Corey Goldberg: </h4>this is basically a mini tutorial on imports, which the OP never asked about.   This answer could be replaced with &quot;use <code>time.sleep()</code>&quot;<br><h4> Comment 132531375 William Martens: </h4>@CoreyGoldberg I dont see any harm in this post, it  explains a bit imports too!<br>------------------------------------------------------------------ <br><h3> Answer 54128477 BlackBeard: </h3><h3>If you would like to put a time delay in a Python script:</h3>
+
+<p>Use <strong><code>time.sleep</code></strong> or <strong><code>Event().wait</code></strong> like this:</p>
+
+<pre><code>from threading import Event
+from time import sleep
+
+delay_in_sec = 2
+
+# Use time.sleep like this
+sleep(delay_in_sec)         # Returns None
+print(f'slept for {delay_in_sec} seconds')
+
+# Or use Event().wait like this
+Event().wait(delay_in_sec)  # Returns False
+print(f'waited for {delay_in_sec} seconds')
+</code></pre>
+
+<h1>However, if you want to delay the execution of a function do this:</h1>
+
+<p>Use <a href="https://docs.python.org/2.7/library/threading.html?highlight=timer#threading.Timer" rel="noreferrer"><strong><code>threading.Timer</code></strong></a> like this:</p>
+
+<pre><code>from threading import Timer
+
+delay_in_sec = 2
+
+def hello(delay_in_sec):
+    print(f'function called after {delay_in_sec} seconds')
+
+t = Timer(delay_in_sec, hello, [delay_in_sec])  # Hello function will be called 2 seconds later with [delay_in_sec] as the *args parameter
+t.start()  # Returns None
+print("Started")
+</code></pre>
+
+<p>Outputs:</p>
+
+<pre><code>Started
+function called after 2 seconds
+</code></pre>
+
+<h3>Why use the later approach?</h3>
+
+<ul>
+<li>It does <strong>not</strong> stop execution of the whole script (except for the function you pass it).</li>
+<li>After starting the timer you can also stop it by doing <code>timer_obj.cancel()</code>.</li>
+</ul>
+<h4> Comment 104481652 Saad Anees: </h4>its working for the first time.. second time its giving error &#39;RuntimeError: threads can only be started once&#39;<br>------------------------------------------------------------------ <br><h3> Answer 53600344 Aaron_ab: </h3><h2>asyncio.sleep</h2>
+
+<p>Notice in recent Python versions (Python&nbsp;3.4 or higher) you can use <code>asyncio.sleep</code>. It's related to asynchronous programming and asyncio. Check out next example:</p>
+
+<pre><code>import asyncio
+from datetime import datetime
+
+@asyncio.coroutine
+def countdown(iteration_name, countdown_sec):
+    """
+    Just count for some countdown_sec seconds and do nothing else
+    """
+    while countdown_sec &gt; 0:
+       print(f'{iteration_name} iterates: {countdown_sec} seconds')
+       yield from asyncio.sleep(1)
+       countdown_sec -= 1
+
+loop = asyncio.get_event_loop()
+tasks = [asyncio.ensure_future(countdown('First Count', 2)),
+         asyncio.ensure_future(countdown('Second Count', 3))]
+
+start_time = datetime.utcnow()
+
+# Run both methods. How much time will both run...?
+loop.run_until_complete(asyncio.wait(tasks))
+
+loop.close()
+
+print(f'total running time: {datetime.utcnow() - start_time}')
+</code></pre>
+
+<p>We may think it will "sleep" for 2 seconds for first method and then 3 seconds in the second method, a total of 5 seconds running time of this code. But it will print:</p>
+
+<pre><code>total_running_time: 0:00:03.01286
+</code></pre>
+
+<p>It is recommended to read <a href="https://docs.python.org/3/library/asyncio.html" rel="nofollow noreferrer">asyncio official documentation</a> for more details.</p>
+<h4> Comment 103043768 mabraham: </h4>The original question was about inserting a delay. That nail needs a hammer, not an asynchronous wrench :-)<br><h4> Comment 102240630 srrvnn: </h4>Why is this better than time.sleep()?<br><h4> Comment 102241167 Aaron_ab: </h4>Try running similar example with <code>time.sleep</code>. You will not get same running time results. Recommend to read about <code>asynchronous</code> programming in python<br>------------------------------------------------------------------ <br><h3> Answer 52352252 LoneWolf: </h3><p>This is an easy example of a time delay:</p>
+
+<pre><code>import time
+
+def delay(period='5'):
+    # If the user enters nothing, it'll wait 5 seconds
+    try:
+        # If the user not enters a int, I'll just return ''
+        time.sleep(period)
+    except:
+        return ''
+</code></pre>
+
+<p>Another, in <a href="http://en.wikipedia.org/wiki/Tkinter" rel="nofollow noreferrer">Tkinter</a>:</p>
+
+<pre><code>import tkinter
+
+def tick():
+    pass
+
+root = Tk()
+delay = 100 # Time in milliseconds
+root.after(delay, tick)
+root.mainloop()
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 50694125 Haran Rajkumar: </h3><p>While everyone else has suggested the de facto <code>time</code> module, I thought I'd share a different method using <code>matplotlib</code>'s <code>pyplot</code> function, <a href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.pause.html" rel="noreferrer"><code>pause</code></a>.</p>
+<h3>An example</h3>
+<pre><code>from matplotlib import pyplot as plt
+plt.pause(5)    # Pauses the program for 5 seconds
+</code></pre>
+<p>Typically this is used to prevent the plot from disappearing as soon as it is plotted or to make crude animations.</p>
+<p>This would save you an <code>import</code> if you already have <code>matplotlib</code> imported.</p>
+------------------------------------------------------------------ <br><h3> Answer 55662588 Matthijs990: </h3><p>You also can try this:</p>
+
+<pre><code>import time
+# The time now
+start = time.time() 
+while time.time() - start &lt; 10: # Run 1- seconds
+    pass
+# Do the job
+</code></pre>
+
+<p>Now the shell will not crash or not react.</p>
+<h4> Comment 98303908 Keith Ripley: </h4>Don&#39;t use this solution. It may technically work, but it will eat your CPU. Modern hardware and operating systems have better ways of creating time delays that don&#39;t hog system resources. Use time.sleep() instead.<br><h4> Comment 121951118 Trenton: </h4>Yes, modern, like anything from the last 4-5 decades.<br>

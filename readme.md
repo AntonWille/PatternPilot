@@ -20,11 +20,16 @@ These points can serve as a good initial focus for examination in combination wi
 ### Download Data from Stackoverflow
 
 A minimal SORequests-Class is defined in stack_overflow_api.py. This works without an api-key for read-only requests, but with a limit of 300 Requests per day.
-By invoking script/download_so_data.py, you can download the 100 top questions and their answers. Adding a number indicates the page, so
-`script/download_so_data.py 2`
-will download posts 101 to 200 of the most popular posts for each of the three tags 'ruby', 'python' and 'perl'.
+You can download the 100 top questions and their answers. Adding a number indicates the page, so
 
+`python scripts/stack_api/download_so_data.py 2`
+
+will download posts 101 to 200 of the most popular posts. The tag currently needs to be changed in the main function.
 If a valid DB exists, it will write these to the defined tables, and save copies in JSON format in the data-folder.
+
+Once in the database, you can extract the posts to html with
+
+`python scripts/full_post_generator.py`
 
 Note: One caveat  of this script is that Questions are only added once. So a question tagged "Ruby Python Perl" would only get added one, to the stack of of posts that was executed first!
 
@@ -39,7 +44,7 @@ Week 2 was primarily a holiday spent with the family and friends. I read some of
 
 ### WEEK 3
 After doing everything I could before actually starting with the important work; encoding the Stackoverflow Posts, I finally started doing this in earnest.
-The Code-System that developed over this week can be found in data/code_system_060124.
+The Code-System that developed over this week can be found in `data/code_system_07_01_24`.
 Anxiety to not be able to find interesting cultural differences or cultural occorunces in general was quickly replaced with some concerns that there is too much volume to fit into a Bachelor thesis: Posts average around 1000 lines, so there is a very substantial amount  of discussion in just these 300 posts.
 
 Some early thoughts:

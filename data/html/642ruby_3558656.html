@@ -1,0 +1,168 @@
+ <h2> Title: How to remove RVM (Ruby Version Manager) from my system </h2> <h3> lucianosousa, question_id: 3558656 </h3>Score: 642, Tags: {ruby,rubygems,rvm} <br><p>How can I remove RVM (Ruby Version Manager) from my system?</p>
+<h4> Comment 17624114 Jochem Schulenklopper: </h4>Not sure about your intentions to remove <code>rvm</code> -- it could be its &#39;obtrusiveness&#39; -- but <a href="https://github.com/sstephenson/rbenv" rel="nofollow noreferrer"><code>rbenv</code></a> is a a worthwhile alternative.You can still manage multiple Ruby versions on your system, but it doesn&#39;t override shell commands, doesn&#39;t manage gemsets (Bundler is more than sufficient), and doesn&#39;t need to be loaded in the shell.<br>------------------------------------------------------------------ <br><h3> Answer 3558763 tadman: </h3><p>There's a simple command built-in that will pull it:</p>
+<pre><code>rvm implode
+</code></pre>
+<p>This will remove the <code>rvm/</code> directory and all the rubies built within it. In order to remove the final trace of rvm, you need to remove the rvm gem, too, if you installed that:</p>
+<pre><code>gem uninstall rvm
+</code></pre>
+<p>There may be elements left over from a Homebrew, Apt or DNF install of it that require removal as well. This depends on how you installed it in the first place. That clean-up step is optional, as RVM will no longer be involved in Ruby, but can help keep things organized.</p>
+<p>If you've made modifications to your <code>PATH</code> you might want to pull those, too. Check your <code>.bashrc</code>, <code>.profile</code> and <code>.bash_profile</code> files, among other things.</p>
+<p>You may also have an <code>/etc/rvmrc</code> file, or one in your home directory <code>~/.rvmrc</code> that may need to be removed as well.</p>
+<h4> Comment 3729711 Jed Schneider: </h4>+1 for noting the profile settings and the gem uninstall, <i>if</i> you didn&#39;t listen to Wayne in the first place and installed it as a gem. :)<br><h4> Comment 24778726 Nate Cook: </h4>I also had a reference to RVM in <code>~&#47;.zshrc</code><br><h4> Comment 48564338 mycargus: </h4>Anyone else feel like uninstalling rvm should be easier than this? Good gravy.<br><h4> Comment 6328590 berkes: </h4>If you -like me- have rvm configured in passenger, make sure to reinstall passenger afterwards too.<br><h4> Comment 7791642 tadman: </h4>It may break it temporarily until you create a new shell, as that&#39;s just how things like <code>bash</code> behave when you yank executables out of the <code>PATH</code>.<br><h4> Comment 44917801 secador de pelo: </h4>I also had a reference to RVM in ~/.zlogin<br><h4> Comment 3729798 tadman: </h4>It installs just fine as a gem if you remember to update it afterwards. I find that a more reliable method than source installing anything. Wayne also says to not root install it but I don&#39;t listen to him on that point either. It&#39;s so much better to have an rvm-managed system Ruby. 1.9.2p0 is working perfectly with both TextMate, shell and Passenger.<br><h4> Comment 119926639 Steven : </h4>rvm implode makes me feel bad for removing it lol. Thanks for your answer helped a lot!<br><h4> Comment 37868953 Thomas: </h4>I needed to type <code>rvm implode --force</code> without the force option I could not implode.<br><h4> Comment 32494889 Nick_K: </h4>Hi, if you continue to receive permission denied error after you followed the above instructions, make sure you logout and relogin as a single user. It worked for me<br><h4> Comment 7789992 Moshe: </h4>Uninstalling like this breaks the path to the default ruby.<br><h4> Comment 33103045 hourback: </h4>After performing these steps (in order to switch to rbenv), my environment was still littered with variables left over from RVM, even after purging its files from my Ubuntu system and restarting my terminals.  I rebooted, and they were all gone.  I rebooted so I could be sure there wasn&#39;t some init file somewhere setting them again.<br><h4> Comment 49469244 Tibor Nagy: </h4>I had to remove also <code>source &#47;usr&#47;local&#47;rvm&#47;scripts&#47;cli</code>  from the <code>.bashrc</code>.<br>------------------------------------------------------------------ <br><h3> Answer 16790072 Caffeine Coder: </h3><p>A lot of people do a common mistake of thinking that 'rvm implode' does it . You need to delete all traces of any .rm files . Also , it will take some manual deletions from root . Make sure , it gets deleted and also all the ruby versions u installed using it .</p>
+------------------------------------------------------------------ <br><h3> Answer 15286533 Rory O&#39;Kane: </h3><p>If the other answers don’t remove RVM throughly enough for you, <a href="https://rvm.io/support/troubleshooting/" rel="noreferrer">RVM’s Troubleshooting page</a> contains this section:</p>
+
+<blockquote>
+  <h2>How do I completely clean out all traces of RVM from my system, including for system wide installs?</h2>
+  
+  <p>Here is a custom script which we name as <code>cleanout-rvm</code>. While you can definitely use <code>rvm implode</code> as a regular user or <code>rvmsudo rvm implode</code> for a system wide install, this script is useful as it steps completely outside of RVM and cleans out RVM without using RVM itself, leaving no traces.</p>
+  
+  <pre class="lang-sh prettyprint-override"><code>#!/bin/bash
+/usr/bin/sudo rm -rf $HOME/.rvm $HOME/.rvmrc /etc/rvmrc /etc/profile.d/rvm.sh /usr/local/rvm /usr/local/bin/rvm
+/usr/bin/sudo /usr/sbin/groupdel rvm
+/bin/echo "RVM is removed. Please check all .bashrc|.bash_profile|.profile|.zshrc for RVM source lines and delete
+or comment out if this was a Per-User installation."
+</code></pre>
+</blockquote>
+------------------------------------------------------------------ <br><h3> Answer 25571648 Kingsley Ijomah: </h3><p>When using <code>implode</code> and you see:</p>
+
+<pre><code>Psychologist intervened, cancelling implosion, crisis avoided :)
+</code></pre>
+
+<p>Then you may want to use <code>--force</code></p>
+
+<pre><code>rvm implode --force
+</code></pre>
+
+<p>Then remove RVM from the following locations:</p>
+
+<pre><code>rm -rf /usr/local/rvm
+sudo rm /etc/profile.d/rvm.sh
+sudo rm /etc/rvmrc
+sudo rm ~/.rvmrc
+</code></pre>
+
+<p>Check the following files and remove or comment out references to RVM:</p>
+
+<pre><code>~/.bashrc 
+~/.bash_profile 
+~/.profile 
+~/.zshrc
+~/.zlogin
+</code></pre>
+
+<p>Comment-out/remove the following lines from /etc/profile:</p>
+
+<pre><code> source /etc/profile.d/sm.sh
+ source /etc/profile.d/rvm.sh
+</code></pre>
+
+<p>/etc/profile is a read-only file so use:</p>
+
+<pre><code>sudo vim /etc/profile
+</code></pre>
+
+<p>And after making the change write using a bang!</p>
+
+<pre><code>:w!
+</code></pre>
+
+<p>Finally re-login/restart your terminal.</p>
+<h4> Comment 108264317 the Tin Man: </h4>If RVM was installed for a single user, it shouldn&#39;t have been done using <code>sudo</code> initially, so none of its files will be in the <code>&#47;etc</code> or <code>&#47;usr</code> paths. Only when it was installed using the multi-user or with <code>sudo</code> will you see that, and their existence are strong hints that the <a href="https://rvm.io/rvm/install" rel="nofollow noreferrer">RVM installation documentation</a> was <i>NOT</i> followed to install it in the first place.<br><h4> Comment 135546112 Yash Jadhav: </h4>what we have to do using sudo vim /etc/profile also what is :w! .Please help<br><h4> Comment 107156488 Newbyte: </h4>What makes that initial message appear?<br>------------------------------------------------------------------ <br><h3> Answer 7251303 hinosx: </h3><p>In addition to @tadman's answer I removed the wrappers in <code>/usr/local/bin</code> as well as the file <code>/etc/profile.d/rvm</code>.</p>
+
+<p>The wrappers include:</p>
+
+<pre><code>erb
+gem
+irb
+rake
+rdoc
+ri
+ruby
+testrb
+</code></pre>
+<h4> Comment 42461681 bfontaine: </h4>Note: it’s <code>&#47;usr&#47;local&#47;bin</code>, not <code>&#47;user&#47;local&#47;bin</code>.<br>------------------------------------------------------------------ <br><h3> Answer 12284436 Vishnu Atrai: </h3><p>Remove the RVM load script from /.bash_rc or /.zsh_rc, then use:</p>
+
+<pre><code>rm -rf /.rvm
+</code></pre>
+
+<p>Or: </p>
+
+<pre><code>rvm implode
+</code></pre>
+<h4> Comment 56554606 cola: </h4>Is it rvm <code>rm -rf &#47;.rvm</code> or <code>rm -rf ~&#47;.rvm</code> ?<br>------------------------------------------------------------------ <br><h3> Answer 43897293 slal: </h3><p>Run:</p>
+
+<pre><code>rvm implode
+</code></pre>
+
+<p>Now you need to uninstall the RVM gem using:</p>
+
+<pre><code>gem uninstall rvm
+</code></pre>
+
+<p>Check if there are any remaining RVM files in your home directory, if yes remove them.</p>
+
+<p>Go to the home directory and list all hidden files:</p>
+
+<pre><code>ls -a
+
+rm  .rvm
+rm  .rvmrc
+</code></pre>
+<h4> Comment 108264361 the Tin Man: </h4><i>Note:</i> RVM isn&#39;t a gem so <code>gem uninstall rvm</code> will fail.<br>------------------------------------------------------------------ <br><h3> Answer 9233927 rogerdpack: </h3><p>Note that if you installed RVM via apt-get, you have to run some further steps than <code>rvm implode</code> or <code>apt-get remove ruby-rvm</code> to get it to really uninstall.</p>
+
+<p>See "<a href="https://stackoverflow.com/questions/8402827/installing-rvm-on-ubuntu">Installing RVM on Ubuntu</a>".</p>
+------------------------------------------------------------------ <br><h3> Answer 39172267 leenyburger: </h3><p>For other shell newbies trying to fix the PATH variable </p>
+
+<p>After following instructions in accepted answer, check and modify your PATH variable if necessary : </p>
+
+<pre><code>env | grep PATH 
+</code></pre>
+
+<p>if you see "rvm" anywhere, you need to figure out where you are setting PATH and modify.  I was setting it in 3 files - so check all the following files:</p>
+
+<pre><code>vim .bashrc  
+</code></pre>
+
+<p>Delete the lines in the file referencing rvm using the dd command.  :wq to save and exit.<br>
+<code>source .bashrc</code> to "reload"</p>
+
+<p>Repeat this process (starting with the vim command) for .profile and .bash_profile</p>
+------------------------------------------------------------------ <br><h3> Answer 26285201 chbrown: </h3><p>If you're still getting a <code>env: ruby_executable_hooks: No such file or directory</code> when calling some Ruby package, that means RVM left a little gift for you in your <code>$PATH</code>.</p>
+
+<p>Run the following to find the offending scripts:</p>
+
+<pre><code>grep '#!/usr/bin/env ruby_executable_hooks' /usr/local/bin/*
+</code></pre>
+
+<p>Then <code>rm</code> all the matches. You'll have to reinstall all of those libraries with an RVM-free <code>gem</code>, of course.</p>
+------------------------------------------------------------------ <br><h3> Answer 60385208 abadfish: </h3><p>I am running Ubuntu 19.04 and followed all the instructions above and then some. Finally, what worked for me was to run</p>
+
+<pre><code>sudo apt autoremove rvm
+</code></pre>
+
+<p>and now when I try and reinstall RVM it's actually gone. RVM is invasive, to say the least.  </p>
+<h4> Comment 108264586 the Tin Man: </h4>There are numerous attempts to explain how to install RVM across the internet, and most are very out-of-date and quite wrong because the application has grown a lot in the years since it was released. <a href="https://rvm.io/" rel="nofollow noreferrer">RVM&#39;s site</a> is the definitive source for information about installing, deleting, or using it. There are many pages because it&#39;s flexible tool, but if you follow the basic installation you&#39;ll find it&#39;s not at all invasive and quite easy to manage or remove.<br>------------------------------------------------------------------ <br><h3> Answer 61198742 the Tin Man: </h3><p>Per RVM's troubleshooting documentation "<a href="https://rvm.io/support/troubleshooting" rel="nofollow noreferrer">How do I completely clean out all traces of RVM from my system, including for system wide installs?</a>":</p>
+
+<blockquote>
+  <p>Here is a custom script which we name as 'cleanout-rvm'. While you can definitely use <code>rvm implode</code> as a regular user or <code>rvmsudo rvm implode</code> for a system wide install, this script is useful as it steps completely outside of RVM and cleans out RVM without using RVM itself, leaving no traces. </p>
+
+<pre><code>#!/bin/bash
+/usr/bin/sudo rm -rf $HOME/.rvm $HOME/.rvmrc /etc/rvmrc /etc/profile.d/rvm.sh /usr/local/rvm /usr/local/bin/rvm
+/usr/bin/sudo /usr/sbin/groupdel rvm
+/bin/echo "RVM is removed. Please check all .bashrc|.bash_profile|.profile|.zshrc for RVM source lines and delete or comment out if this was a Per-User installation."
+</code></pre>
+</blockquote>
+------------------------------------------------------------------ <br><h3> Answer 68135309 thiagoBarbosa48: </h3><p>Complementing  @Kingsley Ijomah answer...</p>
+<p>It may be necessary to fix the PATH so that the <code>rvm</code> command also disappears from the terminal.</p>
+<p>To check your PATH:</p>
+<pre><code>env | grep PATH
+</code></pre>
+<p>To fix your PATH removing RVM directories:</p>
+<pre><code>dir_to_remove=/home/user/.rvm/bin
+PATH=:$PATH:
+PATH=${PATH//:$dir_to_remove:/:}
+PATH=${PATH#:}; PATH=${PATH%:}
+</code></pre>
+<p>In this case, if you have more than one directory, change <code>dir_to_remove</code> one at a time.</p>
+<p>I needed to remove some rvm and rbenv directories as I am now using asdf.</p>
+<p>Be careful.</p>

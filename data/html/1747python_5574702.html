@@ -1,0 +1,335 @@
+ <h2> Title: How do I print to stderr in Python? </h2> <h3> wim, question_id: 5574702 </h3>Score: 1747, Tags: {python,printing,stderr} <br><p>There are several ways to write to stderr:</p>
+<pre><code>print &gt;&gt; sys.stderr, &quot;spam&quot;  # Python 2 only.
+
+sys.stderr.write(&quot;spam\n&quot;)
+
+os.write(2, b&quot;spam\n&quot;)
+
+from __future__ import print_function
+print(&quot;spam&quot;, file=sys.stderr)
+</code></pre>
+<p>What are the differences between these methods? Which method should be preferred?</p>
+<h4> Comment 8303220 Jessica: </h4>The first way listed is one of the many things removed in Python 3. The consensus seems to be that the &gt;&gt; syntax was ugly anyway, and since print is now a function, the syntax would never work.<br>------------------------------------------------------------------ <br><h3> Answer 41304513 slushy: </h3><p>Nobody's mentioned <a href="https://docs.python.org/3.8/library/logging.html" rel="noreferrer"><code>logging</code></a> yet, but logging was created specifically to communicate error messages. Basic configuration will set up a stream handler writing to stderr.</p>
+
+<p>This script:</p>
+
+<pre><code># foo.py
+import logging
+
+logging.basicConfig(format='%(message)s')
+log = logging.getLogger(__name__)
+log.warning('I print to stderr by default')
+print('hello world')
+</code></pre>
+
+<p>has the following result when run on the command line:</p>
+
+<pre><code>$ python3 foo.py &gt; bar.txt
+I print to stderr by default
+</code></pre>
+
+<p>and <em>bar.txt</em> will contain the 'hello world' printed on stdout.</p>
+<h4> Comment 86069180 Mnebuerquo: </h4>In my experience, more people use print to log messages than use logging. I think python4 should just remove print from the language and force you to use logging for that.<br><h4> Comment 100507146 Carlos Saltos: </h4>This is the best answer !! ... I was struggling with print or sys or who knows ... when a proper logging is needed ... thanks for the good idea<br><h4> Comment 115683510 creallf: </h4>@Mnebuerquo Java does that... And now we have Kotlin.<br>------------------------------------------------------------------ <br><h3> Answer 14981125 MarcH: </h3><p>I found this to be the only one short, flexible, portable and readable:</p>
+<pre><code>import sys
+
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+</code></pre>
+<p>The optional function <code>eprint</code> saves some repetition. It can be used in the same way as the standard <code>print</code> function:</p>
+<pre><code>&gt;&gt;&gt; print(&quot;Test&quot;)
+Test
+&gt;&gt;&gt; eprint(&quot;Test&quot;)
+Test
+&gt;&gt;&gt; eprint(&quot;foo&quot;, &quot;bar&quot;, &quot;baz&quot;, sep=&quot;---&quot;)
+foo---bar---baz
+</code></pre>
+<h4> Comment 42533683 MarcH: </h4>@DanH Yes this <i>forces</i> you to make your code Python3-ready. I guess this could be why many people actually like it!<br><h4> Comment 75053868 alexis: </h4>FWIW this code <b>doesn&#39;t</b> force you to use the function version of <code>print</code> in your entire program. Only in the module containing the definition of <code>eprint()</code>. Put it in a small file by itself, import <code>eprint</code> from it into your other files, and you can continue using statement <code>print</code> as long as you want.<br><h4> Comment 42341774 Dan H: </h4>Just one thought: since this will import the print function, every other &quot;print&quot; in the original script will now need to be &quot;functionized&quot; adding &quot;(&quot; and &quot;)&quot;.  So that is a slight strike against this method, IMO.<br><h4> Comment 42603878 Dan H: </h4>@MarkH... yes, it forces you to make your code Python3-ready... it also forces you to do it NOW, just to print some debugging info to the stderr... which I would find more of a hassle in most situations when I&#39;m trying to debug something.  (I&#39;d rather not introduce new syntax errors!)  :-)<br><h4> Comment 87741110 bobpaul: </h4>Also you converting from print to print function is a simple find replace that 2to3 already automates for you. Just do it already if you haven&#39;t; python2 will be gone in less than 2 years... Some things between 2 and 3 can get a bit tricky; print function isn&#39;t one of them. See <a href="https://docs.python.org/2/library/2to3.html" rel="nofollow noreferrer">docs.python.org/2/library/2to3.html</a><br><h4> Comment 106038068 gmagno: </h4>In case you&#39;re writing <code>eprint</code> as a class method, don&#39;t forget to add <code>self</code> as an argument: <code>def eprint(self, *args, **kwargs):</code>. Otherwise you&#39;ll get your output messed up and it might take you a while to find out why :-)<br><h4> Comment 131794354 Art Swri: </h4>Python 2 will be gone in 2 years. Really. Let&#39;s check the calendar...<br><h4> Comment 123482857 Luc: </h4>or just <code>print(&#39;your message&#39;, file=sys.stderr)</code> now that python2 is dead since years. See Joachim&#39;s answer below and upvote that if you like this cleaner solution.<br>------------------------------------------------------------------ <br><h3> Answer 5574737 Mike Ramirez: </h3><pre><code>import sys
+sys.stderr.write()
+</code></pre>
+
+<p>Is my choice, just more readable and saying exactly what you intend to do and portable across versions.  </p>
+
+<p>Edit: being 'pythonic' is a third thought to me over readability and performance... with these two things in mind, with python 80% of your code will be pythonic. list comprehension being the 'big thing' that isn't used as often (readability).</p>
+<h4> Comment 12781489 temoto: </h4>Just don&#39;t forget to flush.<br><h4> Comment 13817070 Colonel Panic: </h4><code>sys.stderr.write()</code> is nothing like <code>print</code>. It doesn&#39;t add a newline.<br><h4> Comment 12847667 vdboor: </h4>Advantage of the <code>print</code> statement is easy printing of non-string values, without having to convert them first. If you need a print statement, I would therefore recommend using the 3rd option to be python 3 ready<br><h4> Comment 50809262 jpmc26: </h4>@SkipHuffman You mean <code>os.linesep</code>. This is <code>stderr</code> we&#39;re talking about, after all. Don&#39;t want the console to mess up with the wrong newline.<br><h4> Comment 23104172 JonnyJD: </h4>This works on Python 2 and 3, which is important if you want to support both.<br><h4> Comment 18886198 Skip Huffman: </h4>Does&#39;t add a new line?  Just put +&#39;\n&#39; at the end.<br><h4> Comment 19912666 temoto: </h4>@Matt are you sure it applies even if stderr is redirected to file?<br><h4> Comment 10639116 Mike Ramirez: </h4>@Dheeraj yes and no, pythonic to me is using the language elegantly while retaining readability. Some simple list/dict comprehensions compound statements would be more pythonic than the normal for loop, I try to opt for the more common, longer versions.  I wouldn&#39;t call it pythonic.<br><h4> Comment 82375154 Noumenon: </h4>To log an exception like this, use <code>sys.stderr.write(traceback.format_exc())</code>.<br><h4> Comment 65624209 conjectures: </h4>This suggestion has my vote. Importing from future can break other code, and no weird syntax.<br><h4> Comment 72607707 Qix - MONICA WAS MISTREATED: </h4>@temoto Yes. /length<br><h4> Comment 112011982 David Lotts: </h4>@Matt  Yes you need to flush stderr.    sys.stderr.flush()<br><h4> Comment 114960856 John Marshall: </h4>@Matt: stderr is <a href="https://docs.python.org/3/library/sys.html#sys.stderr" rel="nofollow noreferrer">line buffered</a>. So it&#39;ll appear to be unbuffered if you always write stuff ending in <code>\n</code> to it, but it&#39;s not really the case — as can be observed in code that forgets that (unlike <code>print()</code>) it needs to be explicit about appending a <code>&#39;\n&#39;</code> to the string to be printed out.<br><h4> Comment 115040454 John Marshall: </h4>@Matt: No-one is suggesting that <i>Unix</i> buffers fd 2. (Note too that that <code>stderr</code> man page is about the C <code>stderr</code> and is Linux- or glibc-specific; the C Standard just says that <code>stderr</code> is initially not fully buffered.) But, as you note, this question is about the behaviour of Python&#39;s <code>sys.stderr</code>. That has indeed changed again in <a href="https://bugs.python.org/issue13601" rel="nofollow noreferrer">Python 3.9</a>, but <code>sys.stderr</code> has been line buffered to a terminal and otherwise fully buffered since at least <a href="https://github.com/python/cpython/commit/9169641b8b2995abb651826887773eb12cbf6064" rel="nofollow noreferrer">Python 3.1</a>.<br>------------------------------------------------------------------ <br><h3> Answer 15808105 Joachim W: </h3><p>Python 3:</p>
+<pre class="lang-py prettyprint-override"><code>print(&quot;fatal error&quot;, file=sys.stderr)
+</code></pre>
+<p>Python 2:</p>
+<pre class="lang-py prettyprint-override"><code>print &gt;&gt; sys.stderr, &quot;fatal error&quot;
+</code></pre>
+<hr />
+<h2>Long answer</h2>
+<p><code>print &gt;&gt; sys.stderr</code> is gone in Python3.
+<a href="http://docs.python.org/3.0/whatsnew/3.0.html" rel="noreferrer">http://docs.python.org/3.0/whatsnew/3.0.html</a> says:</p>
+<blockquote>
+<p>Old: <code>print &gt;&gt; sys.stderr, &quot;fatal error&quot;</code> <br />
+New: <code>print(&quot;fatal error&quot;, file=sys.stderr)</code></p>
+</blockquote>
+<p>For many of us, it feels somewhat unnatural to relegate the destination to the end of the command. The alternative</p>
+<pre><code>sys.stderr.write(&quot;fatal error\n&quot;)
+</code></pre>
+<p>looks more object oriented, and elegantly goes from the generic to the specific. But note that <code>write</code> is not a 1:1 replacement for <code>print</code>.</p>
+<h4> Comment 92780378 Michael Scheper: </h4>I suppose it&#39;s a matter of preference, but I don&#39;t see what&#39;s ugly about <code>print(&#39;spam&#39;, file=sys.stderr)</code>. If you&#39;re doing it over and over again, you can code the &#39;eprint&#39; function like in the most popular answer, but in that case, I would ask, what&#39;s wrong with logging? <a href="https://stackoverflow.com/a/41304513/1450294">stackoverflow.com/a/41304513/1450294</a><br><h4> Comment 101773026 MarkHu: </h4>Another way of clarifying intent would be to do <code>with sys.stderr as dest:</code> before an indented call to <code>print(&quot;ERROR&quot;, file=dest)</code><br>------------------------------------------------------------------ <br><h3> Answer 8054613 Frankovskyi Bogdan: </h3><p>For <strong>Python 2</strong> my choice is:
+<code>print &gt;&gt; sys.stderr, 'spam'</code>
+Because you can simply print lists/dicts etc. without convert it to string. 
+<code>print &gt;&gt; sys.stderr, {'spam': 'spam'}</code>
+instead of:
+<code>sys.stderr.write(str({'spam': 'spam'}))</code></p>
+<h4> Comment 23104228 JonnyJD: </h4>This doesn&#39;t work on Python 3, so you should avoid it in new code.<br><h4> Comment 14650996 luketparkinson: </h4>The more Pythonic way to print a dictionary would be with something like <code>&quot;{0}&quot;.format({&#39;spam&#39;: &#39;spam&#39;})</code> anyway, wouldn&#39;t it? I would say you should avoid explicitly converting to string.  Edit: I accidentally a grammar<br><h4> Comment 22131476 Frankovskyi Bogdan: </h4>@luketparkinson this all about debugging - so, I think, it&#39;s more preferable to use the simplest code as possible.<br>------------------------------------------------------------------ <br><h3> Answer 5574749 Carl F.: </h3><p>I would say that your first approach:</p>
+<pre><code>print &gt;&gt; sys.stderr, 'spam' 
+</code></pre>
+<p>is the &quot;One . . . <strong>obvious</strong> way to do it&quot;  The others don't satisfy rule #1 (&quot;Beautiful is better than ugly.&quot;)</p>
+<p><strong>-- Edit for 2020 --</strong></p>
+<p>Above was my answer for Python 2.7 in 2011. Now that Python 3 is the standard, I think the &quot;right&quot; answer is:</p>
+<pre class="lang-py prettyprint-override"><code>print(&quot;spam&quot;, file=sys.stderr) 
+</code></pre>
+<h4> Comment 6345266 porgarmingduod: </h4>Opinions differ. This is the least <b>obvious</b> to me.<br><h4> Comment 32005059 volcano: </h4>I would say that this is the ugliest version of all 3<br><h4> Comment 32701377 Dmytro Sirenko: </h4>What does that <code>&gt;&gt;</code> mean syntactically? I understand that it&#39;s an effort to copy bash&#39;s <code>&gt;</code>, so is it some shoehorned syntax to do just that?<br><h4> Comment 31243712 Rebs: </h4>@AliVeli There are no parentheses, this is an older Python &lt;=2 syntax, and therefore not Python 3 compatible.<br><h4> Comment 96248237 theking2: </h4>print &gt;&gt; sys.stderr,  &#39;test&#39;  no longer working (python3)<br><h4> Comment 60868548 Sean Allred: </h4>@EarlGray It&#39;s a holdover from C++&#39;s stream insertion operator: <code>std::cout &lt;&lt; &quot;spam&quot;;</code><br><h4> Comment 110047211 DylanYoung: </h4>What makes this beautiful?  It looks like muddled mess of non-python programming languages thrown into python just to support print as a statement.  That is of course one of the reasons they eliminated the print statement.<br><h4> Comment 127383843 Alex Li: </h4>The 2020 version is as good as it gets (:<br><h4> Comment 56131254 leewz: </h4>@EarlGray, it&#39;s just how it is. <a href="https://docs.python.org/2/reference/grammar.html" rel="nofollow noreferrer">The grammar</a> says a print statement is either <code>print &lt;stuff&gt;</code> or <code>print &gt;&gt; &lt;stuff&gt;</code>.<br><h4> Comment 9553501 Hayri Uğur Koltuk: </h4>where do you have to put parantheses here?<br>------------------------------------------------------------------ <br><h3> Answer 20830343 aaguirre: </h3><p>I did the following using Python 3:</p>
+
+<pre><code>from sys import stderr
+
+def print_err(*args, **kwargs):
+    print(*args, file=stderr, **kwargs)
+</code></pre>
+
+<p>So now I'm able to add keyword arguments, for example, to avoid carriage return:</p>
+
+<pre><code>print_err("Error: end of the file reached. The word ", end='')
+print_err(word, "was not found")
+</code></pre>
+<h4> Comment 31243910 Rebs: </h4>I was going to suggest that you could use a partial too, but realised that partial assigns the stderr to the function at the creation time of the partial. This prevents you redirecting stderr later as the partial will still hold the original stderr object.<br>------------------------------------------------------------------ <br><h3> Answer 54086653 Florian Castellane: </h3><p>In Python 3, one can just use <a href="https://docs.python.org/3/library/functions.html#print" rel="noreferrer">print():</a></p>
+
+<pre class="lang-py prettyprint-override"><code>print(*objects, sep=' ', end='\n', file=sys.stdout, flush=False)
+</code></pre>
+
+<p>almost out of the box:</p>
+
+<pre class="lang-py prettyprint-override"><code>import sys
+print("Hello, world!", file=sys.stderr)
+</code></pre>
+
+<p>or:</p>
+
+<pre class="lang-py prettyprint-override"><code>from sys import stderr
+print("Hello, world!", file=stderr)
+</code></pre>
+
+<p>This is straightforward and does not need to include anything besides <code>sys.stderr</code>.</p>
+------------------------------------------------------------------ <br><h3> Answer 12757834 Brian W.: </h3><p>This will mimic the standard print function but output on stderr</p>
+
+<pre><code>def print_err(*args):
+    sys.stderr.write(' '.join(map(str,args)) + '\n')
+</code></pre>
+<h4> Comment 36027121 AMS: </h4>I would add a sys.stderr.flush()<br><h4> Comment 40991094 Robᵩ: </h4>@AMS - Why? <code>print</code> doesn&#39;t include a flush.<br><h4> Comment 54873244 Mad Physicist: </h4>Why mimic when you can actually do it?<br><h4> Comment 126863695 Chris Reid: </h4>stderr  is unbuffered, so flushes every time automatically.  stdout flushes periodically when the buffer is full or another write is made to it later.<br>------------------------------------------------------------------ <br><h3> Answer 20832405 Rebs: </h3><p><strong>EDIT</strong> In hind-sight, I think the potential confusion with changing sys.stderr and not seeing the behaviour updated makes this answer not as good as just using a simple function as others have pointed out.</p>
+
+<p>Using partial only saves you 1 line of code. The potential confusion is not worth saving 1 line of code.</p>
+
+<p><strong>original</strong></p>
+
+<p>To make it even easier, here's a version that uses 'partial', which is a big help in wrapping functions.</p>
+
+<pre><code>from __future__ import print_function
+import sys
+from functools import partial
+
+error = partial(print, file=sys.stderr)
+</code></pre>
+
+<p>You then use it like so</p>
+
+<pre><code>error('An error occured!')
+</code></pre>
+
+<p>You can check that it's printing to stderr and not stdout by doing the following (over-riding code from <a href="http://coreygoldberg.blogspot.com.au/2009/05/python-redirect-or-turn-off-stdout-and.html" rel="noreferrer">http://coreygoldberg.blogspot.com.au/2009/05/python-redirect-or-turn-off-stdout-and.html</a>):</p>
+
+<pre><code># over-ride stderr to prove that this function works.
+class NullDevice():
+    def write(self, s):
+        pass
+sys.stderr = NullDevice()
+
+# we must import print error AFTER we've removed the null device because
+# it has been assigned and will not be re-evaluated.
+# assume error function is in print_error.py
+from print_error import error
+
+# no message should be printed
+error("You won't see this error!")
+</code></pre>
+
+<p>The downside to this is partial <strong>assigns</strong> the value of sys.stderr to the wrapped function at the time of creation. Which means, <strong>if you redirect stderr later it won't affect this function.</strong>
+If you plan to redirect stderr, then use the **kwargs method mentioned by <a href="https://stackoverflow.com/a/20830343/1591957">aaguirre</a> on this page.</p>
+<h4> Comment 56847082 MarcH: </h4>BTW: &quot;currying&quot; is a (more) useful search keyword if you want to know more about &quot;partial&quot;.<br><h4> Comment 55054681 Agi Hammerthief: </h4>Is Corey Goldberg&#39;s code best run on a Rube Goldberg machine? :P<br>------------------------------------------------------------------ <br><h3> Answer 13176584 Seppo Enarvi: </h3><p>The same applies to stdout:</p>
+
+<pre><code>print 'spam'
+sys.stdout.write('spam\n')
+</code></pre>
+
+<p>As stated in the other answers, <em>print</em> offers a pretty interface that is often more convenient (e.g. for printing debug information), while <em>write</em> is faster and can also be more convenient when you have to format the output exactly in certain way. I would consider maintainability as well:</p>
+
+<ol>
+<li><p>You may later decide to switch between stdout/stderr and a regular file.</p></li>
+<li><p><em>print()</em> syntax has changed in Python 3, so if you need to support both versions, <em>write()</em> might be better.</p></li>
+</ol>
+<h4> Comment 59194391 johnthagen: </h4>Using <code>from __future__ import print_function</code> is a better way to support both Python 2.6+ and Python 3.<br>------------------------------------------------------------------ <br><h3> Answer 59050481 feli_x: </h3><p>If you want to exit a program because of a fatal error, use:</p>
+
+<pre><code>sys.exit("Your program caused a fatal error. ... description ...")
+</code></pre>
+
+<p>and <code>import sys</code> in the header.</p>
+------------------------------------------------------------------ <br><h3> Answer 35305836 Jeff Silverman: </h3><p>I am working in python 3.4.3.  I am cutting out a little typing that shows how I got here:</p>
+
+<pre><code>[18:19 jsilverman@JSILVERMAN-LT7 pexpect]$ python3
+&gt;&gt;&gt; import sys
+&gt;&gt;&gt; print("testing", file=sys.stderr)
+testing
+&gt;&gt;&gt;
+[18:19 jsilverman@JSILVERMAN-LT7 pexpect]$ 
+</code></pre>
+
+<p>Did it work?  Try redirecting stderr to a file and see what happens:</p>
+
+<pre><code>[18:22 jsilverman@JSILVERMAN-LT7 pexpect]$ python3 2&gt; /tmp/test.txt
+&gt;&gt;&gt; import sys
+&gt;&gt;&gt; print("testing", file=sys.stderr)
+&gt;&gt;&gt; [18:22 jsilverman@JSILVERMAN-LT7 pexpect]$
+[18:22 jsilverman@JSILVERMAN-LT7 pexpect]$ cat /tmp/test.txt
+Python 3.4.3 (default, May  5 2015, 17:58:45)
+[GCC 4.9.2] on cygwin
+Type "help", "copyright", "credits" or "license" for more information.
+testing
+
+[18:22 jsilverman@JSILVERMAN-LT7 pexpect]$
+</code></pre>
+
+<p>Well, aside from the fact that the little introduction that python gives you has been slurped into stderr (where else would it go?), it works.</p>
+------------------------------------------------------------------ <br><h3> Answer 11001566 ThePracticalOne: </h3><p>If you do a simple test:</p>
+
+<pre><code>import time
+import sys
+
+def run1(runs):
+    x = 0
+    cur = time.time()
+    while x &lt; runs:
+        x += 1
+        print &gt;&gt; sys.stderr, 'X'
+    elapsed = (time.time()-cur)
+    return elapsed
+
+def run2(runs):
+    x = 0
+    cur = time.time()
+    while x &lt; runs:
+        x += 1
+        sys.stderr.write('X\n')
+        sys.stderr.flush()
+    elapsed = (time.time()-cur)
+    return elapsed
+
+def compare(runs):
+    sum1, sum2 = 0, 0
+    x = 0
+    while x &lt; runs:
+        x += 1
+        sum1 += run1(runs)
+        sum2 += run2(runs)
+    return sum1, sum2
+
+if __name__ == '__main__':
+    s1, s2 = compare(1000)
+    print "Using (print &gt;&gt; sys.stderr, 'X'): %s" %(s1)
+    print "Using (sys.stderr.write('X'),sys.stderr.flush()):%s" %(s2)
+    print "Ratio: %f" %(float(s1) / float(s2))
+</code></pre>
+
+<p>You will find that sys.stderr.write() is consistently <strong>1.81</strong> times faster!</p>
+<h4> Comment 80215779 Corey Goldberg: </h4>[1/3] Timing small snippets of code is complex, error prone, context dependent, and often leads to misleading claims like &quot;X is consistently 1.81 times faster!&quot;<br><h4> Comment 31293718 wim: </h4>I don&#39;t care about performance, for something like printing warnings.<br><h4> Comment 80215789 Corey Goldberg: </h4>[3/3] Even if this benchmark were more accurate, it&#39;s probably not worth worrying about.  As Knuth wrote: &quot;Programmers waste enormous amounts of time thinking about, or worrying about, the speed of noncritical parts of their programs, and these attempts at efficiency actually have a strong negative impact when debugging and maintenance are considered. We should forget about small efficiencies, say about 97% of the time: premature optimization is the root of all evil.&quot;<br><h4> Comment 25124641 Always Asking: </h4>The result of this test is somehow misleading. Print &#39;XXXXXXXXXXXXXXXXXXXX&#39; instead of &#39;X&#39; and the ratio drops to <b>1.05</b>. I assume most python programs need to print more than a single character.<br><h4> Comment 18115011 hamish: </h4>If I run this I see a much smaller difference. It&#39;s interesting that most answers ignore the print function (python 3) way. I&#39;ve never used it before (inertia), but thought I&#39;d run this timing script and add the print function. Direct comparison of print statement and function isn&#39;t possible (import from <b>future</b> applies to the whole file and masks the print statement) but rewriting this code to use the print function instead of statement I see a bigger speed up (~1.6 though somewhat variable) in favour of the print function.<br><h4> Comment 101448291 Marcel Waldvogel: </h4>A corollary to @CoreyGoldberg&#39;s [3/3]: &quot;Don&#39;t start to optimize anything until you have fully optimized the innermost loop&quot;<br><h4> Comment 38005790 ThePracticalOne: </h4>I know it&#39;s been a while, but you replied equally long after my post... If you don&#39;t car about performance than I would suggest the more pythonic way would be to use sys.stderr.write and not the WTF?!? &quot;&gt;&gt;&quot; characters. If this sys.stdout namespace is too long you could rename it... (ie. from sys import stderr as stderr_fh). Then you can do stderr_fh.write(&quot;blah&quot;)<br><h4> Comment 80215784 Corey Goldberg: </h4>[2/3] Rather than writing a benchmark framework, you should use the one provided by the Standard Library&#39;s <code>timeit</code> module.  It handles some of the common pitfalls when timing snippets of code.  Some issues with the benchmark above: Python2&#39;s <code>time.time()</code> may not be accurate or precise depending on platform, it doesn&#39;t disable garbage collection which may run during the benchmark, it only runs 1000 iterations which doesn&#39;t produce statistically significant results.  It also measures function call overhead, incrementing the iteration counter, and other code besides what it claims to measure.<br>------------------------------------------------------------------ <br><h3> Answer 48522414 Vinay Kumar: </h3><blockquote>
+  <p>Answer to the question is : There are different way to print stderr in python but that depends on
+  1.) which python version we are using
+  2.) what exact output we want.</p>
+</blockquote>
+
+<p>The differnce between print and stderr's write function:
+<strong>stderr</strong> : stderr (standard error) is pipe that is built into every UNIX/Linux system, when your program crashes and prints out debugging information (like a traceback in Python), it goes to the stderr pipe.</p>
+
+<p><strong>print</strong>: print is a wrapper that formats the inputs (the input is the space between argument and the newline at the end) and it then calls the write function of a given object, the given object by default is sys.stdout, but we can pass a file i.e we can print the input in a file also.</p>
+
+<p>Python2:
+If we are using python2 then</p>
+
+<pre><code>&gt;&gt;&gt; import sys
+&gt;&gt;&gt; print "hi"
+hi
+&gt;&gt;&gt; print("hi")
+hi
+&gt;&gt;&gt; print &gt;&gt; sys.stderr.write("hi")
+hi
+</code></pre>
+
+<blockquote>
+  <p>Python2 trailing comma has in Python3 become a parameter, so if we use
+  trailing commas to avoid the newline after a print, this will in
+  Python3 look like print('Text to print', end=' ') which is a syntax
+  error under Python2.</p>
+</blockquote>
+
+<p><a href="http://python3porting.com/noconv.html" rel="nofollow noreferrer">http://python3porting.com/noconv.html</a></p>
+
+<blockquote>
+  <p>If we check same above sceario in python3:</p>
+</blockquote>
+
+<pre><code>&gt;&gt;&gt; import sys
+&gt;&gt;&gt; print("hi")
+hi
+</code></pre>
+
+<blockquote>
+  <p>Under Python 2.6 there is a <strong>future</strong> import to make print into a
+  function. So to avoid any syntax errors and other differences we
+  should start any file where we use print() with from <strong>future</strong> import
+  print_function. The <strong>future</strong> import only works under Python 2.6 and
+  later, so for Python 2.5 and earlier you have two options. You can
+  either convert the more complex print to something simpler, or you can
+  use a separate print function that works under both Python2 and
+  Python3.</p>
+</blockquote>
+
+<pre><code>&gt;&gt;&gt; from __future__ import print_function
+&gt;&gt;&gt; 
+&gt;&gt;&gt; def printex(*args, **kwargs):
+...     print(*args, file=sys.stderr, **kwargs)
+... 
+&gt;&gt;&gt; printex("hii")
+hii
+&gt;&gt;&gt;
+</code></pre>
+
+<blockquote>
+  <p>Case: Point to be noted that sys.stderr.write() or sys.stdout.write()
+  ( stdout (standard output) is a pipe that is built into every
+  UNIX/Linux system) is not a replacement for print, but yes we can use
+  it as a alternative in some case. Print is a wrapper which wraps the
+  input with space and newline at the end and uses the write function to
+  write. This is the reason  sys.stderr.write() is faster.</p>
+  
+  <p><strong>Note:</strong> we can also trace and debugg using Logging</p>
+</blockquote>
+
+<pre><code>#test.py
+import logging
+logging.info('This is the existing protocol.')
+FORMAT = "%(asctime)-15s %(clientip)s %(user)-8s %(message)s"
+logging.basicConfig(format=FORMAT)
+d = {'clientip': '192.168.0.1', 'user': 'fbloggs'}
+logging.warning("Protocol problem: %s", "connection reset", extra=d)
+</code></pre>
+
+<p><a href="https://docs.python.org/2/library/logging.html#logger-objects" rel="nofollow noreferrer">https://docs.python.org/2/library/logging.html#logger-objects</a></p>
+------------------------------------------------------------------ <br><h3> Answer 70703661 Peter Moore: </h3><p>Im doing this just for fun but here is another way... :-)</p>
+<pre><code>message = 'error: Belly up!!'
+print(message, file=sys.stderr if 'error' in message.lower() else sys.stdout)
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 73697035 David Bakare: </h3><p>Another way</p>
+<pre><code>import sys
+print(&quot;{}&quot;.format(sys.exec_info()[1], file=sys.stderr)
+</code></pre>

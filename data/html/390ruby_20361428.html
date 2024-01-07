@@ -1,0 +1,179 @@
+ <h2> Title: Rails I18n validation deprecation warning </h2> <h3> Mauricio Moraes, question_id: 20361428 </h3>Score: 390, Tags: {ruby-on-rails,ruby,ruby-on-rails-4,deprecated,rails-i18n} <br><p>I just updated to rails 4.0.2 and I'm getting this warning:</p>
+
+<blockquote>
+  <p>[deprecated] I18n.enforce_available_locales will default to true in the future. If you really want to skip validation of your locale you can set I18n.enforce_available_locales = false to avoid this message.</p>
+</blockquote>
+
+<p>Is there any security issue in setting it to false?</p>
+<h4> Comment 31569789 Mark Berry: </h4>I have the same on Rails 3.2.16. According to Simone Carletti&#39;s answer below, it&#39;s in  Rails 4 (&gt;= 4.0.2) and Rails 3.2 (&gt;= 3.2.14).<br><h4> Comment 31335423 lucke84: </h4>Apparently this happens also to <code>Rails 4.0.1</code> applications.<br>------------------------------------------------------------------ <br><h3> Answer 20381730 Simone Carletti: </h3><p><strong>Important</strong>: Make sure your app is not using I18n 0.6.8, it has a <a href="https://github.com/svenfuchs/i18n/commit/2893ebf4674a12fcded5779ad13fa05dc74dbf5e" rel="noreferrer">bug that prevents the configuration to be set correctly</a>.</p>
+
+<hr>
+
+<h2>Short answer</h2>
+
+<p>In order to silence the warning edit the application.rb file and include the following line inside the <code>Rails::Application</code> body</p>
+
+<pre><code>config.i18n.enforce_available_locales = true
+</code></pre>
+
+<p>The possible values are:</p>
+
+<ul>
+<li><strong>false</strong>: if you
+
+<ul>
+<li>want to skip the locale validation</li>
+<li>don't care about locales</li>
+</ul></li>
+<li><strong>true</strong>: if you
+
+<ul>
+<li>want the application to raise an error if an invalid locale is passed (or)</li>
+<li>want to default to the new Rails behaviors (or)</li>
+<li>care about locale validation</li>
+</ul></li>
+</ul>
+
+<p>Note:</p>
+
+<ul>
+<li>The old default behavior corresponds to <code>false</code>, not <code>true</code>.</li>
+<li>If you are setting the <code>config.i18n.default_locale</code> configuration or other i18n settings, make sure to do it after setting the <code>config.i18n.enforce_available_locales</code> setting.</li>
+<li>If your use third party gems that include I18n features, setting the variable through the Application <code>config</code> object, may not have an effect. In this case, set it directly to <code>I18n</code> using <code>I18n.config.enforce_available_locales</code>.
+
+<h3>Caveats</h3></li>
+</ul>
+
+<h3>Example</h3>
+
+<pre><code>require File.expand_path('../boot', __FILE__)
+
+# ...
+
+module YouApplication
+  class Application &lt; Rails::Application
+
+    # ...
+
+    config.i18n.enforce_available_locales = true
+    # or if one of your gem compete for pre-loading, use
+    I18n.config.enforce_available_locales = true
+
+    # ...
+
+  end
+end
+</code></pre>
+
+<h2>Long answer</h2>
+
+<p>The deprecation warning is now displayed both in Rails 4 (>= 4.0.2) and Rails 3.2 (>= 3.2.14). The reason is explained in <a href="https://github.com/svenfuchs/i18n/commit/3b6e56e06fd70f6e4507996b017238505e66608c" rel="noreferrer">this commit</a>.</p>
+
+<blockquote>
+  <p>Enforce available locales</p>
+  
+  <p>When <code>I18n.config.enforce_available_locales</code> is true we'll raise an
+  I18n::InvalidLocale exception if the passed locale is unavailable.</p>
+  
+  <p>The default is set to <code>nil</code> which will display a deprecation error.</p>
+  
+  <p>If set to <code>false</code> we'll skip enforcing available locales altogether (old behaviour).</p>
+  
+  <p>This has been implemented in the following methods :</p>
+  
+  <ul>
+  <li>I18n.config.default_locale=</li>
+  <li>I18n.config.locale=</li>
+  <li>I18n.translate</li>
+  <li>I18n.localize</li>
+  <li>I18n.transliterate</li>
+  </ul>
+</blockquote>
+
+<p>Before this change, if you passed an unsupported locale, Rails would silently switch to it if the locale is valid (i.e. if there is a corresponding locale file in the <code>/config/locales</code> folder), otherwise the locale would default to the <code>config.i18n.default_locale</code> configuration (which defaults to :en).</p>
+
+<p>The new version of the I18n gem, forces developers to be a little bit more conscious of the locale management.</p>
+
+<p>In the future, the behavior will change and if a locale is invalid, the Rails app will raise an error. </p>
+
+<p>In preparation of such change (that may potentially break several applications that until today were relying on silent defaults), the warning is forcing you to explicitly declare which validation you want to perform, during the current transition period.</p>
+
+<p>To restore the previous behavior, simply set the following configuration to <code>false</code></p>
+
+<pre><code>config.i18n.enforce_available_locales = false
+</code></pre>
+
+<p>otherwise, set it to true to match the new Rails defaults or if you want to be more rigid on domain validation and avoid switching to the default in case of invalid locale.</p>
+
+<pre><code>config.i18n.enforce_available_locales = true
+</code></pre>
+
+<h3>Caveat</h3>
+
+<ol>
+<li><p>If you are setting the <code>config.i18n.default_locale</code> configuration or using any of the previously mentioned methods (<code>default_locale=</code>, <code>locale=</code>, <code>translate</code>, etc), make sure to do it after setting the <code>config.i18n.enforce_available_locales</code> setting. Otherwise, the deprecation warning will keep on popping up. (Thanks <a href="https://stackoverflow.com/users/292586/fabio-batista">Fábio Batista</a>).</p></li>
+<li><p>If you use third party gems that include I18n features, setting the variable through may not have effect. In fact, the issue is the same as described in the previous point, just a little bit harder to debug. </p>
+
+<p>This issue is a matter of precedence. When you set the config in your Rails app, the value is not immediately assigned to the I18n gem. Rails stores each config in an internal object, loads the dependencies (Railties and third party gems) and then it passes the configuration to the target classes. If you use a gem (or Rails plugin) that calls any of the I18n methods before the config is assigned to I18n, then you'll get the warning.</p>
+
+<p>In this case, you need to skip the Rails stack and set the config immediately to the I18n gem by calling</p>
+
+<pre><code>I18n.config.enforce_available_locales = true
+</code></pre>
+
+<p>instead of</p>
+
+<pre><code>config.i18n.enforce_available_locales = true
+</code></pre>
+
+<p>The issue is easy to prove. Try to generate a new empty Rails app and you will see that setting <code>config.i18n</code> in the <code>application.rb</code> works fine.</p>
+
+<p>If in your app it does not, there is an easy way to debug the culprit. Locate the i18n gem in your system, open the <code>i18n.rb</code> file and edit the method <code>enforce_available_locales!</code> to include the statement <code>puts caller.inspect</code>.</p>
+
+<p><img src="https://i.stack.imgur.com/qukFy.png" alt=""></p>
+
+<p>This will cause the method to print the stacktrace whenever invoked. You will be able to determine which gem is calling it by inspecting the stacktrace (in my case it was Authlogic).</p>
+
+<pre><code>["/Users/weppos/.rvm/gems/ruby-2.0.0-p247@application/gems/i18n-0.6.9/lib/i18n.rb:150:in `translate'",
+ "/Users/weppos/.rvm/gems/ruby-2.0.0-p247@application/gems/authlogic-3.1.0/lib/authlogic/i18n/translator.rb:8:in `translate'",
+ "/Users/weppos/.rvm/gems/ruby-2.0.0-p247@application/gems/authlogic-3.1.0/lib/authlogic/i18n.rb:79:in `translate'",
+ "/Users/weppos/.rvm/gems/ruby-2.0.0-p247@application/gems/authlogic-3.1.0/lib/authlogic/acts_as_authentic/email.rb:68:in `validates_format_of_email_field_options'",
+ "/Users/weppos/.rvm/gems/ruby-2.0.0-p247@application/gems/authlogic-3.1.0/lib/authlogic/acts_as_authentic/email.rb:102:in `block in included'",
+ "/Users/weppos/.rvm/gems/ruby-2.0.0-p247@application/gems/authlogic-3.1.0/lib/authlogic/acts_as_authentic/email.rb:99:in `class_eval'",
+ "/Users/weppos/.rvm/gems/ruby-2.0.0-p247@application/gems/authlogic-3.1.0/lib/authlogic/acts_as_authentic/email.rb:99:in `included'",
+ "/Users/weppos/.rvm/gems/ruby-2.0.0-p247@application/gems/authlogic-3.1.0/lib/authlogic/acts_as_authentic/base.rb:37:in `include'",
+ "/Users/weppos/.rvm/gems/ruby-2.0.0-p247@application/gems/authlogic-3.1.0/lib/authlogic/acts_as_authentic/base.rb:37:in `block in acts_as_authentic'",
+ "/Users/weppos/.rvm/gems/ruby-2.0.0-p247@application/gems/authlogic-3.1.0/lib/authlogic/acts_as_authentic/base.rb:37:in `each'",
+ "/Users/weppos/.rvm/gems/ruby-2.0.0-p247@application/gems/authlogic-3.1.0/lib/authlogic/acts_as_authentic/base.rb:37:in `acts_as_authentic'",
+ "/Users/weppos/Projects/application/app/models/user.rb:8:in `&lt;class:User&gt;'",
+ "/Users/weppos/Projects/application/app/models/user.rb:1:in `&lt;top (required)&gt;'",
+</code></pre></li>
+</ol>
+<h4> Comment 30437392 F&#225;bio Batista: </h4>If you are setting the <code>config.i18n.default_locale</code> configuration, make sure you do it <i>after</i> setting the new <code>config.i18n.enforce_available_locales</code> setting. Otherwise, the deprecation warning will keep on popping.<br><h4> Comment 30465170 Pioz: </h4>For me, works only if I set <code>I18n.enforce_available_locales = true</code>. <code>config.i18n.enforce_available_locales = true</code> dont works.<br><h4> Comment 30466422 Simone Carletti: </h4>@Pioz It may be caused by the gems your application depends to. I updated the post to explain why.<br><h4> Comment 31230216 Tamer Shlash: </h4>It should be mentioned that one have to set <code>I18n.config.available_locales = [:your_locale, :en]</code> for example, otherwise you will not be able to start your rails server.<br><h4> Comment 42579646 jwadsack: </h4>How do I make this change on a gem? I get this notice running rspec tests for one of my gems but there is not <code>config</code> section for a gem, is there?<br><h4> Comment 42595748 Simone Carletti: </h4>@jwadsack open a new question<br><h4> Comment 42609510 jwadsack: </h4>@SimoneCarletti  <a href="https://stackoverflow.com/questions/27045510/rails-i18n-deprecation-warning-on-a-gem" title="rails i18n deprecation warning on a gem">stackoverflow.com/questions/27045510/&hellip;</a><br><h4> Comment 43936063 Anna: </h4>Thank you!   In my case I needed to add <code>I18n.enforce_available_locales  = false</code> before  <code>I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)</code> in my initializer<br><h4> Comment 30509549 Fabio: </h4>@SimoneCarletti direct call should be <code>I18n.config.enforce_available_locales</code> not <code>I18n.config.i18n.enforce_available_locales</code>, I&#39;ve edited your answer. Thanx for the fix.<br><h4> Comment 30619905 givanse: </h4>I thought the same and spent hours looking for answers, there is a bug with locales that have the language-country format: <a href="http://stackoverflow.com/questions/20487127">stackoverflow.com/questions/20487127</a><br>------------------------------------------------------------------ <br><h3> Answer 20364593 mhartl: </h3><p>Just for completeness, note that you can also get rid of the warning by setting <code>I18n.enforce_available_locales</code> to <code>true</code> (or <code>false</code>) in <code>config/application.rb</code>:</p>
+
+<pre><code>require File.expand_path('../boot', __FILE__)
+.
+.
+.
+module SampleApp
+  class Application &lt; Rails::Application
+    .
+    .
+    .
+    I18n.enforce_available_locales = true
+    .
+    .
+    .
+  end
+end
+</code></pre>
+<h4> Comment 30404733 Mischa: </h4>Wouldn&#39;t it be neater to do <code>config.i18n.enforce_available_locales = true</code>?<br><h4> Comment 30404858 Mike Atlas: </h4>@Mischa that didn&#39;t work for me, the answer above does though.<br><h4> Comment 30436644 balexand: </h4><code>config.i18n.enforce_available_locales = true</code> in config/application.rb eliminated the deprecation warning for me in Rails 4.0.2, but only if I put it above the other <code>config.i18n</code> lines.<br><h4> Comment 30404839 CLod: </h4>I&#39;m on 3.2.16, I set to I18n.enforce_available_locales = false , but I still have the message...<br><h4> Comment 30418014 Ev Dolzhenko: </h4>@Mischa sadly not, had to go through <code>I18n.config</code> for this to have an effect<br><h4> Comment 30462389 ExiRe: </h4>Rails <code>3.2.16</code>, only <code>I18n.enforce_available_locales = </code> version works.<br>------------------------------------------------------------------ <br><h3> Answer 20371779 SpeedyWizard: </h3><p><code>I18n.config.enforce_available_locales = true</code> worked for me in Rails 3.2.16 (I put it in config/application.rb)</p>
+------------------------------------------------------------------ <br><h3> Answer 20361996 Justin: </h3><p>Doesn't seem that way - that'd be previous behavior of the way i18n works - new behavior (true) will raise an error when you ask for a locale not implemented/available.</p>
+
+<p>See the commit that added this warning: <a href="https://github.com/svenfuchs/i18n/commit/3b6e56e06fd70f6e4507996b017238505e66608c" rel="noreferrer">https://github.com/svenfuchs/i18n/commit/3b6e56e06fd70f6e4507996b017238505e66608c</a></p>
+------------------------------------------------------------------ <br><h3> Answer 54457787 Foram: </h3><p>If you want to care about locales write into <code>appilcation.rb</code> file.</p>
+
+<pre><code>config.i18n.enforce_available_locales = true
+</code></pre>
+
+<p>You can write false if locale validation and do not care about that.</p>

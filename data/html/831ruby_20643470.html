@@ -1,0 +1,483 @@
+ <h2> Title: Execute a command line binary with Node.js </h2> <h3> Dave Thompson, question_id: 20643470 </h3>Score: 831, Tags: {javascript,ruby,node.js,command-line-interface} <br><p>I am in the process of porting a CLI library from Ruby over to Node.js. In my code I execute several third party binaries when necessary. I am not sure how best to accomplish this in Node.</p>
+
+<p>Here's an example in Ruby where I call PrinceXML to convert a file to a PDF:</p>
+
+<pre><code>cmd = system("prince -v builds/pdf/book.html -o builds/pdf/book.pdf")
+</code></pre>
+
+<p>What is the equivalent code in Node?</p>
+<h4> Comment 75956245 mattyb: </h4><a href="https://github.com/IndigoUnited/node-cross-spawn" rel="nofollow noreferrer">This</a> library is a good place to start. It allows you to spawn processes across all os platforms.<br><h4> Comment 98183250 drorw: </h4>Simplest is to use child_process.exec, here are some <a href="https://www.codota.com/code/javascript/functions/child_process/exec" rel="nofollow noreferrer">good examples</a><br><h4> Comment 89735701 Damjan Pavlica: </h4>Possible duplicate of <a href="https://stackoverflow.com/questions/12941083/execute-and-get-the-output-of-a-shell-command-in-node-js">Execute and get the output of a shell command in node.js</a><br>------------------------------------------------------------------ <br><h3> Answer 54093136 FacePalm: </h3><p>Now you can use shelljs (from node v4) as follows:</p>
+<pre><code>var shell = require('shelljs');
+
+shell.echo('hello world');
+shell.exec('node --version');
+</code></pre>
+<p>Install with</p>
+<pre><code>npm install shelljs
+</code></pre>
+<p>See <a href="https://github.com/shelljs/shelljs" rel="noreferrer">https://github.com/shelljs/shelljs</a></p>
+<h4> Comment 110267955 Ben Bieler: </h4>It should not be necessary to install new modules<br><h4> Comment 129753515 ajskateboarder: </h4>This actually worked for me as all other answers I followed didn&#39;t output anything to the terminal.<br>------------------------------------------------------------------ <br><h3> Answer 20643568 hexacyanide: </h3><p>For even newer version of Node.js (v8.1.4), the events and calls are similar or identical to older versions, but it's encouraged to use the standard newer language features. Examples:</p>
+<p>For buffered, non-stream formatted output (you get it all at once), use <a href="https://nodejs.org/docs/latest-v8.x/api/child_process.html#child_process_child_process_exec_command_options_callback" rel="noreferrer"><code>child_process.exec</code></a>:</p>
+<pre><code>const { exec } = require('child_process');
+exec('cat *.js bad_file | wc -l', (err, stdout, stderr) =&gt; {
+  if (err) {
+    // node couldn't execute the command
+    return;
+  }
+
+  // the *entire* stdout and stderr (buffered)
+  console.log(`stdout: ${stdout}`);
+  console.log(`stderr: ${stderr}`);
+});
+</code></pre>
+<p>You can also use it with Promises:</p>
+<pre><code>const util = require('util');
+const exec = util.promisify(require('child_process').exec);
+
+async function ls() {
+  const { stdout, stderr } = await exec('ls');
+  console.log('stdout:', stdout);
+  console.log('stderr:', stderr);
+}
+ls();
+</code></pre>
+<p>If you wish to receive the data gradually in chunks (output as a stream), use <a href="https://nodejs.org/docs/latest-v8.x/api/child_process.html#child_process_child_process_spawn_command_args_options" rel="noreferrer"><code>child_process.spawn</code></a>:</p>
+<pre><code>const { spawn } = require('child_process');
+const child = spawn('ls', ['-lh', '/usr']);
+
+// use child.stdout.setEncoding('utf8'); if you want text chunks
+child.stdout.on('data', (chunk) =&gt; {
+  // data from standard output is here as buffers
+});
+
+// since these are streams, you can pipe them elsewhere
+child.stderr.pipe(dest);
+
+child.on('close', (code) =&gt; {
+  console.log(`child process exited with code ${code}`);
+});
+</code></pre>
+<p>Both of these functions have a synchronous counterpart. An example for <a href="https://nodejs.org/docs/latest-v8.x/api/child_process.html#child_process_child_process_execsync_command_options" rel="noreferrer"><code>child_process.execSync</code></a>:</p>
+<pre><code>const { execSync } = require('child_process');
+// stderr is sent to stderr of parent process
+// you can set options.stdio if you want it to go elsewhere
+let stdout = execSync('ls');
+</code></pre>
+<p>As well as <a href="https://nodejs.org/docs/latest-v8.x/api/child_process.html#child_process_child_process_spawnsync_command_args_options" rel="noreferrer"><code>child_process.spawnSync</code></a>:</p>
+<pre><code>const { spawnSync} = require('child_process');
+const child = spawnSync('ls', ['-lh', '/usr']);
+
+console.log('error', child.error);
+console.log('stdout ', child.stdout);
+console.log('stderr ', child.stderr);
+</code></pre>
+<hr />
+<p><strong>Note:</strong> The following code is still functional, but is primarily targeted at users of ES5 and before.</p>
+<p>The module for spawning child processes with Node.js is well documented in the <a href="http://nodejs.org/docs/latest-v5.x/api/child_process.html" rel="noreferrer">documentation</a> (v5.0.0). To execute a command and fetch its complete output as a buffer, use <a href="https://nodejs.org/docs/latest-v5.x/api/child_process.html#child_process_child_process_exec_command_options_callback" rel="noreferrer"><code>child_process.exec</code></a>:</p>
+<pre><code>var exec = require('child_process').exec;
+var cmd = 'prince -v builds/pdf/book.html -o builds/pdf/book.pdf';
+
+exec(cmd, function(error, stdout, stderr) {
+  // command output is in stdout
+});
+</code></pre>
+<p>If you need to use handle process I/O with streams, such as when you are expecting large amounts of output, use <a href="https://nodejs.org/docs/latest-v5.x/api/child_process.html#child_process_child_process_spawn_command_args_options" rel="noreferrer"><code>child_process.spawn</code></a>:</p>
+<pre><code>var spawn = require('child_process').spawn;
+var child = spawn('prince', [
+  '-v', 'builds/pdf/book.html',
+  '-o', 'builds/pdf/book.pdf'
+]);
+
+child.stdout.on('data', function(chunk) {
+  // output will be here in chunks
+});
+
+// or if you want to send output elsewhere
+child.stdout.pipe(dest);
+</code></pre>
+<p>If you are executing a file rather than a command, you might want to use <a href="https://nodejs.org/docs/latest-v5.x/api/child_process.html#child_process_child_process_execfile_file_args_options_callback" rel="noreferrer"><code>child_process.execFile</code></a>, which parameters which are almost identical to <code>spawn</code>, but has a fourth callback parameter like <code>exec</code> for retrieving output buffers. That might look a bit like this:</p>
+<pre><code>var execFile = require('child_process').execFile;
+execFile(file, args, options, function(error, stdout, stderr) {
+  // command output is in stdout
+});
+</code></pre>
+<hr />
+<p>As of <a href="https://nodejs.org/en/blog/release/v0.11.12/" rel="noreferrer">v0.11.12</a>, Node now supports synchronous <code>spawn</code> and <code>exec</code>. All of the methods described above are asynchronous, and have a synchronous counterpart. Documentation for them can be found <a href="https://nodejs.org/docs/latest-v5.x/api/child_process.html#child_process_synchronous_process_creation" rel="noreferrer">here</a>. While they are useful for scripting, do note that unlike the methods used to spawn child processes asynchronously, the synchronous methods do not return an instance of <a href="https://nodejs.org/docs/latest-v5.x/api/child_process.html#child_process_class_childprocess" rel="noreferrer"><code>ChildProcess</code></a>.</p>
+<h4> Comment 30952679 Dave Thompson: </h4>THANK YOU. This was driving me nuts. Sometimes it helps to just have the obvious solution pointed out so we noobs (to node) can learn and run with it.<br><h4> Comment 33011842 Louis Ameline: </h4>Note : require(&#39;child_process&#39;).execFile() will be of interest for people who need to run a file rather than a system-wide known command like prince here.<br><h4> Comment 52423252 ComFreek: </h4>Instead of <code>child.pipe(dest)</code> (which doesn&#39;t exist), you have to use <code>child.stdout.pipe(dest)</code> and <code>child.stderr.pipe(dest)</code>, e.g. <code>child.stdout.pipe(process.stdout)</code> and <code>child.stderr.pipe(process.stderr)</code>.<br><h4> Comment 75341716 Cameron: </h4>What if I don&#39;t want to put everything into a file, but I want to execute more than one command? Maybe like <code>echo &quot;hello&quot;</code> and <code>echo &quot;world&quot;</code>.<br><h4> Comment 80439504 Rishabh Agrawal: </h4>is this the standard way to do this ? i mean how all the wrapper are written in nodejs ? i mean let&#39;s say for gearman,rabbitmq etc. which require to run the command but they also have some wrapper as well but i can&#39;t find any of this code in their library code<br><h4> Comment 84340975 Mathankumar K: </h4>@hexacyanide . any possible to open <code>c:windows\system32\osk.exe</code> form child process options.<br><h4> Comment 124253845 Cam Jackson: </h4>Note that if you want all of the child&#39;s input and output to just be passed straight through, then you can call spawn like this: <code>spawn(&#39;ls&#39;, { stdio: &#39;inherit&#39; })</code>. That way you don&#39;t have to stuff around with <code>child.stdout.on(&#39;data&#39;...</code> and all the rest of it.<br>------------------------------------------------------------------ <br><h3> Answer 35586247 iSkore: </h3>
+<h3>Node JS <code>v15.8.0</code>, LTS <code>v14.15.4</code>, and <code>v12.20.1</code>  ---  Feb 2021</h3>
+<p><strong>Async method (Unix):</strong></p>
+<pre><code>'use strict';
+
+const { spawn } = require( 'child_process' );
+const ls = spawn( 'ls', [ '-lh', '/usr' ] );
+
+ls.stdout.on( 'data', ( data ) =&gt; {
+    console.log( `stdout: ${ data }` );
+} );
+
+ls.stderr.on( 'data', ( data ) =&gt; {
+    console.log( `stderr: ${ data }` );
+} );
+
+ls.on( 'close', ( code ) =&gt; {
+    console.log( `child process exited with code ${ code }` );
+} );
+</code></pre>
+<br/>
+<p><strong>Async method (Windows):</strong></p>
+<pre><code>'use strict';
+
+const { spawn } = require( 'child_process' );
+// NOTE: Windows Users, this command appears to be differ for a few users.
+// You can think of this as using Node to execute things in your Command Prompt.
+// If `cmd` works there, it should work here.
+// If you have an issue, try `dir`:
+// const dir = spawn( 'dir', [ '.' ] );
+const dir = spawn( 'cmd', [ '/c', 'dir' ] );
+
+dir.stdout.on( 'data', ( data ) =&gt; console.log( `stdout: ${ data }` ) );
+dir.stderr.on( 'data', ( data ) =&gt; console.log( `stderr: ${ data }` ) );
+dir.on( 'close', ( code ) =&gt; console.log( `child process exited with code ${code}` ) );
+</code></pre>
+<br/>
+<p><strong>Sync:</strong></p>
+<pre><code>'use strict';
+
+const { spawnSync } = require( 'child_process' );
+const ls = spawnSync( 'ls', [ '-lh', '/usr' ] );
+
+console.log( `stderr: ${ ls.stderr.toString() }` );
+console.log( `stdout: ${ ls.stdout.toString() }` );
+</code></pre>
+<p>From <a href="https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options" rel="noreferrer">Node.js v15.8.0 Documentation</a></p>
+<p>The same goes for <a href="https://nodejs.org/docs/latest-v14.x/api/child_process.html#child_process_child_process_spawn_command_args_options" rel="noreferrer">Node.js v14.15.4 Documentation</a> and <a href="https://nodejs.org/docs/latest-v12.x/api/child_process.html#child_process_child_process_spawn_command_args_options" rel="noreferrer">Node.js v12.20.1 Documentation</a></p>
+<h4> Comment 91629301 iSkore: </h4>@Tyguy7 how are you running it? And do you have any overrides on the console object?<br><h4> Comment 92091207 Stephen: </h4>Why do you claim one method is proper?<br><h4> Comment 73911067 Brian Jorden: </h4>Thank you for giving both proper and simple versions. The slightly simpler sync version was totally fine for my one off &quot;do something and throw it away&quot; script that I needed.<br><h4> Comment 86666571 AndyO: </h4>Might be worth pointing out that in order to do this example in Windows, one has to use <code>&#39;cmd&#39;, [&#39;&#47;c&#39;, &#39;dir&#39;]</code>. At least I was just searching high and low why <code>&#39;dir&#39;</code> without arguments doesn&#39;t work before I remembered this... ;)<br><h4> Comment 73911115 iSkore: </h4>No problem! Always nice to have both even if it&#39;s not &quot;proper&quot; according to some.<br><h4> Comment 91628178 Tyguy7: </h4>None of these output ANYTHING to the console.<br><h4> Comment 107614974 iSkore: </h4>It only imports what you want opposed to a reference to the entire module<br><h4> Comment 99018055 Lindsay Ryan: </h4>May I suggest adding a short explanation to the top of this clarifying that <code>async</code> is what&#39;s meant by proper? In the context of the other responses, my first understanding was conversely that <code>spawn</code> was <i>more</i> proper than the other alternatives, such as <code>exec</code>. Especially since you say &quot;From the documentation&quot;. This gives the impression that the documentation advises using <code>spawn</code> over alternatives, when the documentation actually highlights that <code>spawn</code> is the underlying mechanism for all the others.<br><h4> Comment 107610916 OhadR: </h4>super silly question: what is the meaning of declaring  const { spawnSync } (what is the meaning of the curly braces around &#39;spawnSync &#39; ?)<br><h4> Comment 107614893 iSkore: </h4>Not a silly question at all! <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment" rel="nofollow noreferrer">here’s a resource for you</a> - object destructuring is a way to extract a key from an object. Like this: <code>const { a, b } = { a: 10, b: 20 }</code> is the same as <code>const a = obj.a, b = obj.b;</code><br><h4> Comment 92102952 iSkore: </h4>I’m assuming you are reffering to why async is proper? Because of how the event loop works with synchronous functions. Synchronous functions will stop all other executions until the synchronous function is complete. For instance, let’s say you’re running a server that accepts HTTP requests that dispatch a synchronous CLI command. Let’s say an ffmpeg command that could take minutes or more. All other requests would be completely blocked until that original request is fulfilled. All recommendations in the node spec recommend using async, for that reason I specify “proper”<br><h4> Comment 92102988 iSkore: </h4>But I added the synchronous method example because its still valid and in testing senarios or during a programs “initialization” stage, when the program first starts, and never runs those commands again, synchronous methods are a valid use case. But during standard runtime of a program, synchronous methods are not advised.<br><h4> Comment 94545495 Nouman Dilshad: </h4>@iSkore I am executing a command using (&#39;child_process&#39;).exec but it gives me an error       Error: Command failed: unoconv -f pdf &quot;./document.docx&quot;    &#39;unoconv&#39; is not recognized as an internal or external command,    operable program or batch file.   This command is working when I run it in git commandline tool.<br><h4> Comment 94548258 iSkore: </h4>Sounds like you are running on a windows machine (if you have a “git CLI tool) and the unoconv tool isn’t installed. Try running that unoconv command in your powershell. If it doesn’t run there, it won’t run in node. This answer is the “general use case” so try running the <code>dir</code> or <code>ls</code> command. If that doesn’t work the function is setup incorrectly.<br>------------------------------------------------------------------ <br><h3> Answer 20643517 Andrei Karpuszonak: </h3><p>You are looking for <a href="https://nodejs.org/api/child_process.html#child_process_child_process_exec_command_options_callback">child_process.exec</a></p>
+
+<p>Here is the example:</p>
+
+<pre><code>const exec = require('child_process').exec;
+const child = exec('cat *.js bad_file | wc -l',
+    (error, stdout, stderr) =&gt; {
+        console.log(`stdout: ${stdout}`);
+        console.log(`stderr: ${stderr}`);
+        if (error !== null) {
+            console.log(`exec error: ${error}`);
+        }
+});
+</code></pre>
+<h4> Comment 53897382 hgoebl: </h4>@Harshdeep in case of long stdout outputs (several MB e.g.) you can listen to <code>data</code> events on stdout. Look in the docs, but it must be something like <code>childProc.stdout.on(&quot;data&quot;, fn)</code>.<br><h4> Comment 53885607 Harshdeep: </h4>@hgoebl, what is the alternative then?<br><h4> Comment 30902333 hgoebl: </h4>This is correct. But be aware that this kind of calling a child-process has limitations for the length of stdout.<br>------------------------------------------------------------------ <br><h3> Answer 37438131 Paul Rumkin: </h3><p>Since version 4 the closest alternative is <code>child_process.execSync</code> <a href="https://nodejs.org/dist/latest/docs/api/child_process.html#child_process_child_process_execsync_command_options" rel="noreferrer">method</a>:</p>
+<pre><code>const {execSync} = require('child_process');
+
+let output = execSync('prince -v builds/pdf/book.html -o builds/pdf/book.pdf');
+</code></pre>
+<blockquote>
+<p>⚠️ Note that <code>execSync</code> call blocks event loop.</p>
+</blockquote>
+<h4> Comment 63090819 Paul Rumkin: </h4>Yes, there is no memory leaks. I guess it initialises only libuv child process structures without creating it in node at all.<br><h4> Comment 63081859 NiCk Newman: </h4>This works great on latest node. Is a <code>child_process</code> being created when using <code>execSync</code> though? And does it get removed right after the command, right? So no memory leaks?<br>------------------------------------------------------------------ <br><h3> Answer 43427191 Ben Bieler: </h3><pre><code>const exec = require("child_process").exec
+exec("ls", (error, stdout, stderr) =&gt; {
+ //do whatever here
+})
+</code></pre>
+<h4> Comment 73916888 Al Sweigart: </h4>Please add more explanation for how this code works and how it solves the answer. Remember that StackOverflow is building an archive of answers for people reading this in the future.<br><h4> Comment 91955187 user6068326: </h4>What Al said is true, but I will say the benefit of this answer is that it is so much simpler than having to read through the top answer for someone who needs a quick response.<br>------------------------------------------------------------------ <br><h3> Answer 44163693 Cameron: </h3><p>If you want something that closely resembles the <a href="https://stackoverflow.com/a/20643568/5645583">top answer</a> but is also synchronous then this will work.</p>
+
+<pre><code>var execSync = require('child_process').execSync;
+var cmd = "echo 'hello world'";
+
+var options = {
+  encoding: 'utf8'
+};
+
+console.log(execSync(cmd, options));
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 23711893 Vadorequest: </h3><p>I just wrote a Cli helper to deal with Unix/windows easily.</p>
+
+<p><strong>Javascript:</strong></p>
+
+<pre><code>define(["require", "exports"], function (require, exports) {
+    /**
+     * Helper to use the Command Line Interface (CLI) easily with both Windows and Unix environments.
+     * Requires underscore or lodash as global through "_".
+     */
+    var Cli = (function () {
+        function Cli() {}
+            /**
+             * Execute a CLI command.
+             * Manage Windows and Unix environment and try to execute the command on both env if fails.
+             * Order: Windows -&gt; Unix.
+             *
+             * @param command                   Command to execute. ('grunt')
+             * @param args                      Args of the command. ('watch')
+             * @param callback                  Success.
+             * @param callbackErrorWindows      Failure on Windows env.
+             * @param callbackErrorUnix         Failure on Unix env.
+             */
+        Cli.execute = function (command, args, callback, callbackErrorWindows, callbackErrorUnix) {
+            if (typeof args === "undefined") {
+                args = [];
+            }
+            Cli.windows(command, args, callback, function () {
+                callbackErrorWindows();
+
+                try {
+                    Cli.unix(command, args, callback, callbackErrorUnix);
+                } catch (e) {
+                    console.log('------------- Failed to perform the command: "' + command + '" on all environments. -------------');
+                }
+            });
+        };
+
+        /**
+         * Execute a command on Windows environment.
+         *
+         * @param command       Command to execute. ('grunt')
+         * @param args          Args of the command. ('watch')
+         * @param callback      Success callback.
+         * @param callbackError Failure callback.
+         */
+        Cli.windows = function (command, args, callback, callbackError) {
+            if (typeof args === "undefined") {
+                args = [];
+            }
+            try {
+                Cli._execute(process.env.comspec, _.union(['/c', command], args));
+                callback(command, args, 'Windows');
+            } catch (e) {
+                callbackError(command, args, 'Windows');
+            }
+        };
+
+        /**
+         * Execute a command on Unix environment.
+         *
+         * @param command       Command to execute. ('grunt')
+         * @param args          Args of the command. ('watch')
+         * @param callback      Success callback.
+         * @param callbackError Failure callback.
+         */
+        Cli.unix = function (command, args, callback, callbackError) {
+            if (typeof args === "undefined") {
+                args = [];
+            }
+            try {
+                Cli._execute(command, args);
+                callback(command, args, 'Unix');
+            } catch (e) {
+                callbackError(command, args, 'Unix');
+            }
+        };
+
+        /**
+         * Execute a command no matters what's the environment.
+         *
+         * @param command   Command to execute. ('grunt')
+         * @param args      Args of the command. ('watch')
+         * @private
+         */
+        Cli._execute = function (command, args) {
+            var spawn = require('child_process').spawn;
+            var childProcess = spawn(command, args);
+
+            childProcess.stdout.on("data", function (data) {
+                console.log(data.toString());
+            });
+
+            childProcess.stderr.on("data", function (data) {
+                console.error(data.toString());
+            });
+        };
+        return Cli;
+    })();
+    exports.Cli = Cli;
+});
+</code></pre>
+
+<p><strong>Typescript original source file:</strong></p>
+
+<pre><code> /**
+ * Helper to use the Command Line Interface (CLI) easily with both Windows and Unix environments.
+ * Requires underscore or lodash as global through "_".
+ */
+export class Cli {
+
+    /**
+     * Execute a CLI command.
+     * Manage Windows and Unix environment and try to execute the command on both env if fails.
+     * Order: Windows -&gt; Unix.
+     *
+     * @param command                   Command to execute. ('grunt')
+     * @param args                      Args of the command. ('watch')
+     * @param callback                  Success.
+     * @param callbackErrorWindows      Failure on Windows env.
+     * @param callbackErrorUnix         Failure on Unix env.
+     */
+    public static execute(command: string, args: string[] = [], callback ? : any, callbackErrorWindows ? : any, callbackErrorUnix ? : any) {
+        Cli.windows(command, args, callback, function () {
+            callbackErrorWindows();
+
+            try {
+                Cli.unix(command, args, callback, callbackErrorUnix);
+            } catch (e) {
+                console.log('------------- Failed to perform the command: "' + command + '" on all environments. -------------');
+            }
+        });
+    }
+
+    /**
+     * Execute a command on Windows environment.
+     *
+     * @param command       Command to execute. ('grunt')
+     * @param args          Args of the command. ('watch')
+     * @param callback      Success callback.
+     * @param callbackError Failure callback.
+     */
+    public static windows(command: string, args: string[] = [], callback ? : any, callbackError ? : any) {
+        try {
+            Cli._execute(process.env.comspec, _.union(['/c', command], args));
+            callback(command, args, 'Windows');
+        } catch (e) {
+            callbackError(command, args, 'Windows');
+        }
+    }
+
+    /**
+     * Execute a command on Unix environment.
+     *
+     * @param command       Command to execute. ('grunt')
+     * @param args          Args of the command. ('watch')
+     * @param callback      Success callback.
+     * @param callbackError Failure callback.
+     */
+    public static unix(command: string, args: string[] = [], callback ? : any, callbackError ? : any) {
+        try {
+            Cli._execute(command, args);
+            callback(command, args, 'Unix');
+        } catch (e) {
+            callbackError(command, args, 'Unix');
+        }
+    }
+
+    /**
+     * Execute a command no matters what's the environment.
+     *
+     * @param command   Command to execute. ('grunt')
+     * @param args      Args of the command. ('watch')
+     * @private
+     */
+    private static _execute(command, args) {
+        var spawn = require('child_process').spawn;
+        var childProcess = spawn(command, args);
+
+        childProcess.stdout.on("data", function (data) {
+            console.log(data.toString());
+        });
+
+        childProcess.stderr.on("data", function (data) {
+            console.error(data.toString());
+        });
+    }
+}
+
+Example of use:
+
+    Cli.execute(Grunt._command, args, function (command, args, env) {
+        console.log('Grunt has been automatically executed. (' + env + ')');
+
+    }, function (command, args, env) {
+        console.error('------------- Windows "' + command + '" command failed, trying Unix... ---------------');
+
+    }, function (command, args, env) {
+        console.error('------------- Unix "' + command + '" command failed too. ---------------');
+    });
+</code></pre>
+<h4> Comment 46632106 Vadorequest: </h4>Most recent version there, with usage example to use Grunt in CLI: <a href="https://gist.github.com/Vadorequest/f72fa1c152ec55357839" rel="nofollow noreferrer">gist.github.com/Vadorequest/f72fa1c152ec55357839</a><br>------------------------------------------------------------------ <br><h3> Answer 57742057 Ken Mueller: </h3><p>Use this lightweight <code>npm</code> package: <strong><code>system-commands</code></strong></p>
+
+<p>Look at it <a href="https://www.npmjs.com/package/system-commands" rel="noreferrer">here</a>.</p>
+
+<p>Import it like this:</p>
+
+<pre><code>const system = require('system-commands')
+</code></pre>
+
+<p>Run commands like this:</p>
+
+<pre><code>system('ls').then(output =&gt; {
+    console.log(output)
+}).catch(error =&gt; {
+    console.error(error)
+})
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 52771149 Jesus is Lord: </h3><p>If you don't mind a dependency and want to use promises, <a href="https://www.npmjs.com/package/child-process-promise" rel="nofollow noreferrer"><code>child-process-promise</code></a> works:</p>
+<p><strong>installation</strong></p>
+<pre><code>npm install child-process-promise --save
+</code></pre>
+<p><strong>exec Usage</strong></p>
+<pre><code>var exec = require('child-process-promise').exec;
+ 
+exec('echo hello')
+    .then(function (result) {
+        var stdout = result.stdout;
+        var stderr = result.stderr;
+        console.log('stdout: ', stdout);
+        console.log('stderr: ', stderr);
+    })
+    .catch(function (err) {
+        console.error('ERROR: ', err);
+    });
+</code></pre>
+<p><strong>spawn usage</strong></p>
+<pre><code>var spawn = require('child-process-promise').spawn;
+ 
+var promise = spawn('echo', ['hello']);
+ 
+var childProcess = promise.childProcess;
+ 
+console.log('[spawn] childProcess.pid: ', childProcess.pid);
+childProcess.stdout.on('data', function (data) {
+    console.log('[spawn] stdout: ', data.toString());
+});
+childProcess.stderr.on('data', function (data) {
+    console.log('[spawn] stderr: ', data.toString());
+});
+ 
+promise.then(function () {
+        console.log('[spawn] done!');
+    })
+    .catch(function (err) {
+        console.error('[spawn] ERROR: ', err);
+    });
+</code></pre>
+<p><strong>ECMAScript Modules <code>import</code>...<code>from</code> syntax</strong></p>
+<pre><code>import {exec} from 'child-process-promise';
+let result = await exec('echo hi');
+console.log(result.stdout);
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 35687237 DUzun: </h3><p>@hexacyanide's answer is almost a complete one. 
+On Windows command <code>prince</code> could be <code>prince.exe</code>, <code>prince.cmd</code>, <code>prince.bat</code> or just <code>prince</code> (I'm no aware of how gems are bundled, but npm bins come with a sh script and a batch script - <code>npm</code> and <code>npm.cmd</code>).
+If you want to write a portable script that would run on Unix and Windows, you have to spawn the right executable.</p>
+
+<p>Here is a simple yet portable spawn function:</p>
+
+<pre><code>function spawn(cmd, args, opt) {
+    var isWindows = /win/.test(process.platform);
+
+    if ( isWindows ) {
+        if ( !args ) args = [];
+        args.unshift(cmd);
+        args.unshift('/c');
+        cmd = process.env.comspec;
+    }
+
+    return child_process.spawn(cmd, args, opt);
+}
+
+var cmd = spawn("prince", ["-v", "builds/pdf/book.html", "-o", "builds/pdf/book.pdf"])
+
+// Use these props to get execution results:
+// cmd.stdin;
+// cmd.stdout;
+// cmd.stderr;
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 76829191 Richard: </h3><p>Node 16:</p>
+<pre class="lang-js prettyprint-override"><code>const { execSync } = require('child_process');
+execSync('ls'); // your system command
+</code></pre>

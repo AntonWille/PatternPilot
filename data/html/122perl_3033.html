@@ -1,0 +1,175 @@
+ <h2> Title: What&#39;s the safest way to iterate through the keys of a Perl hash? </h2> <h3> Rudd Zwolinski, question_id: 3033 </h3>Score: 122, Tags: {perl,hash,iteration,each} <br><p>If I have a Perl hash with a bunch of (key, value) pairs, what is the preferred method of iterating through all the keys?  I have heard that using <code>each</code> may in some way have unintended side effects.  So, is that true, and is one of the two following methods best, or is there a better way?</p>
+
+<pre><code># Method 1
+while (my ($key, $value) = each(%hash)) {
+    # Something
+}
+
+# Method 2
+foreach my $key (keys(%hash)) {
+    # Something
+}
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 3360 John Siracusa: </h3><p>The rule of thumb is to use the function most suited to your needs.</p>
+
+<p>If you just want the keys and do not plan to ever <em>read</em> any of the values, use keys():</p>
+
+<pre><code>foreach my $key (keys %hash) { ... }
+</code></pre>
+
+<p>If you just want the values, use values():</p>
+
+<pre><code>foreach my $val (values %hash) { ... }
+</code></pre>
+
+<p>If you need the keys <em>and</em> the values, use each():</p>
+
+<pre><code>keys %hash; # reset the internal iterator so a prior each() doesn't affect the loop
+while(my($k, $v) = each %hash) { ... }
+</code></pre>
+
+<p>If you plan to change the keys of the hash in any way <em>except</em> for deleting the current key during the iteration, then you must not use each().  For example, this code to create a new set of uppercase keys with doubled values works fine using keys():</p>
+
+<pre><code>%h = (a =&gt; 1, b =&gt; 2);
+
+foreach my $k (keys %h)
+{
+  $h{uc $k} = $h{$k} * 2;
+}
+</code></pre>
+
+<p>producing the expected resulting hash:</p>
+
+<pre><code>(a =&gt; 1, A =&gt; 2, b =&gt; 2, B =&gt; 4)
+</code></pre>
+
+<p>But using each() to do the same thing:</p>
+
+<pre><code>%h = (a =&gt; 1, b =&gt; 2);
+
+keys %h;
+while(my($k, $v) = each %h)
+{
+  $h{uc $k} = $h{$k} * 2; # BAD IDEA!
+}
+</code></pre>
+
+<p>produces incorrect results in hard-to-predict ways.  For example:</p>
+
+<pre><code>(a =&gt; 1, A =&gt; 2, b =&gt; 2, B =&gt; 8)
+</code></pre>
+
+<p>This, however, is safe:</p>
+
+<pre><code>keys %h;
+while(my($k, $v) = each %h)
+{
+  if(...)
+  {
+    delete $h{$k}; # This is safe
+  }
+}
+</code></pre>
+
+<p>All of this is described in the perl documentation:</p>
+
+<pre><code>% perldoc -f keys
+% perldoc -f each
+</code></pre>
+<h4> Comment 168131 ysth: </h4>Please add a void-context keys %h; before each each loop to show safely using the iterator.<br><h4> Comment 35006278 Rawler: </h4>There is another caveat with each. The iterator is bound to the hash, not the context, which means it is not re-entrant. For example if you loop over a hash, and print the hash perl will internally reset the iterator, making this code loop endlessly:       my %hash = ( a =&gt; 1, b =&gt; 2, c =&gt; 3, );     while ( my ($k, $v) = each %hash ) {       print %hash;     }  Read more at <a href="http://blogs.perl.org/users/rurban/2014/04/do-not-use-each.html" rel="nofollow noreferrer">blogs.perl.org/users/rurban/2014/04/do-not-use-each.html</a><br>------------------------------------------------------------------ <br><h3> Answer 73004 Darren Meyer: </h3><p>The place where <code>each</code> can cause you problems is that it's a true, non-scoped iterator.  By way of example:</p>
+
+<pre><code>while ( my ($key,$val) = each %a_hash ) {
+    print "$key =&gt; $val\n";
+    last if $val; #exits loop when $val is true
+}
+
+# but "each" hasn't reset!!
+while ( my ($key,$val) = each %a_hash ) {
+    # continues where the last loop left off
+    print "$key =&gt; $val\n";
+}
+</code></pre>
+
+<p>If you need to be sure that <code>each</code> gets all the keys and values, you need to make sure you use <code>keys</code> or <code>values</code> first (as that resets the iterator).  See the <a href="http://perldoc.perl.org/functions/each.html" rel="noreferrer">documentation for each</a>.</p>
+------------------------------------------------------------------ <br><h3> Answer 67970 8jean: </h3><p>One thing you should be aware of when using <strong><code>each</code></strong> is that it has
+the side effect of adding "state" to your hash (the hash has to remember
+what the "next" key is). When using code like the snippets posted above,
+which iterate over the whole hash in one go, this is usually not a
+problem. However, you will run into hard to track down problems (I speak from
+experience ;), when using <code>each</code> together with statements like
+<code>last</code> or <code>return</code> to exit from the <code>while ... each</code> loop before you
+have processed all keys.</p>
+
+<p>In this case, the hash will remember which keys it has already returned, and
+when you use <code>each</code> on it the next time (maybe in a totaly unrelated piece of
+code), it will continue at this position. </p>
+
+<p>Example:</p>
+
+<pre><code>my %hash = ( foo =&gt; 1, bar =&gt; 2, baz =&gt; 3, quux =&gt; 4 );
+
+# find key 'baz'
+while ( my ($k, $v) = each %hash ) {
+    print "found key $k\n";
+    last if $k eq 'baz'; # found it!
+}
+
+# later ...
+
+print "the hash contains:\n";
+
+# iterate over all keys:
+while ( my ($k, $v) = each %hash ) {
+    print "$k =&gt; $v\n";
+}
+</code></pre>
+
+<p>This prints:</p>
+
+<pre><code>found key bar
+found key baz
+the hash contains:
+quux =&gt; 4
+foo =&gt; 1
+</code></pre>
+
+<p>What happened to keys "bar" and baz"? They're still there, but the
+second <code>each</code> starts where the first one left off, and stops when it reaches the end of the hash, so we never see them in the second loop.</p>
+------------------------------------------------------------------ <br><h3> Answer 57767 Jeffrey Horn: </h3><p>Using the each syntax will prevent the entire set of keys from being generated at once.  This can be important if you're using a tie-ed hash to a database with millions of rows.  You don't want to generate the entire list of keys all at once and exhaust your physical memory.  In this case each serves as an iterator whereas keys actually generates the entire array before the loop starts.</p>
+
+<p>So, the only place "each" is of real use is when the hash is very large (compared to the memory available).  That is only likely to happen when the hash itself doesn't live in memory itself unless you're programming a handheld data collection device or something with small memory.</p>
+
+<p>If memory is not an issue, usually the map or keys paradigm is the more prevelant and easier to read paradigm.</p>
+------------------------------------------------------------------ <br><h3> Answer 67239 Michael Carman: </h3><p>A few miscellaneous thoughts on this topic:</p>
+
+<ol>
+<li>There is nothing unsafe about any of the hash iterators themselves. What is unsafe is modifying the keys of a hash while you're iterating over it. (It's perfectly safe to modify the values.) The only potential side-effect I can think of is that <code>values</code> returns aliases which means that modifying them will modify the contents of the hash. This is by design but may not be what you want in some circumstances.</li>
+<li>John's <a href="https://stackoverflow.com/questions/3033/safest-way-to-iterate-through-the-keys-of-a-perl-hash#3360">accepted answer</a> is good with one exception: the documentation is clear that it is not safe to add keys while iterating over a hash. It may work for some data sets but will fail for others depending on the hash order.</li>
+<li>As already noted, it is safe to delete the last key returned by <code>each</code>. This is <em>not</em> true for <code>keys</code> as <code>each</code> is an iterator while <code>keys</code> returns a list.</li>
+</ol>
+<h4> Comment 168125 ysth: </h4>Re &quot;not true for keys&quot;, rather: it&#39;s not applicable to keys and any delete is safe.  The phrasing you use implies it&#39;s never safe to delete anything when using keys.<br><h4> Comment 168128 ysth: </h4>Re: &quot;nothing unsafe about any of the hash iterators&quot;, the other danger is assuming the iterator is at the beginning before starting an each loop, as others mention.<br>------------------------------------------------------------------ <br><h3> Answer 22669 Gary Richardson: </h3><p>I usually use <code>keys</code> and I can't think of the last time I used or read a use of <code>each</code>.</p>
+
+<p>Don't forget about <code>map</code>, depending on what you're doing in the loop!</p>
+
+<pre><code>map { print "$_ =&gt; $hash{$_}\n" } keys %hash;
+</code></pre>
+<h4> Comment 1580760 ko-dos: </h4>don&#39;t use map unless you want the return value<br>------------------------------------------------------------------ <br><h3> Answer 3066 jj33: </h3><p>I may get bitten by this one but I think that it's personal preference.  I can't find any reference in the docs to each() being different than keys() or values() (other than the obvious "they return different things" answer.  In fact the docs state the use the same iterator and they all return actual list values instead of copies of them, and that modifying the hash while iterating over it using any call is bad.</p>
+
+<p>All that said, I almost always use keys() because to me it is usually more self documenting to access the key's value via the hash itself.  I occasionally use values() when the value is a reference to a large structure and the key to the hash was already stored in the structure, at which point the key is redundant and I don't need it.  I think I've used each() 2 times in 10 years of Perl programming and it was probably the wrong choice both times =)</p>
+------------------------------------------------------------------ <br><h3> Answer 3072 jaredg: </h3><p>I always use method 2 as well.  The only benefit of using each is if you're just reading (rather than re-assigning) the value of the hash entry, you're not constantly de-referencing the hash.</p>
+------------------------------------------------------------------ <br><h3> Answer 4489750 Hogsmill: </h3><p>I woudl say:</p>
+
+<ol>
+<li>Use whatever's easiest to read/understand for most people (so keys, usually, I'd argue)</li>
+<li>Use whatever you decide consistently throught the whole code base. </li>
+</ol>
+
+<p>This give 2 major advantages:</p>
+
+<ol>
+<li>It's easier to spot "common" code so you can re-factor into functions/methiods.</li>
+<li>It's easier for future developers to maintain.</li>
+</ol>
+
+<p>I don't think it's more expensive to use keys over each, so no need for two different constructs for the same thing in your code.</p>
+<h4> Comment 76954390 Adrian G&#252;nter: </h4>With <code>keys</code> memory usage increases by <code>hash-size * avg-key-size</code>. Given that key size is only limited by memory (as they&#39;re just array elements like &quot;their&quot; corresponding values under the hood), in some situations it can be <i>prohibitively</i> more expensive in both memory usage and time taken to make the copy.<br>

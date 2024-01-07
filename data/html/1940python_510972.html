@@ -1,0 +1,205 @@
+ <h2> Title: Getting the class name of an instance </h2> <h3> Dan, question_id: 510972 </h3>Score: 1940, Tags: {python,introspection,instanceof,python-datamodel} <br><p>How do I find out the name of the class used to create an instance of an object in Python?</p>
+<p>I'm not sure if I should use the <a href="https://docs.python.org/2/library/inspect.html" rel="noreferrer" title="inspect — Inspect live objects"><code>inspect</code></a> module or parse the <code>__class__</code> attribute.</p>
+<h4> Comment 324914 Dan: </h4>the top-level name of the class that the instance belongs to (without module name, etc...)<br><h4> Comment 324913 sykora: </h4>What exactly are you &#39;parsing&#39; from the <b>class</b> variable?<br>------------------------------------------------------------------ <br><h3> Answer 511059 sykora: </h3><p>Have you tried the <a href="https://docs.python.org/library/stdtypes.html#definition.__name__" rel="noreferrer"><code>__name__</code> attribute</a> of the class? ie <code>type(x).__name__</code> will give you the name of the class, which I think is what you want.</p>
+
+<pre><code>&gt;&gt;&gt; import itertools
+&gt;&gt;&gt; x = itertools.count(0)
+&gt;&gt;&gt; type(x).__name__
+'count'
+</code></pre>
+
+<p>If you're still using Python 2, note that the above method works with <a href="https://wiki.python.org/moin/NewClassVsClassicClass" rel="noreferrer">new-style classes</a> only (in Python 3+ all classes are "new-style" classes). Your code might use some old-style classes. The following works for both:</p>
+
+<pre><code>x.__class__.__name__
+</code></pre>
+<h4> Comment 21560894 jpmc26: </h4>Why use <code>__class__</code> over the <code>type</code> method? Like so: <code>type(x).__name__</code>. Isn&#39;t calling double underscore members directly discouraged? I can&#39;t see a way around using <code>__name__</code>, though.<br><h4> Comment 20099795 cfi: </h4>Amazingly simple. Wonder why <code>dir(x.__class__)</code> does not list it?<br><h4> Comment 26518541 Quantum7: </h4>You have to use <code>__class__</code> directly to be compatible with old-style classes, since their type is just <code>instance</code>.<br><h4> Comment 86816935 Erik Aronesty: </h4>This is used often enough in logging, orm and framework code that there really should be a builtin typename(x) ... requiring a user to look at the &quot;guts&quot; to get a <b>name</b> isn&#39;t terribly pythonic, IMO.<br><h4> Comment 90581278 sleblanc: </h4>@ErikAronesty, <code>def typename(x): return type(x).__name__</code><br><h4> Comment 86132996 Bobort: </h4>Since I&#39;m using this is in a <code>__getattr__</code> method, if I seek any attributes on <code>self</code>, I get a recursion error.  Using <code>type</code> was of utmost importance in that situation.<br><h4> Comment 110789797 wjandrea: </h4>@Bobort Couldn&#39;t you just use <code>super().__getattr__(self, &#39;__class__&#39;)</code>?<br><h4> Comment 105823404 inVader: </h4>So, I have tried both these solutions on a case where they do not perform as I would expect or wish. <code>RandomOverSampler</code> from the <code>imblearn</code> package is a class deriving from a series of parents where one of which is defined as <code>SamplerMixin(BaseEstimator, metaclass=ABCMeta)</code>. In this case, both of the proposed methods return <code>ABCMeta</code> on an instance of <code>RandomOverSampler</code> (or the analogous <code>RandomUnderSampler</code> class) while I was looking for a convenient way to distinguish between these objects at runtime. Any idea on how to get the <i>actual</i> class name?<br><h4> Comment 125385788 Roy Cohen: </h4>@Bobort I remember reading somewhere that, for efficiency, dunder attributes don&#39;t work with custom <code>__getattr__</code>, so you wouldn&#39;t get a recursion error. Not sure tho.<br><h4> Comment 110789764 wjandrea: </h4>@jpmc26 <a href="https://stackoverflow.com/a/10633356/4518341">They can be different</a>.<br>------------------------------------------------------------------ <br><h3> Answer 511060 mthurlin: </h3><p>Do you want the name of the class as a string?</p>
+
+<pre><code>instance.__class__.__name__
+</code></pre>
+<h4> Comment 51772434 Leagsaidh Gordon: </h4>@EduardLuca Double underscores at the start only are similar to a single underscore at the start, but even more &quot;private&quot; (look up &quot;python name mangling&quot;). Double underscores at beginning <i>and end</i> are different - those are reserved for python and are not private (e.g. magic methods like __init__ and __add__).<br><h4> Comment 40141691 Eduard Luca: </h4>Is it safe to use double underscore properties?<br><h4> Comment 24195853 Pencilcheck: </h4>Or instance.__class__ to get the class object :D<br><h4> Comment 50683177 user4396006: </h4>@EduardLuca why wouldn&#39;t it be safe? Built-in properties use underscores so that they do not cause any conflict with the code you write<br><h4> Comment 50736925 Eduard Luca: </h4>Well I know that single underscores mean / suggest that the method / property should be private (although you can&#39;t really implement private methods in Python AFAIK), and I was wondering if that&#39;s not the case with (some) double underscores too.<br><h4> Comment 104352918 Bostone: </h4>Or if you doing this from inside the class this will work <code>self.__class__.__name__</code><br><h4> Comment 133504246 OrrinPants: </h4>A shorter solution is <code>type(instance).__name__</code>.<br><h4> Comment 133640343 user3481644: </h4>This is what I needed for a utility to create a logger for classes without having a string literal.<br>------------------------------------------------------------------ <br><h3> Answer 510988 GHZ: </h3><p><a href="https://docs.python.org/3/library/functions.html#type" rel="noreferrer"><code>type()</code></a> ?</p>
+<pre><code>&gt;&gt;&gt; class A:
+...     def whoami(self):
+...         print(type(self).__name__)
+...
+&gt;&gt;&gt;
+&gt;&gt;&gt; class B(A):
+...     pass
+...
+&gt;&gt;&gt;
+&gt;&gt;&gt;
+&gt;&gt;&gt; o = B()
+&gt;&gt;&gt; o.whoami()
+'B'
+&gt;&gt;&gt;
+</code></pre>
+<h4> Comment 16082542 andreb: </h4>or <code>self.__class__.__name__</code> instead of <code>type(self).__name__</code> to get the same behaviour. Unless there is something the <code>type()</code> function does that I am not aware of?<br><h4> Comment 14179899 joctee: </h4>I like this one. This way, it is possible in a base class to get the name of the subclass.<br><h4> Comment 39164251 Grochni: </h4>If you&#39;re using <code>type(item)</code> on a list item the result will be <code>&lt;type &#39;instance&#39;&gt;</code> while <code>item.__class__.__name__</code> holds the class name.<br><h4> Comment 45617970 Nate C-K: </h4>I think the issue that @Grochni mentions is only relevant for certain classes in Python 2.x, see here: <a href="http://stackoverflow.com/questions/6666856/why-does-typemyfield-return-type-instance-and-not-type-field" title="why does typemyfield return type instance and not type field">stackoverflow.com/questions/6666856/&hellip;</a><br><h4> Comment 133504274 OrrinPants: </h4>@andreb The original solution is shorter.<br>------------------------------------------------------------------ <br><h3> Answer 24130402 Jonathan: </h3><pre><code>class A:
+  pass
+
+a = A()
+str(a.__class__)
+</code></pre>
+
+<p>The sample code above (when input in the interactive interpreter) will produce <code>'__main__.A'</code> as opposed to <code>'A'</code> which is produced if the <code>__name__</code> attribute is invoked. By simply passing the result of <code>A.__class__</code> to the <code>str</code> constructor the parsing is handled for you. However, you could also use the following code if you want something more explicit.</p>
+
+<pre><code>"{0}.{1}".format(a.__class__.__module__,a.__class__.__name__)
+</code></pre>
+
+<p>This behavior can be preferable if you have classes with the same name defined in separate modules.</p>
+
+<p><strong>The sample code provided above was tested in Python 2.7.5.</strong></p>
+------------------------------------------------------------------ <br><h3> Answer 16293038 Prasath: </h3><p>In Python 2,</p>
+<pre><code>type(instance).__name__ != instance.__class__.__name__
+# if class A is defined like
+class A():
+   ...
+
+type(instance) == instance.__class__
+# if class A is defined like
+class A(object):
+  ...
+</code></pre>
+<p>Example:</p>
+<pre><code>&gt;&gt;&gt; class aclass(object):
+...   pass
+...
+&gt;&gt;&gt; a = aclass()
+&gt;&gt;&gt; type(a)
+&lt;class '__main__.aclass'&gt;
+&gt;&gt;&gt; a.__class__
+&lt;class '__main__.aclass'&gt;
+&gt;&gt;&gt;
+&gt;&gt;&gt; type(a).__name__
+'aclass'
+&gt;&gt;&gt;
+&gt;&gt;&gt; a.__class__.__name__
+'aclass'
+&gt;&gt;&gt;
+
+
+&gt;&gt;&gt; class bclass():
+...   pass
+...
+&gt;&gt;&gt; b = bclass()
+&gt;&gt;&gt;
+&gt;&gt;&gt; type(b)
+&lt;type 'instance'&gt;
+&gt;&gt;&gt; b.__class__
+&lt;class __main__.bclass at 0xb765047c&gt;
+&gt;&gt;&gt; type(b).__name__
+'instance'
+&gt;&gt;&gt;
+&gt;&gt;&gt; b.__class__.__name__
+'bclass'
+&gt;&gt;&gt;
+</code></pre>
+<h4> Comment 27874859 alcalde: </h4>This only holds true for old Python 2.x. In 3.x, bclass() would resolve to bclass(object). And even then, new classes appeared in Python 2.2.<br>------------------------------------------------------------------ <br><h3> Answer 46205181 Yurii Rabeshko: </h3><p>Alternatively you can use the <code>classmethod</code> decorator:</p>
+
+<pre class="lang-python prettyprint-override"><code>class A:
+    @classmethod
+    def get_classname(cls):
+        return cls.__name__
+
+    def use_classname(self):
+        return self.get_classname()
+</code></pre>
+
+<p><strong>Usage</strong>:</p>
+
+<pre class="lang-python prettyprint-override"><code>&gt;&gt;&gt; A.get_classname()
+'A'
+&gt;&gt;&gt; a = A()
+&gt;&gt;&gt; a.get_classname()
+'A'
+&gt;&gt;&gt; a.use_classname()
+'A'
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 45061340 Dimitris Fasarakis Hilliard: </h3><p>Apart from grabbing the special <a href="https://docs.python.org/3/library/stdtypes.html#definition.__name__" rel="noreferrer"><code>__name__</code></a> attribute, you might find yourself in need of the <a href="https://www.python.org/dev/peps/pep-3155/" rel="noreferrer">qualified name</a> for a given class/function. This is done by grabbing the types <code>__qualname__</code>.</p>
+
+<p>In most cases, these will be exactly the same, but, when dealing with nested classes/methods these differ in the output you get. For example:</p>
+
+<pre><code>class Spam:
+    def meth(self):
+        pass
+    class Bar:
+        pass
+
+&gt;&gt;&gt; s = Spam()
+&gt;&gt;&gt; type(s).__name__ 
+'Spam'
+&gt;&gt;&gt; type(s).__qualname__
+'Spam'
+&gt;&gt;&gt; type(s).Bar.__name__       # type not needed here
+'Bar'
+&gt;&gt;&gt; type(s).Bar.__qualname__   # type not needed here 
+'Spam.Bar'
+&gt;&gt;&gt; type(s).meth.__name__
+'meth'
+&gt;&gt;&gt; type(s).meth.__qualname__
+'Spam.meth'
+</code></pre>
+
+<p>Since introspection is what you're after, this is always you might want to consider.</p>
+<h4> Comment 86133051 Bobort: </h4>And I would avoid naming anything in my software &quot;meth&quot;.<br><h4> Comment 84040536 FireAphis: </h4>Should be noted that <code>__qualname__</code> is for Python 3.3+<br><h4> Comment 106740964 ti7: </h4>Related explanation for <code>__qualname__</code> vs <code>__name__</code>: <a href="https://stackoverflow.com/questions/58108488/what-is-qualname-in-python" title="what is qualname in python">stackoverflow.com/questions/58108488/what-is-qualname-in-pyt&zwnj;&#8203;hon</a><br>------------------------------------------------------------------ <br><h3> Answer 9383568 RyanN: </h3><p>Good question.</p>
+
+<p>Here's a simple example based on GHZ's which might help someone:</p>
+
+<pre><code>&gt;&gt;&gt; class person(object):
+        def init(self,name):
+            self.name=name
+        def info(self)
+            print "My name is {0}, I am a {1}".format(self.name,self.__class__.__name__)
+&gt;&gt;&gt; bob = person(name='Robert')
+&gt;&gt;&gt; bob.info()
+My name is Robert, I am a person
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 64843213 Lalit Vavdara: </h3><p>You can simply use <code>__qualname__</code> which stands for qualified name of a function or class</p>
+<p>Example:</p>
+<pre><code>&gt;&gt;&gt; class C:
+...     class D:
+...         def meth(self):
+...             pass
+...
+&gt;&gt;&gt; C.__qualname__
+'C'
+&gt;&gt;&gt; C.D.__qualname__
+'C.D'
+&gt;&gt;&gt; C.D.meth.__qualname__
+'C.D.meth'
+</code></pre>
+<p>documentation link <a href="https://docs.python.org/3/glossary.html#term-qualified-name" rel="noreferrer"><strong>qualname</strong></a></p>
+<h4> Comment 116397633 pascal sautot: </h4>this gives the name of a class not the  class name of an instance<br><h4> Comment 133172463 Rimov: </h4>This was already suggested by @Dimitris in 2017<br>------------------------------------------------------------------ <br><h3> Answer 61937483 v.babak: </h3><p>To get instance classname:</p>
+
+<pre class="lang-py prettyprint-override"><code>type(instance).__name__
+</code></pre>
+
+<p>or</p>
+
+<pre class="lang-py prettyprint-override"><code>instance.__class__.__name__
+</code></pre>
+
+<p>both are the same</p>
+<h4> Comment 110789907 wjandrea: </h4><a href="https://stackoverflow.com/q/1060499/4518341">Actually they can be different</a> if the class overrides <code>__class__</code>, or in old style classes (which are obsolete)<br>------------------------------------------------------------------ <br><h3> Answer 73761570 Supergamer: </h3><p>You can first use <code>type</code> and then <code>str</code> to extract class name from it.</p>
+<pre class="lang-py prettyprint-override"><code>class foo:pass;
+
+bar:foo=foo();
+print(str(type(bar))[8:-2][len(str(type(bar).__module__))+1:]);
+</code></pre>
+<h2>Result</h2>
+<pre><code>foo
+</code></pre>
+<h4> Comment 133504463 OrrinPants: </h4>That&#39;s hard to read, are those inline methods I don&#39;t know about?<br><h4> Comment 135774578 Luis Milanese: </h4>If I came across a line such as this, I&#39;d definitely &quot;annotate&quot; the code just to know the name of whom I was going to swear a lot.<br>------------------------------------------------------------------ <br><h3> Answer 74891859 Yaakov Bressler: </h3><p>If you're looking to solve this for a list (or iterable collection) of objects, here's how I would solve:</p>
+<pre class="lang-py prettyprint-override"><code>from operator import attrgetter
+
+# Will use a few data types to show a point
+my_list = [1, &quot;2&quot;, 3.0, [4], object(), type, None]
+
+# I specifically want to create a generator
+my_class_names = list(map(attrgetter(&quot;__name__&quot;), map(type, my_list))))
+
+# Result:
+['int', 'str', 'float', 'list', 'object', 'type', 'NoneType']
+
+
+# Alternatively, use a lambda
+my_class_names = list(map(lambda x: type(x).__name__, my_list))
+</code></pre>

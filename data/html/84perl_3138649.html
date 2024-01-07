@@ -1,0 +1,150 @@
+ <h2> Title: Programmatically read from STDIN or input file in Perl </h2> <h3> syker, question_id: 3138649 </h3>Score: 84, Tags: {perl,stdin} <br><p>What is the slickest way to programatically read from stdin or an input file (if provided) in Perl?</p>
+------------------------------------------------------------------ <br><h3> Answer 3138692 ennuikiller: </h3><pre><code>while (&lt;&gt;) {
+print;
+}
+</code></pre>
+
+<p>will read either from a file specified on the command line or from stdin if no file is given</p>
+
+<p>If you are required this loop construction in command line, then you may use <a href="http://perldoc.perl.org/perlrun.html#*-n*" rel="noreferrer"><code>-n</code></a> option:</p>
+
+<pre><code>$ perl -ne 'print;'
+</code></pre>
+
+<p>Here you just put code between <code>{}</code> from first example into <code>''</code> in second</p>
+<h4> Comment 3224713 msw: </h4>+1 +nitpick: &quot;will read from one or more files consecutively specified on the command line&quot;<br><h4> Comment 3227553 Axeman: </h4>...and all you need to do is write <code>@ARGV = &quot;&#47;path&#47;to&#47;some&#47;file.ext&quot;;</code> and it reads the file--so you can even program a default file on certain conditions.<br><h4> Comment 10959103 mivk: </h4>And if your script is very short, you can use the -n or -p options to perl, and specify your processing on the command line: <code>perl -n -e &#39;$_ = uc($_); print;&#39; yourfile</code>. With -p instead of -n, perl automatically prints $_ at the end.<br><h4> Comment 30973113 David Tonhofer: </h4>And of course you can &quot;slurp&quot; everything in one go: <code>my @slurp = &lt;&gt;; foreach my $line (@slurp) { ... }</code><br><h4> Comment 83710976 David Mertens: </h4>Is there a reason you don&#39;t name the read line with something like <code>while (my $line = &lt;&gt;) {...</code>?<br>------------------------------------------------------------------ <br><h3> Answer 14899879 Ron: </h3><p>This provides a named variable to work with:</p>
+
+<pre><code>foreach my $line ( &lt;STDIN&gt; ) {
+    chomp( $line );
+    print "$line\n";
+}
+</code></pre>
+
+<p>To read a file, pipe it in like this:</p>
+
+<pre><code>program.pl &lt; inputfile
+</code></pre>
+<h4> Comment 30700826 MikeKulls: </h4>+1 for avoiding the all too common shorthand unreadable Perl code<br><h4> Comment 38143777 David Mertens: </h4>-1 since foreach will slurp the whole file. Better to assign to the line in a while loop. Furthermore, Perl has built-in magical behavior for bare angle brackets, so you should have said while(my $line = &lt;&gt;). Then no redirection is necessary.<br><h4> Comment 43354938 tiktak: </h4>The first line should read <code>foreach my $line ( &lt;STDIN&gt; ) {</code>  I agree with @MikeKulls. It&#39;s not Perl&#39;s fault if Perl scripts are unreadable. Programmers are to blame here!<br><h4> Comment 43385076 MikeKulls: </h4>Rereading the question this response is incorrect because it only reads from stdin and doesn&#39;t read a file specified on the command line. ennuikiller&#39;s answer is correct although I would write it as <code>while(my $line = &lt;&gt;) { print $line; }</code>.<br><h4> Comment 69506770 Greg Nisbet: </h4>@MikeKulls Shouldn&#39;t that be <code>while (my $line = &lt;&gt;, defined $line) { ... }</code> or <code>while (&lt;&gt;) { my $line = $_; }</code> to avoid stopping on a blank line?<br><h4> Comment 70655931 MikeKulls: </h4>@GregoryNisbet good point. I would write it even more explicitly and add an explicit check for undef with a break or something along those lines.<br><h4> Comment 83710753 David Mertens: </h4>@MikeKulls, @GregoryNisbet, no, <code>while(my $line = &lt;&gt;)</code> has all kinds of special casing to Do What You Mean here. But as to your specific concern about blank lines, an empty line is not false: it contains <code>&quot;\n&quot;</code>, which is boolean true.<br>------------------------------------------------------------------ <br><h3> Answer 3138667 el.pescado - нет войне: </h3><p>You need to use &lt;&gt; operator:</p>
+<pre><code>while (&lt;&gt;) {
+    print $_; # or simply &quot;print;&quot;
+}
+</code></pre>
+<p>Which can be compacted to:</p>
+<pre><code>print while (&lt;&gt;);
+</code></pre>
+<p>Arbitrary file:</p>
+<pre><code>open my $F, &quot;&lt;file.txt&quot; or die $!;
+while (&lt;$F&gt;) {
+    print $_;
+}
+close $F;
+</code></pre>
+<h4> Comment 135058661 Higinio Fuentes: </h4>I&#39;m trying to run this script in Windows but no movement or error, any idea?<br>------------------------------------------------------------------ <br><h3> Answer 21683901 Neil Best: </h3><p>The "slickest" way in certain situations is to take advantage of the <a href="http://perldoc.perl.org/perlrun.html#Command-Switches"><code>-n</code> switch</a>.  It implicitly wraps your code with a <code>while(&lt;&gt;)</code> loop and handles the input flexibly.</p>
+
+<p>In <code>slickestWay.pl</code>:</p>
+
+<pre>
+#!/usr/bin/perl -n
+
+BEGIN: {
+  # do something once here
+}
+
+# implement logic for a single line of input
+print $result;
+</pre>
+
+<p>At the command line:</p>
+
+<pre><code>chmod +x slickestWay.pl
+</code></pre>
+
+<p>Now, depending on your input do one of the following:</p>
+
+<ol>
+<li><p>Wait for user input</p>
+
+<pre><code>./slickestWay.pl
+</code></pre></li>
+<li><p>Read from file(s) named in arguments (no redirection required)</p>
+
+<pre><code>./slickestWay.pl input.txt
+./slickestWay.pl input.txt moreInput.txt
+</code></pre></li>
+<li><p>Use a pipe</p>
+
+<pre><code>someOtherScript | ./slickestWay.pl 
+</code></pre></li>
+</ol>
+
+<p>The <code>BEGIN</code> block is necessary if you need to initialize some kind of object-oriented interface, such as Text::CSV or some such, which you can add to the shebang with <code>-M</code>.</p>
+
+<p><code>-l</code> and <code>-p</code> are also your friends.</p>
+------------------------------------------------------------------ <br><h3> Answer 27346470 Sigusr2: </h3><p>If there is a reason you <em>can't</em> use the simple solution provided by ennuikiller above, then you will have to use Typeglobs to manipulate file handles. This is way more work. This example copies from the file in <code>$ARGV[0]</code> to that in <code>$ARGV[1]</code>. It defaults to <code>STDIN</code> and <code>STDOUT</code> respectively if files are not specified.</p>
+
+<pre><code>use English;
+
+my $in;
+my $out;
+
+if ($#ARGV &gt;= 0){
+    unless (open($in,  "&lt;", $ARGV[0])){
+      die "could not open $ARGV[0] for reading.";
+    }
+}
+else {
+    $in  = *STDIN;
+}
+
+if ($#ARGV &gt;= 1){
+    unless (open($out, "&gt;", $ARGV[1])){
+      die "could not open $ARGV[1] for writing.";
+    }
+}
+else {
+    $out  = *STDOUT;
+}
+
+while ($_ = &lt;$in&gt;){
+    $out-&gt;print($_);
+}
+</code></pre>
+<h4> Comment 67917200 Matija Nalis: </h4>+1 for a way that will work if filename to read from <i>is not</i> provided on command line but somewhere else (in some variable, read from config file etc - you just replace <code>$ARGV[0]</code> etc with other variable) where all other answers fail...<br><h4> Comment 83710809 David Mertens: </h4>Or, for reading, just <code>unshift</code> the filename onto <code>@ARGV</code> and use the diamond operator, <code>&lt;&gt;</code>.<br>------------------------------------------------------------------ <br><h3> Answer 14503104 Thorsten Niehues: </h3><p>Do</p>
+
+<pre><code>$userinput =  &lt;STDIN&gt;; #read stdin and put it in $userinput
+chomp ($userinput);    #cut the return / line feed character
+</code></pre>
+
+<p>if you want to read just one line</p>
+<h4> Comment 83710960 David Mertens: </h4>Only reads from STDIN, not from specified file. The diamond operator is <i>exactly</i> what the OP is looking for.<br>------------------------------------------------------------------ <br><h3> Answer 3138765 trapd00r: </h3><pre><code>if(my $file = shift) { # if file is specified, read from that
+  open(my $fh, '&lt;', $file) or die($!);
+  while(my $line = &lt;$fh&gt;) {
+    print $line;
+  }
+}
+else { # otherwise, read from STDIN
+  print while(&lt;&gt;);
+}
+</code></pre>
+<h4> Comment 76947292 Eugen Konkov: </h4>You also do not describe what <code>shift</code> is doing here<br><h4> Comment 3224898 Dave Sherohman: </h4>The plain <code>&lt;&gt;</code> operator will automatically find and read from any file(s) given on the command line. There&#39;s no need for the <code>if</code>.<br>------------------------------------------------------------------ <br><h3> Answer 32682576 Westrock: </h3><p>Here is how I made a script that could take either command line inputs or have a text file redirected.
+<br></p>
+
+<pre><code>if ($#ARGV &lt; 1) {
+    @ARGV = ();
+    @ARGV = &lt;&gt;;
+    chomp(@ARGV);
+}
+</code></pre>
+
+<p><br>
+This will reassign the contents of the file to @ARGV, from there you just process @ARGV as if someone was including command line options.
+<br>
+<br>
+<em>WARNING</em>
+<br>
+<br>
+If no file is redirected, the program will sit their idle because it is waiting for input from STDIN.
+<br>
+<br>
+I have not figured out a way to detect if a file is being redirected in yet to eliminate the STDIN issue. </p>
+<h4> Comment 83710936 David Mertens: </h4>This is a cool approach, but not what the OP was asking for. This makes it possible to pass a single filename as an argument, the contents of which are used as command-line arguments. OP was looking for something different. Also, why the cryptic <code>$#ARGV &lt; 1</code> instead of (what I think of as) more clear <code>@ARGV == 1</code>?<br>

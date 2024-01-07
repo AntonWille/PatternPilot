@@ -1,0 +1,236 @@
+ <h2> Title: What&#39;s the difference between Perl&#39;s backticks, system, and exec? </h2> <h3> rlbond, question_id: 799968 </h3>Score: 266, Tags: {perl} <br><p>Can someone please help me? In Perl, what is the difference between:</p>
+
+<pre><code>exec "command";
+</code></pre>
+
+<p>and</p>
+
+<pre><code>system("command");
+</code></pre>
+
+<p>and</p>
+
+<pre><code>print `command`;
+</code></pre>
+
+<p>Are there other ways to run shell commands too?</p>
+<h4> Comment 610049 Michael Myers: </h4>Almost an exact duplicate of <a href="http://stackoverflow.com/questions/797127/whats-the-differences-between-system-and-backticks-and-pipes-in-perl" title="whats the differences between system and backticks and pipes in perl">stackoverflow.com/questions/797127/&hellip;</a>, except that this one has exec and the other one has pipes.<br>------------------------------------------------------------------ <br><h3> Answer 800034 Ludwig Weinzierl: </h3><h2><strong>exec</strong></h2>
+
+<p>executes a command and <em>never returns</em>.
+  It's like a <code>return</code> statement in a function.</p>
+
+<p>If the command is not found <code>exec</code> returns false.
+  It never returns true, because if the command is found it never returns at all.
+  There is also no point in returning <code>STDOUT</code>, <code>STDERR</code> or exit status of the command.
+  You can find documentation about it in  <a href="http://perldoc.perl.org/functions/exec.html" rel="noreferrer"><strong><code>perlfunc</code></strong></a>, 
+  because it is a function.</p>
+
+<h2><strong>system</strong></h2>
+
+<p>executes a command and your Perl script is continued after the command has finished.</p>
+
+<p>The return value is the exit status of the command.
+  You can find documentation about it in  <a href="http://perldoc.perl.org/functions/system.html" rel="noreferrer"><strong><code>perlfunc</code></strong></a>.</p>
+
+<h2><strong>backticks</strong></h2>
+
+<p>like <code>system</code> executes a command and your perl script is continued after the command has finished.</p>
+
+<p>In contrary to <strong><code>system</code></strong> the return value is <code>STDOUT</code> of the command.
+  <code>qx//</code> is equivalent to backticks.
+  You can find documentation about it in <a href="http://perldoc.perl.org/perlop.html#Quote-Like-Operators" rel="noreferrer"><strong><code>perlop</code></strong></a>, because unlike <code>system</code> and <code>exec</code>it is an operator.</p>
+
+<hr>
+
+<h2><strong>Other ways</strong></h2>
+
+<p>What is missing from the above is a way to execute a command asynchronously.
+That means your perl script and your command run simultaneously.
+This can be accomplished with <a href="http://perldoc.perl.org/functions/open.html" rel="noreferrer"><strong><code>open</code></strong></a>.
+It allows you to read <code>STDOUT</code>/<code>STDERR</code> and write to <code>STDIN</code> of your command.
+It is platform dependent though.</p>
+
+<p>There are also several modules which can ease this tasks.
+There is <code>IPC::Open2</code> and <code>IPC::Open3</code> and <code>IPC::Run</code>, as well as
+<code>Win32::Process::Create</code> if you are on windows.</p>
+<h4> Comment 29315917 jjohn: </h4>For the record, backticks and qx[] also populate $? (the OS return value).<br><h4> Comment 610235 Ludwig Weinzierl: </h4>perlcunc, maybe this will be my new nick name;-)<br><h4> Comment 610147 ephemient: </h4>I think you mean s/perlcunc/perlfunc/ ... also the perlipc documentation goes into great depth about opening pipes.<br><h4> Comment 111440928 felwithe: </h4>In list context, backticks returns a list of lines that were the output of the command. In scalar context, it returns them as a single string joined with newlines.<br><h4> Comment 120053994 ikegami: </h4>Re &quot;<i>because unlike <code>system</code> and <code>exec</code> it is an operator</i>&quot; All three are operators. <code>system</code> and <code>exec</code> are named list operators, which is why they&#39;re documented in perlfunc along with the other named list operators, named unary operators and named nulary operators.<br>------------------------------------------------------------------ <br><h3> Answer 800105 Chas. Owens: </h3><p>In general I use <code>system</code>, <code>open</code>, <code>IPC::Open2</code>, or <code>IPC::Open3</code> depending on what I want to do.  The <code>qx//</code> operator, while simple, is too constraining in its functionality to be very useful outside of quick hacks.  I find <code>open</code> to much handier.</p>
+
+<h2><a href="http://perldoc.perl.org/functions/system.html" rel="noreferrer"><code>system</code></a>: run a command and wait for it to return</h2>
+
+<p>Use <code>system</code> when you want to run a command, don't care about its output, and don't want the Perl script to do anything until the command finishes.</p>
+
+<pre><code>#doesn't spawn a shell, arguments are passed as they are
+system("command", "arg1", "arg2", "arg3");
+</code></pre>
+
+<p>or</p>
+
+<pre><code>#spawns a shell, arguments are interpreted by the shell, use only if you
+#want the shell to do globbing (e.g. *.txt) for you or you want to redirect
+#output
+system("command arg1 arg2 arg3");
+</code></pre>
+
+<h2><a href="http://perldoc.perl.org/perlop.html#qx/STRING/" rel="noreferrer"><code>qx//</code> or ``</a>: run a command and capture its STDOUT</h2>
+
+<p>Use <code>qx//</code> when you want to run a command, capture what it writes to STDOUT, and don't want the Perl script to do anything until the command finishes.</p>
+
+<pre><code>#arguments are always processed by the shell
+
+#in list context it returns the output as a list of lines
+my @lines = qx/command arg1 arg2 arg3/;
+
+#in scalar context it returns the output as one string
+my $output = qx/command arg1 arg2 arg3/;
+</code></pre>
+
+<h2><a href="http://perldoc.perl.org/functions/exec.html" rel="noreferrer"><code>exec</code></a>: replace the current process with another process.</h2>
+
+<p>Use <code>exec</code> along with <a href="http://perldoc.perl.org/functions/fork.html" rel="noreferrer"><code>fork</code></a> when you want to run a command, don't care about its output, and don't want to wait for it to return.  <code>system</code> is really just </p>
+
+<pre><code>sub my_system {
+    die "could not fork\n" unless defined(my $pid = fork);
+    return waitpid $pid, 0 if $pid; #parent waits for child
+    exec @_; #replace child with new process
+}
+</code></pre>
+
+<p>You may also want to read the <a href="http://perldoc.perl.org/functions/waitpid.html" rel="noreferrer"><code>waitpid</code></a> and <a href="http://perldoc.perl.org/perlipc.html" rel="noreferrer"><code>perlipc</code></a> manuals.</p>
+
+<h2><a href="http://perldoc.perl.org/functions/open.html" rel="noreferrer"><code>open</code></a>: run a process and create a pipe to its STDIN or STDERR</h2>
+
+<p>Use <code>open</code> when you want to write data to a process's STDIN or read data from a process's STDOUT (but not both at the same time).</p>
+
+<pre><code>#read from a gzip file as if it were a normal file
+open my $read_fh, "-|", "gzip", "-d", $filename
+    or die "could not open $filename: $!";
+
+#write to a gzip compressed file as if were a normal file
+open my $write_fh, "|-", "gzip", $filename
+    or die "could not open $filename: $!";
+</code></pre>
+
+<h2><a href="http://perldoc.perl.org/IPC/Open2.html" rel="noreferrer">IPC::Open2</a>: run a process and create a pipe to both STDIN and STDOUT</h2>
+
+<p>Use <code>IPC::Open2</code> when you need to read from and write to a process's STDIN and STDOUT.</p>
+
+<pre><code>use IPC::Open2;
+
+open2 my $out, my $in, "/usr/bin/bc"
+    or die "could not run bc";
+
+print $in "5+6\n";
+
+my $answer = &lt;$out&gt;;
+</code></pre>
+
+<h2><a href="http://perldoc.perl.org/IPC/Open3.html" rel="noreferrer">IPC::Open3</a>: run a process and create a pipe to STDIN, STDOUT, and STDERR</h2>
+
+<p>use <code>IPC::Open3</code> when you need to capture all three standard file handles of the process. I would write an example, but it works mostly the same way IPC::Open2 does, but with a slightly different order to the arguments and a third file handle.</p>
+<h4> Comment 51739456 Jassi: </h4>Very informative and upto date answer. Thanks @chas-owens<br><h4> Comment 69659977 ikegami: </h4>IPC::Open3 is too low-level for most uses. IPC::Run3 and IPC::Run are usually far more appropriate.<br><h4> Comment 128094001 Joel: </h4>Does this also spawn a shell: my @cmd = (&quot;cmd&quot;, &quot;param1&quot;); system (@cmd);<br>------------------------------------------------------------------ <br><h3> Answer 800016 Benedikt Waldvogel: </h3><h3>Let me quote the manuals first:</h3>
+
+<p><a href="http://perldoc.perl.org/functions/exec.html" rel="noreferrer">perldoc exec()</a>:</p>
+
+<blockquote>
+  <p>The exec function executes a system command and <strong>never returns</strong>-- use <em>system</em> instead of <em>exec</em> if you want it to return</p>
+</blockquote>
+
+<p><a href="http://perldoc.perl.org/functions/system.html" rel="noreferrer">perldoc system()</a>:</p>
+
+<blockquote>
+  <p>Does exactly the same thing as exec LIST , except that <strong>a fork is done</strong> first, and the parent process waits for the child process to complete.</p>
+</blockquote>
+
+<p>In contrast to <em>exec</em> and <em>system</em>, backticks don't give you the return value but the collected STDOUT.</p>
+
+<p><a href="http://perldoc.perl.org/perlop.html#%60STRING%60" rel="noreferrer">perldoc &#x0060;String&#x0060;</a>:</p>
+
+<blockquote>
+  <p>A string which is (possibly) interpolated and then executed as a system command with <em>/bin/sh</em> or its equivalent. Shell wildcards, pipes, and redirections will be honored. The collected <strong>standard output of the command is returned</strong>; standard error is unaffected.</p>
+</blockquote>
+
+<hr>
+
+<h2>Alternatives:</h2>
+
+<p>In more complex scenarios, where you want to fetch STDOUT, STDERR or the return code, you can use well known standard modules like <a href="http://perldoc.perl.org/IPC/Open2.html" rel="noreferrer">IPC::Open2</a> and <a href="http://perldoc.perl.org/IPC/Open3.html" rel="noreferrer">IPC::Open3</a>.</p>
+
+<p>Example:</p>
+
+<pre><code>use IPC::Open2;
+my $pid = open2(\*CHLD_OUT, \*CHLD_IN, 'some', 'cmd', 'and', 'args');
+waitpid( $pid, 0 );
+my $child_exit_status = $? &gt;&gt; 8;
+</code></pre>
+
+<p>Finally, <a href="http://search.cpan.org/dist/IPC::Run/" rel="noreferrer">IPC::Run</a> from the CPAN is also worth looking at…</p>
+<h4> Comment 610098 Shane C. Mason: </h4>This is a rude response. You should try to be helpful without the anger.<br><h4> Comment 610144 ephemient: </h4>I certainly didn&#39;t interpret it as being rude.  Brusque, maybe, but this is not a highly-intelligent question requiring a thoughtful answer.<br><h4> Comment 610127 v3.: </h4>I think he was just making a reference to the ol&#39; RTFM :P<br><h4> Comment 610131 Benedikt Waldvogel: </h4>wasn&#39;t meant rude actually ;) removed the f-word though, to avoid any misunderstandings…<br>------------------------------------------------------------------ <br><h3> Answer 37629494 linuxtestside: </h3><p>What's the difference between Perl's backticks (<code>`</code>), <code>system</code>, and <code>exec</code>?</p>
+
+<pre><code>exec -&gt; exec "command"; ,
+system -&gt; system("command"); and 
+backticks -&gt; print `command`;
+</code></pre>
+
+<h2><code>exec</code></h2>
+
+<p><code>exec</code> executes a command and never resumes the Perl script. It's to a script like a <code>return</code> statement is to a function.</p>
+
+<p>If the command is not found, <code>exec</code> returns false. It never returns true, because if the command is found, it never returns at all. There is also no point in returning <code>STDOUT</code>, <code>STDERR</code> or exit status of the command. You can find documentation about it in <strong>perlfunc</strong>, because it is a function.</p>
+
+<p>E.g.: </p>
+
+<pre><code>#!/usr/bin/perl
+print "Need to start exec command";
+my $data2 = exec('ls');
+print "Now END exec command";
+print "Hello $data2\n\n";
+</code></pre>
+
+<p>In above code, there are three <code>print</code> statements, but due to <code>exec</code> leaving the script, only the first print statement is executed. Also, the <code>exec</code> command output is not being assigned to any variable.</p>
+
+<p>Here, only you're only getting the output of the first <code>print</code> statement and of executing the <code>ls</code> command on standard out.</p>
+
+<h3><code>system</code></h3>
+
+<p><code>system</code> executes a command and your Perl script is resumed after the command has finished. The return value is the exit status of the command. You can find documentation about it in <strong>perlfunc</strong>.</p>
+
+<p>E.g.: </p>
+
+<pre><code>#!/usr/bin/perl
+print "Need to start system command";
+my $data2 = system('ls');
+print "Now END system command";
+print "Hello $data2\n\n";
+</code></pre>
+
+<p>In above code, there are three <code>print</code> statements. As the script is resumed after the <code>system</code> command, all three print statements are executed.</p>
+
+<p>Also, the result of running <code>system</code> <em>is</em> assigned to <code>data2</code>, but the assigned value is <code>0</code> (the exit code from <code>ls</code>).</p>
+
+<p>Here, you're getting the output of the first <code>print</code> statement, then that of the <code>ls</code> command, followed by the outputs of the final two <code>print</code> statements on standard out.</p>
+
+<h3>backticks (<code>`</code>)</h3>
+
+<p>Like <code>system</code>, enclosing a command in backticks executes that command and your Perl script is resumed after the command has finished. In contrast to <code>system</code>, the return value is <code>STDOUT</code> of the command. <code>qx//</code> is equivalent to backticks. You can find documentation about it in <strong>perlop</strong>, because unlike system and <code>exec</code>, it is an operator.</p>
+
+<p>E.g.: </p>
+
+<pre><code>#!/usr/bin/perl
+print "Need to start backticks command";
+my $data2 = `ls`;
+print "Now END system command";
+print "Hello $data2\n\n";
+</code></pre>
+
+<p>In above code, there are three <code>print</code> statements and all three are being executed. The output of <code>ls</code> is not going to standard out directly, but assigned to the variable <code>data2</code> and then printed by the final print statement.</p>
+<h4> Comment 136374854 Jenish: </h4>In summary, exec executes and never comeback. system executes and comeback with exit code  backticks executes and comeback with result of the execution.<br>------------------------------------------------------------------ <br><h3> Answer 800019 Shane C. Mason: </h3><p>The difference between 'exec' and 'system' is that exec replaces your current program with 'command' and NEVER returns to your program. system, on the other hand, forks and runs 'command' and returns you the exit status of 'command' when it is done running. The back tick runs 'command' and then returns a string representing its standard out (whatever it would have printed to the screen)</p>
+
+<p>You can also use popen to run shell commands and I think that there is a shell module - 'use shell' that gives you transparent access to typical shell commands.</p>
+
+<p>Hope that clarifies it for you.</p>
+<h4> Comment 610184 Shane C. Mason: </h4>The last part of his question was &quot;are there other ways to run shell commands too&quot; - Shell is another way to run shell commands.<br><h4> Comment 610303 Shane C. Mason: </h4>Again, it answered his question of &#39;are there other ways&#39;<br><h4> Comment 610218 Chas. Owens: </h4>The docs specifically state &quot;This package is included as a show case, illustrating a few Perl features. It shouldn&#39;t be used for production programs. Although it does provide a simple interface for obtaining the standard output of arbitrary commands, there may be better ways of achieving what you need.&quot;<br><h4> Comment 1651178 tsee: </h4>@ephemient: &quot;not widely installed&quot;? Try running &quot;corelist Shell&quot;. You&#39;ll get &quot;Shell was first released with perl 5&quot;. That is perl 5.000. It&#39;s been part of the perl <i>core</i> for ages! :)<br><h4> Comment 610390 Chas. Owens: </h4>Bad, unsupported ways should not be given without warnings that they are bad and unsupported.<br><h4> Comment 610153 ephemient: </h4>Perhaps you mean <code>use Shell;</code> (<a href="http://search.cpan.org/dist/Shell/Shell.pm" rel="nofollow noreferrer">search.cpan.org/dist/Shell/Shell.pm</a>)?  It&#39;s not widely installed, nor is it applicable to the question, I think...<br>------------------------------------------------------------------ <br><h3> Answer 77356851 Jenish: </h3><p>In summary,</p>
+<ul>
+<li><strong>exec</strong> executes and never comeback.</li>
+<li><strong>system</strong> executes and comeback with exit code.</li>
+<li><strong>backticks</strong> executes and comeback with result of the execution.</li>
+</ul>

@@ -1,0 +1,1254 @@
+ <h2> Title: How do I check if a string represents a number (float or int)? </h2> <h3> Daniel Goldberg, question_id: 354038 </h3>Score: 1965, Tags: {python,casting,floating-point,type-conversion} <br><p>How do I check if a string represents a numeric value in Python?</p>
+<pre><code>def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+</code></pre>
+<p>The above works, but it seems clunky.</p>
+<hr />
+<p><sub>If what you are testing comes from user input, it is <em>still</em> a string <em>even if it represents</em> an <code>int</code> or a <code>float</code>. See <a href="https://stackoverflow.com/questions/20449427/">How can I read inputs as numbers?</a> for converting the input, and <a href="https://stackoverflow.com/questions/23294658/">Asking the user for input until they give a valid response</a> for ensuring that the input represents an <code>int</code> or <code>float</code> (or other requirements) before proceeding.</sub></p>
+<h4> Comment 22051860 Colonel Panic: </h4>What&#39;s wrong with what your current solution? It&#39;s short, fast and readable.<br><h4> Comment 28459739 thiruvenkadam: </h4>Even though this question is older, I just wanted to say that this is an elegant way which is documented as <a href="http://docs.python.org/2/glossary.html#term-eafp" rel="nofollow noreferrer">EAFP</a>. So probably the best solution for this kind of problem.<br><h4> Comment 56957952 ovangle: </h4><i>Don&#39;t</i> return the result of float(s) or None on fail.   if you then use it as <code>x = float(&#39;0.00&#39;); if x: use_float(x);</code> you&#39;ve now got a bug in your code. Truthy values are the reason these functions raise an exception rather than returning <code>None</code> in the first place. A better solution is just to avoid the utility function and surround the call to float in a <code>try catch</code> when you want to use it.<br><h4> Comment 26076869 Jiminion: </h4>Wouldn&#39;t it better to return the result of float(s) in the case of a successful conversion?  You still have the check for success (result is False) and you actually HAVE the conversion, which you are likely to want anyway.<br><h4> Comment 24116348 Thruston: </h4>And you don&#39;t just have to return True or False.  You can return the value suitably modified instead - for example you could use this to put non-numbers in quotes.<br><h4> Comment 71140783 dbra: </h4>Warning: the snippet tells that <i>any</i> object that automatically <i>casts</i> to float is a number, and this could be misleading. As example, a simple <i>bool</i> results to be a number, because float(True) returns a valid 1.0.<br><h4> Comment 123702306 John Henckel: </h4>The slow part is NOT the float(a).  The slow part is the exception throw/catch. As every good programmer knows: NEVER USE EXCEPTIONS FOR NORMAL CODE PATH. The OP did not specify, so I think we ought to assume non-numeric is &quot;normal&quot; input to this function.  Is it common practice in python to use exceptions as part of the normal code flow?  @SamanthaAtkins<br><h4> Comment 46782707 laike9m: </h4><a href="http://www.pythoncentral.io/how-to-check-if-a-string-is-a-number-in-python-including-unicode/" rel="nofollow noreferrer">pythoncentral.io/&hellip;</a>, would help.<br><h4> Comment 37596865 Woody Pride: </h4>This seems OK, unless you are validating inputs from a user as locale.atoi(&quot;0,1,00&quot;) evaluates to 100....<br><h4> Comment 47075970 smci: </h4>Return the result of <code>float(s)</code>, on success, or <code>None</code>, on fail. Then you get the True/False behavior, as well as being able to directly use the result.<br><h4> Comment 52220989 jfs: </h4>related: <a href="http://stackoverflow.com/q/385558/4279">Extract float/double value</a><br><h4> Comment 61372365 Supreet Sethi: </h4>This is part of the problem tackled in the post <a href="http://stackoverflow.com/questions/36903462/adding-numbers-in-a-string/36904322#36904322" title="adding numbers in a string">stackoverflow.com/questions/36903462/adding-numbers-in-a-str&zwnj;&#8203;ing/&hellip;</a><br><h4> Comment 119841177 Ievgen: </h4>@Colonel Panic it&#39;s also slow<br><h4> Comment 101502212 Samantha Atkins: </h4>not slow.  int(s) or float(s) is likely nearly as fast as what the python interpreter uses for such things and may even have some C code under it.   In [17]: time_it(int, &#39;333&#39;, count=1)                                                                                   Out[17]: 4.0531158447265625e-06  Pretty darn fast.<br><h4> Comment 106913923 orcaman: </h4>You probably want to get rid of the ValueError part, otherwise this will raise an exception when it gets a list / dict for input<br><h4> Comment 132095186 Apostolos: </h4>Clunky or not, this is <b>the best answer</b> and I have upvoted it. Yet there&#39;s another one with more upvotes (from @Zoomulator) and it is <b>a wrong answer</b>, It is not what the question asks! Well, it&#39;s not a mystery. It&#39;s just how the human mind works! 😀<br><h4> Comment 133565855 Blue Phoenix: </h4>My code to test isfloat is as follow: def is_float(s):     if s.isdigit():         return False     try:         float(s)         return True     except Exception as e:         return False<br><h4> Comment 125310218 anu: </h4>Why not follow lazy checking pattern ? assume that the object is a float and attempt the operation and catch an exception, log it and then cast it to float and reattempt.<br><h4> Comment 38915279 cppcoder: </h4>Very useful function. In addition if you want to allow space, such as 1e + 2, etc. then this function needs modification.<br><h4> Comment 39061050 karlgold: </h4>If don&#39;t know whether the the input value is a string, you can also catch TypeError<br><h4> Comment 26076904 Jiminion: </h4>Thruston - I see your point, but then the check is less trivial.<br>------------------------------------------------------------------ <br><h3> Answer 354073 Zoomulator: </h3><p>For non-negative (unsigned) integers only, use <a href="https://docs.python.org/3/library/stdtypes.html#str.isdigit" rel="noreferrer" title="str.isdigit"><code>isdigit()</code></a>:</p>
+<pre><code>&gt;&gt;&gt; a = &quot;03523&quot;
+&gt;&gt;&gt; a.isdigit()
+True
+&gt;&gt;&gt; b = &quot;963spam&quot;
+&gt;&gt;&gt; b.isdigit()
+False
+</code></pre>
+<hr />
+<p>Documentation for <code>isdigit()</code>: <a href="https://docs.python.org/2/library/stdtypes.html#str.isdigit" rel="noreferrer">Python2</a>, <a href="https://docs.python.org/3/library/stdtypes.html#str.isdigit" rel="noreferrer">Python3</a></p>
+<p>For Python 2 Unicode strings:
+<a href="https://docs.python.org/2/library/stdtypes.html#unicode.isnumeric" rel="noreferrer" title="unicode.isnumeric"><code>isnumeric()</code></a>.</p>
+<h4> Comment 1477861 intrepion: </h4>That&#39;s a negative on negatives as well<br><h4> Comment 16106826 Adam Parkin: </h4>While Number != Digit, people who are looking for ways to test if a string contains an integer may very well stumble across this question, and the isDigit approach may very well be perfectly suitable for their application.<br><h4> Comment 6900432 ssc: </h4>Fails with exponentials too: &#39;1e3&#39;.isdigit() --&gt; False<br><h4> Comment 18339463 jfs: </h4>@AdamParkin: <code>isdigit()</code> and <code>int()</code> have different opinions about what is an integer e.g., for the Unicode character <a href="http://codepoints.net/U+00B9" rel="nofollow noreferrer"><code>u&#39;\u00b9&#39;</code></a>: <code>u&#39;&#185;&#39;.isdigit()</code> is <code>True</code> but <code>int(u&#39;&#185;&#39;)</code> raises ValueError.<br><h4> Comment 24877861 Justin Johnson: </h4>+1: isdigit() may not be what be what the OP was looking for, but it is exactly what I wanted. It may not be the case that this answer and method doesn&#39;t cover all types of numbers, but it is still highly relevant, contrary to the arguments about its accuracy.  While &quot;Number != Digit,&quot; digit is still a subset of number, particularly numbers that are positive, non-negative, and use base 1-10. Further, this method is particularly useful and brief for cases where you want to inspect whether a string is a numeric ID or not, which often falls into the subset of numbers that I just described.<br><h4> Comment 44956020 RattleyCooper: </h4>+1, I was looking for this solution based on my google query, so anyone saying this answer is irrelevant wasn&#39;t thinking about anybody except the OP.  Since stack overflow has so many answers that show up in google, this is absolutely relevant to those who are looking for this type of solution(like if you need to remove any non-digits from a phone number: <code>phone = &#39;&#39;.join([n for n in someString if n.isdigit()])</code>)<br><h4> Comment 19996651 Iulius Curt: </h4>The name <code>isdigit</code> is misleading from the start, since digit means <code>[0-9]</code><br><h4> Comment 16197783 r_31415: </h4>Even if this answer doesn&#39;t solve the OP&#39;s question, in order to solve the issue with floats, what about doing something like a.isdigit() or a.replace(&#39;.&#39;,&#39;&#39;).isdigit()?<br><h4> Comment 50505197 Barry: </h4>How does this have 800+ upvotes when it&#39;s totally wrong? The fact that there are comments on here that are like &quot;+1, this doesn&#39;t answer the question but helps me anyway&quot; blows my mind. <b>-1</b>.<br><h4> Comment 41356504 jfs: </h4>@JustinJohnson: have you read my <a href="http://stackoverflow.com/questions/354038/how-do-i-check-if-a-string-is-a-number-in-python#comment18339463_354073">previous comment</a>? You probably want <a href="http://stackoverflow.com/a/22793379/4279"><code>isdecimal()</code> instead</a>.<br><h4> Comment 41483466 Justin Johnson: </h4>@J.F.Sebastian You are right; <code>isdecimal()</code> is the correct method to use in the scenario that I described.<br><h4> Comment 132095056 Apostolos: </h4>This is NOT WHAT THE QUESTION ASKS! How comes this wrong answer got 1,700+ upvotes (up to now)??<br><h4> Comment 131100625 KetZoomer: </h4>I found that using underscores in the string works when passes through int but isdigit returns false.<br><h4> Comment 60680034 Tommy: </h4>This bombs on negative numbers, which are numbers, which the OP asked about (OP never specified positive).<br><h4> Comment 68417290 Del: </h4>As others have said, this is a good method, but totally not suitable for the question. Otherwise do people want to mark my answer &quot;chicken&quot; as correct. It is what I had for dinner last night, and is therefore true and correct, just irrelevant to the question asked.On a serious note, yes this method is a good method, but it is completely incorrect for the question asked, which specifically references floats, and should therefore not be upvoted.<br><h4> Comment 54271661 jfs: </h4>@DuckPuncher: for phone numbers, you need <a href="http://stackoverflow.com/questions/354038/how-do-i-check-if-a-string-is-a-number-float-in-python/354073#comment18339463_354073"><code>isdecimal()</code> instead of <code>isdigit()</code></a> here (if <code>someString</code> may contain non-ascii characters).<br><h4> Comment 77828387 Gangnus: </h4>@Jason9987 digit is one of 10 symbols [0-9]. So, maths definitions won&#39;t work here anyway.<br><h4> Comment 82316302 Paul Kenjora: </h4>You could split on &#39;.&#39; and check if both halves are is_digit() to check a float.<br>------------------------------------------------------------------ <br><h3> Answer 354130 S.Lott: </h3><blockquote>
+  <p>Which, not only is ugly and slow</p>
+</blockquote>
+
+<p>I'd dispute both.</p>
+
+<p>A regex or other string parsing method would be uglier and slower.  </p>
+
+<p>I'm not sure that anything much could be faster than the above.  It calls the function and returns.  Try/Catch doesn't introduce much overhead because the most common exception is caught without an extensive search of stack frames.</p>
+
+<p>The issue is that any numeric conversion function has two kinds of results</p>
+
+<ul>
+<li>A number, if the number is valid</li>
+<li>A status code (e.g., via errno) or exception to show that no valid number could be parsed.</li>
+</ul>
+
+<p>C (as an example) hacks around this a number of ways.  Python lays it out clearly and explicitly.</p>
+
+<p>I think your code for doing this is perfect.</p>
+<h4> Comment 25410513 Eric O. Lebigot: </h4>I don&#39;t think that the code is perfect (but I think it&#39;s very close): it is more usual to put <i>only</i> the part being &quot;tested&quot; in the <code>try</code> clause, so I would put the <code>return True</code> in an <code>else</code> clause of the <code>try</code>.  One of the reasons is that with the code in the question, if I had to review it, I would have to check that the second statement in the <code>try</code> clause cannot raise a ValueError: granted, this does not require too much time or brain power, but why use any when none is needed?<br><h4> Comment 59810221 JamEngulfer: </h4>But abstraction is the whole point of libraries. Having an &#39;isNumber&#39; function (in any language) helps a huge amount because you can build it straight into if statements and have far more readable and maintainable code that relying on try - catch blocks. Also, if you need to use the code more than once in more than one class/module, you have then used more lines of code than a built in function would have.<br><h4> Comment 33879546 Basic: </h4>How awful. How about if I don&#39;t care what the number <i>is</i> just that it&#39;s a number (which is what brought me here)? Instead of a 1-line <code>IsNumeric()</code> I either end up with a try/catch or another wrapping a try/catch. Ugh<br><h4> Comment 56958065 ovangle: </h4>It&#39;s not provided &#39;out of the box&#39; because <code>if is_number(s): x = float(x) else: &#47;&#47; fail</code> is the same number of lines of code as the <code>try: x = float(x) catch TypeError: # fail</code>. This utility function is an entirely unecessary abstraction.<br><h4> Comment 31221269 sage: </h4>The answer seems compelling, but makes me wonder why it&#39;s not provided out-of-the-box...   I&#39;ll copy this and use it in any case.<br><h4> Comment 33993154 Nils Lindemann: </h4>@Basic I do not get your point. Name your function, which does the checking <code>IsNumeric</code> and use that function. Thats the idea of using functions - having one-liners.<br><h4> Comment 33994298 Basic: </h4>@Nils My point is that it&#39;s such an obvious, simple operation available in every other high-level language I&#39;ve used, that its absence feels like a glaring omission. Then again, this isn&#39;t the place for a protracted discussion, so let&#39;s agree to disagree.<br><h4> Comment 39233896 ArtOfWarfare: </h4>@Basic - Ah, I neglected JS. SQL is such a narrowly focused language that I wouldn&#39;t compare it to Python or any other high level general purpose programming languages. And I have to confess I&#39;m not familiar with PHP, VB, or C#. Your comments are fair enough. I don&#39;t see any purpose to deleting them.<br><h4> Comment 39224175 ArtOfWarfare: </h4>@Basic - &quot;[Checking if a string is a number is] available in every other high-level language&quot; - I&#39;ll agree with you on most of the sentence that I extracted this quote from, but I disagree with the quoted text. Is one available in Java (and if so, since which JDK version?) Last I checked (admittedly several years ago), there wasn&#39;t.<br><h4> Comment 39228461 Basic: </h4>@ArtOfWarfare The key bit is where I said &quot;That I&#39;ve used&quot;... Without meaning to start a war, I avoid Java whenever possible. The fact that it&#39;s lacking an <code>IsNumeric()</code> surprises me not at all.<br><h4> Comment 39229001 ArtOfWarfare: </h4>@Basic - So I&#39;m curious, what all languages have you used that come with that function out of the box? We&#39;ve covered that Python and Java don&#39;t have it, and if Java doesn&#39;t have it, we can rule out C, C++, and probably C# too. Objective-C doesn&#39;t have it. There&#39;s not many popular high level languages left... does Ruby have it? Does PHP have it? Perl? At this point I think I&#39;ve named all the popular/major high level languages...<br><h4> Comment 39229270 Basic: </h4>@ArtOfWarfare PHP, Javascript and VB.Net off the top of my head. T-SQL has <code>ISNUMERIC()</code> if you&#39;d classify that as a language. C# has <code>Double.TryParse()</code> which will return a boolean although it can be a little woolier (can optionally allow whitespace, thousand separators, etc). Anyway, we&#39;re hijacking up this comment thread so I&#39;ll come back and delete my comments from today in a few hours<br>------------------------------------------------------------------ <br><h3> Answer 23639915 user2489252: </h3><p><strong>TL;DR</strong> The best solution is <code>s.replace('.','',1).isdigit()</code></p>
+<p>I did some <a href="http://nbviewer.ipython.org/github/rasbt/One-Python-benchmark-per-day/blob/master/ipython_nbs/day6_string_is_number.ipynb?create=1" rel="noreferrer">benchmarks</a> comparing the different approaches</p>
+<pre><code>def is_number_tryexcept(s):
+    &quot;&quot;&quot; Returns True if string is a number. &quot;&quot;&quot;
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+       
+import re    
+def is_number_regex(s):
+    &quot;&quot;&quot; Returns True if string is a number. &quot;&quot;&quot;
+    if re.match(&quot;^\d+?\.\d+?$&quot;, s) is None:
+        return s.isdigit()
+    return True
+
+
+def is_number_repl_isdigit(s):
+    &quot;&quot;&quot; Returns True if string is a number. &quot;&quot;&quot;
+    return s.replace('.','',1).isdigit()
+</code></pre>
+<p>If the string is not a number, the except-block is quite slow. But more importantly, the try-except method is the only approach that handles scientific notations correctly.</p>
+<pre><code>funcs = [
+          is_number_tryexcept, 
+          is_number_regex,
+          is_number_repl_isdigit
+          ]
+
+a_float = '.1234'
+
+print('Float notation &quot;.1234&quot; is not supported by:')
+for f in funcs:
+    if not f(a_float):
+        print('\t -', f.__name__)
+</code></pre>
+<p>Float notation &quot;.1234&quot; is not supported by:</p>
+<ul>
+<li><p>is_number_regex</p>
+<p>scientific1 = '1.000000e+50'
+scientific2 = '1e50'</p>
+<p>print('Scientific notation &quot;1.000000e+50&quot; is not supported by:')
+for f in funcs:
+if not f(scientific1):
+print('\t -', f.<strong>name</strong>)</p>
+<p>print('Scientific notation &quot;1e50&quot; is not supported by:')
+for f in funcs:
+if not f(scientific2):
+print('\t -', f.<strong>name</strong>)</p>
+</li>
+</ul>
+<p>Scientific notation &quot;1.000000e+50&quot; is not supported by:</p>
+<ul>
+<li>is_number_regex</li>
+<li>is_number_repl_isdigit<br />
+Scientific notation &quot;1e50&quot; is not supported by:</li>
+<li>is_number_regex</li>
+<li>is_number_repl_isdigit</li>
+</ul>
+<h2>EDIT: The benchmark results</h2>
+<pre><code>import timeit
+
+test_cases = ['1.12345', '1.12.345', 'abc12345', '12345']
+times_n = {f.__name__:[] for f in funcs}
+
+for t in test_cases:
+    for f in funcs:
+        f = f.__name__
+        times_n[f].append(min(timeit.Timer('%s(t)' %f, 
+                      'from __main__ import %s, t' %f)
+                              .repeat(repeat=3, number=1000000)))
+</code></pre>
+<p>where the following functions were tested</p>
+<pre><code>from re import match as re_match
+from re import compile as re_compile
+
+def is_number_tryexcept(s):
+    &quot;&quot;&quot; Returns True if string is a number. &quot;&quot;&quot;
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+def is_number_regex(s):
+    &quot;&quot;&quot; Returns True if string is a number. &quot;&quot;&quot;
+    if re_match(&quot;^\d+?\.\d+?$&quot;, s) is None:
+        return s.isdigit()
+    return True
+
+
+comp = re_compile(&quot;^\d+?\.\d+?$&quot;)    
+
+def compiled_regex(s):
+    &quot;&quot;&quot; Returns True if string is a number. &quot;&quot;&quot;
+    if comp.match(s) is None:
+        return s.isdigit()
+    return True
+
+
+def is_number_repl_isdigit(s):
+    &quot;&quot;&quot; Returns True if string is a number. &quot;&quot;&quot;
+    return s.replace('.','',1).isdigit()
+</code></pre>
+<p><a href="https://i.stack.imgur.com/DFoK6.png" rel="noreferrer"><img src="https://i.stack.imgur.com/DFoK6.png" alt="enter image description here" /></a></p>
+<h4> Comment 68598180 jcchuks: </h4>for nice charts +1. I saw benchmark and saw  graph, all the TL;DR thing became clear and intuitive.<br><h4> Comment 97926859 Urchin: </h4>This method does not handle negative numbers (dashes). I would advocate to just use the float method as it&#39;s less prone to mistakes and will work every time.<br><h4> Comment 98325297 Markus von Broady: </h4>What&#39;s important to note, is that even on the assumption there can&#39;t be a dash, the replace-isdigit method is only faster for non-numbers (False outcome), while try-except method is faster for numbers (True outcome). If most of your input is valid input, you&#39;re better off with the try-except solution!<br><h4> Comment 113272941 Cecil Curry: </h4><b>Brilliant,</b> aside from the obvious caveats of false negatives for exponentiation and negatives – which you can trivially correct by just chaining <code>s.replace()</code> calls. For example, <code>s.replace(&#39;.&#39;,&#39;&#39;,1).replace(&#39;e-&#39;,&#39;&#39;,1).replace(&#39;e&#39;,&#39;&#39;,1).isd&zwnj;&#8203;igit()</code> handles exponentiation. To then handle negatives, just left-strip the first character if a dash. For example, <code>s.lstrip(&#39;-&#39;).replace(&#39;.&#39;,&#39;&#39;,1).replace(&#39;e-&#39;,&#39;&#39;,1).replace(&#39;&zwnj;&#8203;e&#39;,&#39;&#39;,1).isdigit()</code>. <i>Yes, I have exhaustively tested that one-liner and can confirm it behaves as expected.</i><br><h4> Comment 103218113 EL_DON: </h4>Doesn&#39;t work on exponential notation like <code>&#39;1.5e-9&#39;</code> or on negatives.<br><h4> Comment 131306322 Toby Speight: </h4>@CecilCurry, did your exhaustive testing include <code>5e6e-7</code> or similar?  I anticipate a false positive for strings including both <code>e-</code> and <code>e</code>.<br><h4> Comment 129118215 Vladimir Vilimaitis: </h4>Not only this is a good and a detailed answer, but this approach also makes it compatible  with Cythonized pandas string methods. +1.<br><h4> Comment 132959149 Karl Knechtel: </h4>Aside from the countless other issues that were pointed out with correctness, some (many) cultures use <code>.</code> to represent a thousands separator and <code>,</code> to represent a decimal point. The time (on the order of microseconds) needed to verify input <b>that will be typed by a human, using a keyboard, in response to a prompt in a terminal</b> is absolutely and utterly inconsequential, so calling a solution &quot;best&quot; based on performance here is ridiculous. This answer is terrible.<br><h4> Comment 114240543 Hans Ginzel: </h4>You should be tolerant to white space and accept sign, so <code>comp = re_compile(&quot;^\s*[+-]?\d+?\.\d+?\s*$&quot;)</code>.<br><h4> Comment 107440962 benzhi: </h4>Nice, did something comparable, without the nice charts, but then for thousands of iterations. When I ran way more cases, the try/catch became a bit more expensive on negative cases than the regex, but when used directly in an if (if test_trycatch_function(x): ... else: ...), it took double the time of the regex. My knowledge of python goes not that deep, so I don&#39;t understand why just running or assigning it to a variable that is not further used, I don&#39;t know. Maybe some optimizer completely skipping it?<br><h4> Comment 90877359 Alexander McFarlane: </h4>Note that adding <code>.lstrip(&#39;-&#39;)</code> for negative numbers makes the func <code>is_number_repl_isdigit</code> 1.5x longer to run<br><h4> Comment 90893773 SethMMorton: </h4>Can you include <a href="https://github.com/SethMMorton/fastnumbers" rel="nofollow noreferrer"><code>fastnumbers</code></a> in the graph (see <a href="https://stackoverflow.com/a/25299619/1399279">stackoverflow.com/a/25299619/1399279</a> for how to use it in this application)?<br><h4> Comment 87157204 Corey Goldberg: </h4>The TLDR is misleading and disingenuous.  Being &quot;best&quot; doesn&#39;t correlate with any performance benchmark.  For example, I usually value readability much more than micro-optimizations, so benchmarks have almost no weight in determining a best solution for my context.  TLDR would be more accurate of it stated: &quot;best if ranked by execution time from a small set of arbitrary benchmarks&quot;<br><h4> Comment 87178472 user2489252: </h4>fair enough, but in the TLDR, I also didn&#39;t say that it&#39;s based on the benchmarks. To me, it seems also to be the most readable solution<br><h4> Comment 72551123 Simon C.: </h4>I agree with @JCChuks: the graph helps a lot to get all the TL;DR quickly. But I think a TL;DR (like : <b>TL;DR</b> :  the best solution is  <code>s.replace(&#39;.&#39;,&#39;&#39;,1).isdigit()</code>) should appear at the beginning of this anwser. In any case it should be the accepted one. Thanks!<br>------------------------------------------------------------------ <br><h3> Answer 3618897 W7GVR: </h3><p>There is one exception that you may want to take into account: the string 'NaN'</p>
+
+<p>If you want is_number to return FALSE for 'NaN' this code will not work as Python converts it to its representation of a number that is not a number (talk about identity issues):</p>
+
+<pre><code>&gt;&gt;&gt; float('NaN')
+nan
+</code></pre>
+
+<p>Otherwise, I should actually thank you for the piece of code I now use extensively. :)</p>
+
+<p>G.</p>
+<h4> Comment 13909296 agf: </h4>Another exception is the string <code>&#39;inf&#39;</code>. Either <code>inf</code> or <code>NaN</code> can also be prefixed with a <code>+</code> or <code>-</code> and still be accepted.<br><h4> Comment 32084846 Steve Jessop: </h4><code>x-1 == x</code> is true for large floats smaller than <code>inf</code>. From Python 3.2 you can use <code>math.isfinite</code> to test for numbers that are neither NaN nor infinite, or check both <code>math.isnan</code> and <code>math.isinf</code> prior to that.<br><h4> Comment 21843944 RyanN: </h4>If you want to return False for a NaN and Inf, change line to x = float(s); return (x == x) and (x - 1 != x). This should return True for all floats except Inf and NaN<br><h4> Comment 7373991 kindall: </h4>Actually, <code>NaN</code> might be a good value to return (rather than <code>False</code>) if the text passed is not in fact a representation of a number. Checking for it is kind of a pain (Python&#39;s <code>float</code> type really needs a method for it) but you can use it in calculations without producing an error, and only need to check the result.<br>------------------------------------------------------------------ <br><h3> Answer 10762002 haxwithaxe: </h3><p>how about this:</p>
+
+<pre><code>'3.14'.replace('.','',1).isdigit()
+</code></pre>
+
+<p>which will return true only if there is one or no '.' in the string of digits.</p>
+
+<pre><code>'3.14.5'.replace('.','',1).isdigit()
+</code></pre>
+
+<p>will return false</p>
+
+<p>edit: just saw another comment ...
+adding a <code>.replace(badstuff,'',maxnum_badstuff)</code> for other cases can be done. if you are passing salt and not arbitrary condiments (ref:<a href="http://xkcd.com/974/" rel="noreferrer">xkcd#974</a>) this will do fine :P</p>
+<h4> Comment 41701318 Michael Barton: </h4>This doesn&#39;t however account for negative numbers.<br><h4> Comment 61154794 Alfe: </h4>Or numbers with exponents like <code>1.234e56</code> (which might also be written as <code>+1.234E+56</code> and several more variants).<br><h4> Comment 104639070 Karam Qusai: </h4>man this is the smartest solution I ever seen in this website!, nicely done man!<br><h4> Comment 71447555 Baldrickk: </h4><code>re.match(r&#39;^[+-]*(0[xbo])?[0-9A-Fa-f]*\.?[0-9A-Fa-f]*(E[+-]*&zwnj;&#8203;[0-9A-Fa-f]+)$&#39;, &#39;str&#39;)</code> should do a better job of determining a number (but not all, I&#39;m not claiming that).  I don&#39;t recommend using this, far better to use the Questioner&#39;s original code.<br><h4> Comment 84896163 aloisdg: </h4>if you dont like this solution, read <a href="https://stackoverflow.com/a/23639915/1248177">this</a> before downvoting!<br>------------------------------------------------------------------ <br><h3> Answer 3335060 Matthew Wilcoxson: </h3><p>Updated after Alfe pointed out you don't need to check for float separately as complex handles both:</p>
+
+<pre><code>def is_number(s):
+    try:
+        complex(s) # for int, long, float and complex
+    except ValueError:
+        return False
+
+    return True
+</code></pre>
+
+<hr>
+
+<p>Previously said: Is some rare cases you might also need to check for complex numbers (e.g. 1+2i), which can not be represented by a float:</p>
+
+<pre><code>def is_number(s):
+    try:
+        float(s) # for int, long and float
+    except ValueError:
+        try:
+            complex(s) # for complex
+        except ValueError:
+            return False
+
+    return True
+</code></pre>
+<h4> Comment 26077028 Jiminion: </h4>I disagree.  That&#39;s VERY unlikely in normal use, and you would be better building an is_complex_number() call for when you are using them, rather than burden a call with extra operation for a 0.0001% chance of misoperation.<br><h4> Comment 61154874 Alfe: </h4>You can strip the <code>float()</code> stuff completely and just check for the <code>complex()</code> call to succeed.  Everything parsed by <code>float()</code> can be parsed by <code>complex()</code>.<br><h4> Comment 94589992 plhn: </h4><code>complex(&#39;(01989)&#39;)</code> will return <code>(1989+0j)</code>. But <code>float(&#39;(01989)&#39;)</code> will fail. So I think using <code>complex</code> is not good idea.<br><h4> Comment 62512935 fixxxer: </h4>This function will return Pandas&#39;s NaNs and Inf values as numeric values.<br><h4> Comment 113273045 Cecil Curry: </h4><b>Yikes.</b> Bizarre that <code>complex()</code> accepts <code>(</code>- and <code>)</code>-delimited syntax – presumably to account for the composite vector addition in the imaginary plane underlying complex numbers, but still. As @plhn suggests, using <code>complex()</code> here invites false positives. <b>Don&#39;t do this in production code.</b> Honestly, <code>s.lstrip(&#39;-&#39;).replace(&#39;.&#39;,&#39;&#39;,1).replace(&#39;e-&#39;,&#39;&#39;,1).replace(&#39;&zwnj;&#8203;e&#39;,&#39;&#39;,1).isdigit()</code> remains the optimal solution for most use cases.<br>------------------------------------------------------------------ <br><h3> Answer 358479 Jason Baker: </h3><blockquote>
+  <p>Which, not only is ugly and slow, seems clunky.</p>
+</blockquote>
+
+<p>It may take some getting used to, but this is the pythonic way of doing it.  As has been already pointed out, the alternatives are worse.  But there is one other advantage of doing things this way:  polymorphism.</p>
+
+<p>The central idea behind duck typing is that "if it walks and talks like a duck, then it's a duck."  What if you decide that you need to subclass string so that you can change how you determine if something can be converted into a float?  Or what if you decide to test some other object entirely?  You can do these things without having to change the above code.</p>
+
+<p>Other languages solve these problems by using interfaces.  I'll save the analysis of which solution is better for another thread.  The point, though, is that python is decidedly on the duck typing side of the equation, and you're probably going to have to get used to syntax like this if you plan on doing much programming in Python (but that doesn't mean you have to like it of course).</p>
+
+<p>One other thing you might want to take into consideration: Python is pretty fast in throwing and catching exceptions compared to a lot of other languages (30x faster than .Net for instance).  Heck, the language itself even throws exceptions to communicate non-exceptional, normal program conditions (every time you use a for loop).  Thus, I wouldn't worry too much about the performance aspects of this code until you notice a significant problem.</p>
+<h4> Comment 7373979 kindall: </h4>Another common place where Python uses exceptions for basic functions is in <code>hasattr()</code> which is just a <code>getattr()</code> call wrapped in a <code>try&#47;except</code>. Still, exception handling is slower than normal flow control, so using it for something that is going to be true <i>most of the time</i> can result in a performance penalty.<br><h4> Comment 33879515 Basic: </h4>It seems that if you want a one-liner, you&#39;re SOL<br><h4> Comment 61276232 heltonbiker: </h4>Also pythonic is the idea that it&#39;s &quot;better to ask forgiveness than permission&quot;, regarding the impact of having cheap exceptions.<br>------------------------------------------------------------------ <br><h3> Answer 32453110 Sdwdaw: </h3><p>For <code>int</code> use this:</p>
+
+<pre><code>&gt;&gt;&gt; "1221323".isdigit()
+True
+</code></pre>
+
+<p>But for <code>float</code> we need some tricks ;-). Every float number has one point...</p>
+
+<pre><code>&gt;&gt;&gt; "12.34".isdigit()
+False
+&gt;&gt;&gt; "12.34".replace('.','',1).isdigit()
+True
+&gt;&gt;&gt; "12.3.4".replace('.','',1).isdigit()
+False
+</code></pre>
+
+<p>Also for negative numbers just add <code>lstrip()</code>:</p>
+
+<pre><code>&gt;&gt;&gt; '-12'.lstrip('-')
+'12'
+</code></pre>
+
+<p>And now we get a universal way:</p>
+
+<pre><code>&gt;&gt;&gt; '-12.34'.lstrip('-').replace('.','',1).isdigit()
+True
+&gt;&gt;&gt; '.-234'.lstrip('-').replace('.','',1).isdigit()
+False
+</code></pre>
+<h4> Comment 61155136 Alfe: </h4>Doesn&#39;t handle things like <code>1.234e56</code> and similar.  Also, I&#39;d be interested how you&#39;d find out that <code>99999999999999999999e99999999999999999999</code> is not a number.  Trying to parse it finds out quickly.<br><h4> Comment 123039056 brewmanz: </h4>Note that <code>&gt;&gt;&gt; &#39;--1234&#39;.lstrip(&#39;-&#39;).replace(&#39;.&#39;,&#39;&#39;,1).isdigit()</code> returns true; perhaps not what&#39;s expected<br><h4> Comment 71888219 Zev Averbach: </h4>This runs ~30% faster than the accepted solution on a list of 50m strings, and 150% faster on a list of 5k strings.  👏<br>------------------------------------------------------------------ <br><h3> Answer 48729739 Moinuddin Quadri: </h3><p>This answer provides step by step guide having function with examples to find the string is:</p>
+<ul>
+<li><em>Positive integer</em></li>
+<li><em>Positive/negative - integer/float</em></li>
+<li><em>How to discard &quot;NaN&quot; (not a number) strings while checking for number?</em></li>
+</ul>
+<h2>Check if string is <em>positive</em> integer</h2>
+<p>You may use <a href="https://docs.python.org/2/library/stdtypes.html#str.isdigit" rel="noreferrer"><strong><code>str.isdigit()</code></strong></a> to check whether given string is <em>positive</em> integer.</p>
+<p>Sample Results:</p>
+<pre><code># For digit
+&gt;&gt;&gt; '1'.isdigit()
+True
+&gt;&gt;&gt; '1'.isalpha()
+False
+</code></pre>
+<h2>Check for string as positive/negative - integer/float</h2>
+<p><code>str.isdigit()</code> returns <code>False</code> if the string is a <em>negative</em> number or a float number. For example:</p>
+<pre><code># returns `False` for float
+&gt;&gt;&gt; '123.3'.isdigit()
+False
+# returns `False` for negative number
+&gt;&gt;&gt; '-123'.isdigit()
+False
+</code></pre>
+<p>If you want to <strong>also check for the <em>negative</em> integers and <a href="https://docs.python.org/3/library/functions.html#float" rel="noreferrer"><code>float</code></a></strong>, then you may write a custom function to check for it as:</p>
+<pre><code>def is_number(n):
+    try:
+        float(n)   # Type-casting the string to `float`.
+                   # If string is not a valid `float`, 
+                   # it'll raise `ValueError` exception
+    except ValueError:
+        return False
+    return True
+</code></pre>
+<p>Sample Run:</p>
+<pre><code>&gt;&gt;&gt; is_number('123')    # positive integer number
+True
+
+&gt;&gt;&gt; is_number('123.4')  # positive float number
+True
+ 
+&gt;&gt;&gt; is_number('-123')   # negative integer number
+True
+
+&gt;&gt;&gt; is_number('-123.4') # negative `float` number
+True
+
+&gt;&gt;&gt; is_number('abc')    # `False` for &quot;some random&quot; string
+False
+</code></pre>
+<h2>Discard &quot;NaN&quot; (not a number) strings while checking for number</h2>
+<p>The above functions will return <code>True</code> for the &quot;NAN&quot; (Not a number) string because for Python it is valid float representing it is not a number. For example:</p>
+<pre><code>&gt;&gt;&gt; is_number('NaN')
+True
+</code></pre>
+<p>In order to check whether the number is &quot;NaN&quot;, you may use <a href="https://docs.python.org/2/library/math.html#math.isnan" rel="noreferrer"><strong><code>math.isnan()</code></strong></a> as:</p>
+<pre><code>&gt;&gt;&gt; import math
+&gt;&gt;&gt; nan_num = float('nan')
+
+&gt;&gt;&gt; math.isnan(nan_num)
+True
+</code></pre>
+<p>Or if you don't want to import additional library to check this, then you may simply check it via comparing it with itself using <code>==</code>. Python returns <code>False</code> when <code>nan</code> float is compared with itself. For example:</p>
+<pre><code># `nan_num` variable is taken from above example
+&gt;&gt;&gt; nan_num == nan_num
+False
+</code></pre>
+<p>Hence, above <strong>function <code>is_number</code> can be updated to return <code>False</code> for <code>&quot;NaN&quot;</code></strong> as:</p>
+<pre><code>def is_number(n):
+    is_number = True
+    try:
+        num = float(n)
+        # check for &quot;nan&quot; floats
+        is_number = num == num   # or use `math.isnan(num)`
+    except ValueError:
+        is_number = False
+    return is_number
+</code></pre>
+<p>Sample Run:</p>
+<pre><code>&gt;&gt;&gt; is_number('Nan')   # not a number &quot;Nan&quot; string
+False
+
+&gt;&gt;&gt; is_number('nan')   # not a number string &quot;nan&quot; with all lower cased
+False
+
+&gt;&gt;&gt; is_number('123')   # positive integer
+True
+
+&gt;&gt;&gt; is_number('-123')  # negative integer
+True
+
+&gt;&gt;&gt; is_number('-1.12') # negative `float`
+True
+
+&gt;&gt;&gt; is_number('abc')   # &quot;some random&quot; string
+False
+</code></pre>
+<p><em><strong>PS: Each operation for each check depending on the type of number comes with additional overhead. Choose the version of <code>is_number</code> function which fits your requirement.</strong></em></p>
+<h4> Comment 132959178 Karl Knechtel: </h4>This should be at the top because it adequately addresses the ambiguity of asking about &quot;a number&quot;, and shows corresponding solutions for multiple interpretations.<br>------------------------------------------------------------------ <br><h3> Answer 15205926 Blackzafiro: </h3><p>You can use Unicode strings, they have a method to do just what you want:</p>
+
+<pre><code>&gt;&gt;&gt; s = u"345"
+&gt;&gt;&gt; s.isnumeric()
+True
+</code></pre>
+
+<p>Or:</p>
+
+<pre><code>&gt;&gt;&gt; s = "345"
+&gt;&gt;&gt; u = unicode(s)
+&gt;&gt;&gt; u.isnumeric()
+True
+</code></pre>
+
+<p><a href="http://www.tutorialspoint.com/python/string_isnumeric.htm">http://www.tutorialspoint.com/python/string_isnumeric.htm</a></p>
+
+<p><a href="http://docs.python.org/2/howto/unicode.html">http://docs.python.org/2/howto/unicode.html</a></p>
+<h4> Comment 34369390 andilabs: </h4>for non-negative ints it is ok ;-)<br><h4> Comment 41537386 jfs: </h4><code>s.isdecimal()</code> checks if <code>s</code> string is a non-negative integer. <code>s.isnumeric()</code> includes characters that <code>int()</code> rejects.<br>------------------------------------------------------------------ <br><h3> Answer 25299619 SethMMorton: </h3><p>For strings of non-numbers, <code>try: except:</code> is actually slower than regular expressions.  For strings of valid numbers, regex is slower.  So, the appropriate method depends on your input. </p>
+
+<p>If you find that you are in a performance bind, you can use a new third-party module called <a href="https://pypi.org/project/fastnumbers" rel="noreferrer">fastnumbers</a> that provides a function called <a href="http://fastnumbers.readthedocs.io/en/master/api.html#fastnumbers.isfloat" rel="noreferrer">isfloat</a>.  Full disclosure, I am the author.  I have included its results in the timings below.</p>
+
+<hr>
+
+<pre><code>from __future__ import print_function
+import timeit
+
+prep_base = '''\
+x = 'invalid'
+y = '5402'
+z = '4.754e3'
+'''
+
+prep_try_method = '''\
+def is_number_try(val):
+    try:
+        float(val)
+        return True
+    except ValueError:
+        return False
+
+'''
+
+prep_re_method = '''\
+import re
+float_match = re.compile(r'[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?$').match
+def is_number_re(val):
+    return bool(float_match(val))
+
+'''
+
+fn_method = '''\
+from fastnumbers import isfloat
+
+'''
+
+print('Try with non-number strings', timeit.timeit('is_number_try(x)',
+    prep_base + prep_try_method), 'seconds')
+print('Try with integer strings', timeit.timeit('is_number_try(y)',
+    prep_base + prep_try_method), 'seconds')
+print('Try with float strings', timeit.timeit('is_number_try(z)',
+    prep_base + prep_try_method), 'seconds')
+print()
+print('Regex with non-number strings', timeit.timeit('is_number_re(x)',
+    prep_base + prep_re_method), 'seconds')
+print('Regex with integer strings', timeit.timeit('is_number_re(y)',
+    prep_base + prep_re_method), 'seconds')
+print('Regex with float strings', timeit.timeit('is_number_re(z)',
+    prep_base + prep_re_method), 'seconds')
+print()
+print('fastnumbers with non-number strings', timeit.timeit('isfloat(x)',
+    prep_base + 'from fastnumbers import isfloat'), 'seconds')
+print('fastnumbers with integer strings', timeit.timeit('isfloat(y)',
+    prep_base + 'from fastnumbers import isfloat'), 'seconds')
+print('fastnumbers with float strings', timeit.timeit('isfloat(z)',
+    prep_base + 'from fastnumbers import isfloat'), 'seconds')
+print()
+</code></pre>
+
+<hr>
+
+<pre><code>Try with non-number strings 2.39108395576 seconds
+Try with integer strings 0.375686168671 seconds
+Try with float strings 0.369210958481 seconds
+
+Regex with non-number strings 0.748660802841 seconds
+Regex with integer strings 1.02021503448 seconds
+Regex with float strings 1.08564686775 seconds
+
+fastnumbers with non-number strings 0.174362897873 seconds
+fastnumbers with integer strings 0.179651021957 seconds
+fastnumbers with float strings 0.20222902298 seconds
+</code></pre>
+
+<p>As you can see</p>
+
+<ul>
+<li><code>try: except:</code> was fast for numeric input but very slow for an invalid input</li>
+<li>regex is very efficient when the input is invalid</li>
+<li><code>fastnumbers</code> wins in both cases</li>
+</ul>
+<h4> Comment 90878584 Alexander McFarlane: </h4>Tested against the best alternatives in this thread I confirm this solution is <b>by far</b> the fastest. The second fastest method is <code>str(s).strip(&#39;-&#39;).replace(&#39;.&#39;,&#39;&#39;,1).isdigit()</code> which is approximately 10x slower!<br><h4> Comment 61179076 Alfe: </h4>I stand corrected :-}  it just didn&#39;t look like it was doing this.  Maybe using names like <code>prep_code_basis</code> and <code>prep_code_re_method</code> would have prevented my mistake.<br><h4> Comment 61629446 Solomon Ucko: </h4>Do you mind explaining how your module works, at least for the <code>isfloat</code> function?<br><h4> Comment 61630141 SethMMorton: </h4>@SolomonUcko Here is a link to the source code for the string checking part: <a href="https://github.com/SethMMorton/fastnumbers/blob/v1.0.0/src/string_contains_float.c" rel="nofollow noreferrer">github.com/SethMMorton/fastnumbers/blob/v1.0.0/src/&hellip;</a>. Basically, it walks across each character in the string in order and validates that it follows a pattern for a valid float.  If the input is already a number, it just uses the fast <a href="https://docs.python.org/3/c-api/float.html" rel="nofollow noreferrer">PyFloat_Check</a>.<br><h4> Comment 113748507 mic: </h4>Note that <code>timeit.timeit</code> runs the statement 1 million times. I was confused why these numbers seemed so slow.<br><h4> Comment 116788678 rfadams: </h4>This solution is great and should be nearer the top, honestly. It does require a new library, but it is easy to use and behaves in an intuitive manner. Was exactly what I was looking for. Thanks @SethMMorton<br>------------------------------------------------------------------ <br><h3> Answer 34615173 Aruthawolf: </h3><p>I know this is particularly old but I would add an answer I believe covers the information missing from the highest voted answer that could be very valuable to any who find this:</p>
+
+<p>For each of the following methods connect them with a count if you need any input to be accepted. (Assuming we are using vocal definitions of integers rather than 0-255, etc.)</p>
+
+<p><code>x.isdigit()</code>
+works well for checking if x is an integer.</p>
+
+<p><code>x.replace('-','').isdigit()</code>
+works well for checking if x is a negative.(Check - in first position)</p>
+
+<p><code>x.replace('.','').isdigit()</code>
+works well for checking if x is a decimal.</p>
+
+<p><code>x.replace(':','').isdigit()</code>
+works well for checking if x is a ratio.</p>
+
+<p><code>x.replace('/','',1).isdigit()</code>
+works well for checking if x is a fraction.</p>
+<h4> Comment 73628353 Ethan Chen: </h4>Though for fractions, you probably need to do <code>x.replace(&#39;&#47;&#39;,&#39;&#39;,1).isdigit()</code> or otherwise dates such as 4/7/2017 would be misinterpreted as numbers.<br><h4> Comment 132075996 Avi Drucker: </h4>Similar to Ethan Chen&#39;s comment, we&#39;d only want to replace the first decimal/period character, otherwise version numbers such as 0.2.5 would be considered valid floats. So, <code>x.replace(&#39;.&#39;,&#39;&#39;,1).isdigit()</code> rather than <code>x.replace(&#39;.&#39;,&#39;&#39;).isdigit()</code>, and similarly, a more delicate check for things that aren&#39;t negative numbers such as ranges like 5-9 (&quot;5 to 9&quot;) in contrast with -59 (the actual negative 59).<br><h4> Comment 86569966 Daniel Braun: </h4>For the best ways to chain the conditions: <a href="https://stackoverflow.com/q/3411771/5922329">stackoverflow.com/q/3411771/5922329</a><br>------------------------------------------------------------------ <br><h3> Answer 9337733 Evan Plaice: </h3><h2>Just Mimic C#</h2>
+
+<p><strong>In C# there are two different functions that handle parsing of scalar values:</strong></p>
+
+<ul>
+<li>Float.Parse()</li>
+<li>Float.TryParse()</li>
+</ul>
+
+<p><strong>float.parse():</strong></p>
+
+<pre><code>def parse(string):
+    try:
+        return float(string)
+    except Exception:
+        throw TypeError
+</code></pre>
+
+<p><em>Note: If you're wondering why I changed the exception to a TypeError, <a href="http://docs.python.org/library/exceptions.html">here's the documentation</a>.</em></p>
+
+<p><strong>float.try_parse():</strong></p>
+
+<pre><code>def try_parse(string, fail=None):
+    try:
+        return float(string)
+    except Exception:
+        return fail;
+</code></pre>
+
+<p><em>Note: You don't want to return the boolean 'False' because that's still a value type. None is better because it indicates failure. Of course, if you want something different you can change the fail parameter to whatever you want.</em></p>
+
+<p>To extend float to include the 'parse()' and 'try_parse()' you'll need to monkeypatch the 'float' class to add these methods.</p>
+
+<p>If you want respect pre-existing functions the code should be something like:</p>
+
+<pre><code>def monkey_patch():
+    if(!hasattr(float, 'parse')):
+        float.parse = parse
+    if(!hasattr(float, 'try_parse')):
+        float.try_parse = try_parse
+</code></pre>
+
+<p><em>SideNote: I personally prefer to call it Monkey Punching because it feels like I'm abusing the language when I do this but YMMV.</em></p>
+
+<p><strong>Usage:</strong></p>
+
+<pre><code>float.parse('giggity') // throws TypeException
+float.parse('54.3') // returns the scalar value 54.3
+float.tryParse('twank') // returns None
+float.tryParse('32.2') // returns the scalar value 32.2
+</code></pre>
+
+<p><em>And the great Sage Pythonas said to the Holy See Sharpisus, "Anything you can do I can do better; I can do anything better than you."</em></p>
+<h4> Comment 65722195 BlackJack: </h4>Using <code>!</code> instead of <code>not</code> might be a minor error, but you definitely can&#39;t assign attributes to the built-in <code>float</code> in CPython.<br><h4> Comment 123550245 nurettin: </h4>@joanis technically it looks like a valid answer with all the formatting and the bold text, but if you look closely, it just copies the question and moves the goal post to a different idiom. And I found better answers below it so it&#39;s just taking up space. At least that&#39;s my opinion.<br><h4> Comment 123560396 joanis: </h4>@nurettin Well, OK, I&#39;ve read it careful and I now agree with you. Unfortunately, I&#39;ve already voted &quot;Looks OK&quot; in my review yesterday.<br><h4> Comment 112790978 Janus Troelsen: </h4>downvoted for catching all exceptions indiscriminately and for using a keyword that doesn&#39;t exist &quot;throw&quot;<br><h4> Comment 123532007 nurettin: </h4>I&#39;m the person who flagged &quot;Doesn&#39;t answer the question&quot;.<br><h4> Comment 123541150 joanis: </h4>@nurettin You have more rep than I do, so I hope you know what you&#39;re doing, but I don&#39;t think that&#39;s an appropriate use of the flag. Just downvote if you don&#39;t like this answer. But it&#39;s still a valid attempt at an answer.<br><h4> Comment 11785261 Evan Plaice: </h4>I have been coding in mostly JS lately and didn&#39;t actually test this so there may be some minor errors. If you see any, feel free to correct my mistakes.<br><h4> Comment 11785353 Evan Plaice: </h4>To add support for complex numbers see the answer by @Matthew Wilcoxson. <a href="http://stackoverflow.com/a/3335060/290340">stackoverflow.com/a/3335060/290340</a>.<br>------------------------------------------------------------------ <br><h3> Answer 354134 codelogic: </h3><p>Casting to float and catching ValueError is probably the fastest way, since float() is specifically meant for just that. Anything else that requires string parsing (regex, etc) will likely be slower due to the fact that it's not tuned for this operation. My $0.02.</p>
+<h4> Comment 186539 tzot: </h4>Your &quot;2e-2&quot; dollars are a float too (an additional argument for using float :)<br><h4> Comment 18091580 Luke: </h4>@tzot NEVER use a float to represent a monetary value.<br><h4> Comment 18117082 tzot: </h4>@Luke: I totally agree with you, although I never suggested using floats to represent monetary values; I just said that monetary values <i>can</i> be represented as floats :)<br>------------------------------------------------------------------ <br><h3> Answer 14352314 Ron Reiter: </h3><p>I wanted to see which method is fastest. Overall the best and most consistent results were given by the <code>check_replace</code> function. The fastest results were given by the <code>check_exception</code> function, but only if there was no exception fired - meaning its code is the most efficient, but the overhead of throwing an exception is quite large.</p>
+
+<p>Please note that checking for a successful cast is the only method which is accurate, for example, this works with <code>check_exception</code> but the other two test functions will return False for a valid float:</p>
+
+<pre><code>huge_number = float('1e+100')
+</code></pre>
+
+<p>Here is the benchmark code:</p>
+
+<pre><code>import time, re, random, string
+
+ITERATIONS = 10000000
+
+class Timer:    
+    def __enter__(self):
+        self.start = time.clock()
+        return self
+    def __exit__(self, *args):
+        self.end = time.clock()
+        self.interval = self.end - self.start
+
+def check_regexp(x):
+    return re.compile("^\d*\.?\d*$").match(x) is not None
+
+def check_replace(x):
+    return x.replace('.','',1).isdigit()
+
+def check_exception(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+to_check = [check_regexp, check_replace, check_exception]
+
+print('preparing data...')
+good_numbers = [
+    str(random.random() / random.random()) 
+    for x in range(ITERATIONS)]
+
+bad_numbers = ['.' + x for x in good_numbers]
+
+strings = [
+    ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(random.randint(1,10)))
+    for x in range(ITERATIONS)]
+
+print('running test...')
+for func in to_check:
+    with Timer() as t:
+        for x in good_numbers:
+            res = func(x)
+    print('%s with good floats: %s' % (func.__name__, t.interval))
+    with Timer() as t:
+        for x in bad_numbers:
+            res = func(x)
+    print('%s with bad floats: %s' % (func.__name__, t.interval))
+    with Timer() as t:
+        for x in strings:
+            res = func(x)
+    print('%s with strings: %s' % (func.__name__, t.interval))
+</code></pre>
+
+<p>Here are the results with Python 2.7.10 on a 2017 MacBook Pro 13:</p>
+
+<pre><code>check_regexp with good floats: 12.688639
+check_regexp with bad floats: 11.624862
+check_regexp with strings: 11.349414
+check_replace with good floats: 4.419841
+check_replace with bad floats: 4.294909
+check_replace with strings: 4.086358
+check_exception with good floats: 3.276668
+check_exception with bad floats: 13.843092
+check_exception with strings: 15.786169
+</code></pre>
+
+<p>Here are the results with Python 3.6.5 on a 2017 MacBook Pro 13:</p>
+
+<pre><code>check_regexp with good floats: 13.472906000000009
+check_regexp with bad floats: 12.977665000000016
+check_regexp with strings: 12.417542999999995
+check_replace with good floats: 6.011045999999993
+check_replace with bad floats: 4.849356
+check_replace with strings: 4.282754000000011
+check_exception with good floats: 6.039081999999979
+check_exception with bad floats: 9.322753000000006
+check_exception with strings: 9.952595000000002
+</code></pre>
+
+<p>Here are the results with PyPy 2.7.13 on a 2017 MacBook Pro 13:</p>
+
+<pre><code>check_regexp with good floats: 2.693217
+check_regexp with bad floats: 2.744819
+check_regexp with strings: 2.532414
+check_replace with good floats: 0.604367
+check_replace with bad floats: 0.538169
+check_replace with strings: 0.598664
+check_exception with good floats: 1.944103
+check_exception with bad floats: 2.449182
+check_exception with strings: 2.200056
+</code></pre>
+<h4> Comment 106035357 David Ljung Madison Stellar: </h4>&quot;Please note that checking for a successful cast is the only method which is accurate&quot; &lt;- this isn&#39;t actually true.  I&#39;ve run your test using the regexp in my answer above, and it actually runs faster than the regexp.  I&#39;ll add the results to my answer above.<br><h4> Comment 106035517 David Ljung Madison Stellar: </h4>Incidentally, as an amusing point, your bad numbers creator can actually create some legal numbers, though it would be quite rare.  :)<br>------------------------------------------------------------------ <br><h3> Answer 52676692 user10461621: </h3><p>The input may be as follows:</p>
+
+<p><code>a="50"</code>
+<code>b=50</code>
+<code>c=50.1</code>
+<code>d="50.1"</code></p>
+
+<hr>
+
+<h2><strong>1-General input:</strong></h2>
+
+<p>The input of this function can be everything!</p>
+
+<p>Finds whether the given variable is numeric. Numeric strings consist of optional sign, any number of digits, optional decimal part and optional exponential part. Thus +0123.45e6 is a valid numeric value. Hexadecimal (e.g. 0xf4c3b00c) and binary (e.g. 0b10100111001) notation is not allowed.</p>
+
+<p><strong>is_numeric</strong> function</p>
+
+<pre><code>import ast
+import numbers              
+def is_numeric(obj):
+    if isinstance(obj, numbers.Number):
+        return True
+    elif isinstance(obj, str):
+        nodes = list(ast.walk(ast.parse(obj)))[1:]
+        if not isinstance(nodes[0], ast.Expr):
+            return False
+        if not isinstance(nodes[-1], ast.Num):
+            return False
+        nodes = nodes[1:-1]
+        for i in range(len(nodes)):
+            #if used + or - in digit :
+            if i % 2 == 0:
+                if not isinstance(nodes[i], ast.UnaryOp):
+                    return False
+            else:
+                if not isinstance(nodes[i], (ast.USub, ast.UAdd)):
+                    return False
+        return True
+    else:
+        return False
+</code></pre>
+
+<p>test:</p>
+
+<pre><code>&gt;&gt;&gt; is_numeric("54")
+True
+&gt;&gt;&gt; is_numeric("54.545")
+True
+&gt;&gt;&gt; is_numeric("0x45")
+True
+</code></pre>
+
+<p><strong>is_float</strong> function</p>
+
+<p>Finds whether the given variable is float. float strings consist of optional sign, any number of digits, ...</p>
+
+<pre><code>import ast
+
+def is_float(obj):
+    if isinstance(obj, float):
+        return True
+    if isinstance(obj, int):
+        return False
+    elif isinstance(obj, str):
+        nodes = list(ast.walk(ast.parse(obj)))[1:]
+        if not isinstance(nodes[0], ast.Expr):
+            return False
+        if not isinstance(nodes[-1], ast.Num):
+            return False
+        if not isinstance(nodes[-1].n, float):
+            return False
+        nodes = nodes[1:-1]
+        for i in range(len(nodes)):
+            if i % 2 == 0:
+                if not isinstance(nodes[i], ast.UnaryOp):
+                    return False
+            else:
+                if not isinstance(nodes[i], (ast.USub, ast.UAdd)):
+                    return False
+        return True
+    else:
+        return False
+</code></pre>
+
+<p>test:</p>
+
+<pre><code>&gt;&gt;&gt; is_float("5.4")
+True
+&gt;&gt;&gt; is_float("5")
+False
+&gt;&gt;&gt; is_float(5)
+False
+&gt;&gt;&gt; is_float("5")
+False
+&gt;&gt;&gt; is_float("+5.4")
+True
+</code></pre>
+
+<p>what is <a href="https://docs.python.org/2/library/ast.html" rel="noreferrer">ast</a>?</p>
+
+<hr>
+
+<h2>2- If you are confident that the variable content is <strong>String</strong>:</h2>
+
+<p>use <a href="https://docs.python.org/2/library/stdtypes.html#str.isdigit" rel="noreferrer">str.isdigit()</a> method</p>
+
+<pre><code>&gt;&gt;&gt; a=454
+&gt;&gt;&gt; a.isdigit()
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+AttributeError: 'int' object has no attribute 'isdigit'
+&gt;&gt;&gt; a="454"
+&gt;&gt;&gt; a.isdigit()
+True
+</code></pre>
+
+<hr>
+
+<h2>3-Numerical input:</h2>
+
+<p><strong>detect int value:</strong></p>
+
+<pre><code>&gt;&gt;&gt; isinstance("54", int)
+False
+&gt;&gt;&gt; isinstance(54, int)
+True
+&gt;&gt;&gt; 
+</code></pre>
+
+<p><strong>detect float:</strong></p>
+
+<pre><code>&gt;&gt;&gt; isinstance("45.1", float)
+False
+&gt;&gt;&gt; isinstance(45.1, float)
+True
+</code></pre>
+<h4> Comment 92291470 user10460842: </h4>what is &quot;<code>ast</code>&quot;?<br><h4> Comment 116022854 user7075574: </h4>An <a href="https://imgur.com/jANQ7Ka.png" rel="nofollow noreferrer">insight</a> on the types<br><h4> Comment 116072385 Ramon: </h4>This fails under a test of <code>is_numeric(&quot;String 1&quot;)</code> Wrapped the method in try/except and works.<br>------------------------------------------------------------------ <br><h3> Answer 65164407 Siddharth Satpathy: </h3><p>In a most general case for a float, one would like to take care of integers and decimals. Let's take the string <code>&quot;1.1&quot;</code> as an example.</p>
+<p>I would try one of the following:</p>
+<p><strong>1.&gt;  <a href="https://docs.python.org/3/library/stdtypes.html" rel="noreferrer">isnumeric()</a></strong></p>
+<pre><code>word = &quot;1.1&quot;
+
+&quot;&quot;.join(word.split(&quot;.&quot;)).isnumeric()
+&gt;&gt;&gt; True
+</code></pre>
+<p><strong>2.&gt;  <a href="https://docs.python.org/3/library/stdtypes.html" rel="noreferrer">isdigit()</a></strong></p>
+<pre><code>word = &quot;1.1&quot;
+
+&quot;&quot;.join(word.split(&quot;.&quot;)).isdigit()
+&gt;&gt;&gt; True
+</code></pre>
+<p><strong>3.&gt;  <a href="https://docs.python.org/3/library/stdtypes.html" rel="noreferrer">isdecimal()</a></strong></p>
+<pre><code>word = &quot;1.1&quot;
+
+&quot;&quot;.join(word.split(&quot;.&quot;)).isdecimal()
+&gt;&gt;&gt; True
+</code></pre>
+<p><strong>Speed:</strong></p>
+<p>► All the aforementioned methods have similar speeds.</p>
+<pre><code>%timeit &quot;&quot;.join(word.split(&quot;.&quot;)).isnumeric()
+&gt;&gt;&gt; 257 ns ± 12 ns per loop (mean ± std. dev. of 7 runs, 1000000 loops each)
+
+%timeit &quot;&quot;.join(word.split(&quot;.&quot;)).isdigit()
+&gt;&gt;&gt; 252 ns ± 11 ns per loop (mean ± std. dev. of 7 runs, 1000000 loops each)
+
+%timeit &quot;&quot;.join(word.split(&quot;.&quot;)).isdecimal()
+&gt;&gt;&gt; 244 ns ± 7.17 ns per loop (mean ± std. dev. of 7 runs, 1000000 loops each)
+</code></pre>
+<h4> Comment 125231069 user3711502: </h4>For all of these examples, you&#39;re checking if 11 is a number, not 1.1<br><h4> Comment 129147382 kakyo: </h4>I find this the most elegant solution although in theory you are not testing the float &quot;value&quot;. What a shame on this piece of Python&#39;s str impl, so counterituitive.<br><h4> Comment 131306363 Toby Speight: </h4>You need to test some more inputs.  Try <code>1.1.1</code>, which is not a valid number.<br>------------------------------------------------------------------ <br><h3> Answer 9842626 a1an: </h3><p>So to put it all together, checking for Nan, infinity and complex numbers (it would seem they are specified with j, not i, i.e. 1+2j) it results in:</p>
+
+<pre><code>def is_number(s):
+    try:
+        n=str(float(s))
+        if n == "nan" or n=="inf" or n=="-inf" : return False
+    except ValueError:
+        try:
+            complex(s) # for complex
+        except ValueError:
+            return False
+    return True
+</code></pre>
+<h4> Comment 105648552 anish: </h4>So far the best answer. Thanks<br>------------------------------------------------------------------ <br><h3> Answer 56084922 David Ljung Madison Stellar: </h3><p>I think your solution is fine, but there <em>is</em> a correct regexp implementation.</p>
+
+<p>There does seem to be a lot of regexp hate towards these answers which I think is unjustified, regexps can be reasonably clean and correct and fast.  It really depends on what you're trying to do.  The original question was how can you "check if a string can be represented as a number (float)" (as per your title).  Presumably you would want to use the numeric/float value once you've checked that it's valid, in which case your try/except makes a lot of sense.  But if, for some reason, you just want to validate that a <em>string</em> is a <em>number</em> then a regex also works fine, but it's hard to get correct.  I think most of the regex answers so far, for example, do not properly parse strings without an integer part (such as ".7") which is a float as far as python is concerned.  And that's slightly tricky to check for in a single regex where the fractional portion is not required.  I've included two regex to show this.</p>
+
+<p>It does raise the interesting question as to what a "number" is.  Do you include "inf" which is valid as a float in python?  Or do you include numbers that are "numbers" but maybe can't be represented in python (such as numbers that are larger than the float max).</p>
+
+<p>There's also ambiguities in how you parse numbers.  For example, what about "--20"?  Is this a "number"?  Is this a legal way to represent "20"?  Python will let you do "var = --20" and set it to 20 (though really this is because it treats it as an expression), but float("--20") does not work.</p>
+
+<p>Anyways, without more info, here's a regex that I believe covers all the ints and floats <em>as python parses them</em>.</p>
+
+<pre><code># Doesn't properly handle floats missing the integer part, such as ".7"
+SIMPLE_FLOAT_REGEXP = re.compile(r'^[-+]?[0-9]+\.?[0-9]+([eE][-+]?[0-9]+)?$')
+# Example "-12.34E+56"      # sign (-)
+                            #     integer (12)
+                            #           mantissa (34)
+                            #                    exponent (E+56)
+
+# Should handle all floats
+FLOAT_REGEXP = re.compile(r'^[-+]?([0-9]+|[0-9]*\.[0-9]+)([eE][-+]?[0-9]+)?$')
+# Example "-12.34E+56"      # sign (-)
+                            #     integer (12)
+                            #           OR
+                            #             int/mantissa (12.34)
+                            #                            exponent (E+56)
+
+def is_float(str):
+  return True if FLOAT_REGEXP.match(str) else False
+</code></pre>
+
+<p>Some example test values:</p>
+
+<pre><code>True  &lt;- +42
+True  &lt;- +42.42
+False &lt;- +42.42.22
+True  &lt;- +42.42e22
+True  &lt;- +42.42E-22
+False &lt;- +42.42e-22.8
+True  &lt;- .42
+False &lt;- 42nope
+</code></pre>
+
+<p>Running the benchmarking code in @ron-reiter's <a href="https://stackoverflow.com/a/14352314/1795483">answer</a> shows that this regex is actually faster than the normal regex and is much faster at handling bad values than the exception, which makes some sense.  Results:</p>
+
+<pre><code>check_regexp with good floats: 18.001921
+check_regexp with bad floats: 17.861423
+check_regexp with strings: 17.558862
+check_correct_regexp with good floats: 11.04428
+check_correct_regexp with bad floats: 8.71211
+check_correct_regexp with strings: 8.144161
+check_replace with good floats: 6.020597
+check_replace with bad floats: 5.343049
+check_replace with strings: 5.091642
+check_exception with good floats: 5.201605
+check_exception with bad floats: 23.921864
+check_exception with strings: 23.755481
+</code></pre>
+<h4> Comment 98808130 David Ljung Madison Stellar: </h4>Hope that&#39;s right - would love to hear about any counter examples.  :)<br>------------------------------------------------------------------ <br><h3> Answer 61239204 zardosht: </h3><p><strong><a href="https://docs.python.org/3/library/stdtypes.html#str.isnumeric" rel="noreferrer"><code>str.isnumeric()</code></a></strong></p>
+
+<blockquote>
+  <p>Return <code>True</code> if all characters in the string are numeric characters,
+  and there is at least one character, <code>False</code> otherwise. Numeric
+  characters include digit characters, and all characters that have the
+  Unicode numeric value property, e.g. U+2155, VULGAR FRACTION ONE
+  FIFTH. Formally, numeric characters are those with the property value
+  Numeric_Type=Digit, Numeric_Type=Decimal or Numeric_Type=Numeric.</p>
+</blockquote>
+
+<p><strong><a href="https://docs.python.org/3/library/stdtypes.html#str.isdecimal" rel="noreferrer"><code>str.isdecimal()</code></a></strong></p>
+
+<blockquote>
+  <p>Return <code>True</code> if all characters in the string are decimal characters and
+  there is at least one character, <code>False</code> otherwise. Decimal characters
+  are those that can be used to form numbers in base 10, e.g. U+0660,
+  ARABIC-INDIC DIGIT ZERO. Formally a decimal character is a character
+  in the Unicode General Category “Nd”.</p>
+</blockquote>
+
+<p>Both available for string types from Python 3.0. </p>
+------------------------------------------------------------------ <br><h3> Answer 24559671 astrodsg: </h3><p>I needed to determine if a string cast into basic types (float,int,str,bool). After not finding anything on the internet I created this:</p>
+
+<pre><code>def str_to_type (s):
+    """ Get possible cast type for a string
+
+    Parameters
+    ----------
+    s : string
+
+    Returns
+    -------
+    float,int,str,bool : type
+        Depending on what it can be cast to
+
+    """    
+    try:                
+        f = float(s)        
+        if "." not in s:
+            return int
+        return float
+    except ValueError:
+        value = s.upper()
+        if value == "TRUE" or value == "FALSE":
+            return bool
+        return type(s)
+</code></pre>
+
+<p>Example</p>
+
+<pre><code>str_to_type("true") # bool
+str_to_type("6.0") # float
+str_to_type("6") # int
+str_to_type("6abc") # str
+str_to_type(u"6abc") # unicode       
+</code></pre>
+
+<p>You can capture the type and use it </p>
+
+<pre><code>s = "6.0"
+type_ = str_to_type(s) # float
+f = type_(s) 
+</code></pre>
+<h4> Comment 123560624 joanis: </h4>Good answer, but not fully general: <code>str_to_type(&quot;123e-4&quot;)</code> returns <code>int</code> while <code>float(&quot;123e-4&quot;)</code> returns <code>0.0123</code>. Also, <code>str_to_type(&quot;NaN&quot;)</code> returns <code>int</code>.<br><h4> Comment 123560818 joanis: </h4>Changing <code>if &quot;.&quot; not in s:</code> to <code>if &quot;.&quot; not in s and &quot;e&quot; not in s and &quot;N&quot; not in s:</code> fixes the cases I show here, but it makes the code clunkier and I&#39;m not sure it will catch all the cases.<br><h4> Comment 123560940 joanis: </h4>My preferred solution, and a safer one, is to use nested try/except statements: wrap <code>i = int(s); return int</code> into a first try/except, then put <code>f = float(s); return float</code> inside a second try/except, all the the except block of the first try/except. Like the structure of <a href="https://stackoverflow.com/a/26829047/3216427">user1508746&#39;s answer</a>, with different return values.<br>------------------------------------------------------------------ <br><h3> Answer 3912515 FxIII: </h3><p>I did some speed test. Lets say that if the string is <strong>likely</strong> to be a number the <em>try/except</em> strategy is the fastest possible.If the string is <strong>not likely</strong> to be a number <strong>and</strong> you are interested in <strong>Integer</strong> check, it worths to do some test (isdigit plus heading '-'). 
+If you are interested to check float number, you have to use the <em>try/except</em> code whitout escape.</p>
+------------------------------------------------------------------ <br><h3> Answer 17926244 philh: </h3><p>RyanN suggests</p>
+
+<blockquote>
+  <p>If you want to return False for a NaN and Inf, change line to x = float(s); return (x == x) and (x - 1 != x). This should return True for all floats except Inf and NaN</p>
+</blockquote>
+
+<p>But this doesn't quite work, because for sufficiently large floats, <code>x-1 == x</code> returns true. For example, <code>2.0**54 - 1 == 2.0**54</code></p>
+------------------------------------------------------------------ <br><h3> Answer 26829047 user1508746: </h3><p>I was working on a problem that led me to this thread, namely how to convert a collection of data to strings and numbers in the most intuitive way.  I realized after reading the original code that what I needed was different in two ways:</p>
+
+<p>1 - I wanted an integer result if the string represented an integer</p>
+
+<p>2 - I wanted a number or a string result to stick into a data structure</p>
+
+<p>so I adapted the original code to produce this derivative:</p>
+
+<pre><code>def string_or_number(s):
+    try:
+        z = int(s)
+        return z
+    except ValueError:
+        try:
+            z = float(s)
+            return z
+        except ValueError:
+            return s
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 51652091 xin.chen: </h3><pre><code>import re
+def is_number(num):
+    pattern = re.compile(r'^[-+]?[-0-9]\d*\.\d*|[-+]?\.?[0-9]\d*$')
+    result = pattern.match(num)
+    if result:
+        return True
+    else:
+        return False
+
+
+​&gt;&gt;&gt;: is_number('1')
+True
+
+&gt;&gt;&gt;: is_number('111')
+True
+
+&gt;&gt;&gt;: is_number('11.1')
+True
+
+&gt;&gt;&gt;: is_number('-11.1')
+True
+
+&gt;&gt;&gt;: is_number('inf')
+False
+
+&gt;&gt;&gt;: is_number('-inf')
+False
+</code></pre>
+<h4> Comment 90271171 Mark Dickinson: </h4>Do you not consider <code>1e6</code> to represent a number?<br>------------------------------------------------------------------ <br><h3> Answer 53800165 ravi tanwar: </h3><p>This code handles the exponents, floats, and integers, wihtout using regex.</p>
+
+<pre><code>return True if str1.lstrip('-').replace('.','',1).isdigit() or float(str1) else False
+</code></pre>
+<h4> Comment 131027098 ZygD: </h4>Error if string is encountered<br>------------------------------------------------------------------ <br><h3> Answer 1139186 Anil: </h3><p>Here's my simple way of doing it. Let's say that I'm looping through some strings and I want to add them to an array if they turn out to be numbers.</p>
+
+<pre><code>try:
+    myvar.append( float(string_to_check) )
+except:
+    continue
+</code></pre>
+
+<p>Replace the myvar.apppend with whatever operation you want to do with the string if it turns out to be a number. The idea is to try to use a float() operation and use the returned error to determine whether or not the string is a number.</p>
+<h4> Comment 26015940 DarwinSurvivor: </h4>You should move the append part of that function into an else statement to avoid accidentally triggering the exception should there be something wrong with the array.<br>------------------------------------------------------------------ <br><h3> Answer 40064255 mathfac: </h3><p>I also used the function you mentioned, but soon I notice that strings as "Nan", "Inf" and it's variation are considered as number. So I propose you improved version of your function, that will return false on those type of input and will not fail "1e3" variants:</p>
+
+<pre><code>def is_float(text):
+    try:
+        float(text)
+        # check for nan/infinity etc.
+        if text.isalpha():
+            return False
+        return True
+    except ValueError:
+        return False
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 57516860 Samantha Atkins: </h3><p>User helper function:</p>
+
+<pre><code>def if_ok(fn, string):
+  try:
+    return fn(string)
+  except Exception as e:
+    return None
+</code></pre>
+
+<p>then </p>
+
+<pre><code>if_ok(int, my_str) or if_ok(float, my_str) or if_ok(complex, my_str)
+is_number = lambda s: any([if_ok(fn, s) for fn in (int, float, complex)])
+</code></pre>
+<h4> Comment 126964235 not2qubit: </h4>Looks interesting, but please explain your solution and how to use it, with some input and output.<br>------------------------------------------------------------------ <br><h3> Answer 61014322 Amir Saniyan: </h3><pre><code>def is_float(s):
+    if s is None:
+        return False
+
+    if len(s) == 0:
+        return False
+
+    digits_count = 0
+    dots_count = 0
+    signs_count = 0
+
+    for c in s:
+        if '0' &lt;= c &lt;= '9':
+            digits_count += 1
+        elif c == '.':
+            dots_count += 1
+        elif c == '-' or c == '+':
+            signs_count += 1
+        else:
+            return False
+
+    if digits_count == 0:
+        return False
+
+    if dots_count &gt; 1:
+        return False
+
+    if signs_count &gt; 1:
+        return False
+
+    return True
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 68780861 Gru: </h3><p>I know I'm late to the party, but figured out a solution which wasn't here:
+This solution follows the <a href="https://docs.python.org/3.5/glossary.html#term-eafp" rel="nofollow noreferrer">EAFP principle</a> in Python</p>
+<pre class="lang-py prettyprint-override"><code>def get_number_from_string(value):
+    try:
+        int_value = int(value)
+        return int_value
+
+    except ValueError:
+        return float(value)
+</code></pre>
+<p>Explanation:</p>
+<p>If the value in the string is a <code>float</code> and I first try to parse it as an <code>int</code>, it will throw a <code>ValueError</code>. So, I catch that error and parse the value as <code>float</code> and return.</p>
+<h4> Comment 122786482 sinekonata: </h4>Wouldn&#39;t this fail again in the except block if value were a string like &quot;1.f&quot;?<br><h4> Comment 122798485 Gru: </h4>@sinekonata, it is assumed in the question that the number is present as a string.<br>------------------------------------------------------------------ <br><h3> Answer 70597776 Rafael Braga: </h3><p>One fast and simple option is to check the data type:</p>
+<pre><code>def is_number(value):
+    return type(value) in [int, float]
+</code></pre>
+<p>Or if you want to test if the values os a string are numeric:</p>
+<pre><code>def isNumber (value):
+    return True if type(value) in [int, float] else str(value).replace('.','',1).isdigit()
+</code></pre>
+<p>tests:</p>
+<pre><code>&gt;&gt;&gt; isNumber(1)
+True
+
+&gt;&gt;&gt; isNumber(1/3)
+True
+
+&gt;&gt;&gt; isNumber(1.3)
+True
+
+&gt;&gt;&gt; isNumber('1.3')
+True
+
+&gt;&gt;&gt; isNumber('s1.3')
+False
+</code></pre>
+<h4> Comment 125170260 john k: </h4>what about e for exponent?<br><h4> Comment 126683833 Rafael Braga: </h4>yeap, @johnktejik That can be a problem. This function will return false to strings like &#39;1.54-e8&#39; and &#39;0X45&#39;. For this kind of number you can use regex to correct the issue.<br>------------------------------------------------------------------ <br><h3> Answer 68410683 Micka: </h3><p>For my very simple and very common use-case: <code>is this human written string with keyboard a number</code>?</p>
+<p>I read through most answers, and ended up with:</p>
+<pre><code>def isNumeric(string):
+    result = True
+    try:
+        x = float(string)
+       result = (x == x) and (x - 1 != x)
+    except ValueError:
+        result = False
+    return result
+</code></pre>
+<p>It will return False for <code>(+-)NaN</code> and <code>(+-)inf</code>.</p>
+<p>You can check it out here: <a href="https://trinket.io/python/ce32c0e54e" rel="nofollow noreferrer">https://trinket.io/python/ce32c0e54e</a></p>
+------------------------------------------------------------------ <br><h3> Answer 74580030 Amit: </h3><p>There are already good answers in this post. I wanted to give a slightly different perspective.</p>
+<p>Instead of searching for a digit, number or float we could do a negative search for an alphabet. i.e. we could ask the program to look if it is not alphabet.</p>
+<pre class="lang-py prettyprint-override"><code>## Check whether it is not alpha rather than checking if it is digit
+print(not &quot;-1.2345&quot;.isalpha())
+print(not &quot;-1.2345e-10&quot;.isalpha())
+</code></pre>
+<p>It will work well if you are sure that your string is a well formed number (Condition 1 and Condition 2 below). However it will fail if the string is not a well formed number by mistake. In such a case it will return a number match even if the string was not a valid number. To take care of this situation, there are many rule based methods must be there. However at this moment, regex comes to my mind. Below are three cases. Please note regex can be much better since I am not a regex expert. Below there are two lists: one for valid numbers and one for invalid numbers. Valid numbers must be picked up while the invalid numbers must not be.</p>
+<p>== Condition 1: String is guranteed to be a valid number but 'inf' is not picked ==</p>
+<pre class="lang-py prettyprint-override"><code>Valid_Numbers = [&quot;1&quot;,&quot;-1&quot;,&quot;+1&quot;,&quot;0.0&quot;,&quot;.1&quot;,&quot;1.2345&quot;,&quot;-1.2345&quot;,&quot;+1.2345&quot;,&quot;1.2345e10&quot;,&quot;1.2345e-10&quot;,&quot;-1.2345e10&quot;,&quot;-1.2345E10&quot;,&quot;-inf&quot;]
+Invalid_Numbers = [&quot;1.1.1&quot;,&quot;++1&quot;,&quot;--1&quot;,&quot;-1-1&quot;,&quot;1.23e10e5&quot;,&quot;--inf&quot;]
+
+################################ Condition 1: Valid number excludes 'inf' ####################################
+
+Case_1_Positive_Result = list(map(lambda x: not x.isalpha(),Valid_Numbers))
+print(&quot;The below must all be True&quot;)
+print(Case_1_Positive_Result)
+
+## This check assumes a valid number. So it fails for the negative cases and wrongly detects string as number
+Case_1_Negative_Result = list(map(lambda x: not x.isalpha(),Invalid_Numbers))
+print(&quot;The below must all be False&quot;)
+print(Case_1_Negative_Result)
+</code></pre>
+<pre class="lang-bash prettyprint-override"><code>The below must all be True
+[True, True, True, True, True, True, True, True, True, True, True, True, True]
+The below must all be False
+[True, True, True, True, True, True]
+</code></pre>
+<p>== Condition 2: String is guranteed to be a valid number and  'inf' is picked ==</p>
+<pre class="lang-py prettyprint-override"><code>################################ Condition 2: Valid number includes 'inf'  ###################################
+Case_2_Positive_Result = list(map(lambda x: x==&quot;inf&quot; or not x.isalpha(),Valid_Numbers+[&quot;inf&quot;]))
+print(&quot;The below must all be True&quot;)
+print(Case_2_Positive_Result)
+
+## This check assumes a valid number. So it fails for the negative cases and wrongly detects string as number
+Case_2_Negative_Result = list(map(lambda x: x==&quot;inf&quot; or not x.isalpha(),Invalid_Numbers+[&quot;++inf&quot;]))
+print(&quot;The below must all be False&quot;)
+print(Case_2_Negative_Result)
+</code></pre>
+<pre class="lang-bash prettyprint-override"><code>The below must all be True
+[True, True, True, True, True, True, True, True, True, True, True, True, True, True]
+The below must all be False
+[True, True, True, True, True, True, True]
+</code></pre>
+<p>== Condition 3: String is not guranteed to be a valid number ==</p>
+<pre class="lang-py prettyprint-override"><code>import re
+CompiledPattern = re.compile(r&quot;([+-]?(inf){1}$)|([+-]?[0-9]*\.?[0-9]*$)|([+-]?[0-9]*\.?[0-9]*[eE]{1}[+-]?[0-9]*$)&quot;)
+Case_3_Positive_Result = list(map(lambda x: True if CompiledPattern.match(x) else False,Valid_Numbers+[&quot;inf&quot;]))
+print(&quot;The below must all be True&quot;)
+print(Case_3_Positive_Result)
+
+## This check assumes a valid number. So it fails for the negative cases and wrongly detects string as number
+Case_3_Negative_Result = list(map(lambda x: True if CompiledPattern.match(x) else False,Invalid_Numbers+[&quot;++inf&quot;]))
+print(&quot;The below must all be False&quot;)
+print(Case_3_Negative_Result)
+</code></pre>
+<pre class="lang-bash prettyprint-override"><code>The below must all be True
+[True, True, True, True, True, True, True, True, True, True, True, True, True, True]
+The below must all be False
+[False, False, False, False, False, False, False]
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 16743970 Thruston: </h3><p>You can generalize the exception technique in a useful way by returning more useful values than True and False.  For example this function puts quotes round strings but leaves numbers alone.  Which is just what I needed for a quick and dirty filter to make some variable definitions for R. </p>
+
+<pre><code>import sys
+
+def fix_quotes(s):
+    try:
+        float(s)
+        return s
+    except ValueError:
+        return '"{0}"'.format(s)
+
+for line in sys.stdin:
+    input = line.split()
+    print input[0], '&lt;- c(', ','.join(fix_quotes(c) for c in input[1:]), ')'
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 30549042 TheRedstoneLemon: </h3><p>Try this.</p>
+
+<pre><code> def is_number(var):
+    try:
+       if var == int(var):
+            return True
+    except Exception:
+        return False
+</code></pre>
+<h4> Comment 52059920 geotheory: </h4>Fails to respond with <code>is_number(&#39;10&#39;)</code><br><h4> Comment 61629541 Solomon Ucko: </h4>@geotheory, what do you mean &quot;fails to respond&quot;?<br>------------------------------------------------------------------ <br><h3> Answer 66309594 DJ Swarm: </h3><p>Sorry for the Zombie thread post - just wanted to round out the code for completeness...</p>
+<pre><code># is_number() function - Uses re = regex library
+# Should handle all normal and complex numbers
+# Does not accept trailing spaces. 
+# Note: accepts both engineering &quot;j&quot; and math &quot;i&quot; but only the imaginary part &quot;+bi&quot; of a complex number a+bi
+# Also accepts inf or NaN
+# Thanks to the earlier responders for most the regex fu
+
+import re
+
+ISNUM_REGEXP = re.compile(r'^[-+]?([0-9]+|[0-9]*\.[0-9]+)([eE][-+]?[0-9]+)?[ij]?$')
+
+def is_number(str):
+#change order if you have a lot of NaN or inf to parse
+    if ISNUM_REGEXP.match(str) or str == &quot;NaN&quot; or str == &quot;inf&quot;: 
+        return True 
+    else:
+        return False
+# A couple test numbers
+# +42.42e-42j
+# -42.42E+42i
+
+print('Is it a number?', is_number(input('Gimme any number: ')))
+</code></pre>
+<p>Gimme any number: +42.42e-42j</p>
+<p>Is it a number? True</p>
+------------------------------------------------------------------ <br><h3> Answer 75713058 Blue Phoenix: </h3><p>My short answer is:
+may be duplicated one, sorry for that
+...
+def is_float(s):
+if s.isdigit():
+return False
+try:
+float(s)
+return True
+except Exception as e:
+return False</p>
+------------------------------------------------------------------ <br><h3> Answer 76667426 dogdog: </h3><pre><code>def is_number(x:str):
+    x = x.replace(&quot;.&quot;, &quot;&quot;, 1)
+    if x.startswith(&quot;-&quot;):
+        x = x[1:]
+    return x.isdigit()
+
+if __name__ == '__main__':
+    for si in [&quot;123.456&quot;, &quot;-123.456&quot;, &quot;123&quot;, &quot;-123&quot;, &quot;--123&quot;, &quot;a123&quot;, &quot;123a&quot;]:
+        print(si, is_number(si))
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 49343274 Alex Pinto: </h3><p>I have a similar problem. Instead of defining a isNumber function, I want to convert a list of strings to floats, something that in high-level terms would be:</p>
+
+<pre><code>[ float(s) for s in list if isFloat(s)]
+</code></pre>
+
+<p>It is a given we can not really separate the float(s) from the isFloat(s) functions: these two results should be returned by the same function. 
+Also, if float(s) fails, the whole process fails, instead of just ignoring the faulty element. Plus, "0" is a valid number and should be included in the list. When filtering out bad elements, be certain not to exclude 0.</p>
+
+<p>Therefore, the above comprehension must be modified somehow to:</p>
+
+<ul>
+<li>if any element in the list cannot be converted, ignore it and don't throw an exception</li>
+<li>avoid calling float(s) more than once for each element (one for the conversion, the other for the test)</li>
+<li>if the converted value is 0, it should still be present in the final list </li>
+</ul>
+
+<p>I propose a solution inspired in the Nullable numerical types of C#. These types are internally represented by a struct that has the numerical value and adds a boolean indicating if the value is valid:</p>
+
+<pre><code>def tryParseFloat(s):
+    try:
+        return(float(s), True)
+    except:
+        return(None, False)
+
+tupleList = [tryParseFloat(x) for x in list]
+floats = [v for v,b in tupleList if b]
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 42437198 donald: </h3><p>use following it handles all cases:-</p>
+
+<pre><code>import re
+a=re.match('((\d+[\.]\d*$)|(\.)\d+$)' ,  '2.3') 
+a=re.match('((\d+[\.]\d*$)|(\.)\d+$)' ,  '2.')
+a=re.match('((\d+[\.]\d*$)|(\.)\d+$)' ,  '.3')
+a=re.match('((\d+[\.]\d*$)|(\.)\d+$)' ,  '2.3sd')
+a=re.match('((\d+[\.]\d*$)|(\.)\d+$)' ,  '2.3')
+</code></pre>

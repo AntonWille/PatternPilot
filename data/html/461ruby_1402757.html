@@ -1,0 +1,299 @@
+ <h2> Title: How to break out from a ruby block? </h2> <h3> user169930, question_id: 1402757 </h3>Score: 461, Tags: {ruby} <br><p>Here is <code>Bar#do_things</code>:</p>
+
+<pre><code>class Bar   
+  def do_things
+    Foo.some_method(x) do |x|
+      y = x.do_something
+      return y_is_bad if y.bad? # how do i tell it to stop and return do_things? 
+      y.do_something_else
+    end
+    keep_doing_more_things
+  end
+end
+</code></pre>
+
+<p>And here is <code>Foo#some_method</code>: </p>
+
+<pre><code>class Foo
+  def self.some_method(targets, &amp;block)
+    targets.each do |target|
+      begin
+        r = yield(target)
+      rescue 
+        failed &lt;&lt; target
+      end
+    end
+  end
+end
+</code></pre>
+
+<p>I thought about using raise, but I am trying to make it generic, so I don't want to put anything any specific in <code>Foo</code>.</p>
+------------------------------------------------------------------ <br><h3> Answer 1402764 JRL: </h3><p>Use the keyword  <code>next</code>. If you do not want to continue to the next item, use <code>break</code>.</p>
+
+<p>When <code>next</code> is used within a block, it causes the block to exit immediately, returning control to the iterator method, which may then begin a new iteration by invoking the block again:</p>
+
+<pre><code>f.each do |line|              # Iterate over the lines in file f
+  next if line[0,1] == "#"    # If this line is a comment, go to the next
+  puts eval(line)
+end
+</code></pre>
+
+<p>When used in a block, <code>break</code> transfers control out of the block, out of the iterator that invoked the block, and to the first expression following the invocation of the iterator:</p>
+
+<pre><code>f.each do |line|             # Iterate over the lines in file f
+  break if line == "quit\n"  # If this break statement is executed...
+  puts eval(line)
+end
+puts "Good bye"              # ...then control is transferred here
+</code></pre>
+
+<p>And finally, the usage of <code>return</code> in a block:</p>
+
+<p><code>return</code> always causes the enclosing method to return, regardless of how deeply nested within blocks it is (except in the case of lambdas):</p>
+
+<pre><code>def find(array, target)
+  array.each_with_index do |element,index|
+    return index if (element == target)  # return from find
+  end
+  nil  # If we didn't find the element, return nil
+end
+</code></pre>
+<h4> Comment 37026229 Ajedi32: </h4>There&#39;s also a keyword called <code>redo</code>, which basically just moves execution back to the top of the block within the current iteration.<br><h4> Comment 21136794 finiteloop: </h4><code>next</code>, <code>break</code>, <code>return</code>, you can&#39;t compare<br><h4> Comment 1244303 user169930: </h4>thanks, but next only moves to the next item in the array. is it possible to exit?<br><h4> Comment 69183037 Sam YC: </h4>hi, <code>returning control to the iterator method</code>, if the method that execute the block doesn&#39;t have iterator outside, how <code>next, break</code> behave? Are they the same?<br><h4> Comment 1244469 Marcel Jackwerth: </h4>You have to call next with the return value. &quot;def f; x = yield; puts x; end&quot; &quot;f do next 3; puts &quot;o&quot;; end&quot; This prints 3 (but no &quot;o&quot;) on the console.<br><h4> Comment 24615640 Tyler Holien: </h4>I added an answer expanding on the comment @MarcelJackwerth added about using <code>next</code> or <code>break</code> with an argument.<br><h4> Comment 51581322 red-o-alf: </h4>A little side question: would it still be ok to use break in a File block like this: <code>File.foreach(filename) { break if condition }</code> ? Would that leave the file opened?<br>------------------------------------------------------------------ <br><h3> Answer 10117277 Don Law: </h3><p>I wanted to just be able to break out of a block - sort of like a forward goto, not really related to a loop.  In fact, I want to break of of a block that is in a loop without terminating the loop.  To do that, I made the block a one-iteration loop:</p>
+
+<pre><code>for b in 1..2 do
+    puts b
+    begin
+        puts 'want this to run'
+        break
+        puts 'but not this'
+    end while false
+    puts 'also want this to run'
+end
+</code></pre>
+
+<p>Hope this helps the next googler that lands here based on the subject line.</p>
+<h4> Comment 18799795 Alex Nye: </h4>This was the only response that answered the question as it was put.  Deserves more points.  Thanks.<br><h4> Comment 36841056 G. Allen Morris III: </h4>This works the same for both break and next.  If the false is changed to true then next will stay in the look and break will break out.<br>------------------------------------------------------------------ <br><h3> Answer 11678342 Tyler Holien: </h3><p>If you want your block to return a useful value (e.g. when using <code>#map</code>, <code>#inject</code>, etc.), <code>next</code> and <code>break</code> also accept an argument.</p>
+
+<p>Consider the following:</p>
+
+<pre><code>def contrived_example(numbers)
+  numbers.inject(0) do |count, x|
+    if x % 3 == 0
+      count + 2
+    elsif x.odd?
+      count + 1
+    else 
+      count
+    end
+  end
+end
+</code></pre>
+
+<p>The equivalent using <code>next</code>:</p>
+
+<pre><code>def contrived_example(numbers)
+  numbers.inject(0) do |count, x|
+    next count if x.even?
+    next (count + 2) if x % 3 == 0
+    count + 1
+  end
+end
+</code></pre>
+
+<p>Of course, you could always extract the logic needed into a method and call that from inside your block:</p>
+
+<pre><code>def contrived_example(numbers)
+  numbers.inject(0) { |count, x| count + extracted_logic(x) }
+end
+
+def extracted_logic(x)
+  return 0 if x.even?
+  return 2 if x % 3 == 0
+  1
+end
+</code></pre>
+<h4> Comment 38226910 Mike Graf: </h4>could you please update w/ a specific example using <code>break</code> (probably just replace one of your <code>next</code> with <code>break</code> ..<br><h4> Comment 33420563 rkallensee: </h4>Thanks for the hint with the argument for <code>break</code>!<br><h4> Comment 67836476 akostadinov: </h4>One very interesting thing. <code>break something</code> works, <code>break(something)</code> works but <code>true &amp;&amp; break(somehting)</code> yields a syntax error. Just FYI. If condition is needed, then <code>if</code> or <code>unless</code> needs to be used.<br>------------------------------------------------------------------ <br><h3> Answer 1402889 AShelly: </h3><p>use the keyword <code>break</code> instead of <code>return</code></p>
+------------------------------------------------------------------ <br><h3> Answer 1403781 August Lilleaas: </h3><p>Perhaps you can use the built-in methods for finding particular items in an Array, instead of <code>each</code>-ing <code>targets</code> and doing everything by hand. A few examples:</p>
+
+<pre><code>class Array
+  def first_frog
+    detect {|i| i =~ /frog/ }
+  end
+
+  def last_frog
+    select {|i| i =~ /frog/ }.last
+  end
+end
+
+p ["dog", "cat", "godzilla", "dogfrog", "woot", "catfrog"].first_frog
+# =&gt; "dogfrog"
+p ["hats", "coats"].first_frog
+# =&gt; nil
+p ["houses", "frogcars", "bottles", "superfrogs"].last_frog
+# =&gt; "superfrogs"
+</code></pre>
+
+<p>One example would be doing something like this:</p>
+
+<pre><code>class Bar
+  def do_things
+    Foo.some_method(x) do |i|
+      # only valid `targets` here, yay.
+    end
+  end
+end
+
+class Foo
+  def self.failed
+    @failed ||= []
+  end
+
+  def self.some_method(targets, &amp;block)
+    targets.reject {|t| t.do_something.bad? }.each(&amp;block)
+  end
+end
+</code></pre>
+<h4> Comment 18622021 wberry: </h4>Rails does it, so why can&#39;t he?<br><h4> Comment 63492214 blm768: </h4>@wberry That&#39;s not to say that it necessarily <i>should</i>. ;) In general, though, it&#39;s best to avoid monkey patching core classes unless you have a pretty good reason (i.e. adding some very useful <i>generalizable</i> functionality that lots of other code will find useful). Even then, tread lightly because once a class is heavily monkey-patched, it&#39;s easy for libraries to start walking over each other and causing some extremely odd behavior.<br><h4> Comment 17755261 mrbrdo: </h4>Don&#39;t add arbitrary methods like that to the Array class! That&#39;s really bad practice.<br>------------------------------------------------------------------ <br><h3> Answer 23922630 G. Allen Morris III: </h3><p><code>next</code> and <code>break</code> seem to do the correct thing in this simplified example!</p>
+
+<pre><code>class Bar
+  def self.do_things
+      Foo.some_method(1..10) do |x|
+            next if x == 2
+            break if x == 9
+            print "#{x} "
+      end
+  end
+end
+
+class Foo
+    def self.some_method(targets, &amp;block)
+      targets.each do |target|
+        begin
+          r = yield(target)
+        rescue  =&gt; x
+          puts "rescue #{x}"
+        end
+     end
+   end
+end
+
+Bar.do_things
+</code></pre>
+
+<p>output: 1 3 4 5 6 7 8</p>
+<h4> Comment 59742546 Ben Aubin: </h4>break ends immediately - next continues to the next iteration.<br>------------------------------------------------------------------ <br><h3> Answer 71075077 smithkm: </h3><p>You have four ways to unwind the stack in 'non-exceptional' ways:  <code>next</code>, <code>break</code>, <code>return</code>, and <code>throw</code>.</p>
+<p><code>next</code> will cause the block to return.</p>
+<p><code>break</code> will cause the method that yielded to the block to return.</p>
+<p><code>return</code> will cause the method where the block is defined to return.</p>
+<p><code>throw</code> will traverse up the stack until it finds a <code>catch</code> with a matching symbol, and cause that to return.  This is much like a 'lightweight' exception for non-exceptional situations.</p>
+<p>All of them can take a return value that will be returned by whatever they caused to return instead of the value their last expression which they would return normally.</p>
+<p>Here are some examples:</p>
+<pre class="lang-rb prettyprint-override"><code>def doSomething
+  puts &quot;&gt; doSomething&quot;
+  yield
+  puts &quot;&lt; doSomething&quot;
+end
+
+def withNext
+  puts &quot;&gt; withNext&quot;
+  doSomething do
+    puts &quot;&gt; block&quot;
+    puts &quot;* NEXT! causes the block to return to doSomething&quot;
+    next
+    puts &quot;&lt; block&quot;
+  end
+  puts &quot;&lt; withNext&quot;
+end
+
+def withBreak
+  puts &quot;&gt; withBreak&quot;
+  doSomething do
+    puts &quot;&gt; block&quot;
+    puts &quot;* BREAK! causes doSomething to return to withBreak&quot;
+    break
+    puts &quot;&lt; block&quot;
+  end
+  puts &quot;&lt; withBreak&quot;
+end
+
+def withReturn
+  puts &quot;&gt; withReturn&quot;
+  doSomething do
+    puts &quot;&gt; block&quot;
+    puts &quot;* RETURN! causes withReturn to return&quot;
+    return
+    puts &quot;&lt; block&quot;
+  end
+  puts &quot;&lt; withReturn&quot;
+end
+
+def withThrow
+  puts &quot;&gt; withThrow&quot;
+  catch :label do
+    puts &quot;&gt; catch :label&quot;
+    doSomething do
+      puts &quot;&gt; block 1&quot;
+      doSomething do
+        puts &quot;&gt; block 2&quot;
+        puts &quot;* THROW! causes catch :label to return to withThrow&quot;
+        throw :label
+        puts &quot;&lt; block 2&quot;
+      end
+      puts &quot;&lt; block 1&quot;
+    end
+    puts &quot;&lt; catch :label&quot;
+  end
+  puts &quot;&lt; withThrow&quot;
+end
+
+withNext
+puts &quot;* Done&quot;
+puts
+withBreak
+puts &quot;* Done&quot;
+puts
+withReturn
+puts &quot;* Done&quot;
+puts
+withThrow
+puts &quot;* Done&quot;
+</code></pre>
+<p>output:</p>
+<pre><code>&gt; withNext
+&gt; doSomething
+&gt; block
+* NEXT! causes the block to return to doSomething
+&lt; doSomething
+&lt; withNext
+* Done
+
+&gt; withBreak
+&gt; doSomething
+&gt; block
+* BREAK! causes doSomething to return to withBreak
+&lt; withBreak
+* Done
+
+&gt; withReturn
+&gt; doSomething
+&gt; block
+* RETURN! causes withReturn to return
+* Done
+
+&gt; withThrow
+&gt; catch :label
+&gt; doSomething
+&gt; block 1
+&gt; doSomething
+&gt; block 2
+* THROW! causes catch :label to return to withThrow
+&lt; withThrow
+* Done
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 44524785 Kiry Meas: </h3><p>To break out from a ruby block simply use <s><code>return</code> keyword <code>return if value.nil?</code></s> <code>next</code>.</p>
+<ul>
+<li><code>next</code> terminates lambda, block, or proc it is in.</li>
+<li><code>break</code> terminates the method that yielded to the block or invoked the proc or lambda it is in.</li>
+</ul>
+<p>Credit to: <a href="https://medium.com/tilthat/ruby-block-return-break-next-101815cda709" rel="nofollow noreferrer">Ruby block return, break, next</a></p>
+<h4> Comment 81495981 interestedparty333: </h4>Doesn&#39;t <code>return</code> exit the function?<br><h4> Comment 126420103 Almokhtar: </h4>shouldn&#39;t use return to exit a block in ruby !<br><h4> Comment 126435648 Kiry Meas: </h4>I stand corrected.<br>

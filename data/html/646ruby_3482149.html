@@ -1,0 +1,174 @@
+ <h2> Title: How do I pick randomly from an array? </h2> <h3> Paul Hoffer, question_id: 3482149 </h3>Score: 646, Tags: {ruby,arrays,random} <br><p>I want to know if there is a much cleaner way of doing this. Basically, I want to pick a random element from an array of variable length.  Normally, I would do it like this:</p>
+
+<pre><code>myArray = ["stuff", "widget", "ruby", "goodies", "java", "emerald", "etc" ]
+item = myArray[rand(myarray.length)]
+</code></pre>
+
+<p>Is there something that is more readable / simpler to replace the second line? Or is that the best way to do it. I suppose you could do <code>myArray.shuffle.first</code>, but I only saw <code>#shuffle</code> a few minutes ago on SO, I haven't actually used it yet.</p>
+<h4> Comment 10618864 Derek Organ: </h4>Good Answer below but a general point about shuffle. I would imagine suffling the full array would be much more intensive than just getting a random number so it wouldn&#39;t be a good direction to go.<br>------------------------------------------------------------------ <br><h3> Answer 3483802 Marc-Andr&#233; Lafortune: </h3><p>Just use <a href="http://ruby-doc.org/core-1.9.3/Array.html#method-i-sample" rel="noreferrer"><code>Array#sample</code></a>:</p>
+
+<pre><code>[:foo, :bar].sample # =&gt; :foo, or :bar :-)
+</code></pre>
+
+<p>It is available in Ruby 1.9.1+. To be also able to use it with an earlier version of Ruby, you could  <a href="https://github.com/marcandre/backports" rel="noreferrer"><code>require "backports/1.9.1/array/sample"</code></a>.</p>
+
+<p>Note that in Ruby 1.8.7 it exists under the unfortunate name <code>choice</code>; it was renamed in later version so you shouldn't use that.</p>
+
+<p>Although not useful in this case, <code>sample</code> accepts a number argument in case you want a number of distinct samples.</p>
+<h4> Comment 31070630 Marc-Andr&#233; Lafortune: </h4>@Purplejacket: Yes, but it might not be the best way to do this. <code>ActiveRecord::Relation</code> will delegate the call to an array, so it will load all the records and then pick one randomly.<br><h4> Comment 3639623 Paul Hoffer: </h4>I should have known that you would have a perfect answer for me (since most Ruby questions I browse here have your input somewhere). I am glad you pointed out the versioning; I am using 1.9.2. apidock (mladen&#39;s comment) does not have sample; neither does ruby-doc. In your opinion, what is the best reference for Ruby, updated to 1.9?<br><h4> Comment 31071526 Purplejacket: </h4>@Marc-Andr&#233;Lafortune: that is an excellent point!!  A more optimized approach might be some inline SQL combined with this:  <a href="http://stackoverflow.com/questions/580639/how-to-randomly-select-rows-in-sql" title="how to randomly select rows in sql">stackoverflow.com/questions/580639/&hellip;</a><br><h4> Comment 31052451 Purplejacket: </h4>Conveniently, you can also use <code>sample</code> on an <code>ActiveRecord::Relation</code>; e.g. <code>@joe.pencils.sample</code> will randomly choose a writing implement from Joe&#39;s pencil collection (assuming normal Rails stuff here).<br><h4> Comment 19438552 Henley Wing Chiu: </h4>.sample is such an non obvious method name. I loved choice much better. Change it back Ruby developers!<br>------------------------------------------------------------------ <br><h3> Answer 17469994 beesasoh: </h3><p><code>myArray.sample(x)</code> can also help you to get x random elements from the array.</p>
+<h4> Comment 82265147 Ekkstein: </h4>@Redithion It&#39;s also worth noting, that the difference between: my_array.sample(1) == [sample] and my_array.sample == sample to provide explicitly what you mean<br>------------------------------------------------------------------ <br><h3> Answer 19220172 Mike Rapadas: </h3><h1>Random Number of Random Items from an Array</h1>
+<pre><code>def random_items(array)
+  array.sample(1 + rand(array.count))
+end
+</code></pre>
+<hr />
+<h3>Examples of possible results:</h3>
+<pre><code>my_array = [&quot;one&quot;, &quot;two&quot;, &quot;three&quot;]
+my_array.sample(1 + rand(my_array.count))
+
+=&gt; [&quot;two&quot;, &quot;three&quot;]
+=&gt; [&quot;one&quot;, &quot;three&quot;, &quot;two&quot;]
+=&gt; [&quot;two&quot;]
+</code></pre>
+<h4> Comment 66481455 sawa: </h4>This would never return an empty array. You need to place <code>1 +</code> in a different place.<br><h4> Comment 39914257 Mike Rapadas: </h4>@fwilson random collections of objects in any order. Also good for testing different combinations or generating stub data<br><h4> Comment 57635263 Tim Kretschmer: </h4>why not extend class Array ? [].total_random  would be way cooler. comeon its ruby. its objective!<br>------------------------------------------------------------------ <br><h3> Answer 19509009 JJ21: </h3><pre><code>myArray.sample
+</code></pre>
+
+<p>will return 1 random value.</p>
+
+<pre><code>myArray.shuffle.first
+</code></pre>
+
+<p>will also return 1 random value.</p>
+<h4> Comment 30379975 superluminary: </h4>The shuffle is superfluous.<br><h4> Comment 41654362 Filip Bartuzi: </h4>Technically this random method is correct too <a href="http://stackoverflow.com/a/84747/2047418">stackoverflow.com/a/84747/2047418</a><br>------------------------------------------------------------------ <br><h3> Answer 72889471 random_user_0891: </h3><p>Here are some benchmark tests I performed on some of the answers posted here, using <code>sample</code> was consistently faster than the rest.</p>
+<pre><code>test_arr = [&quot;stuff&quot;, &quot;widget&quot;, &quot;ruby&quot;, &quot;goodies&quot;, &quot;java&quot;, &quot;emerald&quot; ]
+
+Benchmark.ips do |x|
+  x.report(&quot;1 - sample&quot;) { test_arr.sample }
+  x.report(&quot;2 - shuffle&quot;) { test_arr.shuffle.first }
+  x.report(&quot;3 - length&quot;) { rand(test_arr.length) }
+  x.report(&quot;4 - rand rand&quot;) { test_arr.sample(1 + rand(test_arr.count)) }
+  x.report(&quot;5 - rand el&quot;) { test_arr[rand(test_arr.count)]}
+  x.report(&quot;6 - switch&quot;) { 
+    case rand(0..test_arr.length)      
+    when 0
+      test_arr[0]
+    when 1
+      test_arr[1]
+    when 2
+      test_arr[2]
+    when 3
+      test_arr[3]
+    when 4
+      test_arr[4]
+    when 5
+      test_arr[5]
+    end 
+  }  
+
+  x.compare!
+</code></pre>
+<p>The tests were run on a MacBook Pro (15-inch, 2018), 2.6 GHz 6-Core Intel Core i7, 32 GB 2400 MHz DDR4</p>
+<pre><code>Warming up --------------------------------------
+          1 - sample   713.455k i/100ms
+         2 - shuffle   253.848k i/100ms
+          3 - length   489.078k i/100ms
+       4 - rand rand   236.396k i/100ms
+         5 - rand el   447.244k i/100ms
+          6 - switch   419.272k i/100ms
+Calculating -------------------------------------
+          1 - sample      7.505M (± 3.2%) i/s -     37.813M in   5.044078s
+         2 - shuffle      2.661M (± 2.1%) i/s -     13.454M in   5.057659s
+          3 - length      5.021M (± 1.6%) i/s -     25.432M in   5.066159s
+       4 - rand rand      2.352M (± 2.4%) i/s -     11.820M in   5.029415s
+         5 - rand el      4.452M (± 2.2%) i/s -     22.362M in   5.025623s
+          6 - switch      4.324M (± 1.1%) i/s -     21.802M in   5.043294s
+
+Comparison:
+          1 - sample:  7504636.7 i/s
+          3 - length:  5021326.6 i/s - 1.49x  (± 0.00) slower
+         5 - rand el:  4452078.6 i/s - 1.69x  (± 0.00) slower
+          6 - switch:  4323511.6 i/s - 1.74x  (± 0.00) slower
+         2 - shuffle:  2661267.7 i/s - 2.82x  (± 0.00) slower
+       4 - rand rand:  2351630.7 i/s - 3.19x  (± 0.00) slower
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 51099098 Muhammad Aamir: </h3><pre><code>arr = [1,9,5,2,4,9,5,8,7,9,0,8,2,7,5,8,0,2,9]
+arr[rand(arr.count)]
+</code></pre>
+
+<p>This will return a random element from array.</p>
+
+<p>If You will use the line mentioned below</p>
+
+<pre><code>arr[1+rand(arr.count)]
+</code></pre>
+
+<p>then in some cases it will return 0 or nil value.</p>
+
+<p>The line mentioned below</p>
+
+<pre><code>rand(number)
+</code></pre>
+
+<p>always return the value from 0 to number-1.</p>
+
+<p>If we use</p>
+
+<pre><code>1+rand(number)
+</code></pre>
+
+<p>then it may return number and arr[number] contains no element.</p>
+------------------------------------------------------------------ <br><h3> Answer 57063185 Charon IV: </h3><pre><code>class String
+
+  def black
+    return "\e[30m#{self}\e[0m"
+  end
+
+  def red
+    return "\e[31m#{self}\e[0m"
+  end
+
+  def light_green
+    return "\e[32m#{self}\e[0m"
+  end
+
+  def purple
+    return "\e[35m#{self}\e[0m"
+  end
+
+  def blue_dark
+    return "\e[34m#{self}\e[0m"
+  end
+
+  def blue_light
+    return "\e[36m#{self}\e[0m"
+  end
+
+  def white
+    return "\e[37m#{self}\e[0m"
+  end
+
+
+  def randColor
+    array_color = [
+      "\e[30m#{self}\e[0m",
+      "\e[31m#{self}\e[0m",
+      "\e[32m#{self}\e[0m",
+      "\e[35m#{self}\e[0m",
+      "\e[34m#{self}\e[0m",
+      "\e[36m#{self}\e[0m",
+      "\e[37m#{self}\e[0m" ]
+
+      return array_color[rand(0..array_color.size)]
+  end
+
+
+end
+puts "black".black
+puts "red".red
+puts "light_green".light_green
+puts "purple".purple
+puts "dark blue".blue_dark
+puts "light blue".blue_light
+puts "white".white
+puts "random color".randColor
+</code></pre>

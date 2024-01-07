@@ -1,0 +1,228 @@
+ <h2> Title: Using output from a previous job in a new one in a GitHub Action </h2> <h3> jjmerelo, question_id: 59175332 </h3>Score: 113, Tags: {perl,github-actions} <br><p>For (mainly) pedagogical reasons, I'm trying to run this workflow in GitHub actions:</p>
+
+<pre><code>name: "We 🎔 Perl"
+on:
+  issues:
+    types: [opened, edited, milestoned]
+
+jobs:
+  seasonal_greetings:
+    runs-on: windows-latest
+    steps:
+      - name: Maybe greet
+        id: maybe-greet
+        env:
+          HEY: "Hey you!"
+          GREETING: "Merry Xmas to you too!"
+          BODY: ${{ github.event.issue.body }}
+        run: |
+          $output=(perl -e 'print ($ENV{BODY} =~ /Merry/)?$ENV{GREETING}:$ENV{HEY};')
+          Write-Output "::set-output name=GREET::$output"
+  produce_comment:
+    name: Respond to issue
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump job context
+        env:
+          JOB_CONTEXT: ${{ jobs.maybe-greet.steps.id }}
+        run: echo "$JOB_CONTEXT"
+</code></pre>
+
+<p>I need two different jobs, since they use different context (operating systems), but I need to get the output of a step in the first job to the second job. I am trying with several combinations of the <code>jobs</code> context as found <a href="https://help.github.com/en/actions/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions#jobsjob_idif" rel="noreferrer">here</a> but there does not seem to be any way to do that. Apparently, <code>jobs</code> is just the name of a YAML variable that does not really have a context, and the context <code>job</code> contains just the success or failure. Any idea?</p>
+------------------------------------------------------------------ <br><h3> Answer 61236803 VonC: </h3><p>Check the &quot;<a href="https://github.blog/changelog/2020-04-15-github-actions-new-workflow-features/" rel="noreferrer">GitHub Actions: New workflow features</a>&quot; from April 2020, which could help in your case (to reference step outputs from previous jobs)</p>
+<blockquote>
+<h2>Job outputs</h2>
+</blockquote>
+<blockquote>
+<p>You can specify a set of outputs that you want to pass to subsequent jobs and then access those values from your needs context.</p>
+</blockquote>
+<p>See <a href="https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#jobsjob_idoutputs" rel="noreferrer">documentation</a>:</p>
+<blockquote>
+<pre><code>jobs.&lt;jobs_id&gt;.outputs
+</code></pre>
+</blockquote>
+<blockquote>
+<p><strong>A map of outputs for a job</strong>.</p>
+<p>Job outputs are available to all downstream jobs that depend on this job.<br />
+For more information on defining job dependencies, see <a href="https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idneeds" rel="noreferrer"><code>jobs.&lt;job_id&gt;.needs</code></a>.</p>
+<p>Job outputs are strings, and job outputs containing expressions are evaluated on the runner at the end of each job. Outputs containing secrets are redacted on the runner and not sent to GitHub Actions.</p>
+<p>To use job outputs in a dependent job, you can use the <code>needs</code> context.<br />
+For more information, see &quot;<a href="https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#needs-context" rel="noreferrer">Context and expression syntax for GitHub Actions.</a>&quot;</p>
+<p>To use job outputs in a dependent job, you can use the needs context.</p>
+<p>Example</p>
+</blockquote>
+<pre><code>jobs:
+  job1:
+    runs-on: ubuntu-latest
+    # Map a step output to a job output
+    outputs:
+      output1: ${{ steps.step1.outputs.test }}
+      output2: ${{ steps.step2.outputs.test }}
+    steps:
+    - id: step1
+      run: echo &quot;test=hello&quot; &gt;&gt; $GITHUB_OUTPUT
+    - id: step2
+      run: echo &quot;test=world&quot; &gt;&gt; $GITHUB_OUTPUT
+  job2:
+    runs-on: ubuntu-latest
+    needs: job1
+    steps:
+    - run: echo ${{needs.job1.outputs.output1}} ${{needs.job1.outputs.output2}}
+</code></pre>
+<p>Note the use of <a href="https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-output-parameter" rel="noreferrer"><code>$GITHUB_OUTPUT</code></a>, instead of the <a href="https://github.blog/changelog/2022-10-11-github-actions-deprecating-save-state-and-set-output-commands/" rel="noreferrer">older <code>::set-output</code> now (Oct. 2022) deprecated</a>.</p>
+<blockquote>
+<p>To avoid untrusted logged data to use <code>set-state</code> and <code>set-output</code> workflow commands without the intention of the workflow author we have introduced a <a href="https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files" rel="noreferrer">new set of environment files</a> to manage state and output.</p>
+</blockquote>
+<hr />
+<p><a href="https://stackoverflow.com/users/2808798/jesse-adelman">Jesse Adelman</a> adds in <a href="https://stackoverflow.com/questions/59175332/using-output-from-a-previous-job-in-a-new-one-in-a-github-action/61236803?noredirect=1#comment121129789_61236803">the comments</a>:</p>
+<blockquote>
+<p>This seems to not work well for anything beyond a static string.<br />
+How, for example, would I take a multiline text output of step (say, I'm running a <code>pytest</code> or similar) and use that output in another job?</p>
+</blockquote>
+<ul>
+<li>either write the multi-line text to a file (<a href="https://stackoverflow.com/users/8059748/jschmitter">jschmitter</a>'s <a href="https://stackoverflow.com/questions/59175332/using-output-from-a-previous-job-in-a-new-one-in-a-github-action#comment122653396_61236803">comment</a>)</li>
+<li>or multi-line text to <code>&gt;&gt; $GITHUB_OUTPUT</code> (<a href="https://stackoverflow.com/users/667767/maxisam">maxisam</a>'s <a href="https://stackoverflow.com/a/75932020/6309">answer</a>)</li>
+<li>or base64-encode the output and then decode it in the next job (<a href="https://stackoverflow.com/users/10393763/nate-karasch">Nate Karasch</a>'s <a href="https://stackoverflow.com/questions/59175332/using-output-from-a-previous-job-in-a-new-one-in-a-github-action#comment125445157_61236803">comment</a>)</li>
+</ul>
+<h4> Comment 125723464 flymg: </h4>For anyone else who is wondering why no output is generated; Check that your steps are using <code>id</code> instead of <code>name</code><br><h4> Comment 121129789 VonC: </h4>@JesseAdelman Good question: I am not sure. You should ask a separate question with a link back to this answer, to get a more precise answer.<br><h4> Comment 125445157 Nathan Karasch: </h4>Alternatively, you could base64-encode the output and then decode it in the next job<br><h4> Comment 122653396 jschmitter: </h4>@Jesse Adelman, you&#39;d probably want to write the multi-line text to a file in that case.<br><h4> Comment 121126249 Jesse Adelman: </h4>Thanks for this. This seems to not work well for anything beyond a static string. How, for example, would I take a multiline text output of step (say, I&#39;m running a <code>pytest</code> or similar) and use that output in another job?<br><h4> Comment 132626995 Mercury: </h4>@VonC, Note the <code>echo &quot;test=world&quot; &gt;&gt; $GITHUB_OUTPUT</code> causes ambiguous redirect error, using the old style works: <code>echo &quot;::set-output name=test::world&quot;</code><br><h4> Comment 132628804 VonC: </h4>@Mercury Considering you should not rely on the deprecated form, how would you make the new one work?<br><h4> Comment 132631815 Mercury: </h4>@VonC, I Don&#39;t know, I get either <code>ambiguous redirect</code> or <code>No such file or directory</code> (When i surround the $GITHUB_OUTPUT in quotes)<br><h4> Comment 132633441 VonC: </h4>@Mercury Then you need to ask a separate question to illustrate what your pipeline contains and ask why it produces this error message.<br>------------------------------------------------------------------ <br><h3> Answer 59180475 peterevans: </h3><p><strong>Update</strong>: It's now possible to set job outputs that can be used to transfer string values to downstream jobs. See <a href="https://stackoverflow.com/questions/59175332/using-output-from-a-previous-job-in-a-new-one-in-a-github-action/61236803#61236803">this answer</a>.</p>
+<p>What follows is the original answer. These techniques might still be useful for some use cases.</p>
+<ol>
+<li>Write the data to file and use <code>actions/upload-artifact</code> and <code>actions/download-artifact</code>. A bit awkward, but it works.</li>
+<li>Create a repository dispatch event and send the data to a second workflow. I prefer this method personally, but the downside is that it needs a <code>repo</code> scoped <a href="https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line" rel="nofollow noreferrer">PAT</a>.</li>
+</ol>
+<p>Here is an example of how the second way could work. It uses <a href="https://github.com/peter-evans/repository-dispatch" rel="nofollow noreferrer">repository-dispatch</a> action.</p>
+<pre><code>name: &quot;We 🎔 Perl&quot;
+on:
+  issues:
+    types: [opened, edited, milestoned]
+
+jobs:
+  seasonal_greetings:
+    runs-on: windows-latest
+    steps:
+      - name: Maybe greet
+        id: maybe-greet
+        env:
+          HEY: &quot;Hey you!&quot;
+          GREETING: &quot;Merry Xmas to you too!&quot;
+          BODY: ${{ github.event.issue.body }}
+        run: |
+          $output=(perl -e 'print ($ENV{BODY} =~ /Merry/)?$ENV{GREETING}:$ENV{HEY};')
+          Write-Output &quot;::set-output name=GREET::$output&quot;
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          event-type: my-event
+          client-payload: '{&quot;greet&quot;: &quot;${{ steps.maybe-greet.outputs.GREET }}&quot;}'
+</code></pre>
+<p>This triggers a repository dispatch workflow in the same repository.</p>
+<pre><code>name: Repository Dispatch
+on:
+  repository_dispatch:
+    types: [my-event]
+jobs:
+  myEvent:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ${{ github.event.client_payload.greet }}
+</code></pre>
+<h4> Comment 115490374 jjmerelo: </h4>Additionally, the second workflow will not appear linked to the original push or pull request.<br>------------------------------------------------------------------ <br><h3> Answer 70608321 Dr-Bracket: </h3><p>In my case I wanted to pass an entire build/artifact, not just a string:</p>
+<pre class="lang-yaml prettyprint-override"><code>name: Build something on Ubuntu then use it on MacOS
+
+on:
+  workflow_dispatch:
+    # Allows for manual build trigger
+
+jobs:
+  buildUbuntuProject:
+    name: Builds the project on Ubuntu (Put your stuff here)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: some/compile-action@v99
+      - uses: actions/upload-artifact@v2
+        # Upload the artifact so the MacOS runner do something with it
+        with:
+          name: CompiledProject
+          path: pathToCompiledProject
+  doSomethingOnMacOS:
+    name: Runs the program on MacOS or something
+    runs-on: macos-latest
+    needs: buildUbuntuProject # Needed so the job waits for the Ubuntu job to finish
+    steps:
+      - uses: actions/download-artifact@master
+        with:
+          name: CompiledProject
+          path: somewhereToPutItOnMacOSRunner
+      - run: ls somewhereToPutItOnMacOSRunner # See the artifact on the MacOS runner
+</code></pre>
+------------------------------------------------------------------ <br><h3> Answer 70900405 EvanK: </h3><p>It <em>is</em> possible to capture the entire output (and return code) of a command within a <code>run</code> step, which I've written up here to hopefully save someone else the headache. <strong>Fair warning, it requires a lot of shell trickery and a multiline <code>run</code> to ensure everything happens within a single shell instance.</strong></p>
+<p>In my case, I needed to invoke a script and capture the <strong>entirety</strong> of its stdout for use in a later step, as well as preserve its outcome for error checking:</p>
+<pre class="lang-sh prettyprint-override"><code># capture stdout from script 
+SCRIPT_OUTPUT=$(./do-something.sh)
+
+# capture exit code as well
+SCRIPT_RC=$?
+
+# FYI, this would get stdout AND stderr
+SCRIPT_ALL_OUTPUT=$(./do-something.sh 2&gt;&amp;1)
+</code></pre>
+<p>Since Github's job outputs only seem to be able to capture a single line of text, I <em>also</em> had to escape any newlines for the output:</p>
+<pre class="lang-sh prettyprint-override"><code>echo &quot;::set-output name=stdout::${SCRIPT_OUTPUT//$'\n'/\\n}&quot;
+</code></pre>
+<p>Additionally, I needed to ultimately return the script's <em>exit code</em> to correctly indicate whether it failed. The whole shebang ends up looking like this:</p>
+<pre class="lang-yaml prettyprint-override"><code>- name: A run step with stdout as a captured output
+  id: myscript
+  run: |
+    # run in subshell, capturiing stdout to var
+    SCRIPT_OUTPUT=$(./do-something.sh)
+    # capture exit code too
+    SCRIPT_RC=$?
+    # print a single line output for github
+    echo &quot;::set-output name=stdout::${SCRIPT_OUTPUT//$'\n'/\\n}&quot;
+    # exit with the script status
+    exit $SCRIPT_RC
+  continue-on-error: true
+- name: Add above outcome and output as an issue comment
+  uses: actions/github-script@v5
+  env:
+    STEP_OUTPUT: ${{ steps.myscript.outputs.stdout }}
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    script: |
+      // indicates whather script succeeded or not
+      let comment = `Script finished with \`${{ steps.myscript.outcome }}\`\n`;
+
+      // adds stdout, unescaping newlines again to make it readable
+      comment += `&lt;details&gt;&lt;summary&gt;Show Output&lt;/summary&gt;
+
+      \`\`\`
+      ${process.env.STEP_OUTPUT.replace(/\\n/g, '\n')}
+      \`\`\`
+
+      &lt;/details&gt;`;
+
+      // add the whole damn thing as an issue comment
+      github.rest.issues.createComment({
+        issue_number: context.issue.number,
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        body: comment
+      })
+</code></pre>
+<p><strong>Edit:</strong> there is also <a href="https://github.com/mathiasvr/command-output" rel="noreferrer">an action</a> to accomplish this with much less bootstrapping, which I only just found.</p>
+------------------------------------------------------------------ <br><h3> Answer 74055907 dimisjim: </h3><p><strong>2022 October update:</strong> GitHub is deprecating <code>set-output</code> and recommends to use <a href="https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-output-parameter" rel="nofollow noreferrer">GITHUB_OUTPUT</a> instead. The syntax for defining the outputs and referencing them in other steps, jobs.</p>
+<p>An example from the docs:</p>
+<pre><code>- name: Set color
+  id: random-color-generator
+  run: echo &quot;SELECTED_COLOR=green&quot; &gt;&gt; $GITHUB_OUTPUT
+- name: Get color
+  run: echo &quot;The selected color is ${{ steps.random-color-generator.outputs.SELECTED_COLOR }}&quot;
+</code></pre>
+<h4> Comment 130755769 VonC: </h4>Good point. I have edited <a href="https://stackoverflow.com/a/61236803/6309">my own answer accordingly</a>.<br><h4> Comment 130786268 Christopher: </h4>This new method doesn&#39;t seem to work with <code>fromJson()</code> like the old method did. It complains that the output is a string type instead of the expected JSON.<br>------------------------------------------------------------------ <br><h3> Answer 75932020 maxisam: </h3><p>To update @vonc <a href="https://stackoverflow.com/a/61236803/667767">https://stackoverflow.com/a/61236803/667767</a> on multiline output.</p>
+<p>Here is the way to do it</p>
+<pre class="lang-bash prettyprint-override"><code>      echo 'RESULT&lt;&lt;EOF' &gt;&gt; $GITHUB_OUTPUT
+      echo $multiLine &gt;&gt; $GITHUB_OUTPUT
+      echo 'EOF' &gt;&gt; $GITHUB_OUTPUT
+</code></pre>
