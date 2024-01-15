@@ -1,30 +1,30 @@
- <h2> Title: How do I get a list of installed CPAN modules? </h2> <h3> David McLaughlin, question_id: 115425 </h3>Score: 109, Tags: {perl,perl-module,cpan} <br><p>Aside from trying</p>
+ <h2> Title: How do I get a list of installed CPAN modules? </h2> <h4> David McLaughlin, question_id: 115425 </h4>Score: 109, Tags: {perl,perl-module,cpan} <br><p>Aside from trying</p>
 <pre><code>perldoc &lt;module name&gt;
 </code></pre>
 <p>individually for any CPAN module that takes my fancy or going through the file system and looking at the directories, I have no idea what modules we have installed.</p>
 <p>What's the easiest way to just get a big list of every CPAN module installed? From the command line or otherwise.</p>
-<h4> Comment 86472702 void: </h4>I found <code>cpan -l</code> to be useful for myself on windows.<br><h4> Comment 100131024 Ravi: </h4>This might be useful: <code>instmodsh</code><br><h4> Comment 27631778 Tim Bunce: </h4>Do you want to know what modules are installed, or what distributions are installed?<br><h4> Comment 87545964 lukmdo: </h4>I can suggest using the <a href="http://search.cpan.org/dist/pmtools/" rel="nofollow noreferrer">pmtools</a>, especially <a href="http://search.cpan.org/dist/pmtools/pminst" rel="nofollow noreferrer">pminst</a> which accepts regular expressions.<br><h4> Comment 87545981 jaseywang: </h4><a href="http://administratosphere.wordpress.com/tag/pmtools/" rel="nofollow noreferrer">perl-pmtools</a> is the good tools for you.<br>------------------------------------------------------------------ <br><h3> Answer 118855 pjf: </h3><p>This is answered in the Perl FAQ, the answer which can be quickly found with <code>perldoc -q installed</code>.  In short, it comes down to using <code>ExtUtils::Installed</code> or using <code>File::Find</code>, variants of both of which have been covered previously in this thread.</p>
+<h4> void, Id: 86472702 Score: 8: </h4>I found <code>cpan -l</code> to be useful for myself on windows.<br><h4> Ravi, Id: 100131024 Score: 1: </h4>This might be useful: <code>instmodsh</code><br><h4> Tim Bunce, Id: 27631778 Score: 0: </h4>Do you want to know what modules are installed, or what distributions are installed?<br><h4> lukmdo, Id: 87545964 Score: 0: </h4>I can suggest using the <a href="http://search.cpan.org/dist/pmtools/" rel="nofollow noreferrer">pmtools</a>, especially <a href="http://search.cpan.org/dist/pmtools/pminst" rel="nofollow noreferrer">pminst</a> which accepts regular expressions.<br><h4> jaseywang, Id: 87545981 Score: 0: </h4><a href="http://administratosphere.wordpress.com/tag/pmtools/" rel="nofollow noreferrer">perl-pmtools</a> is the good tools for you.<br>------------------------------------------------------------------ <br><h3> pjf, Id: 118855, Score: 73: </h3><p>This is answered in the Perl FAQ, the answer which can be quickly found with <code>perldoc -q installed</code>.  In short, it comes down to using <code>ExtUtils::Installed</code> or using <code>File::Find</code>, variants of both of which have been covered previously in this thread.</p>
 
 <p>You can also find the FAQ entry <a href="http://perldoc.perl.org/perlfaq3.html#How-do-I-find-which-modules-are-installed-on-my-system%3f" rel="noreferrer">"How do I find which modules are installed on my system?"</a> in perlfaq3. You can see a list of all FAQ answers by looking in <a href="http://perldoc.perl.org/perlfaq.html" rel="noreferrer">perlfaq</a></p>
-<h4> Comment 33810286 Justin: </h4>This gives so much more than the OP requested that it is virtually useless.<br><h4> Comment 59645139 Stefan Lasiewski: </h4>The FAQ says to use <code>cpan -l</code> but that doesn&#39;t work on RHEL6, and <code>&#47;usr&#47;bin&#47;cpan -l</code> throws the error <code>Unknown option: l</code>.<br><h4> Comment 41575523 Mark Reed: </h4>cpan -l is doing a recursive search of whatever directory I run it from.  Is there any way to pass the <code>ExtUtils::Installed</code> constructor&#39;s <code>skip_cwd</code> option from that command line?<br><h4> Comment 76401817 caot: </h4>$ perldoc perllocal | grep Module $ perldoc perllocal | grep -E &#39;VERSION|Module&#39;<br><h4> Comment 81967409 user333869: </h4>use perldoc -t  perllocal  to get plain text output, otherwise grep may not work due to embedded ctrl characters<br><h4> Comment 111235211 Dave Everitt: </h4>@caot <code>perldoc perllocal | grep -E &#39;VERSION|Module &gt; perlmods.txt</code> - nice way of filtering the long readout, so I piped into a file<br>------------------------------------------------------------------ <br><h3> Answer 931074 Sinan &#220;n&#252;r: </h3><p>The answer can be found in the <a href="http://perldoc.perl.org/perlfaq3.html#How-do-I-find-which-modules-are-installed-on-my-system%3f" rel="nofollow noreferrer">Perl FAQ list</a>.</p>
+<h4> Justin, Comment 33810286 Score: 42: </h4>This gives so much more than the OP requested that it is virtually useless.<br><h4> Stefan Lasiewski, Comment 59645139 Score: 11: </h4>The FAQ says to use <code>cpan -l</code> but that doesn&#39;t work on RHEL6, and <code>&#47;usr&#47;bin&#47;cpan -l</code> throws the error <code>Unknown option: l</code>.<br><h4> Mark Reed, Comment 41575523 Score: 2: </h4>cpan -l is doing a recursive search of whatever directory I run it from.  Is there any way to pass the <code>ExtUtils::Installed</code> constructor&#39;s <code>skip_cwd</code> option from that command line?<br><h4> caot, Comment 76401817 Score: 1: </h4>$ perldoc perllocal | grep Module $ perldoc perllocal | grep -E &#39;VERSION|Module&#39;<br><h4> user333869, Comment 81967409 Score: 0: </h4>use perldoc -t  perllocal  to get plain text output, otherwise grep may not work due to embedded ctrl characters<br><h4> Dave Everitt, Comment 111235211 Score: 0: </h4>@caot <code>perldoc perllocal | grep -E &#39;VERSION|Module &gt; perlmods.txt</code> - nice way of filtering the long readout, so I piped into a file<br>------------------------------------------------------------------ <br><h3> Sinan &#220;n&#252;r, Id: 931074, Score: 2: </h3><p>The answer can be found in the <a href="http://perldoc.perl.org/perlfaq3.html#How-do-I-find-which-modules-are-installed-on-my-system%3f" rel="nofollow noreferrer">Perl FAQ list</a>.</p>
 
 <p>You should skim the excellent documentation that comes with Perl</p>
 
 <pre><code>perldoc perltoc
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 115439 Dan: </h3><pre><code>perldoc perllocal
+------------------------------------------------------------------ <br><h3> Dan, Id: 115439, Score: 42: </h3><pre><code>perldoc perllocal
 </code></pre>
 
 <p>Edit: There's a (little) more info about it in the <a href="http://www.cpan.org/misc/cpan-faq.html#How_installed_modules" rel="noreferrer">CPAN FAQ</a></p>
-<h4> Comment 23906 David McLaughlin: </h4>Thanks for the link to the FAQ. Unfortunately not all the modules I know are installed are returning. Date::Calc doesn&#39;t even show up there.<br><h4> Comment 120114718 Axel Bregnsbo: </h4>I got <code>No documentation found for &quot;perllocal&quot;.</code><br>------------------------------------------------------------------ <br><h3> Answer 15166368 Paul Rubel: </h3><p><code>perldoc -q installed</code></p>
+<h4> David McLaughlin, Comment 23906 Score: 2: </h4>Thanks for the link to the FAQ. Unfortunately not all the modules I know are installed are returning. Date::Calc doesn&#39;t even show up there.<br><h4> Axel Bregnsbo, Comment 120114718 Score: 1: </h4>I got <code>No documentation found for &quot;perllocal&quot;.</code><br>------------------------------------------------------------------ <br><h3> Paul Rubel, Id: 15166368, Score: 38: </h3><p><code>perldoc -q installed</code></p>
 
 <p>claims that <code>cpan -l</code> will do the trick, however it's not working for me. The other option:</p>
 
 <p><code>cpan -a</code></p>
 
 <p>does spit out a nice list of installed packages and has the nice side effect of writing them to a file.</p>
-<h4> Comment 38864365 William Turrell: </h4>For the record, <code>cpan -l</code> works (or does for me with CPAN v2.05). <code>cpan -a</code> is indeed prettier.<br><h4> Comment 120399315 Bix: </h4>I just used <code>cpan -l | grep packageName</code> to find what I needed per the recommendation found in perldoc.<br>------------------------------------------------------------------ <br><h3> Answer 934268 Walter H: </h3><p>Try <code>man perllocal</code> or <code>perldoc perllocal</code>.</p>
------------------------------------------------------------------- <br><h3> Answer 30671631 Dan: </h3><pre><code>$ for M in `perldoc -t perllocal|grep Module |sed -e 's/^.*" //'`; do V=`perldoc -t perllocal|awk "/$M/{y=1;next}y" |grep VERSION |head -n 1`; printf "%30s %s\n" "$M" "$V"; done |sort
+<h4> William Turrell, Comment 38864365 Score: 3: </h4>For the record, <code>cpan -l</code> works (or does for me with CPAN v2.05). <code>cpan -a</code> is indeed prettier.<br><h4> Bix, Comment 120399315 Score: 1: </h4>I just used <code>cpan -l | grep packageName</code> to find what I needed per the recommendation found in perldoc.<br>------------------------------------------------------------------ <br><h3> Walter H, Id: 934268, Score: 2: </h3><p>Try <code>man perllocal</code> or <code>perldoc perllocal</code>.</p>
+------------------------------------------------------------------ <br><h3> Dan, Id: 30671631, Score: 30: </h3><pre><code>$ for M in `perldoc -t perllocal|grep Module |sed -e 's/^.*" //'`; do V=`perldoc -t perllocal|awk "/$M/{y=1;next}y" |grep VERSION |head -n 1`; printf "%30s %s\n" "$M" "$V"; done |sort
               Class::Inspector     *   "VERSION: 1.28"
                     Crypt::CBC     *   "VERSION: 2.33"
                Crypt::Rijndael     *   "VERSION: 1.11"
@@ -54,12 +54,12 @@
          XML::NamespaceSupport     *   "VERSION: 1.11"
                 XML::SAX::Base     *   "VERSION: 1.08"
 </code></pre>
-<h4> Comment 75194770 Luis A. Florit: </h4>I got: <code>No documentation found for &quot;perllocal&quot;.</code><br><h4> Comment 60496842 pdwalker: </h4>this works nicely for those of us who don&#39;t have cpan installed.<br><h4> Comment 64897268 Cristina_eGold: </h4>Really underrated answer. This also works for RHEL distributions.<br><h4> Comment 79419028 Hans Goldman: </h4>Took longer to run than I expected (about 20 seconds or so on my machine), but it worked flawlessly! Great answer.<br>------------------------------------------------------------------ <br><h3> Answer 115897 Ovid: </h3><p>It's worth noting that perldoc perllocal will only report on modules installed via CPAN.  If someone installs modules manually, it won't find them.  Also, if you have multiple people installing modules and the perllocal.pod is under source control, people might resolve conflicts incorrectly and corrupt the list (this has happened here at work, for example).</p>
+<h4> Luis A. Florit, Comment 75194770 Score: 8: </h4>I got: <code>No documentation found for &quot;perllocal&quot;.</code><br><h4> pdwalker, Comment 60496842 Score: 2: </h4>this works nicely for those of us who don&#39;t have cpan installed.<br><h4> Cristina_eGold, Comment 64897268 Score: 0: </h4>Really underrated answer. This also works for RHEL distributions.<br><h4> Hans Goldman, Comment 79419028 Score: 0: </h4>Took longer to run than I expected (about 20 seconds or so on my machine), but it worked flawlessly! Great answer.<br>------------------------------------------------------------------ <br><h3> Ovid, Id: 115897, Score: 24: </h3><p>It's worth noting that perldoc perllocal will only report on modules installed via CPAN.  If someone installs modules manually, it won't find them.  Also, if you have multiple people installing modules and the perllocal.pod is under source control, people might resolve conflicts incorrectly and corrupt the list (this has happened here at work, for example).</p>
 
 <p>Regrettably, the solution appears to be walking through @INC with File::Find or something similar.  However, that doesn't just find the modules, it also finds related modules in a distribution.  For example, it would report TAP::Harness and TAP::Parser in addition to the actual distribution name of Test::Harness (assuming you have version 3 or above).  You could potentially match them up with distribution names and discard those names which don't match, but then you might be discarding locally built and installed modules.</p>
 
 <p>I believe brian d foy's backpan indexing work is supposed to have code to hand it at .pm file and it will attempt to infer the distribution, but even this fails at times because what's in a package is not necessarily installed (see Devel::Cover::Inc for an example).</p>
-<h4> Comment 25182 rjray: </h4>From a rudimentary test (doing a &quot;make -n install&quot; in some dirs I have laying around), the &quot;make install&quot; step of any MakeMaker-based module will update perllocal. It&#39;s not specific to installing via CPAN directly.<br><h4> Comment 24788 brian d foy: </h4>I don&#39;t think I need to pull out the BackPAN catalog guns for that one. Something like I do with Test::Prereq to collapse it by what distro it finds in 02packages might be enough. That is a little tricker than just listing the module files though, and the catalog isn&#39;t close to handling that yet.<br><h4> Comment 27631962 Tim Bunce: </h4>I think Dist::Surveyor is still the best tool for answering the question &quot;what <i>distributions</i> are installed in that library?&quot;. See <a href="http://www.slideshare.net/Tim.Bunce/perl-distsurveyor-2011" rel="nofollow noreferrer">this presentation</a> for more details. There&#39;s an easy-to-use fatpacked version in the <a href="https://github.com/timbunce/Dist-Surveyor/network" rel="nofollow noreferrer">git repo</a>.<br>------------------------------------------------------------------ <br><h3> Answer 117386 brian d foy: </h3><p>You can try <a href="http://search.cpan.org/dist/ExtUtils-Installed" rel="noreferrer">ExtUtils-Installed</a>, but that only looks in <code>.packlist</code>s, so it may miss modules that people moved things into <code>@INC</code> by hand.</p>
+<h4> rjray, Comment 25182 Score: 2: </h4>From a rudimentary test (doing a &quot;make -n install&quot; in some dirs I have laying around), the &quot;make install&quot; step of any MakeMaker-based module will update perllocal. It&#39;s not specific to installing via CPAN directly.<br><h4> brian d foy, Comment 24788 Score: 1: </h4>I don&#39;t think I need to pull out the BackPAN catalog guns for that one. Something like I do with Test::Prereq to collapse it by what distro it finds in 02packages might be enough. That is a little tricker than just listing the module files though, and the catalog isn&#39;t close to handling that yet.<br><h4> Tim Bunce, Comment 27631962 Score: 1: </h4>I think Dist::Surveyor is still the best tool for answering the question &quot;what <i>distributions</i> are installed in that library?&quot;. See <a href="http://www.slideshare.net/Tim.Bunce/perl-distsurveyor-2011" rel="nofollow noreferrer">this presentation</a> for more details. There&#39;s an easy-to-use fatpacked version in the <a href="https://github.com/timbunce/Dist-Surveyor/network" rel="nofollow noreferrer">git repo</a>.<br>------------------------------------------------------------------ <br><h3> brian d foy, Id: 117386, Score: 20: </h3><p>You can try <a href="http://search.cpan.org/dist/ExtUtils-Installed" rel="noreferrer">ExtUtils-Installed</a>, but that only looks in <code>.packlist</code>s, so it may miss modules that people moved things into <code>@INC</code> by hand.</p>
 
 <p>I wrote <a href="http://search.cpan.org/dist/App-Module-Lister" rel="noreferrer">App-Module-Lister</a> for a friend who wanted to do this as a CGI script on a non-shell web hosting account. You simple take the module file and upload it as a filename  that your server will treat as a CGI script. It has no dependencies outside of the Standard Library. Use it as is or steal the code.</p>
 
@@ -82,7 +82,7 @@ Time::Timezone  2006.0814
 <p>I've been meaning to add this as a feature to the <code>cpan</code> tool, so I'll do that too. [Time passes] And, now I have a <code>-l</code> switch in <code>cpan</code>. I have a few other things to do with it before I make a release, but <A href="http://github.com/briandfoy/cpan-script/tree/master" rel="noreferrer">it's in github</a>. If you don't want to wait for that, you could just try the <code>-a</code> switch to create an autobundle, although that puts some Pod around the list.</p>
 
 <p>Good luck;</p>
------------------------------------------------------------------- <br><h3> Answer 5577447 Joakim: </h3><p>Here a script which would do the trick:</p>
+------------------------------------------------------------------ <br><h3> Joakim, Id: 5577447, Score: 14: </h3><p>Here a script which would do the trick:</p>
 
 <pre><code>use ExtUtils::Installed;
 
@@ -103,7 +103,7 @@ Prints each module in the following format
 
 =cut
 </code></pre>
-<h4> Comment 89307466 Hans Deragon: </h4>Under RHEL 6.9, this scrips only prints the following:  <code>Perl - 5.10.1</code>  Modules are not listed.<br>------------------------------------------------------------------ <br><h3> Answer 14598354 user2024286: </h3><p>Try the following command</p>
+<h4> Hans Deragon, Comment 89307466 Score: 0: </h4>Under RHEL 6.9, this scrips only prints the following:  <code>Perl - 5.10.1</code>  Modules are not listed.<br>------------------------------------------------------------------ <br><h3> user2024286, Id: 14598354, Score: 10: </h3><p>Try the following command</p>
 <pre><code>instmodsh
 </code></pre>
 <p>With <code>l</code> you will <em>List all installed modules</em>.</p>
@@ -112,7 +112,7 @@ Prints each module in the following format
 <p>A shell to examine installed modules.<br />
 A little interface to ExtUtils::Installed to examine installed modules, validate your packlists and even create a tarball from an installed module.</p>
 </blockquote>
-<h4> Comment 108215399 Dave Everitt: </h4>Simplest answer. Worked fine on our ancient Debian 6 server.<br>------------------------------------------------------------------ <br><h3> Answer 115564 amoore: </h3><p>I like to use the CPAN 'r' command for this. You can get into the CPAN shell with the old style:</p>
+<h4> Dave Everitt, Comment 108215399 Score: 0: </h4>Simplest answer. Worked fine on our ancient Debian 6 server.<br>------------------------------------------------------------------ <br><h3> amoore, Id: 115564, Score: 9: </h3><p>I like to use the CPAN 'r' command for this. You can get into the CPAN shell with the old style:</p>
 
 <pre><code>sudo perl -MCPAN -e shell
 </code></pre>
@@ -125,21 +125,21 @@ A little interface to ExtUtils::Installed to examine installed modules, validate
 <p>(You typically have to use 'sudo' to run it as root, or use 'su -' to become root before you run it, unless you have cpan set up to let you run it as a normal user, but install as root. If you don't have root on this machine, you can still use the CPAN shell to find out this information, but you won't be able to install modules, and you may have to go through a bit of setup the first time you run it.)</p>
 
 <p>Then, once you're in the cpan shell, you can use the 'r' command to report all installed modules and their versions. So, at the "cpan>" prompt, type 'r'. This will list all installed modules and their versions. Use '?' to get some more help.</p>
-<h4> Comment 24791 brian d foy: </h4>The -r recompiles stuff. To get a list, try -a or download the latest sources and play with the new -l switch, added for just this answer. :)<br><h4> Comment 26245 EvdB: </h4>note the difference between the &#39;-r&#39; commandline argument to &#39;cpan&#39;, and the &#39;r&#39; command in the cpan shell :)<br><h4> Comment 26001 Aristotle Pagaltzis: </h4>Why the <code>sudo</code> here? It’s completely unnecessary.<br><h4> Comment 24006 EvdB: </h4>actually &#39;r&#39; gives you the reinstall recommendations - ie all the modules on your install that have a newer version of CPAN. Unless your install is very out of date this will not be a complete list.<br><h4> Comment 24055 skiphoppy: </h4>My &#39;r&#39; always reports next to nothing because I upgrade compulsively.  Which reminds me ... I haven&#39;t upgraded today, yet.<br><h4> Comment 94832423 ILMostro_7: </h4>Use of <code>sudo</code> is not recommended, as it affects the system packages and modules.  AFAIK, at least in recent versions, <code>cpan</code> performs the setup automatically that creates a local installation for the regular user in the <code>$HOME</code> directory.<br>------------------------------------------------------------------ <br><h3> Answer 19976944 Thiyagu ATR: </h3><p>You can get list of perl modules installed in you system by using <code>instmodsh</code> command in your terminal.It will ask you three option in order to enhance the output they are: </p>
+<h4> brian d foy, Comment 24791 Score: 3: </h4>The -r recompiles stuff. To get a list, try -a or download the latest sources and play with the new -l switch, added for just this answer. :)<br><h4> EvdB, Comment 26245 Score: 2: </h4>note the difference between the &#39;-r&#39; commandline argument to &#39;cpan&#39;, and the &#39;r&#39; command in the cpan shell :)<br><h4> Aristotle Pagaltzis, Comment 26001 Score: 1: </h4>Why the <code>sudo</code> here? It’s completely unnecessary.<br><h4> EvdB, Comment 24006 Score: 1: </h4>actually &#39;r&#39; gives you the reinstall recommendations - ie all the modules on your install that have a newer version of CPAN. Unless your install is very out of date this will not be a complete list.<br><h4> skiphoppy, Comment 24055 Score: 0: </h4>My &#39;r&#39; always reports next to nothing because I upgrade compulsively.  Which reminds me ... I haven&#39;t upgraded today, yet.<br><h4> ILMostro_7, Comment 94832423 Score: 0: </h4>Use of <code>sudo</code> is not recommended, as it affects the system packages and modules.  AFAIK, at least in recent versions, <code>cpan</code> performs the setup automatically that creates a local installation for the regular user in the <code>$HOME</code> directory.<br>------------------------------------------------------------------ <br><h3> Thiyagu ATR, Id: 19976944, Score: 9: </h3><p>You can get list of perl modules installed in you system by using <code>instmodsh</code> command in your terminal.It will ask you three option in order to enhance the output they are: </p>
 
 <pre><code>   l            - List all installed modules
    m &lt;module&gt;   - Select a module
    q            - Quit the program
 </code></pre>
-<h4> Comment 136837403 Chandan Sharma: </h4>Thanks @Thiyagu ATR, It working for me.<br>------------------------------------------------------------------ <br><h3> Answer 14599339 slayedbylucifer: </h3><pre><code>perl -MFile::Find=find -MFile::Spec::Functions -Tlwe 'find { wanted =&gt; sub { print canonpath $_ if /\.pm\z/ }, no_chdir =&gt; 1 }, @INC'
+<h4> Chandan Sharma, Comment 136837403 Score: 0: </h4>Thanks @Thiyagu ATR, It working for me.<br>------------------------------------------------------------------ <br><h3> slayedbylucifer, Id: 14599339, Score: 8: </h3><pre><code>perl -MFile::Find=find -MFile::Spec::Functions -Tlwe 'find { wanted =&gt; sub { print canonpath $_ if /\.pm\z/ }, no_chdir =&gt; 1 }, @INC'
 </code></pre>
-<h4> Comment 95749282 not2qubit: </h4>This is very good as it clearly show the full path to each <code>*.pm</code> module. You may see many duplicates...<br>------------------------------------------------------------------ <br><h3> Answer 52566268 Wernfried Domscheit: </h3><p>On Linux/Unix I use this simple command:</p>
+<h4> not2qubit, Comment 95749282 Score: 0: </h4>This is very good as it clearly show the full path to each <code>*.pm</code> module. You may see many duplicates...<br>------------------------------------------------------------------ <br><h3> Wernfried Domscheit, Id: 52566268, Score: 8: </h3><p>On Linux/Unix I use this simple command:</p>
 
 <pre><code>perl -e 'print qx/find $_ -name "*.pm"/ foreach ( @INC );' 
 </code></pre>
 
 <p>It scans all folder in <code>@INC</code> and looks for any *.pm file.</p>
------------------------------------------------------------------- <br><h3> Answer 115793 shelfoo: </h3><p>Here's a really hacky way to do it in *nix, you'll get some stuff you don't really care about (ie: warnings::register etc), but it should give you a list of every .pm file that's accessible via perl.</p>
+------------------------------------------------------------------ <br><h3> shelfoo, Id: 115793, Score: 7: </h3><p>Here's a really hacky way to do it in *nix, you'll get some stuff you don't really care about (ie: warnings::register etc), but it should give you a list of every .pm file that's accessible via perl.</p>
 
 <pre>
 <code>
@@ -154,7 +154,7 @@ for my $path (@INC) {
 }
 </code>
 </pre>
-<h4> Comment 25185 rjray: </h4>This will not give him what he wants. It won&#39;t group related files by the distribution they are part of, and it will list all the core *.pm files from Perl itself.<br>------------------------------------------------------------------ <br><h3> Answer 58114369 user2967328: </h3><p>All those who can't install perldoc, or other modules, and want to know what modules are available (CPAN or otherwise), the following works for linux and Mingw32/64:</p>
+<h4> rjray, Comment 25185 Score: 2: </h4>This will not give him what he wants. It won&#39;t group related files by the distribution they are part of, and it will list all the core *.pm files from Perl itself.<br>------------------------------------------------------------------ <br><h3> user2967328, Id: 58114369, Score: 4: </h3><p>All those who can't install perldoc, or other modules, and want to know what modules are available (CPAN or otherwise), the following works for linux and Mingw32/64:</p>
 
 <pre><code>grep -RhIP '^package [A-Z][\w:]+;' `perl -e 'print join " ",@INC'` | sed 's/package //' | sort | uniq
 </code></pre>
@@ -174,11 +174,11 @@ WWW::RobotRules::AnyDBM_File;
 <p>Which is why I ended up on this page (disappointed)</p>
 
 <p>(I realise this doesn't answer the OP's question exactly, but I'm posting it for anybody who ended up here for the same reason I did.  That's the problem with stack*** it's almost imposisble to find the question you're asking, even when it exists, yet stack*** is nearly always google's top hit!)</p>
-<h4> Comment 131291734 LukeSavefrogs: </h4>This is the only method that worked for me (Cygwin on Windows 10)<br><h4> Comment 103560546 Ashish Kumar: </h4>This worked for me.  Thanks for posting this.  I needed this in an environment where I don&#39;t have much access to install / update any dependencies.<br>------------------------------------------------------------------ <br><h3> Answer 64310781 Nicholas Sushkin: </h3><p>Here's a script by @JamesThomasMoon1979 rewritten as a one-liner</p>
+<h4> LukeSavefrogs, Comment 131291734 Score: 0: </h4>This is the only method that worked for me (Cygwin on Windows 10)<br><h4> Ashish Kumar, Comment 103560546 Score: 0: </h4>This worked for me.  Thanks for posting this.  I needed this in an environment where I don&#39;t have much access to install / update any dependencies.<br>------------------------------------------------------------------ <br><h3> Nicholas Sushkin, Id: 64310781, Score: 4: </h3><p>Here's a script by @JamesThomasMoon1979 rewritten as a one-liner</p>
 <pre><code>perl -MExtUtils::Installed -e '$i=ExtUtils::Installed-&gt;new(); 
       print &quot;$_ &quot;.$i-&gt;version($_).&quot;\n&quot; for $i-&gt;modules();'
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 117771 dland: </h3><p>To walk through the @INC directory trees without using an external program like ls(1), one could use the <code>File::Find::Rule</code> module, which has a nice declarative interface.</p>
+------------------------------------------------------------------ <br><h3> dland, Id: 117771, Score: 1: </h3><p>To walk through the @INC directory trees without using an external program like ls(1), one could use the <code>File::Find::Rule</code> module, which has a nice declarative interface.</p>
 
 <p>Also, you want to filter out duplicates in case previous Perl versions contain the same modules. The code to do this looks like:</p>
 
@@ -200,7 +200,7 @@ for my $path (@INC) {
 </code></pre>
 
 <p>At the end of the run, you also have all your module names as keys in the %seen hash. The code could be adapted to save the canonical filename (given in $file) as the value of the key instead of a count of times seen.</p>
------------------------------------------------------------------- <br><h3> Answer 931213 aks: </h3><p>I wrote a perl script just yesterday to do exactly this. The script returns the list of perl modules installed in @INC using the '::' as the separator. Call the script using - </p>
+------------------------------------------------------------------ <br><h3> aks, Id: 931213, Score: 1: </h3><p>I wrote a perl script just yesterday to do exactly this. The script returns the list of perl modules installed in @INC using the '::' as the separator. Call the script using - </p>
 
 <pre><code>perl perlmod.pl
 </code></pre>
@@ -221,7 +221,7 @@ for my $path (@INC) {
 </code></pre>
 
 <p>The script can be found <a href="http://pastebin.com/f79372961" rel="nofollow noreferrer">here.</a></p>
------------------------------------------------------------------- <br><h3> Answer 1733090 toolic: </h3><p>Here is yet another command-line tool to list all installed .pm files:</p>
+------------------------------------------------------------------ <br><h3> toolic, Id: 1733090, Score: 1: </h3><p>Here is yet another command-line tool to list all installed .pm files:</p>
 
 <p><a href="http://www.perlmonks.org/?node_id=795418" rel="nofollow noreferrer">Find installed Perl modules matching a regular expression</a></p>
 
@@ -230,29 +230,29 @@ for my $path (@INC) {
 <li>Cache option for faster look-up's</li>
 <li>Configurable display options</li>
 </ul>
------------------------------------------------------------------- <br><h3> Answer 44709219 caot: </h3><p>The following worked for me.</p>
+------------------------------------------------------------------ <br><h3> caot, Id: 44709219, Score: 1: </h3><p>The following worked for me.</p>
 
 <pre><code>$ perldoc perllocal | grep Module
 $ perldoc perllocal | grep -E 'VERSION|Module'
 </code></pre>
-<h4> Comment 128790496 Pablo Bianchi: </h4><code>perldoc perllocal | grep &quot;::&quot; | cut -d&quot; &quot; -f9 | sort</code>. I wonder why is not the same output as with <code>instmodsh</code>.<br><h4> Comment 128799074 caot: </h4>@PabloBianchi  referring to Dan&#39;s answer behind, The entries of DBI, JSON, ... do not have any &quot;::&quot;. It&#39;s my guess. It&#39;s easy for you to understand the difference in you system.<br>------------------------------------------------------------------ <br><h3> Answer 6145944 knb: </h3><p>the Perl cookbook contains several iterations of a script "pmdesc" that does what you want. 
+<h4> Pablo Bianchi, Comment 128790496 Score: 0: </h4><code>perldoc perllocal | grep &quot;::&quot; | cut -d&quot; &quot; -f9 | sort</code>. I wonder why is not the same output as with <code>instmodsh</code>.<br><h4> caot, Comment 128799074 Score: 0: </h4>@PabloBianchi  referring to Dan&#39;s answer behind, The entries of DBI, JSON, ... do not have any &quot;::&quot;. It&#39;s my guess. It&#39;s easy for you to understand the difference in you system.<br>------------------------------------------------------------------ <br><h3> knb, Id: 6145944, Score: 0: </h3><p>the Perl cookbook contains several iterations of a script "pmdesc" that does what you want. 
 Google-search for "Perl Cookbook pmdesc" and you'll find <a href="http://kb.ucla.edu/articles/how-do-i-find-what-perl-modules-are-installed-on-my-system" rel="nofollow">articles on other Q&amp;A Sites</a>, several code listings on the net, a discussion of the solution, and even <a href="http://www.perlmonks.org/index.pl?node_id=275693" rel="nofollow">some refinements</a>.  </p>
------------------------------------------------------------------- <br><h3> Answer 7112891 thealexbaron: </h3><p>Here's a Perl one-liner that will print out a list of installed modules:</p>
+------------------------------------------------------------------ <br><h3> thealexbaron, Id: 7112891, Score: 0: </h3><p>Here's a Perl one-liner that will print out a list of installed modules:</p>
 
 <pre><code>perl -MExtUtils::Installed -MData::Dumper -e  'my ($inst) = ExtUtils::Installed-&gt;new(); print Dumper($inst-&gt;modules());'
 </code></pre>
 
 <p>Just make sure you have Data::Dumper installed.</p>
-<h4> Comment 16704805 Paul Tomblin: </h4>This only lists about 15 perl modules, instead of the 5945 that &#39;cpan -l&#39; lists.<br>------------------------------------------------------------------ <br><h3> Answer 21918638 mpersico: </h3><pre><code>cd /the/lib/dir/of/your/perl/installation
+<h4> Paul Tomblin, Comment 16704805 Score: 2: </h4>This only lists about 15 perl modules, instead of the 5945 that &#39;cpan -l&#39; lists.<br>------------------------------------------------------------------ <br><h3> mpersico, Id: 21918638, Score: 0: </h3><pre><code>cd /the/lib/dir/of/your/perl/installation
 perldoc $(find . -name perllocal.pod)
 </code></pre>
 
 <p>Windows users just do a Windows Explorer search to find it.</p>
------------------------------------------------------------------- <br><h3> Answer 57885230 Haili Sun: </h3><p>Try "perldoc -l":</p>
+------------------------------------------------------------------ <br><h3> Haili Sun, Id: 57885230, Score: 0: </h3><p>Try "perldoc -l":</p>
 
 <p>$ perldoc -l  Log::Dispatch
 /usr/local/share/perl/5.26.1/Log/Dispatch.pm</p>
------------------------------------------------------------------- <br><h3> Answer 45776727 Henrik: </h3><p>As you enter your Perl script you have all the installed modules as .pm files below the folders in @INC so a small bash script will do the job for you:</p>
+------------------------------------------------------------------ <br><h3> Henrik, Id: 45776727, Score: -1: </h3><p>As you enter your Perl script you have all the installed modules as .pm files below the folders in @INC so a small bash script will do the job for you:</p>
 
 <pre><code>#!/bin/bash
 
@@ -265,8 +265,8 @@ do
    find $d -name '*.pm'
 done
 </code></pre>
-<h4> Comment 78548009 Hynek -Pichi- Vychodil: </h4>Why not? <code>find `perl -le&#39;print for@INC&#39;` -name &#39;*.pm&#39;</code><br>------------------------------------------------------------------ <br><h3> Answer 47173830 Yasiru G: </h3><p>For Linux the easiest way to get is,</p>
+<h4> Hynek -Pichi- Vychodil, Comment 78548009 Score: 0: </h4>Why not? <code>find `perl -le&#39;print for@INC&#39;` -name &#39;*.pm&#39;</code><br>------------------------------------------------------------------ <br><h3> Yasiru G, Id: 47173830, Score: -1: </h3><p>For Linux the easiest way to get is,</p>
 
 <pre><code>dpkg -l | grep "perl"
 </code></pre>
-<h4> Comment 85472557 ROLO: </h4>the OP asked for a list of CPAN (perl) modules installed in the system, not if perl is installed in the system (neither the OP told us if apt is available)<br><h4> Comment 85501521 Yasiru G: </h4>I&#39;m not  a perl expert but I have seen installed perl modules from above command. May be not the perfect answer here.<br><h4> Comment 115757212 jjmerelo: </h4>@YasiruG it only lists those that have been installed via packages; that&#39;s a minority in any installation. Most of them are installed via CPAN.<br>
+<h4> ROLO, Comment 85472557 Score: 1: </h4>the OP asked for a list of CPAN (perl) modules installed in the system, not if perl is installed in the system (neither the OP told us if apt is available)<br><h4> Yasiru G, Comment 85501521 Score: 0: </h4>I&#39;m not  a perl expert but I have seen installed perl modules from above command. May be not the perfect answer here.<br><h4> jjmerelo, Comment 115757212 Score: 0: </h4>@YasiruG it only lists those that have been installed via packages; that&#39;s a minority in any installation. Most of them are installed via CPAN.<br>

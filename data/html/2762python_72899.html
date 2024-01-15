@@ -1,10 +1,10 @@
- <h2> Title: How to sort a list of dictionaries by a value of the dictionary in Python? </h2> <h3> masi, question_id: 72899 </h3>Score: 2762, Tags: {python,list,sorting,dictionary,data-structures} <br><p>How do I sort a list of dictionaries by a specific key's value? Given:</p>
+ <h2> Title: How to sort a list of dictionaries by a value of the dictionary in Python? </h2> <h4> masi, question_id: 72899 </h4>Score: 2762, Tags: {python,list,sorting,dictionary,data-structures} <br><p>How do I sort a list of dictionaries by a specific key's value? Given:</p>
 <pre class="lang-py prettyprint-override"><code>[{'name': 'Homer', 'age': 39}, {'name': 'Bart', 'age': 10}]
 </code></pre>
 <p>When sorted by <code>name</code>, it should become:</p>
 <pre class="lang-py prettyprint-override"><code>[{'name': 'Bart', 'age': 10}, {'name': 'Homer', 'age': 39}]
 </code></pre>
-<h4> Comment 109532846 Claudiu: </h4>Reading the answer and looking on <a href="https://docs.python.org/3/library/operator.html#operator.itemgetter" rel="nofollow noreferrer">operator.itemgetter</a>. Can I sort on multiple value in the same process (for example we have <code>[{&#39;name&#39;:&#39;Bart&#39;, &#39;age&#39;:10, &#39;note&#39;:3},{&#39;name&#39;:&#39;Homer&#39;,&#39;age&#39;:10,&#39;note&#39;:2},{&#39;name&#39;:&#39;Vasile&zwnj;&#8203;&#39;,&#39;age&#39;:20,&#39;note&#39;:3}&zwnj;&#8203;]</code>  And to use: <code>from operator import itemgetter newlist = sorted(old_list, key=itemgetter(-&#39;note&#39;,&#39;name&#39;)</code>  EDIT: Tested, and it is working but I don&#39;t know how to make note DESC and name ASC.<br>------------------------------------------------------------------ <br><h3> Answer 73050 Mario F: </h3><p>The <a href="https://docs.python.org/library/functions.html#sorted" rel="noreferrer"><code>sorted()</code></a> function takes a <code>key=</code> parameter</p>
+<h4> Claudiu, Id: 109532846 Score: 7: </h4>Reading the answer and looking on <a href="https://docs.python.org/3/library/operator.html#operator.itemgetter" rel="nofollow noreferrer">operator.itemgetter</a>. Can I sort on multiple value in the same process (for example we have <code>[{&#39;name&#39;:&#39;Bart&#39;, &#39;age&#39;:10, &#39;note&#39;:3},{&#39;name&#39;:&#39;Homer&#39;,&#39;age&#39;:10,&#39;note&#39;:2},{&#39;name&#39;:&#39;Vasile&zwnj;&#8203;&#39;,&#39;age&#39;:20,&#39;note&#39;:3}&zwnj;&#8203;]</code>  And to use: <code>from operator import itemgetter newlist = sorted(old_list, key=itemgetter(-&#39;note&#39;,&#39;name&#39;)</code>  EDIT: Tested, and it is working but I don&#39;t know how to make note DESC and name ASC.<br>------------------------------------------------------------------ <br><h3> Mario F, Id: 73050, Score: 3613: </h3><p>The <a href="https://docs.python.org/library/functions.html#sorted" rel="noreferrer"><code>sorted()</code></a> function takes a <code>key=</code> parameter</p>
 <pre><code>newlist = sorted(list_to_be_sorted, key=lambda d: d['name']) 
 </code></pre>
 <p>Alternatively, you can use <a href="https://docs.python.org/library/operator.html#operator.itemgetter" rel="noreferrer"><code>operator.itemgetter</code></a> instead of defining the function yourself</p>
@@ -14,7 +14,7 @@ newlist = sorted(list_to_be_sorted, key=itemgetter('name'))
 <p>For completeness, add <code>reverse=True</code> to sort in descending order</p>
 <pre><code>newlist = sorted(list_to_be_sorted, key=itemgetter('name'), reverse=True)
 </code></pre>
-<h4> Comment 16538435 Bakuriu: </h4><code>itemgetter</code> accepts more than one argument: <code>itemgetter(1,2,3)</code> is a function that return a tuple like <code>obj[1], obj[2], obj[3]</code>, so you can use it to do complex sorts.<br><h4> Comment 7751 jfs: </h4>Using key is not only cleaner but more effecient too.<br><h4> Comment 1417380 Mario F: </h4>The fastest way would be to add a newlist.reverse() statement. Otherwise you can define a comparison like cmp=lambda x,y: - cmp(x[&#39;name&#39;],y[&#39;name&#39;]).<br><h4> Comment 1655758 Philluminati: </h4>if the sort value is a number you could say:  lambda k: (k[&#39;age&#39;] * -1)  to get a reverse sort<br><h4> Comment 15099709 radicand: </h4>This also applies to a list of tuples, if you use <code>itemgetter(i)</code> where <code>i</code> is the index of the tuple element to sort on.<br><h4> Comment 126876658 Bakuriu: </h4>@ciurlaro Note that in python sorting is stable, so say you want to achieve the equivalent of <code>key=itemgetter(&#39;A&#39;, &#39;B&#39;, &#39;C&#39;, &#39;D&#39;, &#39;E&#39;), reverse=(True, True, False, True, True)</code> you could do that by sorting 3 times: first on <code>D, E</code> with <code>reverse=True</code>, then on <code>C</code> with <code>reverse=False</code> and finally on <code>A,B</code> with <code>reverse=True</code>.<br><h4> Comment 133732675 Chris: </h4>@ciurlaro you might want to forget <code>operator.itemgetter</code> in that case and write out the accesses the &quot;old-fashioned&quot; way, negating the &quot;color&quot;. <code>key=lambda x: (x[&quot;speed&quot;], -x[&quot;color&quot;], x[&quot;cost&quot;])</code><br><h4> Comment 126882110 ciurlaro: </h4>@Bakuriu I found this answer <a href="https://stackoverflow.com/a/56842689/3004162">stackoverflow.com/a/56842689/3004162</a> that worked to achieve what I wanted. Still far from a beauty of a builtin function unfortunately, but that&#39;s the best I found<br><h4> Comment 129349601 Hip: </h4>I have a list of dict_keys containing months which are unfortunately unordered. How should I order them from january...to...december? thanks<br><h4> Comment 126821849 ciurlaro: </h4>@Bakuriu is there any way to do complex sorts with both ascending and descending order? e.g. <code>key=itemgetter(&quot;speed&quot;, &quot;color&quot;, &quot;cost&quot;), reverse=(True, False, True)</code><br><h4> Comment 126876597 Bakuriu: </h4>@ciurlaro Not that I know of. In order to make that work you&#39;d first have to <code>map</code> the values in a way that make the fields you want sort in the opposite direction, then use a plain sort by those fields and at the end &quot;un-wrap&quot; the values. Obviously instead of using <code>itemgetter</code> you could use a custom function and do whatever you want there.<br><h4> Comment 103128809 webenformasyon: </h4>in case of unicode strings <code>import locale &#47; locale.setlocale(locale.LC_ALL, &quot;&quot;) &#47; newlist = sorted(list_to_be_sorted, key=lambda k: locale.strxfrm(k[&#39;name&#39;]))</code> works  inspired from <a href="https://stackoverflow.com/questions/1097908/how-do-i-sort-unicode-strings-alphabetically-in-python" title="how do i sort unicode strings alphabetically in python">stackoverflow.com/questions/1097908/&hellip;</a><br><h4> Comment 116582260 sattva_venu: </h4>what if we don&#39;t know the value of key?<br><h4> Comment 124670722 Andrew: </h4>operator.itemgetter worked for me, the first option didn&#39;t work or maybe I didn&#39;t fill in the right info... lambda? d: ?<br><h4> Comment 126777892 reza_khalafi: </h4>list indices must be integers or slices, not str<br>------------------------------------------------------------------ <br><h3> Answer 73465 vemury: </h3><pre><code>import operator
+<h4> Bakuriu, Comment 16538435 Score: 64: </h4><code>itemgetter</code> accepts more than one argument: <code>itemgetter(1,2,3)</code> is a function that return a tuple like <code>obj[1], obj[2], obj[3]</code>, so you can use it to do complex sorts.<br><h4> jfs, Comment 7751 Score: 58: </h4>Using key is not only cleaner but more effecient too.<br><h4> Mario F, Comment 1417380 Score: 5: </h4>The fastest way would be to add a newlist.reverse() statement. Otherwise you can define a comparison like cmp=lambda x,y: - cmp(x[&#39;name&#39;],y[&#39;name&#39;]).<br><h4> Philluminati, Comment 1655758 Score: 4: </h4>if the sort value is a number you could say:  lambda k: (k[&#39;age&#39;] * -1)  to get a reverse sort<br><h4> radicand, Comment 15099709 Score: 4: </h4>This also applies to a list of tuples, if you use <code>itemgetter(i)</code> where <code>i</code> is the index of the tuple element to sort on.<br><h4> Bakuriu, Comment 126876658 Score: 1: </h4>@ciurlaro Note that in python sorting is stable, so say you want to achieve the equivalent of <code>key=itemgetter(&#39;A&#39;, &#39;B&#39;, &#39;C&#39;, &#39;D&#39;, &#39;E&#39;), reverse=(True, True, False, True, True)</code> you could do that by sorting 3 times: first on <code>D, E</code> with <code>reverse=True</code>, then on <code>C</code> with <code>reverse=False</code> and finally on <code>A,B</code> with <code>reverse=True</code>.<br><h4> Chris, Comment 133732675 Score: 0: </h4>@ciurlaro you might want to forget <code>operator.itemgetter</code> in that case and write out the accesses the &quot;old-fashioned&quot; way, negating the &quot;color&quot;. <code>key=lambda x: (x[&quot;speed&quot;], -x[&quot;color&quot;], x[&quot;cost&quot;])</code><br><h4> ciurlaro, Comment 126882110 Score: 0: </h4>@Bakuriu I found this answer <a href="https://stackoverflow.com/a/56842689/3004162">stackoverflow.com/a/56842689/3004162</a> that worked to achieve what I wanted. Still far from a beauty of a builtin function unfortunately, but that&#39;s the best I found<br><h4> Hip, Comment 129349601 Score: 0: </h4>I have a list of dict_keys containing months which are unfortunately unordered. How should I order them from january...to...december? thanks<br><h4> ciurlaro, Comment 126821849 Score: 0: </h4>@Bakuriu is there any way to do complex sorts with both ascending and descending order? e.g. <code>key=itemgetter(&quot;speed&quot;, &quot;color&quot;, &quot;cost&quot;), reverse=(True, False, True)</code><br><h4> Bakuriu, Comment 126876597 Score: 0: </h4>@ciurlaro Not that I know of. In order to make that work you&#39;d first have to <code>map</code> the values in a way that make the fields you want sort in the opposite direction, then use a plain sort by those fields and at the end &quot;un-wrap&quot; the values. Obviously instead of using <code>itemgetter</code> you could use a custom function and do whatever you want there.<br><h4> webenformasyon, Comment 103128809 Score: 0: </h4>in case of unicode strings <code>import locale &#47; locale.setlocale(locale.LC_ALL, &quot;&quot;) &#47; newlist = sorted(list_to_be_sorted, key=lambda k: locale.strxfrm(k[&#39;name&#39;]))</code> works  inspired from <a href="https://stackoverflow.com/questions/1097908/how-do-i-sort-unicode-strings-alphabetically-in-python" title="how do i sort unicode strings alphabetically in python">stackoverflow.com/questions/1097908/&hellip;</a><br><h4> sattva_venu, Comment 116582260 Score: 0: </h4>what if we don&#39;t know the value of key?<br><h4> Andrew, Comment 124670722 Score: 0: </h4>operator.itemgetter worked for me, the first option didn&#39;t work or maybe I didn&#39;t fill in the right info... lambda? d: ?<br><h4> reza_khalafi, Comment 126777892 Score: 0: </h4>list indices must be integers or slices, not str<br>------------------------------------------------------------------ <br><h3> vemury, Id: 73465, Score: 240: </h3><pre><code>import operator
 </code></pre>
 
 <p>To sort the list of dictionaries by key='name':</p>
@@ -26,7 +26,7 @@ newlist = sorted(list_to_be_sorted, key=itemgetter('name'))
 
 <pre><code>list_of_dicts.sort(key=operator.itemgetter('age'))
 </code></pre>
-<h4> Comment 27418020 Claudiu: </h4>@monojohnny: yes, just have the key return a tuple, <code>key=lambda k: (k[&#39;name&#39;], k[&#39;age&#39;])</code>. (or <code>key=itemgetter(&#39;name&#39;, &#39;age&#39;)</code>). tuple&#39;s <code>cmp</code> will compare each element in turn. it&#39;s bloody brilliant.<br><h4> Comment 2243769 monojohnny: </h4>Anyway to combine name and age ? (like in SQL ORDER BY name,age ?)<br><h4> Comment 45522803 Kevin: </h4>@TTT: See the <a href="https://docs.python.org/2/library/stdtypes.html#mutable-sequence-types" rel="nofollow noreferrer">library documentation</a> for <code>list</code> and friends.<br><h4> Comment 33232840 TTT: </h4>In the documentation (<a href="http://docs.python.org/2/tutorial/datastructures.html" rel="nofollow noreferrer">docs.python.org/2/tutorial/datastructures.html</a>) the optional <code>key</code> argument for <code>list.sort()</code> is not described. Any idea where to find that?<br>------------------------------------------------------------------ <br><h3> Answer 73044 pjz: </h3><pre><code>my_list = [{'name':'Homer', 'age':39}, {'name':'Bart', 'age':10}]
+<h4> Claudiu, Comment 27418020 Score: 50: </h4>@monojohnny: yes, just have the key return a tuple, <code>key=lambda k: (k[&#39;name&#39;], k[&#39;age&#39;])</code>. (or <code>key=itemgetter(&#39;name&#39;, &#39;age&#39;)</code>). tuple&#39;s <code>cmp</code> will compare each element in turn. it&#39;s bloody brilliant.<br><h4> monojohnny, Comment 2243769 Score: 16: </h4>Anyway to combine name and age ? (like in SQL ORDER BY name,age ?)<br><h4> Kevin, Comment 45522803 Score: 2: </h4>@TTT: See the <a href="https://docs.python.org/2/library/stdtypes.html#mutable-sequence-types" rel="nofollow noreferrer">library documentation</a> for <code>list</code> and friends.<br><h4> TTT, Comment 33232840 Score: 1: </h4>In the documentation (<a href="http://docs.python.org/2/tutorial/datastructures.html" rel="nofollow noreferrer">docs.python.org/2/tutorial/datastructures.html</a>) the optional <code>key</code> argument for <code>list.sort()</code> is not described. Any idea where to find that?<br>------------------------------------------------------------------ <br><h3> pjz, Id: 73044, Score: 119: </h3><pre><code>my_list = [{'name':'Homer', 'age':39}, {'name':'Bart', 'age':10}]
 
 my_list.sort(lambda x,y : cmp(x['name'], y['name']))
 </code></pre>
@@ -36,12 +36,12 @@ my_list.sort(lambda x,y : cmp(x['name'], y['name']))
 <pre><code>my_list = sorted(my_list, key=lambda k: k['name'])
 </code></pre>
 <p>...the lambda is, IMO, easier to understand than <code>operator.itemgetter</code>, but your mileage may vary.</p>
-<h4> Comment 117662893 pjz: </h4>@Sam if you want to sort by the value of the single key in the dict, even if you don&#39;t know the key, you can do <code>key=lambda k: list(k.values())[0]</code><br><h4> Comment 115803140 pjz: </h4>I&#39;d need more of an example to look at.  Try submitting a possible solution on the codereview stackexchange and asking if there&#39;s a better way.<br><h4> Comment 115078137 Sam: </h4>what could be done if the key is unknown and keeps changing?I mean list of dicts with just one key and value but the key and value could not be defined as they keep changing.<br>------------------------------------------------------------------ <br><h3> Answer 2858683 Dologan: </h3><p>If you want to sort the list by multiple keys, you can do the following:</p>
+<h4> pjz, Comment 117662893 Score: 2: </h4>@Sam if you want to sort by the value of the single key in the dict, even if you don&#39;t know the key, you can do <code>key=lambda k: list(k.values())[0]</code><br><h4> pjz, Comment 115803140 Score: 1: </h4>I&#39;d need more of an example to look at.  Try submitting a possible solution on the codereview stackexchange and asking if there&#39;s a better way.<br><h4> Sam, Comment 115078137 Score: 0: </h4>what could be done if the key is unknown and keeps changing?I mean list of dicts with just one key and value but the key and value could not be defined as they keep changing.<br>------------------------------------------------------------------ <br><h3> Dologan, Id: 2858683, Score: 75: </h3><p>If you want to sort the list by multiple keys, you can do the following:</p>
 <pre><code>my_list = [{'name':'Homer', 'age':39}, {'name':'Milhouse', 'age':10}, {'name':'Bart', 'age':10} ]
 sortedlist = sorted(my_list , key=lambda elem: &quot;%02d %s&quot; % (elem['age'], elem['name']))
 </code></pre>
 <p>It is rather hackish, since it relies on converting the values into a single string representation for comparison, but it works as expected for numbers including negative ones (although you will need to format your string appropriately with zero paddings if you are using numbers).</p>
-<h4> Comment 30807176 Winston Ewert: </h4>No need to convert to string. Just return a tuple as the key.<br><h4> Comment 24239583 njzk2: </h4>sorted using timsort which is stable, you can call sorted several times to have a sort on several criteria<br><h4> Comment 27046230 Permafacture: </h4>njzk2&#39;s comment wasn&#39;t immediately clear to me so I found the following.  You can just sort twice as njzk2 suggests, or pass multiple arguments to operator.itemgetter in the top answer.  Link: <a href="http://stackoverflow.com/questions/5212870/sorting-a-python-list-by-two-criteria" title="sorting a python list by two criteria">stackoverflow.com/questions/5212870/&hellip;</a><br><h4> Comment 47824943 wouter bolsterlee: </h4>Sorting multiple times is the easiest generic solution without hacks: <a href="http://stackoverflow.com/a/29849371/1805397">stackoverflow.com/a/29849371/1805397</a><br>------------------------------------------------------------------ <br><h3> Answer 42855105 forzagreen: </h3><pre><code>a = [{'name':'Homer', 'age':39}, ...]
+<h4> Winston Ewert, Comment 30807176 Score: 18: </h4>No need to convert to string. Just return a tuple as the key.<br><h4> njzk2, Comment 24239583 Score: 3: </h4>sorted using timsort which is stable, you can call sorted several times to have a sort on several criteria<br><h4> Permafacture, Comment 27046230 Score: 1: </h4>njzk2&#39;s comment wasn&#39;t immediately clear to me so I found the following.  You can just sort twice as njzk2 suggests, or pass multiple arguments to operator.itemgetter in the top answer.  Link: <a href="http://stackoverflow.com/questions/5212870/sorting-a-python-list-by-two-criteria" title="sorting a python list by two criteria">stackoverflow.com/questions/5212870/&hellip;</a><br><h4> wouter bolsterlee, Comment 47824943 Score: 0: </h4>Sorting multiple times is the easiest generic solution without hacks: <a href="http://stackoverflow.com/a/29849371/1805397">stackoverflow.com/a/29849371/1805397</a><br>------------------------------------------------------------------ <br><h3> forzagreen, Id: 42855105, Score: 54: </h3><pre><code>a = [{'name':'Homer', 'age':39}, ...]
 
 # This changes the list a
 a.sort(key=lambda k : k['name'])
@@ -49,12 +49,12 @@ a.sort(key=lambda k : k['name'])
 # This returns a new list (a is not modified)
 sorted(a, key=lambda k : k['name']) 
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 73098 efotinis: </h3><pre><code>import operator
+------------------------------------------------------------------ <br><h3> efotinis, Id: 73098, Score: 42: </h3><pre><code>import operator
 a_list_of_dicts.sort(key=operator.itemgetter('name'))
 </code></pre>
 
 <p>'key' is used to sort by an arbitrary value and 'itemgetter' sets that value to each item's 'name' attribute.</p>
------------------------------------------------------------------- <br><h3> Answer 73019 Bartosz Radaczyński: </h3><p>I guess you've meant:</p>
+------------------------------------------------------------------ <br><h3> Bartosz Radaczyński, Id: 73019, Score: 32: </h3><p>I guess you've meant:</p>
 
 <pre><code>[{'name':'Homer', 'age':39}, {'name':'Bart', 'age':10}]
 </code></pre>
@@ -63,7 +63,7 @@ a_list_of_dicts.sort(key=operator.itemgetter('name'))
 
 <pre><code>sorted(l,cmp=lambda x,y: cmp(x['name'],y['name']))
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 73186 Owen: </h3><p>You could use a custom comparison function, or you could pass in a function that calculates a custom sort key. That's usually more efficient as the key is only calculated once per item, while the comparison function would be called many more times.</p>
+------------------------------------------------------------------ <br><h3> Owen, Id: 73186, Score: 28: </h3><p>You could use a custom comparison function, or you could pass in a function that calculates a custom sort key. That's usually more efficient as the key is only calculated once per item, while the comparison function would be called many more times.</p>
 
 <p>You could do it this way:</p>
 
@@ -78,7 +78,7 @@ sorted(x, key=mykey)
 x = [{'name': 'Homer', 'age': 39}, {'name': 'Bart', 'age':10}]
 sorted(x, key=itemgetter('name'))
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 23102554 Shank_Transformer: </h3><p>Let's say I have a dictionary <code>D</code> with the elements below. To sort, just use the key argument in <code>sorted</code> to pass a custom function as below:</p>
+------------------------------------------------------------------ <br><h3> Shank_Transformer, Id: 23102554, Score: 15: </h3><p>Let's say I have a dictionary <code>D</code> with the elements below. To sort, just use the key argument in <code>sorted</code> to pass a custom function as below:</p>
 <pre><code>D = {'eggs': 3, 'ham': 1, 'spam': 2}
 def get_count(tuple):
     return tuple[1]
@@ -88,7 +88,7 @@ sorted(D.items(), key = get_count, reverse=True)
 sorted(D.items(), key = lambda x: x[1], reverse=True)  # Avoiding get_count function call
 </code></pre>
 <p>Check <a href="https://wiki.python.org/moin/HowTo/Sorting/#Key_Functions" rel="noreferrer">this</a> out.</p>
------------------------------------------------------------------- <br><h3> Answer 45094029 uingtea: </h3><p>Sometime we need to use <code>lower()</code> for case-insensitive sorting. For example,</p>
+------------------------------------------------------------------ <br><h3> uingtea, Id: 45094029, Score: 28: </h3><p>Sometime we need to use <code>lower()</code> for case-insensitive sorting. For example,</p>
 <pre><code>lists = [{'name':'Homer', 'age':39},
   {'name':'Bart', 'age':10},
   {'name':'abby', 'age':9}]
@@ -103,7 +103,7 @@ print(lists)
 # abby, Bart, Homer
 # [ {'name':'abby', 'age':9}, {'name':'Bart', 'age':10}, {'name':'Homer', 'age':39}]
 </code></pre>
-<h4> Comment 132186594 Joel Aufrecht: </h4>The most likely reason to need to use <code>lower()</code> here would be to provide case-insensitive alphabetical sorting.  This sample dataset has a lower-case a with <i>abby</i> and an upper-case B with <i>Bart</i>, so the examples show the results without, and then with, case-insensitive sort via <code>.lower()</code>.<br><h4> Comment 112143352 Peter Mortensen: </h4><i>Why</i> do we need to use lower() in this case?<br>------------------------------------------------------------------ <br><h3> Answer 16772049 kiriloff: </h3><p>Using the <a href="https://en.wikipedia.org/wiki/Schwartzian_transform" rel="noreferrer">Schwartzian transform</a> from Perl,</p>
+<h4> Joel Aufrecht, Comment 132186594 Score: 2: </h4>The most likely reason to need to use <code>lower()</code> here would be to provide case-insensitive alphabetical sorting.  This sample dataset has a lower-case a with <i>abby</i> and an upper-case B with <i>Bart</i>, so the examples show the results without, and then with, case-insensitive sort via <code>.lower()</code>.<br><h4> Peter Mortensen, Comment 112143352 Score: 0: </h4><i>Why</i> do we need to use lower() in this case?<br>------------------------------------------------------------------ <br><h3> kiriloff, Id: 16772049, Score: 27: </h3><p>Using the <a href="https://en.wikipedia.org/wiki/Schwartzian_transform" rel="noreferrer">Schwartzian transform</a> from Perl,</p>
 <pre><code>py = [{'name':'Homer', 'age':39}, {'name':'Bart', 'age':10}]
 </code></pre>
 <p>do</p>
@@ -126,8 +126,8 @@ elements, where computing that property is an intensive operation that
 should be performed a minimal number of times. The Schwartzian
 Transform is notable in that it does not use named temporary arrays.</p>
 </blockquote>
-<h4> Comment 45376152 Antti Haapala -- Слава Україні: </h4>Python has supported the <code>key=</code> for <code>.sort</code> since 2.4, that is year 2004, it does the Schwartzian transform within the sorting code, in C; thus this method is useful only on Pythons 2.0-2.3. all of which are more than 12 years old.<br>------------------------------------------------------------------ <br><h3> Answer 72950 Matej: </h3><p>You have to implement your own comparison function that will compare the dictionaries by values of name keys. See <a href="http://wiki.python.org/moin/HowTo/Sorting" rel="noreferrer">Sorting Mini-HOW TO from PythonInfo Wiki</a></p>
-<h4> Comment 112143331 Peter Mortensen: </h4>This relies too much on the link. Can you provide a more complete answer?<br><h4> Comment 112187519 Matej: </h4>Proper anwers are already provided by other contributors as well. Feel free to either keep the link, or delete the answer.<br>------------------------------------------------------------------ <br><h3> Answer 39281050 abby sobh: </h3><p>Using the <a href="https://en.wikipedia.org/wiki/Pandas_%28software%29" rel="noreferrer">Pandas</a> package is another method, though its runtime at large scale is much slower than the more traditional methods proposed by others:</p>
+<h4> Antti Haapala -- Слава Україні, Comment 45376152 Score: 11: </h4>Python has supported the <code>key=</code> for <code>.sort</code> since 2.4, that is year 2004, it does the Schwartzian transform within the sorting code, in C; thus this method is useful only on Pythons 2.0-2.3. all of which are more than 12 years old.<br>------------------------------------------------------------------ <br><h3> Matej, Id: 72950, Score: 24: </h3><p>You have to implement your own comparison function that will compare the dictionaries by values of name keys. See <a href="http://wiki.python.org/moin/HowTo/Sorting" rel="noreferrer">Sorting Mini-HOW TO from PythonInfo Wiki</a></p>
+<h4> Peter Mortensen, Comment 112143331 Score: 3: </h4>This relies too much on the link. Can you provide a more complete answer?<br><h4> Matej, Comment 112187519 Score: 0: </h4>Proper anwers are already provided by other contributors as well. Feel free to either keep the link, or delete the answer.<br>------------------------------------------------------------------ <br><h3> abby sobh, Id: 39281050, Score: 20: </h3><p>Using the <a href="https://en.wikipedia.org/wiki/Pandas_%28software%29" rel="noreferrer">Pandas</a> package is another method, though its runtime at large scale is much slower than the more traditional methods proposed by others:</p>
 <pre><code>import pandas as pd
 
 listOfDicts = [{'name':'Homer', 'age':39}, {'name':'Bart', 'age':10}]
@@ -173,7 +173,7 @@ print('Large Method Pandas: ' + str(t.timeit(1)))
 #Large Method LC2: 0.0206089019775
 #Large Method Pandas: 5.81405615807
 </code></pre>
-<h4> Comment 68160743 clp2: </h4>I ran your code and found a mistake in the the timeit.Timer args for Large Method Pandas: you specify &quot;setup_small&quot; where it should be &quot;setup_large&quot;.  Changing that arg caused the program to run without finishing, and I stopped it after more than 5 minutes.  When I ran it with &quot;timeit(1)&quot;, the Large Method Pandas finished in 7.3 sec, much worse than LC or LC2.<br><h4> Comment 68239871 abby sobh: </h4>You&#39;re quite right, that was quite an oversight on my part. I no longer recommend it for large cases! I have edited the answer to simply allow it as a possibility, the use case is still up for debate.<br>------------------------------------------------------------------ <br><h3> Answer 28094888 vvladymyrov: </h3><p>Here is the alternative general solution - it sorts elements of a dict by keys and values.</p>
+<h4> clp2, Comment 68160743 Score: 4: </h4>I ran your code and found a mistake in the the timeit.Timer args for Large Method Pandas: you specify &quot;setup_small&quot; where it should be &quot;setup_large&quot;.  Changing that arg caused the program to run without finishing, and I stopped it after more than 5 minutes.  When I ran it with &quot;timeit(1)&quot;, the Large Method Pandas finished in 7.3 sec, much worse than LC or LC2.<br><h4> abby sobh, Comment 68239871 Score: 0: </h4>You&#39;re quite right, that was quite an oversight on my part. I no longer recommend it for large cases! I have edited the answer to simply allow it as a possibility, the use case is still up for debate.<br>------------------------------------------------------------------ <br><h3> vvladymyrov, Id: 28094888, Score: 17: </h3><p>Here is the alternative general solution - it sorts elements of a dict by keys and values.</p>
 <p>The advantage of it - no need to specify keys, and it would still work if some keys are missing in some of dictionaries.</p>
 <pre><code>def sort_key_func(item):
     &quot;&quot;&quot; Helper function used to sort list of dicts
@@ -187,7 +187,7 @@ print('Large Method Pandas: ' + str(t.timeit(1)))
     return sorted(pairs)
 sorted(A, key=sort_key_func)
 </code></pre>
-<h4> Comment 112143397 Peter Mortensen: </h4>What do you mean by <i>&quot;sorts elements of a dict by keys and values&quot;</i>? In what way is it sorting? Where do the values come in?<br>------------------------------------------------------------------ <br><h3> Answer 58179903 Bej&#252;r: </h3><p>I have been a big fan of a filter with lambda. However, it is not best option if you consider time complexity.</p>
+<h4> Peter Mortensen, Comment 112143397 Score: 0: </h4>What do you mean by <i>&quot;sorts elements of a dict by keys and values&quot;</i>? In what way is it sorting? Where do the values come in?<br>------------------------------------------------------------------ <br><h3> Bej&#252;r, Id: 58179903, Score: 16: </h3><p>I have been a big fan of a filter with lambda. However, it is not best option if you consider time complexity.</p>
 <h3>First option</h3>
 <pre><code>sorted_list = sorted(list_to_sort, key= lambda x: x['name'])
 # Returns list of values
@@ -209,7 +209,7 @@ python3.6 -m timeit -s &quot;list_to_sort = [{'name':'Homer', 'age':39}, {'name'
 <blockquote>
 <p>1000000 loops, best of 3: 0.438 µsec per loop</p>
 </blockquote>
------------------------------------------------------------------- <br><h3> Answer 47892332 srikavineehari: </h3><p>If you do not need the original <code>list</code> of <code>dictionaries</code>, you could modify it in-place with <code>sort()</code> method using a custom key function.</p>
+------------------------------------------------------------------ <br><h3> srikavineehari, Id: 47892332, Score: 13: </h3><p>If you do not need the original <code>list</code> of <code>dictionaries</code>, you could modify it in-place with <code>sort()</code> method using a custom key function.</p>
 
 <p>Key function:</p>
 
@@ -242,7 +242,7 @@ new_data = sorted(data_two, key=get_name)
 &gt;&gt;&gt; print(new_data)
 [{'name': 'Bart', 'age': 10}, {'name': 'Homer', 'age': 39}]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 59802559 swac: </h3><p>If performance is a concern, I would use <code>operator.itemgetter</code> instead of <code>lambda</code> as built-in functions perform faster than hand-crafted functions. The <code>itemgetter</code> function seems to perform approximately 20% faster than <code>lambda</code> based on my testing.</p>
+------------------------------------------------------------------ <br><h3> swac, Id: 59802559, Score: 11: </h3><p>If performance is a concern, I would use <code>operator.itemgetter</code> instead of <code>lambda</code> as built-in functions perform faster than hand-crafted functions. The <code>itemgetter</code> function seems to perform approximately 20% faster than <code>lambda</code> based on my testing.</p>
 <p>From <a href="https://wiki.python.org/moin/PythonSpeed" rel="noreferrer">https://wiki.python.org/moin/PythonSpeed</a>:</p>
 <blockquote>
 <p>Likewise, the builtin functions run faster than hand-built equivalents. For example, map(operator.add, v1, v2) is faster than map(lambda x,y: x+y, v1, v2).</p>
@@ -267,7 +267,7 @@ sorted(l, key=lambda x: x['name']) == sorted(l, key=operator.itemgetter('name'))
 True
 </code></pre>
 <p>Both techniques sort the list in the same order (verified by execution of the final statement in the code block), but the first one is a little faster.</p>
------------------------------------------------------------------- <br><h3> Answer 75935637 cottontail: </h3><p>It might be better to use <code>dict.get()</code> to fetch the values to sort by in the sorting key. One way it's better than <code>dict[]</code> is that a default value may be used to if a key is missing in some dictionary in the list.</p>
+------------------------------------------------------------------ <br><h3> cottontail, Id: 75935637, Score: 5: </h3><p>It might be better to use <code>dict.get()</code> to fetch the values to sort by in the sorting key. One way it's better than <code>dict[]</code> is that a default value may be used to if a key is missing in some dictionary in the list.</p>
 <p>For example, if a list of dicts were sorted by <code>'age'</code> but <code>'age'</code> was missing in some dict, that dict can either be pushed to the back of the sorted list (or to the front) by simply passing <code>inf</code> as a default value to <code>dict.get()</code>.</p>
 <pre class="lang-py prettyprint-override"><code>lst = [{'name': 'Homer', 'age': 39}, {'name': 'Bart', 'age': 10}, {'name': 'Lisa'}]
 
@@ -283,7 +283,7 @@ sorted(lst, key=lambda d: d.get('age', -float('inf')))  # OK
 # '~' because it has the highest printable ASCII value
 sorted(lst, key=lambda d: d.get('name', '~'))           # OK  
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 76250224 Super Kai - Kazuya Ito: </h3><p>You can sort a list of dictionaries with a key as shown below:</p>
+------------------------------------------------------------------ <br><h3> Super Kai - Kazuya Ito, Id: 76250224, Score: 5: </h3><p>You can sort a list of dictionaries with a key as shown below:</p>
 <pre class="lang-py prettyprint-override"><code>person_list = [
   {'name':'Bob','age':18}, {'name':'Kai','age':36}, {'name':'Ada','age':24} 
 ]
@@ -309,7 +309,7 @@ print(sorted(person_list, key=lambda x: name_list.index(x['name'])))
   {'name':'Kai', 'age':36}, {'name':'Ada', 'age':24}, {'name':'Bob','age':18}
 ]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 69072597 Tms91: </h3><p>As indicated by @Claudiu to @monojohnny in comment section of <a href="https://stackoverflow.com/a/73465/7658051">this answer</a>,<br> given:</p>
+------------------------------------------------------------------ <br><h3> Tms91, Id: 69072597, Score: 3: </h3><p>As indicated by @Claudiu to @monojohnny in comment section of <a href="https://stackoverflow.com/a/73465/7658051">this answer</a>,<br> given:</p>
 <pre><code>list_to_be_sorted = [
                       {'name':'Homer', 'age':39}, 
                       {'name':'Milhouse', 'age':10}, 
@@ -329,7 +329,7 @@ newlist = sorted( list_to_be_sorted, key=operator.itemgetter('age','name') )
 <p>[{'name': 'Bart', 'age': 10},<br>  {'name': 'Milhouse', 'age': 10},<br>
 {'name': 'Homer', 'age': 39}]</p>
 </blockquote>
------------------------------------------------------------------- <br><h3> Answer 72939809 alex: </h3><p>sorting by multiple columns, while in descending order on some of them:
+------------------------------------------------------------------ <br><h3> alex, Id: 72939809, Score: 1: </h3><p>sorting by multiple columns, while in descending order on some of them:
 the cmps array is global to the cmp function, containing field names and inv == -1 for desc 1 for asc</p>
 <pre><code>def cmpfun(a, b):
     for (name, inv) in cmps:
@@ -352,7 +352,7 @@ all_cmps = [
 print 'data:', data
 for cmps in all_cmps: print 'sort:', cmps; print sorted(data, cmpfun)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 75367181 Manrique: </h3><p>You can use the following:</p>
+------------------------------------------------------------------ <br><h3> Manrique, Id: 75367181, Score: 1: </h3><p>You can use the following:</p>
 <pre><code>lst = [{'name': 'Homer', 'age': 39}, {'name': 'Bart', 'age': 10}]
 sorted_lst = sorted(lst, key=lambda x: x['age']) # change this to sort by a different field
 print(sorted_lst)

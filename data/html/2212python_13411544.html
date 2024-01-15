@@ -1,11 +1,11 @@
- <h2> Title: Delete a column from a Pandas DataFrame </h2> <h3> John, question_id: 13411544 </h3>Score: 2212, Tags: {python,pandas,dataframe} <br><p>To delete a column in a DataFrame, I can successfully use:</p>
+ <h2> Title: Delete a column from a Pandas DataFrame </h2> <h4> John, question_id: 13411544 </h4>Score: 2212, Tags: {python,pandas,dataframe} <br><p>To delete a column in a DataFrame, I can successfully use:</p>
 <pre class="lang-py prettyprint-override"><code>del df['column_name']
 </code></pre>
 <p>But why can't I use the following?</p>
 <pre class="lang-py prettyprint-override"><code>del df.column_name
 </code></pre>
 <p>Since it is possible to access the Series via <code>df.column_name</code>, I expected this to work.</p>
------------------------------------------------------------------- <br><h3> Answer 18145399 LondonRob: </h3><p>The best way to do this in Pandas is to use <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.drop.html" rel="noreferrer"><code>drop</code></a>:</p>
+------------------------------------------------------------------ <br><h3> LondonRob, Id: 18145399, Score: 3552: </h3><p>The best way to do this in Pandas is to use <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.drop.html" rel="noreferrer"><code>drop</code></a>:</p>
 <pre><code>df = df.drop('column_name', axis=1)
 </code></pre>
 <p>where <code>1</code> is the <em>axis</em> number (<code>0</code> for rows and <code>1</code> for columns.)</p>
@@ -24,13 +24,13 @@
 <p>Also working with &quot;text&quot; syntax for the columns:</p>
 <pre><code>df.drop(['column_nameA', 'column_nameB'], axis=1, inplace=True)
 </code></pre>
-<h4> Comment 36831932 LondonRob: </h4>True @Paul, but due to the title of the question, most people arriving here will do so via trying to work out how to delete a column.<br><h4> Comment 30650171 beardc: </h4>Is this recommended over <code>del</code> for some reason?<br><h4> Comment 60861568 hobs: </h4>@beardc another advantage of <code>drop</code> over <code>del</code> is that <code>drop</code> allows you to drop multiple columns at once, perform the operation inplace or not, and also delete records along any axis (especially useful for a 3-D matrix or <code>Panel</code>)<br><h4> Comment 36822157 Paul: </h4>Though this method of deletion has its merits, this answer does not really answer the question being asked.<br><h4> Comment 65184788 modulitos: </h4>Another advantage of <code>drop</code> over <code>del</code> is that <a href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.drop.html" rel="nofollow noreferrer">drop</a> is part of the pandas API and contains documentation.<br><h4> Comment 124005739 Rohan: </h4>Note <code>df = df.drop(&#39;column_name&#39;, 1)</code> throws a <code>&quot;FutureWarning: In a future version of pandas all arguments of DataFrame.drop except for the argument &#39;labels&#39; will be keyword-only&quot;</code> in 3.7.2.   Specify <code>df = df.drop(&#39;column_name&#39;, axis=1)</code> to avoid warning,<br><h4> Comment 131851762 jimh: </h4>is <code>del</code> faster than dropping and saving as a new dataframe?<br><h4> Comment 124299435 mrdm: </h4>I have to use Python instead of R and I want to cry for its syntax.<br><h4> Comment 129260783 PatrickT: </h4>If you&#39;re dropping rows, the index is not reset. Something like this drops the first two rows and resets the index, in place: <code>df.drop([0,1], inplace=True)</code> and <code>df.reset_index(drop=True, inplace=True)</code><br>------------------------------------------------------------------ <br><h3> Answer 13485766 Wes McKinney: </h3><p>As you've guessed, the right syntax is </p>
+<h4> LondonRob, Comment 36831932 Score: 164: </h4>True @Paul, but due to the title of the question, most people arriving here will do so via trying to work out how to delete a column.<br><h4> beardc, Comment 30650171 Score: 111: </h4>Is this recommended over <code>del</code> for some reason?<br><h4> hobs, Comment 60861568 Score: 40: </h4>@beardc another advantage of <code>drop</code> over <code>del</code> is that <code>drop</code> allows you to drop multiple columns at once, perform the operation inplace or not, and also delete records along any axis (especially useful for a 3-D matrix or <code>Panel</code>)<br><h4> Paul, Comment 36822157 Score: 36: </h4>Though this method of deletion has its merits, this answer does not really answer the question being asked.<br><h4> modulitos, Comment 65184788 Score: 24: </h4>Another advantage of <code>drop</code> over <code>del</code> is that <a href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.drop.html" rel="nofollow noreferrer">drop</a> is part of the pandas API and contains documentation.<br><h4> Rohan, Comment 124005739 Score: 2: </h4>Note <code>df = df.drop(&#39;column_name&#39;, 1)</code> throws a <code>&quot;FutureWarning: In a future version of pandas all arguments of DataFrame.drop except for the argument &#39;labels&#39; will be keyword-only&quot;</code> in 3.7.2.   Specify <code>df = df.drop(&#39;column_name&#39;, axis=1)</code> to avoid warning,<br><h4> jimh, Comment 131851762 Score: 0: </h4>is <code>del</code> faster than dropping and saving as a new dataframe?<br><h4> mrdm, Comment 124299435 Score: 0: </h4>I have to use Python instead of R and I want to cry for its syntax.<br><h4> PatrickT, Comment 129260783 Score: 0: </h4>If you&#39;re dropping rows, the index is not reset. Something like this drops the first two rows and resets the index, in place: <code>df.drop([0,1], inplace=True)</code> and <code>df.reset_index(drop=True, inplace=True)</code><br>------------------------------------------------------------------ <br><h3> Wes McKinney, Id: 13485766, Score: 1309: </h3><p>As you've guessed, the right syntax is </p>
 
 <pre><code>del df['column_name']
 </code></pre>
 
 <p>It's difficult to make <code>del df.column_name</code> work simply as the result of syntactic limitations in Python. <code>del df[name]</code> gets translated to <code>df.__delitem__(name)</code> under the covers by Python.</p>
-<h4> Comment 66997381 dwanderson: </h4>I realize this is a super old &quot;answer&quot;, but my curiosity is piqued - <i>why</i> is that a syntactic limitation of Python? <code>class A(object): def __init__(self): self.var = 1</code> sets up a class, then <code>a = A(); del a.var</code> works just fine...<br><h4> Comment 69758926 Yonatan: </h4>@dwanderson the difference is that when a column is to be removed, the DataFrame needs to have its own handling for &quot;how to do it&quot;. In the case of <code>del df[name]</code>, it gets translated to <code>df.__delitem__(name)</code> which is a method that DataFrame can implement and modify to its needs. In the case of <code>del df.name</code>, the member variable gets removed without a chance for any custom-code running. Consider your own example - can you get <code>del a.var</code> to result in a print of &quot;deleting variable&quot;? If you can, please tell me how. I can&#39;t :)<br><h4> Comment 70685558 Eugene Pakhomov: </h4>@Yonatan You can use either <a href="https://docs.python.org/3/reference/datamodel.html#object.__delattr__" rel="nofollow noreferrer">docs.python.org/3/reference/datamodel.html#object.__delattr_&zwnj;&#8203;_</a> or descriptors for that: <a href="https://docs.python.org/3/howto/descriptor.html" rel="nofollow noreferrer">docs.python.org/3/howto/descriptor.html</a><br><h4> Comment 79957247 wizzwizz4: </h4>This answer isn&#39;t really correct - the <code>pandas</code> developers <i>didn&#39;t</i>, but that doesn&#39;t mean it is hard to do.<br><h4> Comment 76291720 C S: </h4>@Yonatan Eugene&#39;s comment applies to Python 2 also; descriptors have been in Python 2 since 2.2 and it is trivial to satisfy your requirement ;)<br><h4> Comment 112943871 Zeynab Rostami: </h4>using this answer may cause tokenizing problems when you save the csv and want to read it again. using &quot;df.drop()&quot; as @LondonRob described is the correct way.<br><h4> Comment 70778012 Yonatan: </h4>@EugenePakhomov good point. I was answering in python 2, indeed python 3 gives more flexibility in such matters. Thanks for clarifying.<br><h4> Comment 133545927 alper: </h4>How can I indicate the first column which is for <code>Time</code>?<br><h4> Comment 107807299 pedjjj: </h4>Still, it is correct given that panda works / used to work on Py2.7, too - where you can&#39;t<br>------------------------------------------------------------------ <br><h3> Answer 22596982 Krishna Sankar: </h3><p>Use:</p>
+<h4> dwanderson, Comment 66997381 Score: 35: </h4>I realize this is a super old &quot;answer&quot;, but my curiosity is piqued - <i>why</i> is that a syntactic limitation of Python? <code>class A(object): def __init__(self): self.var = 1</code> sets up a class, then <code>a = A(); del a.var</code> works just fine...<br><h4> Yonatan, Comment 69758926 Score: 25: </h4>@dwanderson the difference is that when a column is to be removed, the DataFrame needs to have its own handling for &quot;how to do it&quot;. In the case of <code>del df[name]</code>, it gets translated to <code>df.__delitem__(name)</code> which is a method that DataFrame can implement and modify to its needs. In the case of <code>del df.name</code>, the member variable gets removed without a chance for any custom-code running. Consider your own example - can you get <code>del a.var</code> to result in a print of &quot;deleting variable&quot;? If you can, please tell me how. I can&#39;t :)<br><h4> Eugene Pakhomov, Comment 70685558 Score: 12: </h4>@Yonatan You can use either <a href="https://docs.python.org/3/reference/datamodel.html#object.__delattr__" rel="nofollow noreferrer">docs.python.org/3/reference/datamodel.html#object.__delattr_&zwnj;&#8203;_</a> or descriptors for that: <a href="https://docs.python.org/3/howto/descriptor.html" rel="nofollow noreferrer">docs.python.org/3/howto/descriptor.html</a><br><h4> wizzwizz4, Comment 79957247 Score: 7: </h4>This answer isn&#39;t really correct - the <code>pandas</code> developers <i>didn&#39;t</i>, but that doesn&#39;t mean it is hard to do.<br><h4> C S, Comment 76291720 Score: 6: </h4>@Yonatan Eugene&#39;s comment applies to Python 2 also; descriptors have been in Python 2 since 2.2 and it is trivial to satisfy your requirement ;)<br><h4> Zeynab Rostami, Comment 112943871 Score: 2: </h4>using this answer may cause tokenizing problems when you save the csv and want to read it again. using &quot;df.drop()&quot; as @LondonRob described is the correct way.<br><h4> Yonatan, Comment 70778012 Score: 0: </h4>@EugenePakhomov good point. I was answering in python 2, indeed python 3 gives more flexibility in such matters. Thanks for clarifying.<br><h4> alper, Comment 133545927 Score: 0: </h4>How can I indicate the first column which is for <code>Time</code>?<br><h4> pedjjj, Comment 107807299 Score: 0: </h4>Still, it is correct given that panda works / used to work on Py2.7, too - where you can&#39;t<br>------------------------------------------------------------------ <br><h3> Krishna Sankar, Id: 22596982, Score: 314: </h3><p>Use:</p>
 
 <pre><code>columns = ['Col1', 'Col2', ...]
 df.drop(columns, inplace=True, axis=1)
@@ -40,7 +40,7 @@ df.drop(columns, inplace=True, axis=1)
 
 <pre><code>df = df.drop(columns, axis=1)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 31431997 jezrael: </h3><h2>Drop by index</h2>
+------------------------------------------------------------------ <br><h3> jezrael, Id: 31431997, Score: 156: </h3><h2>Drop by index</h2>
 
 <p>Delete first, second and fourth columns:</p>
 
@@ -94,7 +94,7 @@ A    2
 B    5
 C    8
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 37000877 firelynx: </h3><p>The actual question posed, missed by most answers here is:</p>
+------------------------------------------------------------------ <br><h3> firelynx, Id: 37000877, Score: 100: </h3><p>The actual question posed, missed by most answers here is:</p>
 <h3>Why can't I use <code>del df.column_name</code>?</h3>
 <p>At first we need to understand the problem, which requires us to dive into <a href="https://rszalski.github.io/magicmethods/" rel="noreferrer"><em>Python magic methods</em></a>.</p>
 <p>As <a href="https://stackoverflow.com/questions/13411544/delete-a-column-from-a-pandas-dataframe/13485766#13485766">Wes points out</a> in his answer, <code>del df['column']</code> maps to the Python <em>magic method</em> <code>df.__delitem__('column')</code> which is <a href="https://github.com/pydata/pandas/blob/c6110e25b3eceb2f25022c2aa9ccea03c0b8b359/pandas/core/generic.py#L1580" rel="noreferrer">implemented in Pandas to drop the column</a>.</p>
@@ -137,7 +137,7 @@ C    8
 <blockquote>
 <p>In the face of ambiguity, refuse the temptation to guess.</p>
 </blockquote>
-<h4> Comment 120997103 pauljohn32: </h4>Actually addresses the WHY part of original question. I&#39;ve implemented subclasses from pandas dataframe. Doing so will teach you vital part of this answer. Differentiating attributes and column names is a big problem. df.a leaves ambiguity whether a is an attribute or column name. However, as pandas is written, df[&quot;a&quot;] can only be a column.<br><h4> Comment 132734915 Joooeey: </h4>This is the only answer to the original question that covers all essential aspects!<br>------------------------------------------------------------------ <br><h3> Answer 34576537 eiTan LaVi: </h3><p>A nice addition is the ability to <strong>drop columns only if they exist</strong>. This way you can cover more use cases, and it will only drop the existing columns from the labels passed to it:</p>
+<h4> pauljohn32, Comment 120997103 Score: 2: </h4>Actually addresses the WHY part of original question. I&#39;ve implemented subclasses from pandas dataframe. Doing so will teach you vital part of this answer. Differentiating attributes and column names is a big problem. df.a leaves ambiguity whether a is an attribute or column name. However, as pandas is written, df[&quot;a&quot;] can only be a column.<br><h4> Joooeey, Comment 132734915 Score: 1: </h4>This is the only answer to the original question that covers all essential aspects!<br>------------------------------------------------------------------ <br><h3> eiTan LaVi, Id: 34576537, Score: 72: </h3><p>A nice addition is the ability to <strong>drop columns only if they exist</strong>. This way you can cover more use cases, and it will only drop the existing columns from the labels passed to it:</p>
 
 <p>Simply add <strong>errors='ignore'</strong>, for example.:</p>
 
@@ -147,10 +147,10 @@ C    8
 <ul>
 <li>This is new from pandas 0.16.1 onward. Documentation is <a href="http://pandas.pydata.org/pandas-docs/version/0.17.0/generated/pandas.DataFrame.drop.html" rel="noreferrer">here</a>.</li>
 </ul>
------------------------------------------------------------------- <br><h3> Answer 36958937 sushmit: </h3><p>From version 0.16.1, you can do</p>
+------------------------------------------------------------------ <br><h3> sushmit, Id: 36958937, Score: 49: </h3><p>From version 0.16.1, you can do</p>
 <pre><code>df.drop(['column_name'], axis = 1, inplace = True, errors = 'ignore')
 </code></pre>
-<h4> Comment 67636601 muon: </h4>And this also supports dropping multiple columns, some of which need not exist (i.e. without raising error <code>errors= &#39;ignore&#39;</code>) <code>df.drop([&#39;column_1&#39;,&#39;column_2&#39;], axis=1 , inplace=True,errors= &#39;ignore&#39;)</code>, if such an application desired!<br>------------------------------------------------------------------ <br><h3> Answer 13415772 Andy Hayden: </h3><p>It's good practice to always use the <code>[]</code> notation. One reason is that attribute notation (<code>df.column_name</code>) does not work for numbered indices:</p>
+<h4> muon, Comment 67636601 Score: 4: </h4>And this also supports dropping multiple columns, some of which need not exist (i.e. without raising error <code>errors= &#39;ignore&#39;</code>) <code>df.drop([&#39;column_1&#39;,&#39;column_2&#39;], axis=1 , inplace=True,errors= &#39;ignore&#39;)</code>, if such an application desired!<br>------------------------------------------------------------------ <br><h3> Andy Hayden, Id: 13415772, Score: 38: </h3><p>It's good practice to always use the <code>[]</code> notation. One reason is that attribute notation (<code>df.column_name</code>) does not work for numbered indices:</p>
 
 <pre><code>In [1]: df = DataFrame([[1, 2, 3], [4, 5, 6]])
 
@@ -166,7 +166,7 @@ In [3]: df.1
        ^
 SyntaxError: invalid syntax
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 46913256 Ted Petrou: </h3><h1>Pandas 0.21+ answer</h1>
+------------------------------------------------------------------ <br><h3> Ted Petrou, Id: 46913256, Score: 32: </h3><h1>Pandas 0.21+ answer</h1>
 
 <p>Pandas version 0.21 has changed the <a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.drop.html" rel="noreferrer"><code>drop</code></a> method slightly to include both the <code>index</code> and <code>columns</code> parameters to match the signature of the <code>rename</code> and <code>reindex</code> methods. </p>
 
@@ -174,11 +174,11 @@ SyntaxError: invalid syntax
 </code></pre>
 
 <p>Personally, I prefer using the <code>axis</code> parameter to denote columns or index because it is the predominant keyword parameter used in nearly all pandas methods. But, now you have some added choices in version 0.21.</p>
------------------------------------------------------------------- <br><h3> Answer 35385805 Alexander: </h3><p>In Pandas 0.16.1+, you can drop columns only if they exist per <a href="https://stackoverflow.com/questions/13411544/delete-a-column-from-a-pandas-dataframe/34576537#34576537">the solution posted by eiTan LaVi</a>.  Prior to that version, you can achieve the same result via a conditional list comprehension:</p>
+------------------------------------------------------------------ <br><h3> Alexander, Id: 35385805, Score: 28: </h3><p>In Pandas 0.16.1+, you can drop columns only if they exist per <a href="https://stackoverflow.com/questions/13411544/delete-a-column-from-a-pandas-dataframe/34576537#34576537">the solution posted by eiTan LaVi</a>.  Prior to that version, you can achieve the same result via a conditional list comprehension:</p>
 <pre><code>df.drop([col for col in ['col_name_1','col_name_2',...,'col_name_N'] if col in df],
         axis=1, inplace=True)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 64376652 Praveen Bushipaka: </h3><p>Use:</p>
+------------------------------------------------------------------ <br><h3> Praveen Bushipaka, Id: 64376652, Score: 26: </h3><p>Use:</p>
 <pre><code>df.drop('columnname', axis =1, inplace = True)
 </code></pre>
 <p>Or else you can go with</p>
@@ -190,7 +190,7 @@ SyntaxError: invalid syntax
 <p>To delete multiple columns based on columns names</p>
 <pre><code>df.drop(['col1','col2',..'coln'], axis = 1, inplace = True)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 46314092 piRSquared: </h3><h1>TL;DR</h1>
+------------------------------------------------------------------ <br><h3> piRSquared, Id: 46314092, Score: 21: </h3><h1>TL;DR</h1>
 
 <p>A lot of effort to find a marginally more efficient solution.  Difficult to justify the added complexity while sacrificing the simplicity of <code>df.drop(dlst, 1, errors='ignore')</code></p>
 
@@ -457,7 +457,7 @@ fig.tight_layout()
 300    (ridx, setdifflst)  0.780157
 1000  (ridxa, setdifflst)  0.861622
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 61305524 Littin Rajan: </h3><p>We can <strong>remove</strong> or <strong>delete</strong> a specified column or specified columns by the <strong>drop()</strong> method.</p>
+------------------------------------------------------------------ <br><h3> Littin Rajan, Id: 61305524, Score: 16: </h3><p>We can <strong>remove</strong> or <strong>delete</strong> a specified column or specified columns by the <strong>drop()</strong> method.</p>
 <p>Suppose <strong>df</strong> is a dataframe.</p>
 <p>Column to be removed = column0</p>
 <blockquote>
@@ -471,20 +471,20 @@ fig.tight_layout()
 </blockquote>
 <pre><code>df = df.drop([col1, col2, . . . , coln], axis=1)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 60695984 ccpizza: </h3><p>If your original dataframe <strong><code>df</code></strong> is not too big, you have no memory constraints, and you only need to keep a few columns, or, if you don't know beforehand the names of all the extra columns that you do not need, then you might as well create a new dataframe with only the columns you need:</p>
+------------------------------------------------------------------ <br><h3> ccpizza, Id: 60695984, Score: 6: </h3><p>If your original dataframe <strong><code>df</code></strong> is not too big, you have no memory constraints, and you only need to keep a few columns, or, if you don't know beforehand the names of all the extra columns that you do not need, then you might as well create a new dataframe with only the columns you need:</p>
 <pre><code>new_df = df[['spam', 'sausage']]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 64840364 S Habeeb Ullah: </h3><p>Deleting a column using the <code>iloc</code> function of <code>dataframe</code> and <code>slicing</code>, when we have a typical column name with unwanted values:</p>
+------------------------------------------------------------------ <br><h3> S Habeeb Ullah, Id: 64840364, Score: 5: </h3><p>Deleting a column using the <code>iloc</code> function of <code>dataframe</code> and <code>slicing</code>, when we have a typical column name with unwanted values:</p>
 <pre><code>df = df.iloc[:,1:] # Removing an unnamed index column
 </code></pre>
 <p>Here <code>0</code> is the default row and <code>1</code> is the first column, hence <code>:,1:</code> is our parameter for deleting the first column.</p>
------------------------------------------------------------------- <br><h3> Answer 36749161 Doctor: </h3><p>The dot syntax works in JavaScript, but not in Python.</p>
+------------------------------------------------------------------ <br><h3> Doctor, Id: 36749161, Score: 3: </h3><p>The dot syntax works in JavaScript, but not in Python.</p>
 
 <ul>
 <li>Python: <code>del df['column_name']</code></li>
 <li>JavaScript: <code>del df['column_name']</code> <strong>or</strong> <code>del df.column_name</code></li>
 </ul>
------------------------------------------------------------------- <br><h3> Answer 52242125 Daksh Gupta: </h3><p><strong>Another way of deleting a column in a Pandas DataFrame</strong></p>
+------------------------------------------------------------------ <br><h3> Daksh Gupta, Id: 52242125, Score: 3: </h3><p><strong>Another way of deleting a column in a Pandas DataFrame</strong></p>
 <p>If you're not looking for <em>in-place</em> deletion then you can create a new DataFrame by specifying the columns using <code>DataFrame(...)</code> function as:</p>
 <pre><code>my_dict = { 'name' : ['a','b','c','d'], 'age' : [10,20,25,22], 'designation' : ['CEO', 'VP', 'MD', 'CEO']}
 
@@ -494,7 +494,7 @@ df = pd.DataFrame(my_dict)
 <pre><code>newdf = pd.DataFrame(df, columns=['name', 'age'])
 </code></pre>
 <p>You get a result as good as what you get with del / drop.</p>
-<h4> Comment 99174415 cs95: </h4>This is technically correct but it seems silly to have to list every column to keep instead of just the one (or few) columns you want to delete.<br>------------------------------------------------------------------ <br><h3> Answer 73076296 Falco Alexander: </h3><p>Taking advantage by using Autocomplete or &quot;IntelliSense&quot; over string literals:</p>
+<h4> cs95, Comment 99174415 Score: 1: </h4>This is technically correct but it seems silly to have to list every column to keep instead of just the one (or few) columns you want to delete.<br>------------------------------------------------------------------ <br><h3> Falco Alexander, Id: 73076296, Score: 2: </h3><p>Taking advantage by using Autocomplete or &quot;IntelliSense&quot; over string literals:</p>
 <pre><code>del df[df.column1.name]
 
 # or
@@ -502,10 +502,10 @@ df = pd.DataFrame(my_dict)
 df.drop(df.column1.name, axis=1, inplace=True)
 </code></pre>
 <p>It works fine with current Pandas versions.</p>
------------------------------------------------------------------- <br><h3> Answer 75637132 Jordy: </h3><p>If you want find the <strong>simple ways</strong> to delete <code>column_name</code> from <code>df</code> data frame, here we go:</p>
+------------------------------------------------------------------ <br><h3> Jordy, Id: 75637132, Score: 1: </h3><p>If you want find the <strong>simple ways</strong> to delete <code>column_name</code> from <code>df</code> data frame, here we go:</p>
 <pre class="lang-py prettyprint-override"><code>df = df[df.columns.drop('column_name')]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 76428891 cottontail: </h3><p>Deleting a column using <code>del</code> is not only problematic (as explained by <a href="https://stackoverflow.com/a/37000877/19123103">@firelynx</a>) but also very slow. For example, it's ~37 times slower than <code>drop()</code>.</p>
+------------------------------------------------------------------ <br><h3> cottontail, Id: 76428891, Score: 1: </h3><p>Deleting a column using <code>del</code> is not only problematic (as explained by <a href="https://stackoverflow.com/a/37000877/19123103">@firelynx</a>) but also very slow. For example, it's ~37 times slower than <code>drop()</code>.</p>
 <pre class="lang-py prettyprint-override"><code>from timeit import timeit
 setup = &quot;import pandas as pd; df=pd.DataFrame([range(10000)])&quot;
 
@@ -562,7 +562,7 @@ perfplot.plot(
 
 plt.tight_layout();
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 69461516 Mykola Zotko: </h3><p>To remove columns before and after specific columns you can use the method <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.truncate.html" rel="nofollow noreferrer">truncate</a>. For example:</p>
+------------------------------------------------------------------ <br><h3> Mykola Zotko, Id: 69461516, Score: 0: </h3><p>To remove columns before and after specific columns you can use the method <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.truncate.html" rel="nofollow noreferrer">truncate</a>. For example:</p>
 <pre><code>   A   B    C     D      E
 0  1  10  100  1000  10000
 1  2  20  200  2000  20000
@@ -574,7 +574,7 @@ df.truncate(before='B', after='D', axis=1)
 0  10  100  1000
 1  20  200  2000
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 69910566 creanion: </h3><p>Viewed from a general Python standpoint,  <code>del obj.column_name</code> makes sense if the attribute <code>column_name</code> can be deleted. It needs to be a regular attribute - or a property with a defined deleter.</p>
+------------------------------------------------------------------ <br><h3> creanion, Id: 69910566, Score: 0: </h3><p>Viewed from a general Python standpoint,  <code>del obj.column_name</code> makes sense if the attribute <code>column_name</code> can be deleted. It needs to be a regular attribute - or a property with a defined deleter.</p>
 <p>The reasons why this doesn't translate to Pandas, and does <em>not</em> make sense for Pandas Dataframes are:</p>
 <ul>
 <li>Consider <code>df.column_name</code> to be a “virtual attribute”, it is not a thing in its own right, it is not the “seat” of that column, it's just a way to access the column.  Much like a property with no deleter.</li>

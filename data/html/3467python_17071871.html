@@ -1,10 +1,10 @@
- <h2> Title: How do I select rows from a DataFrame based on column values? </h2> <h3> szli, question_id: 17071871 </h3>Score: 3467, Tags: {python,pandas,dataframe} <br><p>How can I select rows from a DataFrame based on values in some column in Pandas?</p>
+ <h2> Title: How do I select rows from a DataFrame based on column values? </h2> <h4> szli, question_id: 17071871 </h4>Score: 3467, Tags: {python,pandas,dataframe} <br><p>How can I select rows from a DataFrame based on values in some column in Pandas?</p>
 <p>In SQL, I would use:</p>
 <pre class="lang-sql prettyprint-override"><code>SELECT *
 FROM table
 WHERE column_name = some_value
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 17071908 unutbu: </h3><p>To select rows whose column value equals a scalar, <code>some_value</code>, use <code>==</code>:</p>
+------------------------------------------------------------------ <br><h3> unutbu, Id: 17071908, Score: 6377: </h3><p>To select rows whose column value equals a scalar, <code>some_value</code>, use <code>==</code>:</p>
 <pre><code>df.loc[df['column_name'] == some_value]
 </code></pre>
 <p>To select rows whose column value is in an iterable, <code>some_values</code>, use <code>isin</code>:</p>
@@ -94,7 +94,7 @@ two  foo  4   8
 two  bar  5  10
 one  foo  6  12
 </code></pre>
-<h4> Comment 132858069 user3871: </h4>Do you know how to do this if you don&#39;t have column labels, i.e., by column index? For example, return rows where Col 0 = &quot;some value&quot;. <code>df.iloc[df[0] == some_value]</code> doesn&#39;t work, giving error <code>Cannot index by location index with a non-integer key.</code> Though <code>df.loc[df.iloc[:, 0] == &#39;some_value&#39;]</code> seems to work.<br><h4> Comment 135217477 hobs: </h4>@user3871 as the error message explains (and the examples in the answer show), you need to use <code>df.loc[...]</code> when the ... is a boolean Series (which is what the <code>==</code> binary operator on a pair of <code>Series</code> returns.  And all <code>DataFrame</code> s have column labels, even if you never set any. You can find out what they are with <code>df.columns</code> . So wherever you have <code>df[0]</code> you could use <code>df[df.columns[0]]</code> .<br>------------------------------------------------------------------ <br><h3> Answer 46165056 piRSquared: </h3><p>There are several ways to select rows from a Pandas dataframe:</p>
+<h4> user3871, Comment 132858069 Score: 3: </h4>Do you know how to do this if you don&#39;t have column labels, i.e., by column index? For example, return rows where Col 0 = &quot;some value&quot;. <code>df.iloc[df[0] == some_value]</code> doesn&#39;t work, giving error <code>Cannot index by location index with a non-integer key.</code> Though <code>df.loc[df.iloc[:, 0] == &#39;some_value&#39;]</code> seems to work.<br><h4> hobs, Comment 135217477 Score: 1: </h4>@user3871 as the error message explains (and the examples in the answer show), you need to use <code>df.loc[...]</code> when the ... is a boolean Series (which is what the <code>==</code> binary operator on a pair of <code>Series</code> returns.  And all <code>DataFrame</code> s have column labels, even if you never set any. You can find out what they are with <code>df.columns</code> . So wherever you have <code>df[0]</code> you could use <code>df[df.columns[0]]</code> .<br>------------------------------------------------------------------ <br><h3> piRSquared, Id: 46165056, Score: 811: </h3><p>There are several ways to select rows from a Pandas dataframe:</p>
 <ol>
 <li><strong>Boolean indexing (<code>df[df['col'] == value</code>] )</strong></li>
 <li><strong>Positional indexing (<code>df.iloc[...]</code>)</strong></li>
@@ -377,7 +377,7 @@ spec = pd.DataFrame(
         setp = 'from __main__ import d, {}'.format(i)
         spec.at[i, j] = timeit(stmt, setp, number=50)
 </code></pre>
-<h4> Comment 136068206 Confounded: </h4>I personally like to use <code>groupby</code> and <code>filter</code> as in <code>df.groupby([&#39;column_name&#39;]).filter(lambda x: x.name == column_value)</code>.<br>------------------------------------------------------------------ <br><h3> Answer 31296878 imolit: </h3><h3>tl;dr</h3>
+<h4> Confounded, Comment 136068206 Score: 0: </h4>I personally like to use <code>groupby</code> and <code>filter</code> as in <code>df.groupby([&#39;column_name&#39;]).filter(lambda x: x.name == column_value)</code>.<br>------------------------------------------------------------------ <br><h3> imolit, Id: 31296878, Score: 352: </h3><h3>tl;dr</h3>
 <p>The Pandas equivalent to</p>
 <pre><code>select * from table where column_name = some_value
 </code></pre>
@@ -424,7 +424,7 @@ df[df.foo == 222]
 <p>But at that point I would recommend using the <a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.query.html" rel="noreferrer">query</a> function, since it's less verbose and yields the same result:</p>
 <pre><code>df.query('foo == 222 | bar == 444')
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 35282530 fredcallaway: </h3><p>I find the syntax of the previous answers to be redundant and difficult to remember. Pandas introduced the <code>query()</code> method in v0.13 and I much prefer it. For your question, you could do <code>df.query('col == val')</code>.</p>
+------------------------------------------------------------------ <br><h3> fredcallaway, Id: 35282530, Score: 94: </h3><p>I find the syntax of the previous answers to be redundant and difficult to remember. Pandas introduced the <code>query()</code> method in v0.13 and I much prefer it. For your question, you could do <code>df.query('col == val')</code>.</p>
 <p>Reproduced from <em><a href="http://pandas.pydata.org/pandas-docs/version/0.17.0/indexing.html#indexing-query" rel="noreferrer">The query() Method (Experimental)</a></em>:</p>
 <pre><code>In [167]: n = 10
 
@@ -462,7 +462,7 @@ Out[171]:
 <pre><code>exclude = ('red', 'orange')
 df.query('color not in @exclude')
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 57338153 Erfan: </h3><h3>More flexibility using <code>.query</code> with pandas &gt;= 0.25.0:</h3>
+------------------------------------------------------------------ <br><h3> Erfan, Id: 57338153, Score: 73: </h3><h3>More flexibility using <code>.query</code> with pandas &gt;= 0.25.0:</h3>
 <p>Since pandas &gt;= 0.25.0 we can use the <code>query</code> method to filter dataframes with pandas methods and even column names which have spaces. Normally the spaces in column names would give an error, but now we can solve that using a backtick (`) - see <a href="https://github.com/pandas-dev/pandas/issues/6508" rel="noreferrer">GitHub</a>:</p>
 <pre><code># Example dataframe
 df = pd.DataFrame({'Sender email':['ex@example.com', &quot;reply@shop.com&quot;, &quot;buy@shop.com&quot;]})
@@ -490,7 +490,7 @@ df.query('`Sender email`.str.endswith(@domain)')
 1  reply@shop.com
 2    buy@shop.com
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 47693145 SP001: </h3><p>For selecting only specific columns out of multiple columns for a given value in Pandas:</p>
+------------------------------------------------------------------ <br><h3> SP001, Id: 47693145, Score: 43: </h3><p>For selecting only specific columns out of multiple columns for a given value in Pandas:</p>
 <pre><code>select col_name1, col_name2 from table where column_name = some_value.
 </code></pre>
 <p>Options <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.loc.html" rel="noreferrer"><code>loc</code></a>:</p>
@@ -499,7 +499,7 @@ df.query('`Sender email`.str.endswith(@domain)')
 <p>or <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.query.html" rel="noreferrer"><code>query</code></a>:</p>
 <pre><code>df.query('column_name == some_value')[[col_name1, col_name2]]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 44931669 shivsn: </h3><p>Faster results can be achieved using <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.where.html" rel="noreferrer">numpy.where</a>. </p>
+------------------------------------------------------------------ <br><h3> shivsn, Id: 44931669, Score: 36: </h3><p>Faster results can be achieved using <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.where.html" rel="noreferrer">numpy.where</a>. </p>
 
 <p>For example, with <a href="https://stackoverflow.com/questions/17071871/select-rows-from-a-dataframe-based-on-values-in-a-column-in-pandas/17071908#17071908">unubtu's setup</a> -</p>
 
@@ -530,7 +530,7 @@ In [72]: %timeit df[df.A=='foo']
 In [74]: %timeit df.query('(A=="foo")')  # slowest
 1000 loops, best of 3: 1.71 ms per loop
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 65578196 Punnerud: </h3><p>In newer versions of Pandas, inspired by the documentation (<em><a href="https://pandas.pydata.org/docs/user_guide/10min.html#viewing-data" rel="noreferrer">Viewing data</a></em>):</p>
+------------------------------------------------------------------ <br><h3> Punnerud, Id: 65578196, Score: 36: </h3><p>In newer versions of Pandas, inspired by the documentation (<em><a href="https://pandas.pydata.org/docs/user_guide/10min.html#viewing-data" rel="noreferrer">Viewing data</a></em>):</p>
 <pre><code>df[df[&quot;colume_name&quot;] == some_value] #Scalar, True/False..
 
 df[df[&quot;colume_name&quot;] == &quot;some_value&quot;] #String
@@ -543,7 +543,7 @@ df[df[&quot;colume_name&quot;] == &quot;some_value&quot;] #String
 df['colume_name'].str.contains(&quot;text&quot;) # Search for &quot;text&quot;
 df['colume_name'].str.lower().str.contains(&quot;text&quot;) # Search for &quot;text&quot;, after converting  to lowercase
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 17086321 DataByDavid: </h3><p>Here is a simple example  </p>
+------------------------------------------------------------------ <br><h3> DataByDavid, Id: 17086321, Score: 31: </h3><p>Here is a simple example  </p>
 
 <pre><code>from pandas import DataFrame
 
@@ -572,7 +572,7 @@ df[mask]
 #    Cost    Revenue
 # 1  444     111
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 40676816 TuanDT: </h3><p>To add: You can also do <code>df.groupby('column_name').get_group('column_desired_value').reset_index()</code> to make a new data frame with specified column having a particular value. E.g.,</p>
+------------------------------------------------------------------ <br><h3> TuanDT, Id: 40676816, Score: 20: </h3><p>To add: You can also do <code>df.groupby('column_name').get_group('column_desired_value').reset_index()</code> to make a new data frame with specified column having a particular value. E.g.,</p>
 <pre><code>import pandas as pd
 df = pd.DataFrame({'A': 'foo bar foo bar foo bar foo foo'.split(),
                    'B': 'one one two three two two one three'.split()})
@@ -601,7 +601,7 @@ Sub dataframe where B is two:
 1  foo  two
 2  bar  two
 </code></pre>
-<h4> Comment 132360483 ali bakhtiari: </h4>Instead of ` .drop(&#39;index&#39;, axis = 1)` and creating a new dataframe, you could simply set <code>drop=True</code> in <code>.reset_index()</code><br>------------------------------------------------------------------ <br><h3> Answer 73762002 cottontail: </h3><h2>1. Use f-strings inside <code>query()</code> calls</h2>
+<h4> ali bakhtiari, Comment 132360483 Score: 0: </h4>Instead of ` .drop(&#39;index&#39;, axis = 1)` and creating a new dataframe, you could simply set <code>drop=True</code> in <code>.reset_index()</code><br>------------------------------------------------------------------ <br><h3> cottontail, Id: 73762002, Score: 13: </h3><h2>1. Use f-strings inside <code>query()</code> calls</h2>
 <p>If the column name used to filter your dataframe comes from a local variable, f-strings may be useful. For example,</p>
 <pre class="lang-py prettyprint-override"><code>col = 'A'
 df.query(f&quot;{col} == 'foo'&quot;)
@@ -704,7 +704,7 @@ plot(
     title='Comparison operation on strings',
     equality_check=pd.DataFrame.equals);
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 53674430 vahid: </h3><p>You can also use .apply:</p>
+------------------------------------------------------------------ <br><h3> vahid, Id: 53674430, Score: 11: </h3><p>You can also use .apply:</p>
 
 <pre><code>df.apply(lambda row: row[df['B'].isin(['one','three'])])
 </code></pre>
@@ -725,7 +725,7 @@ plot(
 
 <pre><code>df[[df['B'].isin(['one','three'])]]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 70120429 lord-hasan: </h3><p>If you want to make query to your dataframe repeatedly and speed is important to you, the best thing is to convert your dataframe to dictionary and then by doing this you can make query thousands of times faster.</p>
+------------------------------------------------------------------ <br><h3> lord-hasan, Id: 70120429, Score: 5: </h3><p>If you want to make query to your dataframe repeatedly and speed is important to you, the best thing is to convert your dataframe to dictionary and then by doing this you can make query thousands of times faster.</p>
 <pre><code>my_df = df.set_index(column_name)
 my_dict = my_df.to_dict('index')
 </code></pre>
@@ -736,7 +736,7 @@ my_dict = my_df.to_dict('index')
 <p>If you have duplicated values in column_name you can't make a dictionary. but you can use:</p>
 <pre><code>my_result = my_df.loc[some_value]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 71952267 Erfan: </h3><h3>SQL statements on DataFrames to select rows using DuckDB</h3>
+------------------------------------------------------------------ <br><h3> Erfan, Id: 71952267, Score: 5: </h3><h3>SQL statements on DataFrames to select rows using DuckDB</h3>
 <p>With <a href="https://duckdb.org/docs/guides/python/sql_on_pandas" rel="nofollow noreferrer">DuckDB</a> we can query pandas DataFrames with SQL statements, in a <a href="https://duckdb.org/2021/05/14/sql-on-pandas.html" rel="nofollow noreferrer">highly performant way</a>.</p>
 <p>Since the question is <em>How do I select rows from a DataFrame based on column values?</em>, and the example in the question is a SQL query, this answer looks logical in this topic.</p>
 <p><strong>Example</strong>:</p>
@@ -777,7 +777,7 @@ Out[7]:
 6   9  20
 7  10  21
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 73213567 Mykola Zotko: </h3><p>You can use <code>loc</code> (square brackets) with a function:</p>
+------------------------------------------------------------------ <br><h3> Mykola Zotko, Id: 73213567, Score: 5: </h3><p>You can use <code>loc</code> (square brackets) with a function:</p>
 <pre><code># Series
 s = pd.Series([1, 2, 3, 4]) 
 s.loc[lambda x: x &gt; 1]
@@ -798,7 +798,7 @@ df[lambda x: (x['A'] != 1) &amp; (x['B'] != 30)]
 <pre><code>   A   B
 1  2  20
 </code></pre>
-<h4> Comment 132744640 Artem Sokolov: </h4>In my opinion, this is the best answer, because a) it does not repeat the variable name twice, making it less error-prone, and b) it is chain-friendly, making it much more streamlined with other data frame operations.<br>------------------------------------------------------------------ <br><h3> Answer 75960482 Panagiotis Drakatos: </h3><p>Here are options using pandas built-in functions, similar to <code>isin</code>.</p>
+<h4> Artem Sokolov, Comment 132744640 Score: 1: </h4>In my opinion, this is the best answer, because a) it does not repeat the variable name twice, making it less error-prone, and b) it is chain-friendly, making it much more streamlined with other data frame operations.<br>------------------------------------------------------------------ <br><h3> Panagiotis Drakatos, Id: 75960482, Score: 1: </h3><p>Here are options using pandas built-in functions, similar to <code>isin</code>.</p>
 <pre><code> df = pd.DataFrame({'cost': [250, 150, 100], 'revenue': [100, 250, 300]},index=['A', 'B', 'C'])
 
    cost  revenue
@@ -827,7 +827,7 @@ C   100      300
 B   150      250
 C   100      300
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 71149332 L. Astola: </h3><p>Great answers. Only, when the <strong>size of the dataframe approaches million rows</strong>, many of the methods tend to take ages when using <code>df[df['col']==val]</code>. I wanted to have all possible values of &quot;another_column&quot; that correspond to specific values in &quot;some_column&quot; (in this case in a dictionary). This worked and fast.</p>
+------------------------------------------------------------------ <br><h3> L. Astola, Id: 71149332, Score: 0: </h3><p>Great answers. Only, when the <strong>size of the dataframe approaches million rows</strong>, many of the methods tend to take ages when using <code>df[df['col']==val]</code>. I wanted to have all possible values of &quot;another_column&quot; that correspond to specific values in &quot;some_column&quot; (in this case in a dictionary). This worked and fast.</p>
 <pre><code>s=datetime.datetime.now()
 
 my_dict={}

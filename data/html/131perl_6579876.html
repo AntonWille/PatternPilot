@@ -1,4 +1,4 @@
- <h2> Title: How to match a substring in a string, ignoring case </h2> <h3> Mandar Pande, question_id: 6579876 </h3>Score: 131, Tags: {python,perl} <br><p>I'm looking for ignore case string comparison in Python.</p>
+ <h2> Title: How to match a substring in a string, ignoring case </h2> <h4> Mandar Pande, question_id: 6579876 </h4>Score: 131, Tags: {python,perl} <br><p>I'm looking for ignore case string comparison in Python.</p>
 
 <p>I tried with:</p>
 
@@ -11,14 +11,14 @@
 
 <pre><code>if ($line=~/^Mandy Pande:/i)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 6579933 eumiro: </h3><p>If you don't want to use <code>str.lower()</code>, you can use a <a href="http://en.wikipedia.org/wiki/Regular_expression" rel="noreferrer">regular expression</a>:</p>
+------------------------------------------------------------------ <br><h3> eumiro, Id: 6579933, Score: 225: </h3><p>If you don't want to use <code>str.lower()</code>, you can use a <a href="http://en.wikipedia.org/wiki/Regular_expression" rel="noreferrer">regular expression</a>:</p>
 
 <pre><code>import re
 
 if re.search('mandy', 'Mandy Pande', re.IGNORECASE):
     # Is True
 </code></pre>
-<h4> Comment 111642407 Miro: </h4>re.search(pattern, string, flags=0) <a href="https://docs.python.org/3/library/re.html#re.search" rel="nofollow noreferrer">docs.python.org/3/library/re.html#re.search</a> Scan through string looking for the first location where the regular expression pattern produces a match, and return a corresponding match object. Return None if no position in the string matches the pattern; note that this is different from finding a zero-length match at some point in the string.<br><h4> Comment 122382354 mustafa candan: </h4>Be careful about special characters. They can cause problems with this method<br>------------------------------------------------------------------ <br><h3> Answer 6579927 Samuele Mattiuzzo: </h3><p>You are looking for the <code>.lower()</code> method:</p>
+<h4> Miro, Comment 111642407 Score: 2: </h4>re.search(pattern, string, flags=0) <a href="https://docs.python.org/3/library/re.html#re.search" rel="nofollow noreferrer">docs.python.org/3/library/re.html#re.search</a> Scan through string looking for the first location where the regular expression pattern produces a match, and return a corresponding match object. Return None if no position in the string matches the pattern; note that this is different from finding a zero-length match at some point in the string.<br><h4> mustafa candan, Comment 122382354 Score: 0: </h4>Be careful about special characters. They can cause problems with this method<br>------------------------------------------------------------------ <br><h3> Samuele Mattiuzzo, Id: 6579927, Score: 45: </h3><p>You are looking for the <code>.lower()</code> method:</p>
 <pre><code>string1 = &quot;hi&quot;
 string2 = &quot;HI&quot;
 if string1.lower() == string2.lower():
@@ -27,7 +27,7 @@ else:
     print(&quot;Different!&quot;)
 </code></pre>
 <p>Btw, There's another post <a href="https://stackoverflow.com/questions/62567/ignore-case-in-python-strings">here</a>. Try looking at this.</p>
-<h4> Comment 67365883 Samuele Mattiuzzo: </h4>Let&#39;s call it a workaround then :) 5 years ago I wasn&#39;t as skilled as I am nowadays with English.<br><h4> Comment 7759589 Fredrik Pihl: </h4>No he&#39;s not. &quot; [i don&#39;t want to use toupper/tolower etc.]&quot;<br><h4> Comment 76925753 Ozgur Ozturk: </h4>if you don&#39;t really need to avoid it (for some reason like unicode), maching with lower() can be much more efficient than regex match.<br><h4> Comment 7759641 Fredrik Pihl: </h4>what have () or [] to do with the question?<br><h4> Comment 7759612 Samuele Mattiuzzo: </h4>i know, i read, but the re.match and re.search solutions don&#39;t check for special characters used in regex such as () or []<br><h4> Comment 67270638 user824425: </h4>This is not a more general answer, because tolower/toupper solutions are inappropriate for Unicode.<br>------------------------------------------------------------------ <br><h3> Answer 68380784 Unmitigated: </h3><p>One can use the <code>in</code> operator after applying <a href="https://docs.python.org/3/library/stdtypes.html#str.casefold" rel="noreferrer"><code>str.casefold</code></a> to both strings.</p>
+<h4> Samuele Mattiuzzo, Comment 67365883 Score: 0: </h4>Let&#39;s call it a workaround then :) 5 years ago I wasn&#39;t as skilled as I am nowadays with English.<br><h4> Fredrik Pihl, Comment 7759589 Score: 14: </h4>No he&#39;s not. &quot; [i don&#39;t want to use toupper/tolower etc.]&quot;<br><h4> Ozgur Ozturk, Comment 76925753 Score: 3: </h4>if you don&#39;t really need to avoid it (for some reason like unicode), maching with lower() can be much more efficient than regex match.<br><h4> Fredrik Pihl, Comment 7759641 Score: 2: </h4>what have () or [] to do with the question?<br><h4> Samuele Mattiuzzo, Comment 7759612 Score: 1: </h4>i know, i read, but the re.match and re.search solutions don&#39;t check for special characters used in regex such as () or []<br><h4> user824425, Comment 67270638 Score: 0: </h4>This is not a more general answer, because tolower/toupper solutions are inappropriate for Unicode.<br>------------------------------------------------------------------ <br><h3> Unmitigated, Id: 68380784, Score: 26: </h3><p>One can use the <code>in</code> operator after applying <a href="https://docs.python.org/3/library/stdtypes.html#str.casefold" rel="noreferrer"><code>str.casefold</code></a> to both strings.</p>
 <p><a href="https://docs.python.org/3/library/stdtypes.html#str.casefold" rel="noreferrer"><code>str.casefold</code></a> is the recommended method for use in case-insensitive comparison.</p>
 <blockquote>Return a casefolded copy of the string. Casefolded strings may be used for caseless matching.
 <p>Casefolding is similar to lowercasing but more aggressive because it is intended to remove all case distinctions in a string. For example, the German lowercase letter 'ß' is equivalent to &quot;ss&quot;. Since it is already lowercase, lower() would do nothing to 'ß'; casefold() converts it to &quot;ss&quot;.</p>
@@ -45,30 +45,30 @@ b = &quot;TEST&quot;
 if a.casefold() == b.casefold():
     print('a and b are equal, ignoring case')
 </code></pre>
-<h4> Comment 132361199 Kristian: </h4>Also seems to support non-ANSI letters like the Danish/Norwegian &#198;, &#216; and &#197;.<br>------------------------------------------------------------------ <br><h3> Answer 43262487 norbertoisaac: </h3><p>Try:</p>
+<h4> Kristian, Comment 132361199 Score: 0: </h4>Also seems to support non-ANSI letters like the Danish/Norwegian &#198;, &#216; and &#197;.<br>------------------------------------------------------------------ <br><h3> norbertoisaac, Id: 43262487, Score: 10: </h3><p>Try:</p>
 
 <pre><code>if haystackstr.lower().find(needlestr.lower()) != -1:
   # True
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 6580027 Riccardo B.: </h3><pre><code>a = &quot;MandY&quot;
+------------------------------------------------------------------ <br><h3> Riccardo B., Id: 6580027, Score: 8: </h3><pre><code>a = &quot;MandY&quot;
 a_low = a.lower()
 if &quot;mandy&quot; in a_low:
     print(&quot;true&quot;)
 </code></pre>
 <p>work around</p>
------------------------------------------------------------------- <br><h3> Answer 59702068 pabloverd: </h3><p>you can also use: <code>s.lower() in str.lower()</code></p>
-<h4> Comment 105560564 Gino Mempin: </h4>OP said &quot;<i>I don&#39;t want to use toupper/tolower, etc.</i>&quot;<br>------------------------------------------------------------------ <br><h3> Answer 6579938 a&#39;r: </h3><pre><code>import re
+------------------------------------------------------------------ <br><h3> pabloverd, Id: 59702068, Score: 4: </h3><p>you can also use: <code>s.lower() in str.lower()</code></p>
+<h4> Gino Mempin, Comment 105560564 Score: 2: </h4>OP said &quot;<i>I don&#39;t want to use toupper/tolower, etc.</i>&quot;<br>------------------------------------------------------------------ <br><h3> a&#39;r, Id: 6579938, Score: 3: </h3><pre><code>import re
 if re.search('(?i)Mandy Pande:', line):
     ...
 </code></pre>
-<h4> Comment 7759586 Samuele Mattiuzzo: </h4>this doesn&#39;t check / match for control characters in for regexp like [] or () if i&#39;m not wrong...<br>------------------------------------------------------------------ <br><h3> Answer 63276767 VHS: </h3><p>You can use <code>in</code> operator in conjunction with <code>lower</code> method of strings.</p>
+<h4> Samuele Mattiuzzo, Comment 7759586 Score: 0: </h4>this doesn&#39;t check / match for control characters in for regexp like [] or () if i&#39;m not wrong...<br>------------------------------------------------------------------ <br><h3> VHS, Id: 63276767, Score: 3: </h3><p>You can use <code>in</code> operator in conjunction with <code>lower</code> method of strings.</p>
 <p><code>if &quot;mandy&quot; in line.lower():</code></p>
------------------------------------------------------------------- <br><h3> Answer 6579953 Fredrik Pihl: </h3><p>See <a href="http://docs.python.org/library/re.html#re.I" rel="nofollow noreferrer">this</a>.</p>
+------------------------------------------------------------------ <br><h3> Fredrik Pihl, Id: 6579953, Score: 2: </h3><p>See <a href="http://docs.python.org/library/re.html#re.I" rel="nofollow noreferrer">this</a>.</p>
 
 <pre><code>In [14]: re.match("mandy", "MaNdY", re.IGNORECASE)
 Out[14]: &lt;_sre.SRE_Match object at 0x23a08b8&gt;
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 66835073 mpriya: </h3><p>If it is a pandas series, you can mention <strong>case=False</strong> in the str.contains</p>
+------------------------------------------------------------------ <br><h3> mpriya, Id: 66835073, Score: 2: </h3><p>If it is a pandas series, you can mention <strong>case=False</strong> in the str.contains</p>
 <pre><code>data['Column_name'].str.contains('abcd', case=False) 
 </code></pre>
 <p>OR if it is just two string comparisons try the other method below</p>

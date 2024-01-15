@@ -1,4 +1,4 @@
- <h2> Title: How to access the index value in a &#39;for&#39; loop? </h2> <h3> Joan Venge, question_id: 522563 </h3>Score: 5361, Tags: {python,loops,list} <br><p>How do I access the index while iterating over a sequence with a <code>for</code> loop?</p>
+ <h2> Title: How to access the index value in a &#39;for&#39; loop? </h2> <h4> Joan Venge, question_id: 522563 </h4>Score: 5361, Tags: {python,loops,list} <br><p>How do I access the index while iterating over a sequence with a <code>for</code> loop?</p>
 <pre class="lang-py prettyprint-override"><code>xs = [8, 23, 45]
 
 for x in xs:
@@ -9,13 +9,13 @@ for x in xs:
 item #2 = 23
 item #3 = 45
 </code></pre>
-<h4> Comment 92160350 plugwash: </h4>Note that indexes in python start from 0, so the indexes for your example list are 0 to 4 not 1 to 5<br>------------------------------------------------------------------ <br><h3> Answer 522578 Mike Hordecki: </h3><p>Use the built-in function <a href="https://docs.python.org/3/library/functions.html#enumerate" rel="noreferrer" title="enumerate"><code>enumerate()</code></a>:</p>
+<h4> plugwash, Id: 92160350 Score: 109: </h4>Note that indexes in python start from 0, so the indexes for your example list are 0 to 4 not 1 to 5<br>------------------------------------------------------------------ <br><h3> Mike Hordecki, Id: 522578, Score: 8789: </h3><p>Use the built-in function <a href="https://docs.python.org/3/library/functions.html#enumerate" rel="noreferrer" title="enumerate"><code>enumerate()</code></a>:</p>
 <pre><code>for idx, x in enumerate(xs):
     print(idx, x)
 </code></pre>
 <p>It is <em><a href="https://stackoverflow.com/questions/25011078/what-does-pythonic-mean">non-pythonic</a></em> to manually index via <code>for i in range(len(xs)): x = xs[i]</code> or manually manage an additional state variable.</p>
 <p>Check out <a href="https://www.python.org/dev/peps/pep-0279/" rel="noreferrer" title="PEP 279">PEP 279</a> for more.</p>
-<h4> Comment 86193498 clozach: </h4>As Aaron points out below, use start=1 if you want to get 1-5 instead of 0-4.<br><h4> Comment 113582027 ShadowRanger: </h4>@TheRealChx101: It&#39;s lower than the overhead of looping over a <code>range</code> and indexing each time, and lower than manually tracking and updating the index separately. <code>enumerate</code> with unpacking is heavily optimized (if the <code>tuple</code>s are unpacked to names as in the provided example, it reuses the same <code>tuple</code> each loop to avoid even the cost of freelist lookup, it has an optimized code path for when the index fits in <code>ssize_t</code> that performs cheap in-register math, bypassing Python level math operations, and it avoids indexing the <code>list</code> at the Python level, which is more expensive than you&#39;d think).<br><h4> Comment 103223013 TheRealChx101: </h4>Does <code>enumerate</code> not incur another overhead?<br><h4> Comment 106318992 Błotosmętek: </h4>@TheRealChx101 according to my tests (Python 3.6.3) the difference is negligible and sometimes even in favour of <code>enumerate</code>.<br><h4> Comment 122978535 bfris: </h4>@user2585501. It does: <code>for i in range(5)</code> or <code>for i in range(len(ints))</code> will do the universally common operation of iterating over an index. But if you want both the item <b><i>and</i></b> the index, <code>enumerate</code> is a <i>very</i> useful syntax. I use it all the time.<br><h4> Comment 136696795 Ferazhu: </h4>Regarding the &quot;unpythonic&quot;, is it also an antipattern in other c-like languages that support enumerator? Using forloop on index, taking an item by index and doing nothing else with the index?<br><h4> Comment 134501457 Dmitrii Malygin: </h4>The performance impact of using enumerate with unpacking is significantly lower compared to the overhead incurred by looping over a range and indexing each time, or manually tracking and updating the index separately. The enumerate function with unpacking syntax is highly optimized for efficiency.<br><h4> Comment 122796835 user2585501: </h4>Why does python not have a professional for loop syntax to perform this universally common operation?<br>------------------------------------------------------------------ <br><h3> Answer 28072982 Russia Must Remove Putin: </h3><blockquote>
+<h4> clozach, Comment 86193498 Score: 143: </h4>As Aaron points out below, use start=1 if you want to get 1-5 instead of 0-4.<br><h4> ShadowRanger, Comment 113582027 Score: 25: </h4>@TheRealChx101: It&#39;s lower than the overhead of looping over a <code>range</code> and indexing each time, and lower than manually tracking and updating the index separately. <code>enumerate</code> with unpacking is heavily optimized (if the <code>tuple</code>s are unpacked to names as in the provided example, it reuses the same <code>tuple</code> each loop to avoid even the cost of freelist lookup, it has an optimized code path for when the index fits in <code>ssize_t</code> that performs cheap in-register math, bypassing Python level math operations, and it avoids indexing the <code>list</code> at the Python level, which is more expensive than you&#39;d think).<br><h4> TheRealChx101, Comment 103223013 Score: 10: </h4>Does <code>enumerate</code> not incur another overhead?<br><h4> Błotosmętek, Comment 106318992 Score: 10: </h4>@TheRealChx101 according to my tests (Python 3.6.3) the difference is negligible and sometimes even in favour of <code>enumerate</code>.<br><h4> bfris, Comment 122978535 Score: 8: </h4>@user2585501. It does: <code>for i in range(5)</code> or <code>for i in range(len(ints))</code> will do the universally common operation of iterating over an index. But if you want both the item <b><i>and</i></b> the index, <code>enumerate</code> is a <i>very</i> useful syntax. I use it all the time.<br><h4> Ferazhu, Comment 136696795 Score: 0: </h4>Regarding the &quot;unpythonic&quot;, is it also an antipattern in other c-like languages that support enumerator? Using forloop on index, taking an item by index and doing nothing else with the index?<br><h4> Dmitrii Malygin, Comment 134501457 Score: 0: </h4>The performance impact of using enumerate with unpacking is significantly lower compared to the overhead incurred by looping over a range and indexing each time, or manually tracking and updating the index separately. The enumerate function with unpacking syntax is highly optimized for efficiency.<br><h4> user2585501, Comment 122796835 Score: 0: </h4>Why does python not have a professional for loop syntax to perform this universally common operation?<br>------------------------------------------------------------------ <br><h3> Russia Must Remove Putin, Id: 28072982, Score: 1292: </h3><blockquote>
 <h1>Using a for loop, how do I access the loop index, from 1 to 5 in this case?</h1>
 </blockquote>
 <p>Use <code>enumerate</code> to get the index with the element as you iterate:</p>
@@ -100,16 +100,16 @@ a
 <pre><code>for index, item in enumerate(items, start=0):   # Python indexes start at zero
     print(index, item)
 </code></pre>
-<h4> Comment 106763226 Bergi: </h4>Does the &quot;<i>Getting a count</i>&quot; example work when <code>items</code> is empty?<br><h4> Comment 113582068 ShadowRanger: </h4>@Bergi: It won&#39;t, but you can just add <code>count = 0</code> before the loop to ensure it has a value (and it&#39;s the correct one when the loop never assigns to <code>count</code>, since by definition there were no items).<br><h4> Comment 129621998 nerak99: </h4>Brilliant and comprehensive answer which explains the difference between idiomatic (aka pythonic ) rather than just stating that a particular approach is unidiomatic (i.e. non-pythonic) without explanation.<br>------------------------------------------------------------------ <br><h3> Answer 23886515 A.J.: </h3><p>It's pretty simple to start it from <code>1</code> other than <code>0</code>:</p>
+<h4> Bergi, Comment 106763226 Score: 4: </h4>Does the &quot;<i>Getting a count</i>&quot; example work when <code>items</code> is empty?<br><h4> ShadowRanger, Comment 113582068 Score: 3: </h4>@Bergi: It won&#39;t, but you can just add <code>count = 0</code> before the loop to ensure it has a value (and it&#39;s the correct one when the loop never assigns to <code>count</code>, since by definition there were no items).<br><h4> nerak99, Comment 129621998 Score: 2: </h4>Brilliant and comprehensive answer which explains the difference between idiomatic (aka pythonic ) rather than just stating that a particular approach is unidiomatic (i.e. non-pythonic) without explanation.<br>------------------------------------------------------------------ <br><h3> A.J., Id: 23886515, Score: 261: </h3><p>It's pretty simple to start it from <code>1</code> other than <code>0</code>:</p>
 <pre><code>for index, item in enumerate(iterable, start=1):
    print index, item  # Used to print in python&lt;3.x
    print(index, item) # Migrate to print() after 3.x+
    
 </code></pre>
-<h4> Comment 59805330 Antti Haapala -- Слава Україні: </h4>The question was about list indexes; since they start from 0 there is little point in starting from other number since the indexes would be wrong (yes, the OP said it wrong in the question as well). Otherwise, calling the variable that is tuple of <code>index, item</code> just <code>index</code> is very misleading, as you noted. Just use <code>for index, item in enumerate(ints)</code>.<br><h4> Comment 93991564 pushkin: </h4>@AnttiHaapala The reason, I presume, is that the question&#39;s expected output starts at index 1 instead 0<br><h4> Comment 83092672 hygull: </h4>Better is to enclose index inside parenthesis pairs as (index), it will work on both the Python versions 2 and 3.<br><h4> Comment 113582127 ShadowRanger: </h4>@hygull: Turning <code>index</code> into <code>(index)</code> won&#39;t change a thing on either Py2 or Py3. I feel like maybe you&#39;re thinking of the change to <code>print</code>; the only way to make that work on both Py2 and Py3 is to add <code>from __future__ import print_function</code> to the top of your file to get consistent Py3-style <code>print</code>, and change the <code>print</code> to <code>print(index, item)</code>. Or you read an earlier edit of the question when <code>index</code> was the original <code>tuple</code>, not unpacked to two names, but the parentheses still don&#39;t change anything if you fail to unpack.<br>------------------------------------------------------------------ <br><h3> Answer 522569 David Hanak: </h3><pre><code>for i in range(len(ints)):
+<h4> Antti Haapala -- Слава Україні, Comment 59805330 Score: 16: </h4>The question was about list indexes; since they start from 0 there is little point in starting from other number since the indexes would be wrong (yes, the OP said it wrong in the question as well). Otherwise, calling the variable that is tuple of <code>index, item</code> just <code>index</code> is very misleading, as you noted. Just use <code>for index, item in enumerate(ints)</code>.<br><h4> pushkin, Comment 93991564 Score: 2: </h4>@AnttiHaapala The reason, I presume, is that the question&#39;s expected output starts at index 1 instead 0<br><h4> hygull, Comment 83092672 Score: 1: </h4>Better is to enclose index inside parenthesis pairs as (index), it will work on both the Python versions 2 and 3.<br><h4> ShadowRanger, Comment 113582127 Score: 0: </h4>@hygull: Turning <code>index</code> into <code>(index)</code> won&#39;t change a thing on either Py2 or Py3. I feel like maybe you&#39;re thinking of the change to <code>print</code>; the only way to make that work on both Py2 and Py3 is to add <code>from __future__ import print_function</code> to the top of your file to get consistent Py3-style <code>print</code>, and change the <code>print</code> to <code>print(index, item)</code>. Or you read an earlier edit of the question when <code>index</code> was the original <code>tuple</code>, not unpacked to two names, but the parentheses still don&#39;t change anything if you fail to unpack.<br>------------------------------------------------------------------ <br><h3> David Hanak, Id: 522569, Score: 136: </h3><pre><code>for i in range(len(ints)):
    print(i, ints[i]) # print updated to print() in Python 3.x+ 
 </code></pre>
-<h4> Comment 51464678 saulspatz: </h4>Use enumerate instead<br><h4> Comment 336039 Ben Blank: </h4>That should probably be <code>xrange</code> for pre-3.0.<br><h4> Comment 72718416 januarvs: </h4>For Python 2.3 above, use enumerate built-in function since it is more Pythonic.<br><h4> Comment 79461366 chepner: </h4>@adg I don&#39;t see how avoid <code>enumerate</code> saves any logic; you still have to select which object to index with <code>i</code>, no?<br><h4> Comment 73378874 adg: </h4>Enumerate is not always better - it depends on the requirements of the application. In my current situation the relationships between the object lengths is meaningful to my application. Although I started out using enumerate, I switched to this approach to avoid having to write logic to select which object to enumerate.<br><h4> Comment 113582233 ShadowRanger: </h4>@Graham: Using <code>range</code> would be a premature pessimization, as <code>zip</code> (<code>itertools.izip</code> on Py2) is strictly better for that case. About the only use case for <code>range</code> I know of where there isn&#39;t a better alternative is iterating over overlapping slices of a sequence (where you need the index, but then use it to slice, so getting a value with the index isn&#39;t helpful). You could make it work without <code>range</code> (and for non-sequences) with <code>itertools.tee</code>, but it&#39;s ugly.<br><h4> Comment 134798694   vrnvorona: </h4>@saulspatz, repeating some code N times is not best with enumerate though.<br><h4> Comment 98695822 naoki fujita: </h4>This representation is useful when I use numba or cython.<br><h4> Comment 94655101 Graham: </h4>@chepner If one is iterating through multiple lists, using <code>range</code> may make sense. Though <code>zip</code> is probably more Pythonic for these cases, so using <code>range</code> would still be a premature optimization, as other comments mention.<br>------------------------------------------------------------------ <br><h3> Answer 54227634 Andy Jazz: </h3><p><em><strong>Tested on Python 3.12</strong></em></p>
+<h4> saulspatz, Comment 51464678 Score: 67: </h4>Use enumerate instead<br><h4> Ben Blank, Comment 336039 Score: 11: </h4>That should probably be <code>xrange</code> for pre-3.0.<br><h4> januarvs, Comment 72718416 Score: 5: </h4>For Python 2.3 above, use enumerate built-in function since it is more Pythonic.<br><h4> chepner, Comment 79461366 Score: 4: </h4>@adg I don&#39;t see how avoid <code>enumerate</code> saves any logic; you still have to select which object to index with <code>i</code>, no?<br><h4> adg, Comment 73378874 Score: 2: </h4>Enumerate is not always better - it depends on the requirements of the application. In my current situation the relationships between the object lengths is meaningful to my application. Although I started out using enumerate, I switched to this approach to avoid having to write logic to select which object to enumerate.<br><h4> ShadowRanger, Comment 113582233 Score: 0: </h4>@Graham: Using <code>range</code> would be a premature pessimization, as <code>zip</code> (<code>itertools.izip</code> on Py2) is strictly better for that case. About the only use case for <code>range</code> I know of where there isn&#39;t a better alternative is iterating over overlapping slices of a sequence (where you need the index, but then use it to slice, so getting a value with the index isn&#39;t helpful). You could make it work without <code>range</code> (and for non-sequences) with <code>itertools.tee</code>, but it&#39;s ugly.<br><h4>   vrnvorona, Comment 134798694 Score: 0: </h4>@saulspatz, repeating some code N times is not best with enumerate though.<br><h4> naoki fujita, Comment 98695822 Score: 0: </h4>This representation is useful when I use numba or cython.<br><h4> Graham, Comment 94655101 Score: 0: </h4>@chepner If one is iterating through multiple lists, using <code>range</code> may make sense. Though <code>zip</code> is probably more Pythonic for these cases, so using <code>range</code> would still be a premature optimization, as other comments mention.<br>------------------------------------------------------------------ <br><h3> Andy Jazz, Id: 54227634, Score: 134: </h3><p><em><strong>Tested on Python 3.12</strong></em></p>
 <p>Here are twelve examples of how you can access the indices with their corresponding array's elements using <em><strong>for loops</strong></em>, <em><strong>while loops</strong></em> and some <em><strong>looping functions</strong></em>. Note that array indices always start from zero by default (see <code>example 4</code> to change this).</p>
 <h3>1. Looping elements with counter and <code>+=</code> operator.</h3>
 <pre><code>items = [8, 23, 45, 12, 78]
@@ -322,7 +322,7 @@ ElementPlus.indexForEachOfMy(items)
 #    (3, 12)
 #    (4, 78)
 </code></pre>
-<h4> Comment 135561669 zomilanovic: </h4>Thanks for the really detailed answer showing all variations of how to achieve that.   Should be the accepted answer in my opinion!<br>------------------------------------------------------------------ <br><h3> Answer 45685598 Charitoo: </h3><p>As is the norm in Python, there are several ways to do this. In all examples assume: <code>lst = [1, 2, 3, 4, 5]</code></p>
+<h4> zomilanovic, Comment 135561669 Score: 1: </h4>Thanks for the really detailed answer showing all variations of how to achieve that.   Should be the accepted answer in my opinion!<br>------------------------------------------------------------------ <br><h3> Charitoo, Id: 45685598, Score: 66: </h3><p>As is the norm in Python, there are several ways to do this. In all examples assume: <code>lst = [1, 2, 3, 4, 5]</code></p>
 <ol>
 <li>Using enumerate (<em>considered most idiomatic</em>)</li>
 </ol>
@@ -352,7 +352,7 @@ while index &lt; len(lst):
 </ol>
 <hr />
 <p>As explained before, there are other ways to do this that have not been explained here and they may even apply more in other situations. <em>For example</em>, using <code>itertools.chain</code> with for. It handles nested loops better than the other examples.</p>
------------------------------------------------------------------- <br><h3> Answer 522576 Charlie Martin: </h3><p>Old fashioned way:</p>
+------------------------------------------------------------------ <br><h3> Charlie Martin, Id: 522576, Score: 47: </h3><p>Old fashioned way:</p>
 <pre><code>for ix in range(len(ints)):
     print(ints[ix])
 </code></pre>
@@ -381,7 +381,7 @@ while index &lt; len(lst):
 (4, 5)
 &gt;&gt;&gt; 
 </code></pre>
-<h4> Comment 90134426 user6734503: </h4>This is <b>not</b> wrong and is used in C/C++ and others. It&#39;s considered as non-pythonic, but can also be used in python. Like simple solutions that break it down to the source :+<br><h4> Comment 90156850 user6734503: </h4>Some python <i>extremists</i> would say, don&#39;t do this. But I said it only to indicate that there is more than one possible way<br>------------------------------------------------------------------ <br><h3> Answer 38764000 Andriy Ivaneyko: </h3><h1>Accessing indexes &amp; Performance Benchmarking of approaches</h1>
+<h4> user6734503, Comment 90134426 Score: 5: </h4>This is <b>not</b> wrong and is used in C/C++ and others. It&#39;s considered as non-pythonic, but can also be used in python. Like simple solutions that break it down to the source :+<br><h4> user6734503, Comment 90156850 Score: 0: </h4>Some python <i>extremists</i> would say, don&#39;t do this. But I said it only to indicate that there is more than one possible way<br>------------------------------------------------------------------ <br><h3> Andriy Ivaneyko, Id: 38764000, Score: 47: </h3><h1>Accessing indexes &amp; Performance Benchmarking of approaches</h1>
 <p>The fastest way to access indexes of list within loop in <strong>Python 3.7</strong> is to use the <a href="https://docs.python.org/2/library/functions.html#enumerate" rel="noreferrer">enumerate method</a> for small, medium and huge lists.</p>
 <p>Please see <strong>different approaches</strong> which can be used to iterate over list and access index value and <strong>their performance metrics</strong> (which I suppose would be useful for you) in code samples below:</p>
 <pre><code># Using range
@@ -438,20 +438,20 @@ measure(range(10000000), number=100)
 <li><p><em><a href="https://stackoverflow.com/questions/11990105/rangelenlist-or-enumeratelist">range(len(list)) or enumerate(list)?</a></em></p>
 </li>
 </ul>
-<h4> Comment 72313109 user4805123: </h4>&quot;readability counts&quot;  The speed difference in the small &lt;1000 range is insignificant.  It is 3% slower on an already small time metric.<br><h4> Comment 110368577 Andriy Ivaneyko: </h4>@Georgy makes sense, on python 3.7 enumerate is total winner :)<br><h4> Comment 99134572 Georgy: </h4>How about updating the answer to Python 3?<br>------------------------------------------------------------------ <br><h3> Answer 70404966 Kofi: </h3><p>You can use <code>enumerate</code> and embed expressions inside string literals to obtain the solution.</p>
+<h4> user4805123, Comment 72313109 Score: 7: </h4>&quot;readability counts&quot;  The speed difference in the small &lt;1000 range is insignificant.  It is 3% slower on an already small time metric.<br><h4> Andriy Ivaneyko, Comment 110368577 Score: 2: </h4>@Georgy makes sense, on python 3.7 enumerate is total winner :)<br><h4> Georgy, Comment 99134572 Score: 0: </h4>How about updating the answer to Python 3?<br>------------------------------------------------------------------ <br><h3> Kofi, Id: 70404966, Score: 40: </h3><p>You can use <code>enumerate</code> and embed expressions inside string literals to obtain the solution.</p>
 <p>This is a simple way:</p>
 <pre><code>a=[4,5,6,8]
 for b, val in enumerate(a):
     print('item #{} = {}'.format(b+1, val))
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 30441272 rassa45: </h3><p>First of all, the indexes will be from 0 to 4. Programming languages start counting from 0; don't forget that or you will come across an index-out-of-bounds exception. All you need in the <em>for</em> loop is a variable counting from 0 to 4 like so:</p>
+------------------------------------------------------------------ <br><h3> rassa45, Id: 30441272, Score: 21: </h3><p>First of all, the indexes will be from 0 to 4. Programming languages start counting from 0; don't forget that or you will come across an index-out-of-bounds exception. All you need in the <em>for</em> loop is a variable counting from 0 to 4 like so:</p>
 <pre><code>for x in range(0, 5):
 </code></pre>
 <p>Keep in mind that I wrote 0 to 5 because the loop stops one number before the maximum. :)</p>
 <p>To get the value of an index, use</p>
 <pre><code>list[index]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 30441543 Liam: </h3><p>You can do it with this code:</p>
+------------------------------------------------------------------ <br><h3> Liam, Id: 30441543, Score: 19: </h3><p>You can do it with this code:</p>
 
 <pre><code>ints = [8, 23, 45, 12, 78]
 index = 0
@@ -472,7 +472,7 @@ for value in (ints):
     if index &gt;= len(ints)-1:
         index = 0
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 10459739 thinker007: </h3><p>According to this discussion: <em><a href="http://bytes.com/topic/python/answers/464012-objects-list-index" rel="nofollow noreferrer">object's list index</a></em></p>
+------------------------------------------------------------------ <br><h3> thinker007, Id: 10459739, Score: 18: </h3><p>According to this discussion: <em><a href="http://bytes.com/topic/python/answers/464012-objects-list-index" rel="nofollow noreferrer">object's list index</a></em></p>
 <p>Loop counter iteration</p>
 <p>The current idiom for looping over the indices makes use of the built-in <code>range</code> function:</p>
 <pre><code>for i in range(len(sequence)):
@@ -488,7 +488,7 @@ for value in (ints):
     # Work with index i and element e
 </code></pre>
 <p>via <em><a href="http://www.python.org/dev/peps/pep-0212/" rel="nofollow noreferrer">PEP 212 – Loop Counter Iteration</a></em>.</p>
-<h4> Comment 22352249 Tadeck: </h4>This won&#39;t work for iterating through generators. Just use enumerate().<br><h4> Comment 65275596 TankorSmash: </h4>Nowadays, the current idiom is enumerate, not the range call.<br><h4> Comment 98219961 Jean-Fran&#231;ois Fabre: </h4>and it&#39;s the same as the older answer: <a href="https://stackoverflow.com/a/522576/6451573">stackoverflow.com/a/522576/6451573</a><br>------------------------------------------------------------------ <br><h3> Answer 50672647 Ankur Kothari: </h3><p>If I were to iterate <code>nums = [1, 2, 3, 4, 5]</code> I would do</p>
+<h4> Tadeck, Comment 22352249 Score: 24: </h4>This won&#39;t work for iterating through generators. Just use enumerate().<br><h4> TankorSmash, Comment 65275596 Score: 2: </h4>Nowadays, the current idiom is enumerate, not the range call.<br><h4> Jean-Fran&#231;ois Fabre, Comment 98219961 Score: 0: </h4>and it&#39;s the same as the older answer: <a href="https://stackoverflow.com/a/522576/6451573">stackoverflow.com/a/522576/6451573</a><br>------------------------------------------------------------------ <br><h3> Ankur Kothari, Id: 50672647, Score: 18: </h3><p>If I were to iterate <code>nums = [1, 2, 3, 4, 5]</code> I would do</p>
 
 <pre><code>for i, num in enumerate(nums, start=1):
     print(i, num)
@@ -499,7 +499,7 @@ for value in (ints):
 <pre><code>for i in range(l):
     print(i+1, nums[i])
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 51863929 DrM: </h3><p>In your question, you write <em>"how do I access the loop index, from 1 to 5 in this case?"</em></p>
+------------------------------------------------------------------ <br><h3> DrM, Id: 51863929, Score: 18: </h3><p>In your question, you write <em>"how do I access the loop index, from 1 to 5 in this case?"</em></p>
 
 <p>However, the index for a list runs from zero.  So, then we need to know if what you actually want is the index and item for each item in a list, or whether you really want numbers starting from 1.  Fortunately, in Python, it is easy to do either or both.</p>
 
@@ -549,13 +549,13 @@ for n, a in enumerate(alist):
 4 4
 5 5
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 50780432 RIshu: </h3><p>If there is no duplicate value in the list:</p>
+------------------------------------------------------------------ <br><h3> RIshu, Id: 50780432, Score: 13: </h3><p>If there is no duplicate value in the list:</p>
 
 <pre><code>for i in ints:
     indx = ints.index(i)
     print(i, indx)
 </code></pre>
-<h4> Comment 98217824 user3064538: </h4>First option is O(n&#178;), a terrible idea. If your list is 1000 elements long, it&#39;ll take literally a 1000 times longer than using <code>enumerate</code>. You should delete this answer.<br><h4> Comment 94553173 Stam Kaly: </h4>Note that the first option should not be used, since it only works correctly only when each item in the sequence is unique.<br>------------------------------------------------------------------ <br><h3> Answer 48665823 Ashok Kumar Jayaraman: </h3><p>You can also try this:</p>
+<h4> user3064538, Comment 98217824 Score: 6: </h4>First option is O(n&#178;), a terrible idea. If your list is 1000 elements long, it&#39;ll take literally a 1000 times longer than using <code>enumerate</code>. You should delete this answer.<br><h4> Stam Kaly, Comment 94553173 Score: 2: </h4>Note that the first option should not be used, since it only works correctly only when each item in the sequence is unique.<br>------------------------------------------------------------------ <br><h3> Ashok Kumar Jayaraman, Id: 48665823, Score: 12: </h3><p>You can also try this:</p>
 
 <pre><code>data = ['itemA.ABC', 'itemB.defg', 'itemC.drug', 'itemD.ashok']
 x = []
@@ -573,7 +573,7 @@ for index, value in x:
 2 ['itemC', 'drug']
 3 ['itemD', 'ashok']
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 50613659 PyRsquared: </h3><p>You can use the <code>index</code> method:</p>
+------------------------------------------------------------------ <br><h3> PyRsquared, Id: 50613659, Score: 8: </h3><p>You can use the <code>index</code> method:</p>
 <pre><code>ints = [8, 23, 45, 12, 78]
 inds = [ints.index(i) for i in ints]
 </code></pre>
@@ -587,7 +587,7 @@ inds = [tup for tup in enumerate(ints)]
 </code></pre>
 <p>if you want to get both the index and the value in <code>ints</code> as a list of tuples.</p>
 <p>It uses the method of <code>enumerate</code> in the selected answer to this question, but with list comprehension, making it faster with less code.</p>
------------------------------------------------------------------- <br><h3> Answer 61295753 Amar Kumar: </h3><p>A simple answer using a <em>while</em> loop:</p>
+------------------------------------------------------------------ <br><h3> Amar Kumar, Id: 61295753, Score: 8: </h3><p>A simple answer using a <em>while</em> loop:</p>
 <pre><code>arr = [8, 23, 45, 12, 78]
 i = 0
 while i &lt; len(arr):
@@ -601,21 +601,21 @@ Item  3  =  45
 Item  4  =  12
 Item  5  =  78
 </code></pre>
-<h4> Comment 127121025 Peter Mortensen: </h4>Please review <i><a href="https://meta.stackoverflow.com/questions/415040">Should we edit a question to transcribe code from an image to text?</a></i> and <i><a href="https://meta.stackoverflow.com/questions/285551/">Why not upload images of code/errors when asking a question?</a></i> (e.g., <i>&quot;Images should only be used to illustrate problems that</i> <b><i>can&#39;t be made clear in any other way,</i></b> <i>such as to provide screenshots of a user interface.&quot;</i>) and take the appropriate <a href="https://stackoverflow.com/posts/61295753/edit">action</a> (it covers answers as well). Thanks in advance.<br>------------------------------------------------------------------ <br><h3> Answer 49999897 lola: </h3><p>To print a tuple of (index, value) in a list comprehension using a <em>for</em> loop:</p>
+<h4> Peter Mortensen, Comment 127121025 Score: 0: </h4>Please review <i><a href="https://meta.stackoverflow.com/questions/415040">Should we edit a question to transcribe code from an image to text?</a></i> and <i><a href="https://meta.stackoverflow.com/questions/285551/">Why not upload images of code/errors when asking a question?</a></i> (e.g., <i>&quot;Images should only be used to illustrate problems that</i> <b><i>can&#39;t be made clear in any other way,</i></b> <i>such as to provide screenshots of a user interface.&quot;</i>) and take the appropriate <a href="https://stackoverflow.com/posts/61295753/edit">action</a> (it covers answers as well). Thanks in advance.<br>------------------------------------------------------------------ <br><h3> lola, Id: 49999897, Score: 6: </h3><p>To print a tuple of (index, value) in a list comprehension using a <em>for</em> loop:</p>
 <pre><code>ints = [8, 23, 45, 12, 78]
 print [(i,ints[i]) for i in range(len(ints))]
 </code></pre>
 <p>Output:</p>
 <pre><code>[(0, 8), (1, 23), (2, 45), (3, 12), (4, 78)]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 67461537 Rahul: </h3><p>You can simply use a variable such as <code>count</code> to count the number of elements in the list:</p>
+------------------------------------------------------------------ <br><h3> Rahul, Id: 67461537, Score: 6: </h3><p>You can simply use a variable such as <code>count</code> to count the number of elements in the list:</p>
 <pre><code>ints = [8, 23, 45, 12, 78]
 count = 0
 for i in ints:
     count = count + 1
     print('item #{} = {}'.format(count, i))
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 76948173 cottontail: </h3><p>Yet another way to run a counter in a for loop is to use <code>itertools.count</code>.</p>
+------------------------------------------------------------------ <br><h3> cottontail, Id: 76948173, Score: 4: </h3><p>Yet another way to run a counter in a for loop is to use <code>itertools.count</code>.</p>
 <pre class="lang-py prettyprint-override"><code>from itertools import count
 
 my_list = ['a', 'b', 'a']
@@ -726,7 +726,7 @@ plt.setp(axs, ylim=(0.7, 2.4), yticks=[i*0.25 + 0.75 for i in range(7)],
          xlim=(1, 1100000), xscale='log', xticks=[1, 100, 10000, 1000000])
 fig.tight_layout();
 </code></pre>
-<h4> Comment 135684215 Kelly Bundy: </h4>Nicely done. And index() beating enumerate() in the second scenario despite the two passes is something I&#39;ve been telling/showing people a few times, I might point them here from now on :-)<br>------------------------------------------------------------------ <br><h3> Answer 74084377 jglad: </h3><p>In addition to all the excellent answers above, here is a solution to this problem when working with pandas Series objects. In many cases, pandas Series have custom/unique indices (for example, unique identifier strings) that can't be accessed with the <code>enumerate()</code> function.</p>
+<h4> Kelly Bundy, Comment 135684215 Score: 1: </h4>Nicely done. And index() beating enumerate() in the second scenario despite the two passes is something I&#39;ve been telling/showing people a few times, I might point them here from now on :-)<br>------------------------------------------------------------------ <br><h3> jglad, Id: 74084377, Score: 3: </h3><p>In addition to all the excellent answers above, here is a solution to this problem when working with pandas Series objects. In many cases, pandas Series have custom/unique indices (for example, unique identifier strings) that can't be accessed with the <code>enumerate()</code> function.</p>
 <blockquote>
 <pre><code>xs = pd.Series([8, 23, 45])
 
@@ -763,7 +763,7 @@ print(xs)
 #    id #G923005 = 45
 </code></pre>
 </blockquote>
------------------------------------------------------------------- <br><h3> Answer 74320395 Maifee Ul Asad: </h3><p>One-liner lovers:</p>
+------------------------------------------------------------------ <br><h3> Maifee Ul Asad, Id: 74320395, Score: 3: </h3><p>One-liner lovers:</p>
 <pre class="lang-py prettyprint-override"><code>[index for index, datum in enumerate(data) if 'a' in datum]
 </code></pre>
 <p>Explaination:</p>
@@ -788,7 +788,7 @@ print(xs)
 </li>
 </ul>
 <p><em>Thanks. Keep me in your prayers.</em></p>
------------------------------------------------------------------- <br><h3> Answer 72542661 Ran Turner: </h3><p>You can use <code>range(len(some_list))</code> and then lookup the index like this</p>
+------------------------------------------------------------------ <br><h3> Ran Turner, Id: 72542661, Score: 2: </h3><p>You can use <code>range(len(some_list))</code> and then lookup the index like this</p>
 <pre><code>xs = [8, 23, 45]
 for i in range(len(xs)):
     print(&quot;item #{} = {}&quot;.format(i + 1, xs[i]))
@@ -798,7 +798,7 @@ for i in range(len(xs)):
 for idx, val in enumerate(xs, start=1):
     print(&quot;item #{} = {}&quot;.format(idx, val))
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 72216703 kamalesh d: </h3><p>It can be achieved with the following code:</p>
+------------------------------------------------------------------ <br><h3> kamalesh d, Id: 72216703, Score: 0: </h3><p>It can be achieved with the following code:</p>
 <pre><code>xs = [8, 23, 45]
 for x, n in zip(xs, range(1, len(xs)+1)):
     print(&quot;item #{} = {}&quot;.format(n, x))
@@ -809,7 +809,7 @@ item #1 = 8
 item #2 = 23
 item #3 = 45
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 70595306 LunaticXXD10: </h3><p>A loop with a &quot;counter&quot; variable set as an initialiser that will be a parameter, in formatting the string, as the item number.</p>
+------------------------------------------------------------------ <br><h3> LunaticXXD10, Id: 70595306, Score: -5: </h3><p>A loop with a &quot;counter&quot; variable set as an initialiser that will be a parameter, in formatting the string, as the item number.</p>
 <p>The <em>for</em> loop accesses the &quot;listos&quot; variable which is the list. As we access the list by &quot;i&quot;, &quot;i&quot; is formatted as the item price (or whatever it is).</p>
 <pre><code>listos = [8, 23, 45, 12, 78]
 counter = 1
@@ -824,9 +824,9 @@ Item #3 = 45
 Item #4 = 12
 Item #5 = 78
 </code></pre>
-<h4> Comment 124886118 General Grievance: </h4>@LunaticXXD10 In your <i>original post</i>, which you can see in the edit history, <code>counter += 1</code> was indented at the same level as the <code>for</code> loop. In that case, it would have updated per iteration of the <code>for</code> loop. Here, it updates per iteration of the <code>while</code> loop. My question on the <code>while</code> loop remains: Why is it necessary to use a while loop when counter can be updated in the <code>for</code> loop? This is plainly visible in <a href="https://stackoverflow.com/a/67461537/4294399">Rahul&#39;s answer</a>.<br><h4> Comment 127121436 Peter Mortensen: </h4>Re <i>&quot;...must be enough aware about programming that indentation matters&quot;</i>: Well, computers are quite literally minded.<br><h4> Comment 124863879 LunaticXXD10: </h4>@calculuswhiz the while loop is an important code snippet. the initialiser &quot;counter&quot; is used for item number.  About Indentation: The guy must be enough aware about programming that indentation matters. so after you do your special attribute...{copy paste} you can still edit the indentation.  <i>And the code runs very nicely and smoothly</i><br>------------------------------------------------------------------ <br><h3> Answer 49999727 Sumit Kumar: </h3><p>This serves the purpose well enough:</p>
+<h4> General Grievance, Comment 124886118 Score: 1: </h4>@LunaticXXD10 In your <i>original post</i>, which you can see in the edit history, <code>counter += 1</code> was indented at the same level as the <code>for</code> loop. In that case, it would have updated per iteration of the <code>for</code> loop. Here, it updates per iteration of the <code>while</code> loop. My question on the <code>while</code> loop remains: Why is it necessary to use a while loop when counter can be updated in the <code>for</code> loop? This is plainly visible in <a href="https://stackoverflow.com/a/67461537/4294399">Rahul&#39;s answer</a>.<br><h4> Peter Mortensen, Comment 127121436 Score: 1: </h4>Re <i>&quot;...must be enough aware about programming that indentation matters&quot;</i>: Well, computers are quite literally minded.<br><h4> LunaticXXD10, Comment 124863879 Score: 0: </h4>@calculuswhiz the while loop is an important code snippet. the initialiser &quot;counter&quot; is used for item number.  About Indentation: The guy must be enough aware about programming that indentation matters. so after you do your special attribute...{copy paste} you can still edit the indentation.  <i>And the code runs very nicely and smoothly</i><br>------------------------------------------------------------------ <br><h3> Sumit Kumar, Id: 49999727, Score: -7: </h3><p>This serves the purpose well enough:</p>
 <pre><code>list1 = [10, 'sumit', 43.21, 'kumar', '43', 'test', 3]
 for x in list1:
     print('index:', list1.index(x), 'value:', x)
 </code></pre>
-<h4> Comment 87728132 Peter Szoldan: </h4>This will break down if there are repeated elements in the list as <code>index()</code> will search for the first occurrence of <code>x</code>, not mentioning the O( <b><i>n^2</i></b> ) time required to look up each element.<br><h4> Comment 88444133 Sumit Kumar: </h4>totally agreed that it won&#39;t work for duplicate elements in the list. afterall I&#39;m also learning python.<br><h4> Comment 127119462 Peter Mortensen: </h4>The accepted suggested edit by user <i>Raj kumar</i> resulted in the error <i>&quot;NameError: name &#39;list1&#39; is not defined&quot;</i><br>
+<h4> Peter Szoldan, Comment 87728132 Score: 16: </h4>This will break down if there are repeated elements in the list as <code>index()</code> will search for the first occurrence of <code>x</code>, not mentioning the O( <b><i>n^2</i></b> ) time required to look up each element.<br><h4> Sumit Kumar, Comment 88444133 Score: 0: </h4>totally agreed that it won&#39;t work for duplicate elements in the list. afterall I&#39;m also learning python.<br><h4> Peter Mortensen, Comment 127119462 Score: 0: </h4>The accepted suggested edit by user <i>Raj kumar</i> resulted in the error <i>&quot;NameError: name &#39;list1&#39; is not defined&quot;</i><br>

@@ -1,5 +1,5 @@
- <h2> Title: What is the difference between Python&#39;s list methods append and extend? </h2> <h3> Claudiu, question_id: 252703 </h3>Score: 3111, Tags: {python,list,data-structures,append,extend} <br><p>What's the difference between the list methods <code>append()</code> and <code>extend()</code>?</p>
------------------------------------------------------------------- <br><h3> Answer 252704 Greg Hewgill: </h3><p><code>append</code> appends a single element. <code>extend</code> appends a list of elements.</p>
+ <h2> Title: What is the difference between Python&#39;s list methods append and extend? </h2> <h4> Claudiu, question_id: 252703 </h4>Score: 3111, Tags: {python,list,data-structures,append,extend} <br><p>What's the difference between the list methods <code>append()</code> and <code>extend()</code>?</p>
+------------------------------------------------------------------ <br><h3> Greg Hewgill, Id: 252704, Score: 138: </h3><p><code>append</code> appends a single element. <code>extend</code> appends a list of elements.</p>
 
 <p>Note that if you pass a list to append, it still adds one element:</p>
 
@@ -8,7 +8,7 @@
 &gt;&gt;&gt; a
 [1, 2, 3, [4, 5, 6]]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 252711 kender: </h3><p><a href="https://docs.python.org/3/library/stdtypes.html#mutable-sequence-types" rel="noreferrer"><code>.append()</code></a> appends a specified object at the end of the list:</p>
+------------------------------------------------------------------ <br><h3> kender, Id: 252711, Score: 5856: </h3><p><a href="https://docs.python.org/3/library/stdtypes.html#mutable-sequence-types" rel="noreferrer"><code>.append()</code></a> appends a specified object at the end of the list:</p>
 <pre><code>&gt;&gt;&gt; x = [1, 2, 3]
 &gt;&gt;&gt; x.append([4, 5])
 &gt;&gt;&gt; print(x)
@@ -20,7 +20,7 @@
 &gt;&gt;&gt; print(x)
 [1, 2, 3, 4, 5]
 </code></pre>
-<h4> Comment 77269150 Russia Must Remove Putin: </h4>Actually there&#39;s a <b><i>big difference</i></b> - <code>x + [4, 5]</code> gives you a new list assigned to x - <code>x.extend()</code> mutates the original list. I elaborate in my answer here below.<br><h4> Comment 75510248 Rohan: </h4>What is the difference between <code>extend</code> and simply using the addition operator - in the above example, <code>x = x + [4, 5]</code>?<br><h4> Comment 94380769 Astitva Srivastava: </h4>@AaronHall @Rohan but it is same as <code>x += [4,5]</code>.<br><h4> Comment 97108479 Anthony: </h4>The keyword when using <code>append</code> is <b>Object</b>. If you try to use <code>extend</code> and you pass in a <b>dictionary</b>, it will append the <b>key</b>, and not the whole hash to the end of the array.<br><h4> Comment 111475552 mcagriardic: </h4>@Rohan, the time complexity of x = x + [4, 5] would be O(len(x) + len([4,5])) where as extend has the time complexity of O(len([4, 5]))<br><h4> Comment 131555040 C-3PO: </h4><code>x += [4,5]</code> is the same as <code>extend</code>, and <code>x += [[4,5]]</code> behaves like <code>append</code>.<br><h4> Comment 132380088 Willem van Houten: </h4>Is there a benefit of .append above += ?  To clarify, I have some code that usually appends a single element to a given list, but occasionaly extends with a list.  For the sake of brevity, I consider putting both operations in a single function, inventory += item. Any arguments against that?<br>------------------------------------------------------------------ <br><h3> Answer 252705 Harley Holcombe: </h3><p><code>.append()</code> adds an element to a list,<br />
+<h4> Russia Must Remove Putin, Comment 77269150 Score: 410: </h4>Actually there&#39;s a <b><i>big difference</i></b> - <code>x + [4, 5]</code> gives you a new list assigned to x - <code>x.extend()</code> mutates the original list. I elaborate in my answer here below.<br><h4> Rohan, Comment 75510248 Score: 171: </h4>What is the difference between <code>extend</code> and simply using the addition operator - in the above example, <code>x = x + [4, 5]</code>?<br><h4> Astitva Srivastava, Comment 94380769 Score: 10: </h4>@AaronHall @Rohan but it is same as <code>x += [4,5]</code>.<br><h4> Anthony, Comment 97108479 Score: 2: </h4>The keyword when using <code>append</code> is <b>Object</b>. If you try to use <code>extend</code> and you pass in a <b>dictionary</b>, it will append the <b>key</b>, and not the whole hash to the end of the array.<br><h4> mcagriardic, Comment 111475552 Score: 2: </h4>@Rohan, the time complexity of x = x + [4, 5] would be O(len(x) + len([4,5])) where as extend has the time complexity of O(len([4, 5]))<br><h4> C-3PO, Comment 131555040 Score: 0: </h4><code>x += [4,5]</code> is the same as <code>extend</code>, and <code>x += [[4,5]]</code> behaves like <code>append</code>.<br><h4> Willem van Houten, Comment 132380088 Score: 0: </h4>Is there a benefit of .append above += ?  To clarify, I have some code that usually appends a single element to a given list, but occasionaly extends with a list.  For the sake of brevity, I consider putting both operations in a single function, inventory += item. Any arguments against that?<br>------------------------------------------------------------------ <br><h3> Harley Holcombe, Id: 252705, Score: 738: </h3><p><code>.append()</code> adds an element to a list,<br />
 whereas <code>.extend()</code> concatenates the first list with another list/iterable.</p>
 <pre><code>&gt;&gt;&gt; xs = ['A', 'B']
 &gt;&gt;&gt; xs
@@ -42,7 +42,7 @@ whereas <code>.extend()</code> concatenates the first list with another list/ite
 &gt;&gt;&gt; xs
 ['A', 'B', 'C', 'D', ['E', 'F'], 'G', 'H']
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 28119966 Russia Must Remove Putin: </h3><blockquote>
+------------------------------------------------------------------ <br><h3> Russia Must Remove Putin, Id: 28119966, Score: 658: </h3><blockquote>
 <h2>What is the difference between the list methods append and extend?</h2>
 </blockquote>
 <ul>
@@ -147,7 +147,7 @@ import timeit
 <h2>Conclusion</h2>
 <p>We see that <code>.extend()</code> is semantically clearer, and that it can run much faster than <code>.append()</code>, <em>when you intend to append each element in an iterable to a list.</em></p>
 <p>If you only have a single element (not in an iterable) to add to the list, use <code>.append()</code>.</p>
-<h4> Comment 86962262 Jean-Francois T.: </h4>Perfect answer indeed. What about performance of <code>l1 += l2</code> vs <code>l1.extend(l2)</code>?<br><h4> Comment 90754266 ShadowRanger: </h4>@Jean-FrancoisT.: <code>l1 += l2</code> and <code>l1.extend(l2)</code> ultimately execute the same code (the <code>list_extend</code> function in <code>listobject.c</code>). The only differences are: 1. <code>+=</code> reassigns <code>l1</code> (to itself for <code>list</code>s, but the reassignment supports immutable types that aren&#39;t the same object after), which makes it illegal if <code>l1</code> is actually an attribute of an immutable object; for example, <code>t = ([],)</code>, <code>t[0] += lst</code> would fail, while <code>t[0].extend(lst)</code> would work. 2. <code>l1 += l2</code> uses dedicated bytecodes, while <code>l1.extend(l2)</code> uses generalized method dispatch; this makes <code>+=</code> faster than <code>extend</code>.<br><h4> Comment 90754463 ShadowRanger: </h4>The fact that <code>+=</code> must reassign <code>l1</code> does mean that in some cases, the slower dispatch of <code>extend</code> is partially or wholly made up for by not assigning back to the left hand side. For example, if the <code>list</code> is an attribute of an object, <code>self.l1 += l2</code> and <code>self.l1.extend(l2)</code> have identical performance on my Python 3.6 install, simply because real operation is more like <code>self.l1 = self.l1.__iadd__(l2)</code>, which means it must perform a moderately expensive <code>STORE_ATTR</code> that <code>self.l1.extend(l2)</code> doesn&#39;t have to.<br><h4> Comment 90754732 ShadowRanger: </h4>Simple comparison in local tests: For a local variable (so the <code>+=</code> is just using <code>STORE_FAST</code>, which is super cheap), where the value being added is an existing <code>list</code> with one item in it, with the operation repeated 1000 times, <code>+=</code> took about 33 ns on average, while <code>extend</code> took 78 ns, a difference of 45 ns. If <code>l1</code> is a global (requires more expensive <code>STORE_GLOBAL</code>), the difference narrows to 17 ns. If <code>l1</code> is actually <code>local.l1</code> (requires even more expensive <code>STORE_ATTR</code>), there is no meaningful difference between <code>+=</code> and <code>extend</code> (timings roughly identical; <code>extend</code> sometimes wins).<br><h4> Comment 86189418 ilias iliadis: </h4>@Aaron Hall One small comment in algorithm for timing. &quot;extend_one&quot; may return &quot;slightly wrong&quot; time because the creation of a list is also involved. Probably better is to create the items as variables (<code>ex1 = 0</code> and <code>ex2 = [0]</code>) and pass these variables, if you want to be more strict.<br><h4> Comment 118576708 Russia Must Remove Putin: </h4>@Daniel I added some information to that section - which should lead you to more relevant information if you&#39;re interested.<br><h4> Comment 123463488 ShadowRanger: </h4>@zk82: Yep. It completes the whole operation, then fails on the reassignment. Probably best to avoid it; I&#39;d be forced to tar and feather anyone who actually used <code>+=</code> like that and just used a <code>try:</code>/<code>except TypeError: pass</code> to silence the exception. :-)<br><h4> Comment 118569300 Daniel: </h4>@Aaron Hall you said that <code>append</code> for <code>array a</code> takes O(1) time but what about the creation of a new array with size <code>sizeof(a)+1</code> with the desired values? (first items as in a and the last new item). I am really asking because I don&#39;t know how it works in python<br><h4> Comment 110682424 Tony Suffolk 66: </h4>@tparker - if you have another name (foo) bound to my_list (say you are inside a function) then using += doesn&#39;t rebind my_list to a new object and therefore foo and my_list are still the same list. doing the explicit + and assignment (i.e. not using +=) means the RHS is a new list, and the name my_list is rebound, meaning that my_list and foo are no longer bound to the same object.<br><h4> Comment 123449628 zk82: </h4>A bit weird, &quot;l1[0] += l2&quot; fails but it extends the list, indeed (at least in my Python version) @ShadowRanger &gt;&gt;&gt; try: ...   l1 = ([], ) ...   l1[0] += range(3) ... except TypeError: ...   print(&#39;Exception got, but l1 is:&#39;, l1) ... Exception got, but l1 is: ([0, 1, 2],)<br><h4> Comment 94645109 tparker: </h4>Could you clarify the difference in behavior between <code>my_list = my_list + another_list</code> and <code>my_list += another_list</code>? What&#39;s the practical difference between modifying an existing list and creating a new list to have identical contents and rebinding the name?<br>------------------------------------------------------------------ <br><h3> Answer 46804939 PythonProgrammi: </h3><h1> Append vs Extend</h1>
+<h4> Jean-Francois T., Comment 86962262 Score: 22: </h4>Perfect answer indeed. What about performance of <code>l1 += l2</code> vs <code>l1.extend(l2)</code>?<br><h4> ShadowRanger, Comment 90754266 Score: 12: </h4>@Jean-FrancoisT.: <code>l1 += l2</code> and <code>l1.extend(l2)</code> ultimately execute the same code (the <code>list_extend</code> function in <code>listobject.c</code>). The only differences are: 1. <code>+=</code> reassigns <code>l1</code> (to itself for <code>list</code>s, but the reassignment supports immutable types that aren&#39;t the same object after), which makes it illegal if <code>l1</code> is actually an attribute of an immutable object; for example, <code>t = ([],)</code>, <code>t[0] += lst</code> would fail, while <code>t[0].extend(lst)</code> would work. 2. <code>l1 += l2</code> uses dedicated bytecodes, while <code>l1.extend(l2)</code> uses generalized method dispatch; this makes <code>+=</code> faster than <code>extend</code>.<br><h4> ShadowRanger, Comment 90754463 Score: 4: </h4>The fact that <code>+=</code> must reassign <code>l1</code> does mean that in some cases, the slower dispatch of <code>extend</code> is partially or wholly made up for by not assigning back to the left hand side. For example, if the <code>list</code> is an attribute of an object, <code>self.l1 += l2</code> and <code>self.l1.extend(l2)</code> have identical performance on my Python 3.6 install, simply because real operation is more like <code>self.l1 = self.l1.__iadd__(l2)</code>, which means it must perform a moderately expensive <code>STORE_ATTR</code> that <code>self.l1.extend(l2)</code> doesn&#39;t have to.<br><h4> ShadowRanger, Comment 90754732 Score: 3: </h4>Simple comparison in local tests: For a local variable (so the <code>+=</code> is just using <code>STORE_FAST</code>, which is super cheap), where the value being added is an existing <code>list</code> with one item in it, with the operation repeated 1000 times, <code>+=</code> took about 33 ns on average, while <code>extend</code> took 78 ns, a difference of 45 ns. If <code>l1</code> is a global (requires more expensive <code>STORE_GLOBAL</code>), the difference narrows to 17 ns. If <code>l1</code> is actually <code>local.l1</code> (requires even more expensive <code>STORE_ATTR</code>), there is no meaningful difference between <code>+=</code> and <code>extend</code> (timings roughly identical; <code>extend</code> sometimes wins).<br><h4> ilias iliadis, Comment 86189418 Score: 1: </h4>@Aaron Hall One small comment in algorithm for timing. &quot;extend_one&quot; may return &quot;slightly wrong&quot; time because the creation of a list is also involved. Probably better is to create the items as variables (<code>ex1 = 0</code> and <code>ex2 = [0]</code>) and pass these variables, if you want to be more strict.<br><h4> Russia Must Remove Putin, Comment 118576708 Score: 1: </h4>@Daniel I added some information to that section - which should lead you to more relevant information if you&#39;re interested.<br><h4> ShadowRanger, Comment 123463488 Score: 1: </h4>@zk82: Yep. It completes the whole operation, then fails on the reassignment. Probably best to avoid it; I&#39;d be forced to tar and feather anyone who actually used <code>+=</code> like that and just used a <code>try:</code>/<code>except TypeError: pass</code> to silence the exception. :-)<br><h4> Daniel, Comment 118569300 Score: 0: </h4>@Aaron Hall you said that <code>append</code> for <code>array a</code> takes O(1) time but what about the creation of a new array with size <code>sizeof(a)+1</code> with the desired values? (first items as in a and the last new item). I am really asking because I don&#39;t know how it works in python<br><h4> Tony Suffolk 66, Comment 110682424 Score: 0: </h4>@tparker - if you have another name (foo) bound to my_list (say you are inside a function) then using += doesn&#39;t rebind my_list to a new object and therefore foo and my_list are still the same list. doing the explicit + and assignment (i.e. not using +=) means the RHS is a new list, and the name my_list is rebound, meaning that my_list and foo are no longer bound to the same object.<br><h4> zk82, Comment 123449628 Score: 0: </h4>A bit weird, &quot;l1[0] += l2&quot; fails but it extends the list, indeed (at least in my Python version) @ShadowRanger &gt;&gt;&gt; try: ...   l1 = ([], ) ...   l1[0] += range(3) ... except TypeError: ...   print(&#39;Exception got, but l1 is:&#39;, l1) ... Exception got, but l1 is: ([0, 1, 2],)<br><h4> tparker, Comment 94645109 Score: 0: </h4>Could you clarify the difference in behavior between <code>my_list = my_list + another_list</code> and <code>my_list += another_list</code>? What&#39;s the practical difference between modifying an existing list and creating a new list to have identical contents and rebinding the name?<br>------------------------------------------------------------------ <br><h3> PythonProgrammi, Id: 46804939, Score: 94: </h3><h1> Append vs Extend</h1>
 
 <h2><a href="https://i.stack.imgur.com/KH5jB.png" rel="noreferrer"><img src="https://i.stack.imgur.com/KH5jB.png" alt="enter image description here"></a></h2>
 
@@ -229,7 +229,7 @@ However, appending a list will not add more elements to the list, but one elemen
 <p><a href="https://i.stack.imgur.com/lJK1M.png" rel="noreferrer"><img src="https://i.stack.imgur.com/lJK1M.png" alt="enter image description here"></a></p>
 
 <p><a href="https://i.stack.imgur.com/KC2Ji.png" rel="noreferrer"><img src="https://i.stack.imgur.com/KC2Ji.png" alt="enter image description here"></a></p>
------------------------------------------------------------------- <br><h3> Answer 12045242 Nova: </h3><p>The following two snippets are semantically equivalent:</p>
+------------------------------------------------------------------ <br><h3> Nova, Id: 12045242, Score: 67: </h3><p>The following two snippets are semantically equivalent:</p>
 
 <pre><code>for item in iterator:
     a_list.append(item)
@@ -241,7 +241,7 @@ However, appending a list will not add more elements to the list, but one elemen
 </code></pre>
 
 <p>The latter may be faster as the loop is implemented in C.</p>
-<h4> Comment 19416853 Alex L: </h4>Extending is ~4x faster on my machine than appending in a loop (16us vs 4us for 100 loops of zeros)<br><h4> Comment 54406419 Mad Physicist: </h4><code>extend()</code> probably preallocates, while <code>append()</code> likely does not.<br><h4> Comment 100977352 Soren Bjornstad: </h4>@MadPhysicist: For completeness&#39; sake, there would be times where <code>extend()</code> <i>can&#39;t</i> preallocate sensibly since some iterables don&#39;t implement <code>__len__()</code>, but like you I&#39;d be surprised if it doesn&#39;t try. Some of the performance gain also comes from doing the iteration part in pure C instead of in Python, as pointed out in <a href="https://stackoverflow.com/a/28119966/">Aaron&#39;s answer</a>.<br>------------------------------------------------------------------ <br><h3> Answer 19707477 CodyChan: </h3><p>The <code>append()</code> method adds a single item to the end of the list.</p>
+<h4> Alex L, Comment 19416853 Score: 22: </h4>Extending is ~4x faster on my machine than appending in a loop (16us vs 4us for 100 loops of zeros)<br><h4> Mad Physicist, Comment 54406419 Score: 6: </h4><code>extend()</code> probably preallocates, while <code>append()</code> likely does not.<br><h4> Soren Bjornstad, Comment 100977352 Score: 0: </h4>@MadPhysicist: For completeness&#39; sake, there would be times where <code>extend()</code> <i>can&#39;t</i> preallocate sensibly since some iterables don&#39;t implement <code>__len__()</code>, but like you I&#39;d be surprised if it doesn&#39;t try. Some of the performance gain also comes from doing the iteration part in pure C instead of in Python, as pointed out in <a href="https://stackoverflow.com/a/28119966/">Aaron&#39;s answer</a>.<br>------------------------------------------------------------------ <br><h3> CodyChan, Id: 19707477, Score: 47: </h3><p>The <code>append()</code> method adds a single item to the end of the list.</p>
 
 <pre><code>x = [1, 2, 3]
 x.append([4, 5])
@@ -262,7 +262,7 @@ print(x)
 </code></pre>
 
 <p>From <em><a href="https://rads.stackoverflow.com/amzn/click/com/1430224150" rel="noreferrer" rel="nofollow noreferrer">Dive Into Python</a></em>.</p>
-<h4> Comment 40781525 aneroid: </h4>You can&#39;t extend with just 6 since it&#39;s not iterable. And the second output in your example is wrong. &#39;abc&#39; gets added as a single element since you passed it in to <code>extend</code> as a list with one element <code>[&#39;abc&#39;]</code>: [1, 2, 3, 4, 5, &#39;abc&#39;]. To make your example output correct, change the abc line to: <code>x.extend(&#39;abc&#39;)</code>. And remove the <code>x.extend(6)</code> or change it to <code>x.extend([6])</code>.<br><h4> Comment 125485027 am70: </h4>Also &quot;The extend() method takes one argument, a list,&quot; is wrong<br>------------------------------------------------------------------ <br><h3> Answer 18442908 den.run.ai: </h3><p>You can use "+" for returning extend, instead of extending in place.</p>
+<h4> aneroid, Comment 40781525 Score: 0: </h4>You can&#39;t extend with just 6 since it&#39;s not iterable. And the second output in your example is wrong. &#39;abc&#39; gets added as a single element since you passed it in to <code>extend</code> as a list with one element <code>[&#39;abc&#39;]</code>: [1, 2, 3, 4, 5, &#39;abc&#39;]. To make your example output correct, change the abc line to: <code>x.extend(&#39;abc&#39;)</code>. And remove the <code>x.extend(6)</code> or change it to <code>x.extend([6])</code>.<br><h4> am70, Comment 125485027 Score: 0: </h4>Also &quot;The extend() method takes one argument, a list,&quot; is wrong<br>------------------------------------------------------------------ <br><h3> den.run.ai, Id: 18442908, Score: 41: </h3><p>You can use "+" for returning extend, instead of extending in place.</p>
 
 <pre><code>l1=range(10)
 
@@ -278,7 +278,7 @@ l1+l2
 </code></pre>
 
 <p>Similarly <code>+=</code> for in place behavior, but with slight differences from <code>append</code> &amp; <code>extend</code>. One of the biggest differences of <code>+=</code> from <code>append</code> and <code>extend</code> is when it is used in function scopes, see <a href="https://www.toptal.com/python/top-10-mistakes-that-python-programmers-make?utm_medium=referral&amp;utm_source=zeef.com&amp;utm_campaign=ZEEF" rel="noreferrer">this blog post</a>.</p>
-<h4> Comment 51044106 den.run.ai: </h4>@franklin, see this answer for details: <a href="http://stackoverflow.com/a/28119966/2230844">stackoverflow.com/a/28119966/2230844</a><br><h4> Comment 89610375 pppery: </h4>I don&#39;t see how this answers the question<br><h4> Comment 50959206 franklin: </h4>Does using the &#39;+&#39; to return extend have any affect on time complexity?<br><h4> Comment 129787825 blackraven: </h4>I think <code>list.extend([item])</code> is more efficient than <code>list.append(item)</code><br>------------------------------------------------------------------ <br><h3> Answer 16511403 Chaitanya: </h3><p><code>append(object)</code> updates the list by adding the object to the list.</p>
+<h4> den.run.ai, Comment 51044106 Score: 5: </h4>@franklin, see this answer for details: <a href="http://stackoverflow.com/a/28119966/2230844">stackoverflow.com/a/28119966/2230844</a><br><h4> pppery, Comment 89610375 Score: 3: </h4>I don&#39;t see how this answers the question<br><h4> franklin, Comment 50959206 Score: 0: </h4>Does using the &#39;+&#39; to return extend have any affect on time complexity?<br><h4> blackraven, Comment 129787825 Score: 0: </h4>I think <code>list.extend([item])</code> is more efficient than <code>list.append(item)</code><br>------------------------------------------------------------------ <br><h3> Chaitanya, Id: 16511403, Score: 25: </h3><p><code>append(object)</code> updates the list by adding the object to the list.</p>
 <pre><code>x = [20]
 # List passed to the append(object) method is treated as a single object.
 x.append([21, 22, 23])
@@ -295,10 +295,10 @@ x.extend([21, 22, 23])
 print(x)
 --&gt; [20, 21, 22, 23]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 25144368 bconstanzo: </h3><p>An interesting point that has been hinted, but not explained, is that extend is faster than append. For any loop that has append inside should be considered to be replaced by list.extend(processed_elements).</p>
+------------------------------------------------------------------ <br><h3> bconstanzo, Id: 25144368, Score: 15: </h3><p>An interesting point that has been hinted, but not explained, is that extend is faster than append. For any loop that has append inside should be considered to be replaced by list.extend(processed_elements).</p>
 
 <p>Bear in mind that apprending new elements might result in the realloaction of the whole list to a better location in memory. If this is done several times because we are appending 1 element at a time, overall performance suffers. In this sense, list.extend is analogous to "".join(stringlist).</p>
------------------------------------------------------------------- <br><h3> Answer 16510635 kiriloff: </h3><p><code>extend()</code> can be used with an iterator argument. Here is an example. You wish to make a list out of a list of lists this way:</p>
+------------------------------------------------------------------ <br><h3> kiriloff, Id: 16510635, Score: 23: </h3><p><code>extend()</code> can be used with an iterator argument. Here is an example. You wish to make a list out of a list of lists this way:</p>
 
 <p>From</p>
 
@@ -337,7 +337,7 @@ print(merged)
 &gt;&gt;&gt;
 [1, 2, 3, 4, 5, 6, 7, 8, 9]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 24632188 skdev75: </h3><p>This is the equivalent of <code>append</code> and <code>extend</code> using the <code>+</code> operator:</p>
+------------------------------------------------------------------ <br><h3> skdev75, Id: 24632188, Score: 23: </h3><p>This is the equivalent of <code>append</code> and <code>extend</code> using the <code>+</code> operator:</p>
 
 <pre><code>&gt;&gt;&gt; x = [1,2,3]
 &gt;&gt;&gt; x
@@ -349,7 +349,7 @@ print(merged)
 &gt;&gt;&gt; x
 [1, 2, 3, 4, 5, 6, [7, 8]]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 37787163 The Gr8 Adakron: </h3><p><strong><em>append()</em></strong>: It is basically used in Python to add one element.</p>
+------------------------------------------------------------------ <br><h3> The Gr8 Adakron, Id: 37787163, Score: 18: </h3><p><strong><em>append()</em></strong>: It is basically used in Python to add one element.</p>
 
 <blockquote>
   <p>Example 1:</p>
@@ -393,7 +393,7 @@ print(merged)
 &gt;&gt; print(a)
 &gt;&gt; a = [1, 2, 3, 4, 5, 6]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 26397913 Shiv: </h3><p>Append adds the entire data at once. The whole data will be added to the newly created index. On the other hand, <code>extend</code>, as it name suggests, extends the current array. </p>
+------------------------------------------------------------------ <br><h3> Shiv, Id: 26397913, Score: 15: </h3><p>Append adds the entire data at once. The whole data will be added to the newly created index. On the other hand, <code>extend</code>, as it name suggests, extends the current array. </p>
 
 <p>For example</p>
 
@@ -410,7 +410,7 @@ list2 = [111, 222]
 
 <pre><code>result = [123, 456, 678, 111, 222]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 48036819 kmario23: </h3><p>An English dictionary defines the words <code>append</code> and <code>extend</code> as:</p>
+------------------------------------------------------------------ <br><h3> kmario23, Id: 48036819, Score: 11: </h3><p>An English dictionary defines the words <code>append</code> and <code>extend</code> as:</p>
 
 <p><strong>append</strong>: add (something) to the end of a written document. <br/>
 <strong>extend</strong>: make larger. Enlarge or expand</p>
@@ -457,14 +457,14 @@ lis = lis + list(iterable)
 # as long as the argument is a valid Python object
 list.append(object)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 42171373 Crabime: </h3><p>I hope I can make a useful supplement to this question. If your list stores a specific type object, for example <code>Info</code>, here is a situation that <code>extend</code> method is not suitable: In a <code>for</code> loop and and generating an <code>Info</code> object every time and using <code>extend</code> to store it into your list, it will fail. The exception is like below:</p>
+------------------------------------------------------------------ <br><h3> Crabime, Id: 42171373, Score: 7: </h3><p>I hope I can make a useful supplement to this question. If your list stores a specific type object, for example <code>Info</code>, here is a situation that <code>extend</code> method is not suitable: In a <code>for</code> loop and and generating an <code>Info</code> object every time and using <code>extend</code> to store it into your list, it will fail. The exception is like below:</p>
 
 <blockquote>
   <p>TypeError: 'Info' object is not iterable</p>
 </blockquote>
 
 <p>But if you use the <code>append</code> method, the result is OK. Because every time using the <code>extend</code> method, it will always treat it as a list or any other collection type, iterate it, and place it after the previous list. A specific object can not be iterated, obviously.</p>
------------------------------------------------------------------- <br><h3> Answer 47631056 Wizard: </h3><p>To distinguish them intuitively</p>
+------------------------------------------------------------------ <br><h3> Wizard, Id: 47631056, Score: 5: </h3><p>To distinguish them intuitively</p>
 
 <pre><code>l1 = ['a', 'b', 'c']
 l2 = ['d', 'e', 'f']
@@ -492,7 +492,7 @@ l1
                 'Copy': {'copy'},
                 }
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 39256397 tessie: </h3><p><code>extend(L)</code> extends the list by appending all the items in the given list <code>L</code>.</p>
+------------------------------------------------------------------ <br><h3> tessie, Id: 39256397, Score: 3: </h3><p><code>extend(L)</code> extends the list by appending all the items in the given list <code>L</code>.</p>
 
 <pre><code>&gt;&gt;&gt; a
 [1, 2, 3]
@@ -506,7 +506,7 @@ a = [1, 2, 3]
 &gt;&gt;&gt; a
 [1, 2, 3, 4]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 49591233 ilias iliadis: </h3><p><code>append</code> "extends" the list (in place) by <strong>only one item</strong>, the single object passed (as argument).</p>
+------------------------------------------------------------------ <br><h3> ilias iliadis, Id: 49591233, Score: 0: </h3><p><code>append</code> "extends" the list (in place) by <strong>only one item</strong>, the single object passed (as argument).</p>
 
 <p><code>extend</code> "extends" the list (in place) by <strong>as many items as</strong> the object passed (as argument) contains.</p>
 
@@ -554,7 +554,7 @@ extend: ab,cd,ef,
 append: ab,['cd'],
 extend: ab,cd,
 </code></pre>
-<h4> Comment 129009249 Shweta Lodha: </h4>You can check out my recoding explaining Extend and Append in Python: <a href="https://youtu.be/8A5ohA-UeiI" rel="nofollow noreferrer">youtu.be/8A5ohA-UeiI</a><br>------------------------------------------------------------------ <br><h3> Answer 51375427 vivek: </h3><p>Append and extend are one of the extensibility mechanisms in python. </p>
+<h4> Shweta Lodha, Comment 129009249 Score: 0: </h4>You can check out my recoding explaining Extend and Append in Python: <a href="https://youtu.be/8A5ohA-UeiI" rel="nofollow noreferrer">youtu.be/8A5ohA-UeiI</a><br>------------------------------------------------------------------ <br><h3> vivek, Id: 51375427, Score: 0: </h3><p>Append and extend are one of the extensibility mechanisms in python. </p>
 
 <p>Append: Adds an element to the end of the list. </p>
 

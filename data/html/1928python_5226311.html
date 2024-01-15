@@ -1,8 +1,8 @@
- <h2> Title: Installing specific package version with pip </h2> <h3> Joe, question_id: 5226311 </h3>Score: 1928, Tags: {python,mysql,pip,pypi,mysql-python} <br><p>I am trying to install version 1.2.2 of <code>MySQL_python</code>, using a fresh virtualenv created with the <code>--no-site-packages</code> option. The current version shown in PyPi is <a href="http://pypi.python.org/pypi/MySQL-python/1.2.3" rel="noreferrer">1.2.3</a>. Is there a way to install the older version? I have tried:</p>
+ <h2> Title: Installing specific package version with pip </h2> <h4> Joe, question_id: 5226311 </h4>Score: 1928, Tags: {python,mysql,pip,pypi,mysql-python} <br><p>I am trying to install version 1.2.2 of <code>MySQL_python</code>, using a fresh virtualenv created with the <code>--no-site-packages</code> option. The current version shown in PyPi is <a href="http://pypi.python.org/pypi/MySQL-python/1.2.3" rel="noreferrer">1.2.3</a>. Is there a way to install the older version? I have tried:</p>
 <pre class="lang-sh prettyprint-override"><code>pip install MySQL_python==1.2.2
 </code></pre>
 <p>However, when installed, it still shows <code>MySQL_python-1.2.3-py2.6.egg-info</code> in the site packages. Is this a problem specific to this package, or am I doing something wrong?</p>
------------------------------------------------------------------- <br><h3> Answer 33812968 user1978556: </h3><p>You can even use a version range with <code>pip install</code> command. Something like this:</p>
+------------------------------------------------------------------ <br><h3> user1978556, Id: 33812968, Score: 734: </h3><p>You can even use a version range with <code>pip install</code> command. Something like this:</p>
 
 <pre><code>pip install 'stevedore&gt;=1.3.0,&lt;1.4.0'
 </code></pre>
@@ -11,7 +11,7 @@
 
 <pre><code>pip install 'stevedore&gt;=1.3.0,&lt;1.4.0' --force-reinstall
 </code></pre>
-<h4> Comment 57112945 jschank: </h4>for example:   <code>$ pip install &#39;xkcdpass==1.2.5&#39; --force-reinstall</code><br><h4> Comment 91682544 jmng: </h4>Use double quotes on Windows: pip install &quot;stevedore&gt;=1.3.0,&lt;1.4.0&quot;<br><h4> Comment 133113141 Amit Naidu: </h4>Or use a caret to escape: <code>pip install antigravity^&lt;1.0</code><br>------------------------------------------------------------------ <br><h3> Answer 5226504 Mahmoud Abdelkader: </h3><p><strong>TL;DR</strong>:</p>
+<h4> jschank, Comment 57112945 Score: 159: </h4>for example:   <code>$ pip install &#39;xkcdpass==1.2.5&#39; --force-reinstall</code><br><h4> jmng, Comment 91682544 Score: 17: </h4>Use double quotes on Windows: pip install &quot;stevedore&gt;=1.3.0,&lt;1.4.0&quot;<br><h4> Amit Naidu, Comment 133113141 Score: 0: </h4>Or use a caret to escape: <code>pip install antigravity^&lt;1.0</code><br>------------------------------------------------------------------ <br><h3> Mahmoud Abdelkader, Id: 5226504, Score: 1443: </h3><p><strong>TL;DR</strong>:</p>
 <p><strong>Update as of 2022-12-28</strong>:</p>
 <p><code>pip install --force-reinstall -v</code></p>
 <p>For example: <code>pip install --force-reinstall -v &quot;MySQL_python==1.2.2&quot;</code></p>
@@ -40,13 +40,13 @@
 <pre><code>pip uninstall MySQL_python
 pip install -Iv http://sourceforge.net/projects/mysql-python/files/mysql-python/1.2.2/MySQL-python-1.2.2.tar.gz/download
 </code></pre>
-<h4> Comment 91493119 Joe: </h4>Curious why you use the -I option if we have already removed the existing installation - could you give some detail on that?<br><h4> Comment 5880852 Jochen Ritzel: </h4>There should be no problem with having multiple versions though, that&#39;s the point of creating new folders for every version and using .pth files.<br><h4> Comment 133210922 Manuel Jacob: </h4>Thanks for updating the answer, even though it’s over 10 years old. It seems however that nowadays pip always tries to satisfy the passed requirement (including the version), downgrading if necessary, so it should not be required anymore to pass any additional option.<br>------------------------------------------------------------------ <br><h3> Answer 36399566 Srikar Appalaraju: </h3><p>One way, as suggested in <a href="https://stackoverflow.com/questions/13916820/how-to-install-a-specific-version-of-a-package-with-pip">this post</a>, is to mention version in <code>pip</code> as:</p>
+<h4> Joe, Comment 91493119 Score: 7: </h4>Curious why you use the -I option if we have already removed the existing installation - could you give some detail on that?<br><h4> Jochen Ritzel, Comment 5880852 Score: 1: </h4>There should be no problem with having multiple versions though, that&#39;s the point of creating new folders for every version and using .pth files.<br><h4> Manuel Jacob, Comment 133210922 Score: 0: </h4>Thanks for updating the answer, even though it’s over 10 years old. It seems however that nowadays pip always tries to satisfy the passed requirement (including the version), downgrading if necessary, so it should not be required anymore to pass any additional option.<br>------------------------------------------------------------------ <br><h3> Srikar Appalaraju, Id: 36399566, Score: 206: </h3><p>One way, as suggested in <a href="https://stackoverflow.com/questions/13916820/how-to-install-a-specific-version-of-a-package-with-pip">this post</a>, is to mention version in <code>pip</code> as:</p>
 
 <pre><code>pip install -Iv MySQL_python==1.2.2
 </code></pre>
 
 <p>i.e. Use <code>==</code> and mention the version number to install only that version. <code>-I, --ignore-installed</code> ignores already installed packages.</p>
-<h4> Comment 96768804 Lionel Trebuchon: </h4>Beware! I had the experience that this installed the different versions <b>next to each other</b>! Also interestingly, <code>pip list</code> was not aware of that, but <code>conda list</code> was (and would display the different package versions).  It also completely confused <i>Pycharm</i>.<br>------------------------------------------------------------------ <br><h3> Answer 49666010 Zach Weg: </h3><p>To install a specific python package version whether it is the first time, an upgrade or a downgrade use: </p>
+<h4> Lionel Trebuchon, Comment 96768804 Score: 4: </h4>Beware! I had the experience that this installed the different versions <b>next to each other</b>! Also interestingly, <code>pip list</code> was not aware of that, but <code>conda list</code> was (and would display the different package versions).  It also completely confused <i>Pycharm</i>.<br>------------------------------------------------------------------ <br><h3> Zach Weg, Id: 49666010, Score: 100: </h3><p>To install a specific python package version whether it is the first time, an upgrade or a downgrade use: </p>
 
 <pre><code>pip install --force-reinstall MySQL_python==1.2.4
 </code></pre>
@@ -55,8 +55,8 @@ pip install -Iv http://sourceforge.net/projects/mysql-python/files/mysql-python/
 
 <pre><code>pip install MySQL_python==
 </code></pre>
-<h4> Comment 88674491 FedFranz: </h4>With pip 10.0.1 this is the only working solution. &quot;-I&quot; option actually reinstall the previous version.<br>------------------------------------------------------------------ <br><h3> Answer 5226452 dappawit: </h3><p>I believe that if you already have a package it installed, pip will not overwrite it with another version.  Use <code>-I</code> to ignore previous versions.</p>
-<h4> Comment 5880743 dappawit: </h4>okay, so you ask for version 1.2.2 and it still installs 1.2.3, and nothing else was installed?  The syntax you used is correct for getting specific versions.<br><h4> Comment 115475712 Nick.Mc: </h4><code>No such option: -I</code><br><h4> Comment 5880731 Joe: </h4>I do not have it installed - using a fresh virtualenv created with the --no-site-packages option<br><h4> Comment 79938277 user5359531: </h4>&quot;using a fresh virtualenv created with the --no-site-packages option&quot;; you might need to preceed this with the command <code>unset PYTHONPATH</code> so to keep <code>pip</code> from seeing your pre-installed libraries<br>------------------------------------------------------------------ <br><h3> Answer 54057796 Jack Chan: </h3><p>Sometimes, the previously installed version is cached. </p>
+<h4> FedFranz, Comment 88674491 Score: 5: </h4>With pip 10.0.1 this is the only working solution. &quot;-I&quot; option actually reinstall the previous version.<br>------------------------------------------------------------------ <br><h3> dappawit, Id: 5226452, Score: 42: </h3><p>I believe that if you already have a package it installed, pip will not overwrite it with another version.  Use <code>-I</code> to ignore previous versions.</p>
+<h4> dappawit, Comment 5880743 Score: 3: </h4>okay, so you ask for version 1.2.2 and it still installs 1.2.3, and nothing else was installed?  The syntax you used is correct for getting specific versions.<br><h4> Nick.Mc, Comment 115475712 Score: 1: </h4><code>No such option: -I</code><br><h4> Joe, Comment 5880731 Score: 1: </h4>I do not have it installed - using a fresh virtualenv created with the --no-site-packages option<br><h4> user5359531, Comment 79938277 Score: 0: </h4>&quot;using a fresh virtualenv created with the --no-site-packages option&quot;; you might need to preceed this with the command <code>unset PYTHONPATH</code> so to keep <code>pip</code> from seeing your pre-installed libraries<br>------------------------------------------------------------------ <br><h3> Jack Chan, Id: 54057796, Score: 30: </h3><p>Sometimes, the previously installed version is cached. </p>
 
 <pre><code>~$ pip install pillow==5.2.0
 </code></pre>
@@ -68,13 +68,13 @@ pip install -Iv http://sourceforge.net/projects/mysql-python/files/mysql-python/
 
 <pre><code>~$ pip install --no-cache-dir -I pillow==5.2.0
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 52133217 Trenton: </h3><p>Since this appeared to be a breaking change introduced in version 10 of pip, I downgraded to a compatible version:</p>
+------------------------------------------------------------------ <br><h3> Trenton, Id: 52133217, Score: 13: </h3><p>Since this appeared to be a breaking change introduced in version 10 of pip, I downgraded to a compatible version:</p>
 
 <pre><code>pip install 'pip&lt;10' 
 </code></pre>
 
 <p>This command tells pip to install a version of the module lower than version 10. Do this in a <a href="https://virtualenv.pypa.io/en/stable/userguide/#usage" rel="noreferrer">virutalenv</a> so you don't screw up your site installation of Python.</p>
------------------------------------------------------------------- <br><h3> Answer 54831043 0x5453: </h3><p>I recently ran into an issue when using <code>pip</code>'s <code>-I</code> flag that I wanted to document somewhere:</p>
+------------------------------------------------------------------ <br><h3> 0x5453, Id: 54831043, Score: 9: </h3><p>I recently ran into an issue when using <code>pip</code>'s <code>-I</code> flag that I wanted to document somewhere:</p>
 
 <p><code>-I</code> will <em>not</em> uninstall the existing package before proceeding; it will just install it on top of the old one.  This means that any files that should be deleted between versions will instead be left in place.  This can cause weird behavior if those files share names with other installed modules.</p>
 
@@ -85,14 +85,14 @@ pip install -Iv http://sourceforge.net/projects/mysql-python/files/mysql-python/
 <p>In my case, this manifested with strange syntax errors because the newer version of the package added a file that was only compatible with Python 3, and when I downgraded package versions to support Python 2, I continued importing the Python-3-only module.</p>
 
 <p>Based on this, I would argue that uninstalling the old package is always preferable to using <code>-I</code> when updating installed package versions.</p>
------------------------------------------------------------------- <br><h3> Answer 58187203 Tapan Hegde: </h3><p>This below command worked for me </p>
+------------------------------------------------------------------ <br><h3> Tapan Hegde, Id: 58187203, Score: 9: </h3><p>This below command worked for me </p>
 
 <p>Python version - 2.7</p>
 
 <p>package - python-jenkins</p>
 
 <p>command - <code>$ pip install 'python-jenkins&gt;=1.1.1'</code></p>
-<h4> Comment 108574795 TheAmigo: </h4>I didn&#39;t downvote, but can see that this doesn&#39;t answer the question nor does it provide any helpful information that the OP can use to solve the problem.<br>------------------------------------------------------------------ <br><h3> Answer 53256755 Samarth: </h3><p>There are 2 ways you may install any package with version:-
+<h4> TheAmigo, Comment 108574795 Score: 2: </h4>I didn&#39;t downvote, but can see that this doesn&#39;t answer the question nor does it provide any helpful information that the OP can use to solve the problem.<br>------------------------------------------------------------------ <br><h3> Samarth, Id: 53256755, Score: 1: </h3><p>There are 2 ways you may install any package with version:-
 <strong>A). pip install -Iv package-name == version</strong>
 <strong>B). pip install -v package-name == version</strong></p>
 
@@ -116,10 +116,10 @@ pip install -Iv http://sourceforge.net/projects/mysql-python/files/mysql-python/
 <p>4.And now you can go ahead to reinstall the same package with a specific version, by
 <strong>pip install -v package-name==version</strong>
 e.g. pip install -v pyreadline == 2.*</p>
------------------------------------------------------------------- <br><h3> Answer 58167663 Dilshad.A: </h3><p>If you want to update to latest version and you don't know what is the latest version you can type.</p>
+------------------------------------------------------------------ <br><h3> Dilshad.A, Id: 58167663, Score: 1: </h3><p>If you want to update to latest version and you don't know what is the latest version you can type.</p>
 
 <p>pip install MySQL_python --upgrade</p>
 
 <p>This will update the MySQL_python for latest version available, you can use for any other package version.</p>
------------------------------------------------------------------- <br><h3> Answer 74728486 Omer Anisfeld: </h3><p>dependency packaging has had a new release, wherein it has dropped LegacyVersion from its codebase<br />
+------------------------------------------------------------------ <br><h3> Omer Anisfeld, Id: 74728486, Score: -1: </h3><p>dependency packaging has had a new release, wherein it has dropped LegacyVersion from its codebase<br />
 The quick solution might be pin packaging==21.3</p>

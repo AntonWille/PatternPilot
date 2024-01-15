@@ -1,5 +1,5 @@
- <h2> Title: Checking if a variable is defined? </h2> <h3> readonly, question_id: 288715 </h3>Score: 611, Tags: {ruby,reflection} <br><p>How can I check whether a variable is defined in Ruby?  Is there an <code>isset</code>-type method available?</p>
------------------------------------------------------------------- <br><h3> Answer 10049018 user761856: </h3><p>Try "unless" instead of "if"</p>
+ <h2> Title: Checking if a variable is defined? </h2> <h4> readonly, question_id: 288715 </h4>Score: 611, Tags: {ruby,reflection} <br><p>How can I check whether a variable is defined in Ruby?  Is there an <code>isset</code>-type method available?</p>
+------------------------------------------------------------------ <br><h3> user761856, Id: 10049018, Score: 16: </h3><p>Try "unless" instead of "if"</p>
 
 <pre><code>a = "apple"
 # Note that b is not declared
@@ -17,7 +17,7 @@ unless defined? c
     puts "c is not defined"
 end
 </code></pre>
-<h4> Comment 15829152 look: </h4>It very nicely answers the question in one more useful way, doesn&#39;t it?<br><h4> Comment 27717689 ChrisPhoenix: </h4>The ruby style guide says &quot;Favor unless over if for negative conditions&quot; <a href="https://github.com/bbatsov/ruby-style-guide" rel="nofollow noreferrer">github.com/bbatsov/ruby-style-guide</a><br><h4> Comment 14119082 Andrew Grimm: </h4>What does this answer add that hasn&#39;t been said by the other answers?<br>------------------------------------------------------------------ <br><h3> Answer 288726 Ricardo Acras: </h3><p>Use the <code>defined?</code> keyword (<a href="http://ruby-doc.org/docs/keywords/1.9/Object.html#method-i-defined-3F" rel="noreferrer">documentation</a>). It will return a String with the kind of the item, or <code>nil</code> if it doesn’t exist.</p>
+<h4> look, Comment 15829152 Score: 2: </h4>It very nicely answers the question in one more useful way, doesn&#39;t it?<br><h4> ChrisPhoenix, Comment 27717689 Score: 2: </h4>The ruby style guide says &quot;Favor unless over if for negative conditions&quot; <a href="https://github.com/bbatsov/ruby-style-guide" rel="nofollow noreferrer">github.com/bbatsov/ruby-style-guide</a><br><h4> Andrew Grimm, Comment 14119082 Score: 0: </h4>What does this answer add that hasn&#39;t been said by the other answers?<br>------------------------------------------------------------------ <br><h3> Ricardo Acras, Id: 288726, Score: 816: </h3><p>Use the <code>defined?</code> keyword (<a href="http://ruby-doc.org/docs/keywords/1.9/Object.html#method-i-defined-3F" rel="noreferrer">documentation</a>). It will return a String with the kind of the item, or <code>nil</code> if it doesn’t exist.</p>
 
 <pre><code>&gt;&gt; a = 1
  =&gt; 1
@@ -39,7 +39,7 @@ end
 &gt;&gt; defined? n
  =&gt; "local-variable"
 </code></pre>
-<h4> Comment 7889258 jrdioko: </h4>If you want to set a variable if it doesn&#39;t exist and leave it alone if it does, see @danmayer&#39;s answer (involving the <code>||=</code> operator) below.<br><h4> Comment 65479765 elsurudo: </h4>Here&#39;s another oddity I can into.. If you define a variable in an if-block for which the condition is never met, <code>defined?</code> still returns true for a variable defined within that block!<br><h4> Comment 100227916 stevec: </h4>Is there a method like <code>defined?</code> that returns boolean?<br><h4> Comment 100229295 stevec: </h4>To return true/false, <code>!!defined?(object_name)</code><br><h4> Comment 104387628 Andre Figueiredo: </h4>@jrdioko it&#39;s not the same, i.e. setter returns false value like <code>nil</code> or <code>false</code>, defeating the purpose of caching value in instance variable, and doing all reassigning again, with god-knows-what will be executed..<br>------------------------------------------------------------------ <br><h3> Answer 288729 danmayer: </h3><p>This is useful if you want to do nothing if it does exist but create it if it doesn't exist.</p>
+<h4> jrdioko, Comment 7889258 Score: 7: </h4>If you want to set a variable if it doesn&#39;t exist and leave it alone if it does, see @danmayer&#39;s answer (involving the <code>||=</code> operator) below.<br><h4> elsurudo, Comment 65479765 Score: 2: </h4>Here&#39;s another oddity I can into.. If you define a variable in an if-block for which the condition is never met, <code>defined?</code> still returns true for a variable defined within that block!<br><h4> stevec, Comment 100227916 Score: 2: </h4>Is there a method like <code>defined?</code> that returns boolean?<br><h4> stevec, Comment 100229295 Score: 0: </h4>To return true/false, <code>!!defined?(object_name)</code><br><h4> Andre Figueiredo, Comment 104387628 Score: 0: </h4>@jrdioko it&#39;s not the same, i.e. setter returns false value like <code>nil</code> or <code>false</code>, defeating the purpose of caching value in instance variable, and doing all reassigning again, with god-knows-what will be executed..<br>------------------------------------------------------------------ <br><h3> danmayer, Id: 288729, Score: 95: </h3><p>This is useful if you want to do nothing if it does exist but create it if it doesn't exist.</p>
 
 <pre><code>def get_var
   @var ||= SomeClass.new()
@@ -47,7 +47,7 @@ end
 </code></pre>
 
 <p>This only creates the new instance once. After that it just keeps returning the var.</p>
-<h4> Comment 59416528 anon: </h4>@ArnaudMeuret <a href="http://stackoverflow.com/a/2505285/1863564">Sort of, not really.</a> -- while it may not seem identical, it&#39;s worth reading the answers on that question.<br><h4> Comment 40612268 Tony Zito: </h4>If you <i>are</i> working with booleans, and want the default value to be true if the variable wasn&#39;t explicitly set to false, you can use this construction:  <code>var = (var or var.nil?)</code><br><h4> Comment 13806136 Andrew Marshall: </h4>Just don&#39;t use <code>||=</code> with boolean values, lest you feel the pain of confusion.<br><h4> Comment 7889238 jrdioko: </h4>This is very idiomatic Ruby too and very typical, by the way.<br><h4> Comment 18417224 nzifnab: </h4>along with what @AndrewMarshall said, avoid this idiom with anything that might return <code>nil</code> as well unless you <i>really</i> want to evaluate the expression every time it&#39;s called when it does return <code>nil</code><br><h4> Comment 55883548 Yoshi: </h4><code>||=</code> will not work for boolean <code>false</code>. let&#39;s say  <code>a = false</code> <code>a ||= true</code> then <code>a == true</code> you should use <code>defined? a</code> for boolean case<br><h4> Comment 9837383 Pierre-Adrien: </h4>Thanks for this input ! I&#39;m a ruby/rails beginner and came accross this syntax yesterday evening, had a hard time figuring out what it meant. Looks very handy !<br><h4> Comment 30469910 Ghoti: </h4>Personally don&#39;t like methods with get_ on the front (hey it&#39;s not Java :)), I&#39;d just call it &quot;var&quot; and expose it to the outside world that way. I do this a lot to hide @variables and default them without having to jump through lots of hoops. get_ feels very procedural, you might want to do all sorts of things in that method one day.<br><h4> Comment 39898311 Arnaud Meuret: </h4>No magic here. Mere syntactic sugar for <code>@var = @var || SomeClass.new</code>. Just unroll any Ruby <code>..=</code> operator if you&#39;re having difficulties wrapping your mind around it (and this is completely unrelated do <code>defined?</code> BTW). No layman rubyist should use <code>defined?</code> anyway.<br>------------------------------------------------------------------ <br><h3> Answer 6152507 foomip: </h3><p>The correct syntax for the above statement is:</p>
+<h4> anon, Comment 59416528 Score: 1: </h4>@ArnaudMeuret <a href="http://stackoverflow.com/a/2505285/1863564">Sort of, not really.</a> -- while it may not seem identical, it&#39;s worth reading the answers on that question.<br><h4> Tony Zito, Comment 40612268 Score: 1: </h4>If you <i>are</i> working with booleans, and want the default value to be true if the variable wasn&#39;t explicitly set to false, you can use this construction:  <code>var = (var or var.nil?)</code><br><h4> Andrew Marshall, Comment 13806136 Score: 39: </h4>Just don&#39;t use <code>||=</code> with boolean values, lest you feel the pain of confusion.<br><h4> jrdioko, Comment 7889238 Score: 9: </h4>This is very idiomatic Ruby too and very typical, by the way.<br><h4> nzifnab, Comment 18417224 Score: 6: </h4>along with what @AndrewMarshall said, avoid this idiom with anything that might return <code>nil</code> as well unless you <i>really</i> want to evaluate the expression every time it&#39;s called when it does return <code>nil</code><br><h4> Yoshi, Comment 55883548 Score: 0: </h4><code>||=</code> will not work for boolean <code>false</code>. let&#39;s say  <code>a = false</code> <code>a ||= true</code> then <code>a == true</code> you should use <code>defined? a</code> for boolean case<br><h4> Pierre-Adrien, Comment 9837383 Score: 0: </h4>Thanks for this input ! I&#39;m a ruby/rails beginner and came accross this syntax yesterday evening, had a hard time figuring out what it meant. Looks very handy !<br><h4> Ghoti, Comment 30469910 Score: 0: </h4>Personally don&#39;t like methods with get_ on the front (hey it&#39;s not Java :)), I&#39;d just call it &quot;var&quot; and expose it to the outside world that way. I do this a lot to hide @variables and default them without having to jump through lots of hoops. get_ feels very procedural, you might want to do all sorts of things in that method one day.<br><h4> Arnaud Meuret, Comment 39898311 Score: 0: </h4>No magic here. Mere syntactic sugar for <code>@var = @var || SomeClass.new</code>. Just unroll any Ruby <code>..=</code> operator if you&#39;re having difficulties wrapping your mind around it (and this is completely unrelated do <code>defined?</code> BTW). No layman rubyist should use <code>defined?</code> anyway.<br>------------------------------------------------------------------ <br><h3> foomip, Id: 6152507, Score: 71: </h3><p>The correct syntax for the above statement is:</p>
 
 <pre><code>if (defined?(var)).nil? # will now return true or false
  print "var is not defined\n".color(:red)
@@ -57,8 +57,8 @@ end
 </code></pre>
 
 <p>substituting (<code>var</code>) with your variable. This syntax will return a true/false value for evaluation in the if statement.</p>
-<h4> Comment 12828805 Jerome: </h4>That&#39;s not necessary as nil evaluates to false when used in a test<br><h4> Comment 39898481 Arnaud Meuret: </h4>Which statement are you refering to ?!? Don&#39;t use an answer as a comment to something else.<br><h4> Comment 23129250 vol7ron: </h4>Why not <code>defined?(var) == nil</code> ?<br><h4> Comment 29104093 juanpaco: </h4>@vol7ron - That is perfectly valid syntax.  Using the call to <code>.nil?</code> is more idiomatic, as they say.  It&#39;s more &quot;object-oriented&quot; to ask an object if it <code>nil</code> than to use a comparison operator.  Neither is difficult to read, so use whichever one helps you ship more product.<br>------------------------------------------------------------------ <br><h3> Answer 288724 digitalsanctum: </h3><p><code>defined?(your_var)</code> will work. Depending on what you're doing you can also do something like <code>your_var.nil?</code></p>
-<h4> Comment 27553128 Gobol: </h4><code>your_var.nil?</code> will result in error : <code>undefined local variable or method your_var</code> when not defined before...<br><h4> Comment 25687622 kakubei: </h4>+1 for <code>your_var.nil?</code> because it returns true of false and is much nicer to read and write than <code>defined? var</code>. Thanks for this.<br>------------------------------------------------------------------ <br><h3> Answer 44982213 BenKoshy: </h3><h3>WARNING Re: A Common Ruby Pattern</h3>
+<h4> Jerome, Comment 12828805 Score: 11: </h4>That&#39;s not necessary as nil evaluates to false when used in a test<br><h4> Arnaud Meuret, Comment 39898481 Score: 0: </h4>Which statement are you refering to ?!? Don&#39;t use an answer as a comment to something else.<br><h4> vol7ron, Comment 23129250 Score: 0: </h4>Why not <code>defined?(var) == nil</code> ?<br><h4> juanpaco, Comment 29104093 Score: 0: </h4>@vol7ron - That is perfectly valid syntax.  Using the call to <code>.nil?</code> is more idiomatic, as they say.  It&#39;s more &quot;object-oriented&quot; to ask an object if it <code>nil</code> than to use a comparison operator.  Neither is difficult to read, so use whichever one helps you ship more product.<br>------------------------------------------------------------------ <br><h3> digitalsanctum, Id: 288724, Score: 19: </h3><p><code>defined?(your_var)</code> will work. Depending on what you're doing you can also do something like <code>your_var.nil?</code></p>
+<h4> Gobol, Comment 27553128 Score: 29: </h4><code>your_var.nil?</code> will result in error : <code>undefined local variable or method your_var</code> when not defined before...<br><h4> kakubei, Comment 25687622 Score: 0: </h4>+1 for <code>your_var.nil?</code> because it returns true of false and is much nicer to read and write than <code>defined? var</code>. Thanks for this.<br>------------------------------------------------------------------ <br><h3> BenKoshy, Id: 44982213, Score: 12: </h3><h3>WARNING Re: A Common Ruby Pattern</h3>
 <p>the <code>defined?</code> method is the answer. <a href="https://stackoverflow.com/a/288726/4880924">See the accepted answer above</a>.</p>
 <p><em><strong>But watch out...</strong></em> consider this common ruby pattern:</p>
 <pre><code> def method1
@@ -83,9 +83,9 @@ end
   end
 </code></pre>
 <p>As with most things, the devil is in the implementation details.</p>
-<h4> Comment 105726524 Kulgar: </h4>You are totally right, thank you for highlighting that specific caveat<br>------------------------------------------------------------------ <br><h3> Answer 16238957 Saqib R.: </h3><p>Use <code>defined? YourVariable</code><br>
+<h4> Kulgar, Comment 105726524 Score: 0: </h4>You are totally right, thank you for highlighting that specific caveat<br>------------------------------------------------------------------ <br><h3> Saqib R., Id: 16238957, Score: 10: </h3><p>Use <code>defined? YourVariable</code><br>
 <strong><em>Keep it simple silly</em></strong> .. ;)</p>
------------------------------------------------------------------- <br><h3> Answer 3724712 Sardathrion - against SE abuse: </h3><p>Here is some code, nothing rocket science but it works well enough</p>
+------------------------------------------------------------------ <br><h3> Sardathrion - against SE abuse, Id: 3724712, Score: 8: </h3><p>Here is some code, nothing rocket science but it works well enough</p>
 
 <pre><code>require 'rubygems'
 require 'rainbow'
@@ -97,7 +97,7 @@ end
 </code></pre>
 
 <p>Clearly, the colouring code is not necessary, just a nice visualation in this toy example.</p>
-<h4> Comment 14515836 James: </h4>Presumably because the <code>nil?</code> is optional.<br>------------------------------------------------------------------ <br><h3> Answer 9728836 Bruno Barros: </h3><p>You can try:</p>
+<h4> James, Comment 14515836 Score: 0: </h4>Presumably because the <code>nil?</code> is optional.<br>------------------------------------------------------------------ <br><h3> Bruno Barros, Id: 9728836, Score: 6: </h3><p>You can try:</p>
 
 <pre><code>unless defined?(var)
   #ruby code goes here
@@ -106,7 +106,7 @@ end
 </code></pre>
 
 <p>Because it returns a boolean.</p>
-<h4> Comment 15658664 Andrew Grimm: </h4><code>SyntaxError: compile error (irb):2: syntax error, unexpected $end, expecting kEND</code><br><h4> Comment 17835988 johannes: </h4>to use an <code>unless</code> statement seems overly complicated<br><h4> Comment 133907528 Cadoiz: </h4><code>defined?</code> does <b>NOT</b> return a boolean, but the type of what comes afterwards. This type can be truthy or falsy, but you should pay attention. The <code>=&gt; true</code> is misleading at best unless your &quot;<code>#ruby code </code>&quot; that &quot;<code>goes here</code>&quot; returns <code>true</code>.<br>------------------------------------------------------------------ <br><h3> Answer 41532508 donnoman: </h3><p>As many other examples show you don't actually need a boolean from a method to make logical choices in ruby. It would be a poor form to coerce everything to a boolean unless you actually need a boolean. </p>
+<h4> Andrew Grimm, Comment 15658664 Score: 0: </h4><code>SyntaxError: compile error (irb):2: syntax error, unexpected $end, expecting kEND</code><br><h4> johannes, Comment 17835988 Score: 0: </h4>to use an <code>unless</code> statement seems overly complicated<br><h4> Cadoiz, Comment 133907528 Score: 0: </h4><code>defined?</code> does <b>NOT</b> return a boolean, but the type of what comes afterwards. This type can be truthy or falsy, but you should pay attention. The <code>=&gt; true</code> is misleading at best unless your &quot;<code>#ruby code </code>&quot; that &quot;<code>goes here</code>&quot; returns <code>true</code>.<br>------------------------------------------------------------------ <br><h3> donnoman, Id: 41532508, Score: 5: </h3><p>As many other examples show you don't actually need a boolean from a method to make logical choices in ruby. It would be a poor form to coerce everything to a boolean unless you actually need a boolean. </p>
 
 <p>But if you absolutely need a boolean. Use !! (bang bang) or "falsy falsy reveals the truth".</p>
 
@@ -135,7 +135,7 @@ end
 var is defined? true vs local-variable
 =&gt; nil
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 45691059 leberknecht: </h3><p>It  should be mentioned that using <code>defined</code> to check if a specific field is set in a hash might behave unexpected:</p>
+------------------------------------------------------------------ <br><h3> leberknecht, Id: 45691059, Score: 3: </h3><p>It  should be mentioned that using <code>defined</code> to check if a specific field is set in a hash might behave unexpected:</p>
 
 <pre><code>var = {}
 if defined? var['unknown']
@@ -150,7 +150,7 @@ end
 
 <pre><code>if var.key?('unknown')
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 27445810 Robert Klemme: </h3><p>Please note the distinction between "defined" and "assigned".</p>
+------------------------------------------------------------------ <br><h3> Robert Klemme, Id: 27445810, Score: 2: </h3><p>Please note the distinction between "defined" and "assigned".</p>
 
 <pre><code>$ ruby -e 'def f; if 1&gt;2; x=99; end;p x, defined? x; end;f'
 nil
@@ -158,7 +158,7 @@ nil
 </code></pre>
 
 <p>x is defined even though it is never assigned!</p>
-<h4> Comment 53340403 Paul Pettengill: </h4>This is something I just came across.  I was expecting <code>NameError Exception: undefined local variable or method</code>, and was confused when the only assignment/mention of the variable was in an if block that wasn&#39;t getting hit.<br>------------------------------------------------------------------ <br><h3> Answer 50395751 John Donner: </h3><p><code>defined?</code> is great, but if you are in a Rails environment you can also use <code>try</code>, especially in cases where you want to check a dynamic variable name:</p>
+<h4> Paul Pettengill, Comment 53340403 Score: 0: </h4>This is something I just came across.  I was expecting <code>NameError Exception: undefined local variable or method</code>, and was confused when the only assignment/mention of the variable was in an if block that wasn&#39;t getting hit.<br>------------------------------------------------------------------ <br><h3> John Donner, Id: 50395751, Score: 2: </h3><p><code>defined?</code> is great, but if you are in a Rails environment you can also use <code>try</code>, especially in cases where you want to check a dynamic variable name:</p>
 
 <pre><code>foo = 1
 my_foo = "foo"
@@ -168,7 +168,7 @@ try(:bar)        # =&gt; nil
 try(my_foo)      # =&gt; 1
 try(my_bar)      # =&gt; nil
 </code></pre>
-<h4> Comment 126355254 Ramses: </h4>this is exactly what I was looking for. I need the value if the var exists.Thanks!<br>------------------------------------------------------------------ <br><h3> Answer 33307520 Elliott: </h3><p>Also, you can check if it's defined while in a string via interpolation, if you code: </p>
+<h4> Ramses, Comment 126355254 Score: 0: </h4>this is exactly what I was looking for. I need the value if the var exists.Thanks!<br>------------------------------------------------------------------ <br><h3> Elliott, Id: 33307520, Score: 0: </h3><p>Also, you can check if it's defined while in a string via interpolation, if you code: </p>
 
 <pre><code>puts "Is array1 defined and what type is it? #{defined?(@array1)}"
 </code></pre>
@@ -177,7 +177,7 @@ try(my_bar)      # =&gt; nil
 If it is not defined it will just return a warning saying the variable is not initialized.</p>
 
 <p>Hope this helps! :)</p>
------------------------------------------------------------------- <br><h3> Answer 66048871 stevec: </h3><p>Leaving an incredibly simple example in case it helps.</p>
+------------------------------------------------------------------ <br><h3> stevec, Id: 66048871, Score: 0: </h3><p>Leaving an incredibly simple example in case it helps.</p>
 <p>When variable <strong>doesn't exist</strong>:</p>
 <pre><code>if defined? a then &quot;hi&quot; end
 # =&gt; nil

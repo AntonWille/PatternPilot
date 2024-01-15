@@ -1,4 +1,4 @@
- <h2> Title: Case statement with multiple values in each &#39;when&#39; block </h2> <h3> Nick, question_id: 10197254 </h3>Score: 393, Tags: {ruby-on-rails,ruby,syntax,switch-statement} <br><p>The best way I can describe what I'm looking for is to show you the failed code I've tried thus far:</p>
+ <h2> Title: Case statement with multiple values in each &#39;when&#39; block </h2> <h4> Nick, question_id: 10197254 </h4>Score: 393, Tags: {ruby-on-rails,ruby,syntax,switch-statement} <br><p>The best way I can describe what I'm looking for is to show you the failed code I've tried thus far:</p>
 
 <pre><code>case car
   when ['honda', 'acura'].include?(car)
@@ -9,7 +9,7 @@ end
 </code></pre>
 
 <p>I've got about 4 or 5 different <code>when</code> situations that should be triggered by approximately 50 different possible values of <code>car</code>. Is there a way to do this with <code>case</code> blocks or should I try a massive <code>if</code> block?</p>
------------------------------------------------------------------- <br><h3> Answer 10197397 Charles Caldwell: </h3><p>In a <code>case</code> statement, a <code>,</code> is the equivalent of <code>||</code> in an <code>if</code> statement. </p>
+------------------------------------------------------------------ <br><h3> Charles Caldwell, Id: 10197397, Score: 866: </h3><p>In a <code>case</code> statement, a <code>,</code> is the equivalent of <code>||</code> in an <code>if</code> statement. </p>
 
 <pre><code>case car
    when 'toyota', 'lexus'
@@ -18,7 +18,7 @@ end
 </code></pre>
 
 <p><a href="http://www.skorks.com/2009/08/how-a-ruby-case-statement-works-and-what-you-can-do-with-it/" rel="noreferrer">Some other things you can do with a Ruby case statement</a></p>
-<h4> Comment 90936063 Taywee: </h4>Ruby doesn&#39;t support <code>or</code> or <code>||</code> here because the <code>when</code> takes a series of comma-separated expressions to the right of it, not a single identifier.  Because of this, if you had <code>when a or b</code>, it&#39;s not clear whether this is to be taken as the equivalent of  <code>when a, b</code> or <code>when (a or b)</code>, the latter of which evaluates the expression <code>a or b</code> first before throwing it into the when.  It&#39;s more surprising and less easy to handle for the language to have tokens that change behavior based on context, and then you wouldn&#39;t be able to use a real <code>or</code> expression on the right side of a when.<br><h4> Comment 72199336 Zia Ul Rehman Mughal: </h4>well, this works, but as ruby focus on programmer&#39;s ease, i wonder why it does nto support standard || or &#39;or&#39;? This is kind of confusing<br><h4> Comment 42243428 Furkan Ayhan: </h4>I don&#39;t know why, but this strange situation happens:  When I write this: <code>when &quot;toyota&quot;, &quot;lexus&quot;</code>, I get: <code>unexpected tSTRING_BEG, expecting keyword_do or &#39;{&#39; or &#39;(&#39; (SyntaxError)</code>.   However, when I write this: <code>when &quot;toyota&quot;,&quot;lexus&quot;</code>, it works.  The only difference is a space after comma.<br><h4> Comment 42256968 Charles Caldwell: </h4>@FurkanAyhan That&#39;s odd. I went ahead and <a href="http://rubyfiddle.com/riddles/c6577" rel="nofollow noreferrer">tested the code</a> just to make sure and it does work. My guess is there&#39;s something else going on in your code that&#39;s making it error like that. Is it possible you forgot to close out a string somewhere or something like that?<br><h4> Comment 118228927 Alan Evangelista: </h4>@rsenna that link is broken<br><h4> Comment 79085297 JackChance: </h4>@ZiaUlRehmanMughal, agreed. And even worse in my case, the || was causing a quiet error so it looked like the case succeeded until I really started digging in.. Beware.<br>------------------------------------------------------------------ <br><h3> Answer 10197725 pilcrow: </h3><p>You might take advantage of ruby's "splat" or flattening syntax.</p>
+<h4> Taywee, Comment 90936063 Score: 4: </h4>Ruby doesn&#39;t support <code>or</code> or <code>||</code> here because the <code>when</code> takes a series of comma-separated expressions to the right of it, not a single identifier.  Because of this, if you had <code>when a or b</code>, it&#39;s not clear whether this is to be taken as the equivalent of  <code>when a, b</code> or <code>when (a or b)</code>, the latter of which evaluates the expression <code>a or b</code> first before throwing it into the when.  It&#39;s more surprising and less easy to handle for the language to have tokens that change behavior based on context, and then you wouldn&#39;t be able to use a real <code>or</code> expression on the right side of a when.<br><h4> Zia Ul Rehman Mughal, Comment 72199336 Score: 1: </h4>well, this works, but as ruby focus on programmer&#39;s ease, i wonder why it does nto support standard || or &#39;or&#39;? This is kind of confusing<br><h4> Furkan Ayhan, Comment 42243428 Score: 0: </h4>I don&#39;t know why, but this strange situation happens:  When I write this: <code>when &quot;toyota&quot;, &quot;lexus&quot;</code>, I get: <code>unexpected tSTRING_BEG, expecting keyword_do or &#39;{&#39; or &#39;(&#39; (SyntaxError)</code>.   However, when I write this: <code>when &quot;toyota&quot;,&quot;lexus&quot;</code>, it works.  The only difference is a space after comma.<br><h4> Charles Caldwell, Comment 42256968 Score: 0: </h4>@FurkanAyhan That&#39;s odd. I went ahead and <a href="http://rubyfiddle.com/riddles/c6577" rel="nofollow noreferrer">tested the code</a> just to make sure and it does work. My guess is there&#39;s something else going on in your code that&#39;s making it error like that. Is it possible you forgot to close out a string somewhere or something like that?<br><h4> Alan Evangelista, Comment 118228927 Score: 0: </h4>@rsenna that link is broken<br><h4> JackChance, Comment 79085297 Score: 0: </h4>@ZiaUlRehmanMughal, agreed. And even worse in my case, the || was causing a quiet error so it looked like the case succeeded until I really started digging in.. Beware.<br>------------------------------------------------------------------ <br><h3> pilcrow, Id: 10197725, Score: 121: </h3><p>You might take advantage of ruby's "splat" or flattening syntax.</p>
 
 <p>This makes overgrown <code>when</code> clauses — you have about 10 values to test per branch if I understand correctly — a little more readable in my opinion.  Additionally, you can modify the values to test at runtime.  For example:</p>
 
@@ -41,7 +41,7 @@ end
 </code></pre>
 
 <p>Another common approach would be to use a hash as a dispatch table, with keys for each value of <code>car</code> and values that are some callable object encapsulating the code you wish to execute.</p>
-<h4> Comment 13093643 Nick: </h4>This is what I ended up using, though I feel bad taking away someone&#39;s check mark :D<br><h4> Comment 61075931 Pistos: </h4>Brilliant solution for long <code>when</code> lines.  Thanks for sharing.<br>------------------------------------------------------------------ <br><h3> Answer 68044892 Ped: </h3><p>Remember switch/case (case/when, etc.) is just comparing <em>values</em>.  I like the official answer in this instance for a simple or'd string list comparison, but for more exotic conditional / matching logic,</p>
+<h4> Nick, Comment 13093643 Score: 0: </h4>This is what I ended up using, though I feel bad taking away someone&#39;s check mark :D<br><h4> Pistos, Comment 61075931 Score: 0: </h4>Brilliant solution for long <code>when</code> lines.  Thanks for sharing.<br>------------------------------------------------------------------ <br><h3> Ped, Id: 68044892, Score: 3: </h3><p>Remember switch/case (case/when, etc.) is just comparing <em>values</em>.  I like the official answer in this instance for a simple or'd string list comparison, but for more exotic conditional / matching logic,</p>
 <pre><code>case true
   when ['honda', 'acura'].include?(car)
     # do something
@@ -51,7 +51,7 @@ end
     # do something else
 end
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 44146563 Hew Wolff: </h3><p>Another nice way to put your logic in data is something like this:</p>
+------------------------------------------------------------------ <br><h3> Hew Wolff, Id: 44146563, Score: 0: </h3><p>Another nice way to put your logic in data is something like this:</p>
 
 <pre><code># Initialization.
 CAR_TYPES = {
@@ -69,7 +69,7 @@ when :bar_type
   # do bar things
 end
 </code></pre>
-<h4> Comment 99176882 Nick: </h4>I don&#39;t mean to be rude, but I downvoted because this is less efficient in both time and space. It&#39;s also more complex and less readable than the other two answers. What would be the benefit of using this method?<br><h4> Comment 99292635 Nick: </h4>YAGNI (&quot;You aren&#39;t gonna need it&quot;) may apply here. The design sacrifices time/space efficiency and readability for a scenario that may exist in the future but doesn&#39;t exist yet. The cost is paid now, but the reward may never be reaped.<br><h4> Comment 99180803 Hew Wolff: </h4>It puts your whole classification into one object. You can now do things with that object, such as serialize it and send it to someone else to explain your logic, or store it in a database and allow people to edit it. (The logic will change pretty soon when new car models come out, right?) You might look up &quot;table-driven&quot;.<br>------------------------------------------------------------------ <br><h3> Answer 66480748 Matheus Porto: </h3><p>you could do something like this (inspired by @pilcrow's answer):</p>
+<h4> Nick, Comment 99176882 Score: 1: </h4>I don&#39;t mean to be rude, but I downvoted because this is less efficient in both time and space. It&#39;s also more complex and less readable than the other two answers. What would be the benefit of using this method?<br><h4> Nick, Comment 99292635 Score: 1: </h4>YAGNI (&quot;You aren&#39;t gonna need it&quot;) may apply here. The design sacrifices time/space efficiency and readability for a scenario that may exist in the future but doesn&#39;t exist yet. The cost is paid now, but the reward may never be reaped.<br><h4> Hew Wolff, Comment 99180803 Score: 0: </h4>It puts your whole classification into one object. You can now do things with that object, such as serialize it and send it to someone else to explain your logic, or store it in a database and allow people to edit it. (The logic will change pretty soon when new car models come out, right?) You might look up &quot;table-driven&quot;.<br>------------------------------------------------------------------ <br><h3> Matheus Porto, Id: 66480748, Score: 0: </h3><p>you could do something like this (inspired by @pilcrow's answer):</p>
 <pre><code>honda  = %w[honda acura civic element fit ...]
 toyota = %w[toyota lexus tercel rx yaris ...]
 
@@ -83,7 +83,7 @@ when *honda
 ...
 end
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 69976595 Shubham Chauhan: </h3><p><strong>In a case statement, equivalent of &amp;&amp; in an if statement.</strong></p>
+------------------------------------------------------------------ <br><h3> Shubham Chauhan, Id: 69976595, Score: -3: </h3><p><strong>In a case statement, equivalent of &amp;&amp; in an if statement.</strong></p>
 <p>case coding_language
 when 'ror' &amp;&amp; 'javascript'
 # code

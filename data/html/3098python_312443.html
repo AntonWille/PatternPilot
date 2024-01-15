@@ -1,8 +1,8 @@
- <h2> Title: How do I split a list into equally-sized chunks? </h2> <h3> jespern, question_id: 312443 </h3>Score: 3098, Tags: {python,list,split,chunks} <br><p>How do I split a list of arbitrary length into equal sized chunks?</p>
+ <h2> Title: How do I split a list into equally-sized chunks? </h2> <h4> jespern, question_id: 312443 </h4>Score: 3098, Tags: {python,list,split,chunks} <br><p>How do I split a list of arbitrary length into equal sized chunks?</p>
 <hr />
 <p><sub>See also: <a href="https://stackoverflow.com/q/434287">How to iterate over a list in chunks</a>.<br />
 To chunk strings, see <a href="https://stackoverflow.com/questions/9475241">Split string every nth character?</a>.</sub></p>
-<h4> Comment 134072608 traal: </h4>This question has a pretty official answer from Python core developer Raymond Hettinger, which refers to the official docs: <a href="https://stackoverflow.com/a/74120449">stackoverflow.com/a/74120449</a><br>------------------------------------------------------------------ <br><h3> Answer 312464 Ned Batchelder: </h3><p>Here's a generator that yields evenly-sized chunks:</p>
+<h4> traal, Id: 134072608 Score: 0: </h4>This question has a pretty official answer from Python core developer Raymond Hettinger, which refers to the official docs: <a href="https://stackoverflow.com/a/74120449">stackoverflow.com/a/74120449</a><br>------------------------------------------------------------------ <br><h3> Ned Batchelder, Id: 312464, Score: 4392: </h3><p>Here's a generator that yields evenly-sized chunks:</p>
 <pre><code>def chunks(lst, n):
     &quot;&quot;&quot;Yield successive n-sized chunks from lst.&quot;&quot;&quot;
     for i in range(0, len(lst), n):
@@ -31,13 +31,13 @@ pprint.pprint(list(chunks(range(10, 75), 10)))
 <p>For Python 2:</p>
 <pre><code>[lst[i:i + n] for i in xrange(0, len(lst), n)]
 </code></pre>
-<h4> Comment 136140770 Wayne: </h4>Chunking has been added as <code>itertools.batched(iterable, chunk_size)</code> now in Python 3.12, see more <a href="https://docs.python.org/3.12/library/itertools.html#itertools.batched" rel="nofollow noreferrer">here</a>.<br><h4> Comment 133136665 selle: </h4>Your chunks method should be added to stdlib imho<br><h4> Comment 133732961 ankostis: </h4>@selle It&#39;s already in stdlib, it&#39;s called <code>itertools.islice(iterator, chunk_size)</code>.<br><h4> Comment 133736435 Ned Batchelder: </h4>@ankostis <code>islice</code> does something different: it produces one slice of the iterator.<br><h4> Comment 133763745 ankostis: </h4>@NedBatchelder <code>islice()</code> needs a bit of boilerplate to setup a generator out of an iterator, but look how simple <a href="https://stackoverflow.com/a/22045226/548792">this solution</a> is.<br>------------------------------------------------------------------ <br><h3> Answer 1751478 oremj: </h3><p>Something super simple:</p>
+<h4> Wayne, Comment 136140770 Score: 15: </h4>Chunking has been added as <code>itertools.batched(iterable, chunk_size)</code> now in Python 3.12, see more <a href="https://docs.python.org/3.12/library/itertools.html#itertools.batched" rel="nofollow noreferrer">here</a>.<br><h4> selle, Comment 133136665 Score: 4: </h4>Your chunks method should be added to stdlib imho<br><h4> ankostis, Comment 133732961 Score: 0: </h4>@selle It&#39;s already in stdlib, it&#39;s called <code>itertools.islice(iterator, chunk_size)</code>.<br><h4> Ned Batchelder, Comment 133736435 Score: 0: </h4>@ankostis <code>islice</code> does something different: it produces one slice of the iterator.<br><h4> ankostis, Comment 133763745 Score: 0: </h4>@NedBatchelder <code>islice()</code> needs a bit of boilerplate to setup a generator out of an iterator, but look how simple <a href="https://stackoverflow.com/a/22045226/548792">this solution</a> is.<br>------------------------------------------------------------------ <br><h3> oremj, Id: 1751478, Score: 658: </h3><p>Something super simple:</p>
 <pre><code>def chunks(xs, n):
     n = max(1, n)
     return (xs[i:i+n] for i in range(0, len(xs), n))
 </code></pre>
 <p>For Python 2, use <code>xrange()</code> instead of <code>range()</code>.</p>
-<h4> Comment 121518885 keepAlive: </h4>Using short circuiting, <code>len(l) or 1</code> to deal with empty lists.<br><h4> Comment 133733022 ankostis: </h4>Slow! Prefer <a href="https://docs.python.org/3/library/itertools.html" rel="nofollow noreferrer"><code>itertools.islice()</code></a> instead.<br>------------------------------------------------------------------ <br><h3> Answer 16935535 Moj: </h3><p>I know this is kind of old but nobody yet mentioned <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.array_split.html" rel="noreferrer"><code>numpy.array_split</code></a>:</p>
+<h4> keepAlive, Comment 121518885 Score: 0: </h4>Using short circuiting, <code>len(l) or 1</code> to deal with empty lists.<br><h4> ankostis, Comment 133733022 Score: 0: </h4>Slow! Prefer <a href="https://docs.python.org/3/library/itertools.html" rel="nofollow noreferrer"><code>itertools.islice()</code></a> instead.<br>------------------------------------------------------------------ <br><h3> Moj, Id: 16935535, Score: 429: </h3><p>I know this is kind of old but nobody yet mentioned <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.array_split.html" rel="noreferrer"><code>numpy.array_split</code></a>:</p>
 <pre><code>import numpy as np
 
 lst = range(50)
@@ -50,7 +50,7 @@ np.array_split(lst, 5)
  array([30, 31, 32, 33, 34, 35, 36, 37, 38, 39]),
  array([40, 41, 42, 43, 44, 45, 46, 47, 48, 49])]
 </code></pre>
-<h4> Comment 52802258 FizxMike: </h4>This allows you to set the total number of chunks, not the number of elements per chunk.<br><h4> Comment 129310293 Galigator: </h4>This method change the type of the elements [ [&#39;a&#39;, 1] , [&#39;b&#39;, 2] ] with chunk one may become [ [&#39;a&#39;, &#39;1&#39;] , [&#39;b&#39;, &#39;2&#39;] ]. If type of first element is str then all element become numpy.str_  ...<br><h4> Comment 133733055 ankostis: </h4>It also breaks the lazyness of the iterable and needs O[2x] memory.<br><h4> Comment 134173063 The_spider: </h4>@FizxMike That problem can be solved using <code>np.split(lst, np.arange(0, len(l), chunk_size))</code>, althoug that requires even more memory and time.<br><h4> Comment 136102053 meferne: </h4>The benefit of this solution is that all arrays will be at most different by 1 in size. The accepted answer could have the last chunk a lot shorter.  From the docs: &quot;for an array of length l that should be split into n sections, it returns l % n sub-arrays of size l//n + 1 and the rest of size l//n.&quot;  This approach calculates how many elements would be extra in the last chunk (l % n), and then increases (l % n) arrays by 1 to compensate for that. That&#39;s rather neat, and probably some answer here already coded it like a generator.<br>------------------------------------------------------------------ <br><h3> Answer 312644 tzot: </h3><p>Directly from the (old) Python documentation (recipes for itertools):</p>
+<h4> FizxMike, Comment 52802258 Score: 76: </h4>This allows you to set the total number of chunks, not the number of elements per chunk.<br><h4> Galigator, Comment 129310293 Score: 0: </h4>This method change the type of the elements [ [&#39;a&#39;, 1] , [&#39;b&#39;, 2] ] with chunk one may become [ [&#39;a&#39;, &#39;1&#39;] , [&#39;b&#39;, &#39;2&#39;] ]. If type of first element is str then all element become numpy.str_  ...<br><h4> ankostis, Comment 133733055 Score: 0: </h4>It also breaks the lazyness of the iterable and needs O[2x] memory.<br><h4> The_spider, Comment 134173063 Score: 0: </h4>@FizxMike That problem can be solved using <code>np.split(lst, np.arange(0, len(l), chunk_size))</code>, althoug that requires even more memory and time.<br><h4> meferne, Comment 136102053 Score: 0: </h4>The benefit of this solution is that all arrays will be at most different by 1 in size. The accepted answer could have the last chunk a lot shorter.  From the docs: &quot;for an array of length l that should be split into n sections, it returns l % n sub-arrays of size l//n + 1 and the rest of size l//n.&quot;  This approach calculates how many elements would be extra in the last chunk (l % n), and then increases (l % n) arrays by 1 to compensate for that. That&#39;s rather neat, and probably some answer here already coded it like a generator.<br>------------------------------------------------------------------ <br><h3> tzot, Id: 312644, Score: 355: </h3><p>Directly from the (old) Python documentation (recipes for itertools):</p>
 <pre><code>from itertools import izip, chain, repeat
 
 def grouper(n, iterable, padvalue=None):
@@ -70,7 +70,7 @@ def grouper(n, iterable, padvalue=None):
 <p>These solutions work because <code>[iter(iterable)]*n</code> (or the equivalent in the earlier version) creates <em>one</em> iterator, repeated <code>n</code> times in the list. <code>izip_longest</code> then effectively performs a round-robin of &quot;each&quot; iterator; because this is the same iterator, it is advanced by each such call, resulting in each such zip-roundrobin generating one tuple of <code>n</code> items.</p>
 <h3>Python ≥3.12</h3>
 <p><a href="https://docs.python.org/3/library/itertools.html#itertools.batched" rel="noreferrer">itertools.batched</a> is available.</p>
------------------------------------------------------------------- <br><h3> Answer 22045226 senderle: </h3><p>I'm surprised nobody has thought of using <code>iter</code>'s <a href="http://docs.python.org/2/library/functions.html#iter" rel="noreferrer">two-argument form</a>:</p>
+------------------------------------------------------------------ <br><h3> senderle, Id: 22045226, Score: 304: </h3><p>I'm surprised nobody has thought of using <code>iter</code>'s <a href="http://docs.python.org/2/library/functions.html#iter" rel="noreferrer">two-argument form</a>:</p>
 
 <pre><code>from itertools import islice
 
@@ -148,7 +148,7 @@ def chunk(it, size, padval=_no_padding):
 &gt;&gt;&gt; list(chunk([1, 2, None, None, 5], 2, None))
 [(1, 2), (None, None), (5, None)]
 </code></pre>
-<h4> Comment 124722445 nikicat: </h4>One-liner version:  ``` from itertools import islice from functools import partial  seq = [1,2,3,4,5,6,7] size = 3 result = list(iter(partial(lambda it: tuple(islice(it, size)), iter(seq)), ())) assert result == [(1, 2, 3), (4, 5, 6), (7,)] ```<br>------------------------------------------------------------------ <br><h3> Answer 312467 Markus Jarderot: </h3><p>Here is a generator that work on arbitrary iterables:</p>
+<h4> nikicat, Comment 124722445 Score: 3: </h4>One-liner version:  ``` from itertools import islice from functools import partial  seq = [1,2,3,4,5,6,7] size = 3 result = list(iter(partial(lambda it: tuple(islice(it, size)), iter(seq)), ())) assert result == [(1, 2, 3), (4, 5, 6), (7,)] ```<br>------------------------------------------------------------------ <br><h3> Markus Jarderot, Id: 312467, Score: 125: </h3><p>Here is a generator that work on arbitrary iterables:</p>
 
 <pre><code>def split_seq(iterable, size):
     it = iter(iterable)
@@ -171,7 +171,7 @@ def chunk(it, size, padval=_no_padding):
  [60, 61, 62, 63, 64, 65, 66, 67, 68, 69],
  [70, 71, 72, 73, 74]]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 52022535 pylang: </h3><p><strong>Don't reinvent the wheel.</strong></p>
+------------------------------------------------------------------ <br><h3> pylang, Id: 52022535, Score: 116: </h3><p><strong>Don't reinvent the wheel.</strong></p>
 <p><strong>UPDATE</strong>: A complete solution is found in Python 3.12+ <a href="https://docs.python.org/3.12/library/itertools.html?highlight=batched#itertools.batched" rel="noreferrer"><code>itertools.batched</code></a>.</p>
 <p><strong>Given</strong></p>
 <pre><code>import itertools as it
@@ -243,7 +243,7 @@ list(dd.values())
 </ul>
 <p><sub><sup>+</sup> A third-party library that implements <a href="https://docs.python.org/3/library/itertools.html#itertools-recipes" rel="noreferrer">itertools recipes</a> and more. <code>&gt; pip install more_itertools</code> </sub></p>
 <p><sub><sup>++</sup>Included in Python Standard Library 3.12+.  <code>batched</code> is similar to <code>more_itertools.chunked</code>.</sub></p>
------------------------------------------------------------------- <br><h3> Answer 3226719 lebenf: </h3><p>Simple yet elegant</p>
+------------------------------------------------------------------ <br><h3> lebenf, Id: 3226719, Score: 91: </h3><p>Simple yet elegant</p>
 <pre><code>L = range(1, 1000)
 print [L[x:x+10] for x in xrange(0, len(L), 10)]
 </code></pre>
@@ -251,7 +251,7 @@ print [L[x:x+10] for x in xrange(0, len(L), 10)]
 <pre><code>def chunks(L, n): return [L[x: x+n] for x in xrange(0, len(L), n)]
 chunks(L, 10)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 21767522 Russia Must Remove Putin: </h3><h2>How do you split a list into evenly sized chunks?</h2>
+------------------------------------------------------------------ <br><h3> Russia Must Remove Putin, Id: 21767522, Score: 69: </h3><h2>How do you split a list into evenly sized chunks?</h2>
 <p>&quot;Evenly sized chunks&quot;, to me, implies that they are all the same length, or barring that option, at <strong>minimal variance</strong> in length. E.g. 5 baskets for 21 items could have the following results:</p>
 <pre><code>&gt;&gt;&gt; import statistics
 &gt;&gt;&gt; statistics.variance([5,5,5,5,1]) 
@@ -403,10 +403,10 @@ print(list(iter_baskets_contiguous(range(26), 5)))
 [[0, 1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15], [16, 17, 18, 19, 20], [21, 22, 23, 24, 25]]
 </code></pre>
 <p>Notice that the contiguous generator provide chunks in the same length patterns as the other two, but the items are all in order, and they are as evenly divided as one may divide a list of discrete elements.</p>
------------------------------------------------------------------- <br><h3> Answer 3125186 Tomasz Wysocki: </h3><pre><code>def chunk(input, size):
+------------------------------------------------------------------ <br><h3> Tomasz Wysocki, Id: 3125186, Score: 65: </h3><pre><code>def chunk(input, size):
     return map(None, *([iter(input)] * size))
 </code></pre>
-<h4> Comment 123652445 Sergey Nudnov: </h4>For Python 3.x: <code>return map(lambda *x: x, *([iter(input)] * size))</code>. Yet it drops tail of the list if it cannot be divided in the equal chunks<br><h4> Comment 123652393 Sergey Nudnov: </h4>Doesn&#39;t work in Python 3.8, is that for 2.x?<br>------------------------------------------------------------------ <br><h3> Answer 312466 atzz: </h3><p>If you know list size:</p>
+<h4> Sergey Nudnov, Comment 123652445 Score: 1: </h4>For Python 3.x: <code>return map(lambda *x: x, *([iter(input)] * size))</code>. Yet it drops tail of the list if it cannot be divided in the equal chunks<br><h4> Sergey Nudnov, Comment 123652393 Score: 0: </h4>Doesn&#39;t work in Python 3.8, is that for 2.x?<br>------------------------------------------------------------------ <br><h3> atzz, Id: 312466, Score: 59: </h3><p>If you know list size:</p>
 
 <pre><code>def SplitList(mylist, chunk_size):
     return [mylist[offs:offs+chunk_size] for offs in range(0, len(mylist), chunk_size)]
@@ -426,7 +426,7 @@ print(list(iter_baskets_contiguous(range(26), 5)))
 </code></pre>
 
 <p>In the latter case, it can be rephrased in a more beautiful way if you can be sure that the sequence always contains a whole number of chunks of given size (i.e. there is no incomplete last chunk).</p>
------------------------------------------------------------------- <br><h3> Answer 29009933 Noich: </h3><p>I saw the most awesome Python-ish answer in a <a href="https://stackoverflow.com/questions/23286254/convert-list-to-a-list-of-tuples-python">duplicate</a> of this question:</p>
+------------------------------------------------------------------ <br><h3> Noich, Id: 29009933, Score: 53: </h3><p>I saw the most awesome Python-ish answer in a <a href="https://stackoverflow.com/questions/23286254/convert-list-to-a-list-of-tuples-python">duplicate</a> of this question:</p>
 
 <pre><code>from itertools import zip_longest
 
@@ -443,7 +443,7 @@ r = list(zip_longest(i, i, i))
 </code></pre>
 
 <p>If the list is divided evenly, then you can replace <code>zip_longest</code> with <code>zip</code>, otherwise the triplet <code>(13, 14, None)</code> would be lost. Python 3 is used above. For Python 2, use <code>izip_longest</code>.</p>
------------------------------------------------------------------- <br><h3> Answer 34322647 Rian Rizvi: </h3><p>Here's the one liner:</p>
+------------------------------------------------------------------ <br><h3> Rian Rizvi, Id: 34322647, Score: 45: </h3><p>Here's the one liner:</p>
 <pre><code>[AA[i:i+SS] for i in range(len(AA))[::SS]]
 </code></pre>
 <p>Details. AA is array, SS is chunk size. For example:</p>
@@ -456,7 +456,7 @@ r = list(zip_longest(i, i, i))
 <pre><code>(py3) &gt;&gt;&gt; [list(AA[i:i+SS]) for i in range(len(AA))[::SS]]
 [[10, 11, 12], [13, 14, 15], [16, 17, 18], [19, 20]]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 59266741 nirvana-msu: </h3><p>With <a href="https://www.python.org/dev/peps/pep-0572/" rel="noreferrer">Assignment Expressions</a> in Python 3.8 it becomes quite nice:</p>
+------------------------------------------------------------------ <br><h3> nirvana-msu, Id: 59266741, Score: 36: </h3><p>With <a href="https://www.python.org/dev/peps/pep-0572/" rel="noreferrer">Assignment Expressions</a> in Python 3.8 it becomes quite nice:</p>
 <pre class="lang-py prettyprint-override"><code>import itertools
 
 def batch(iterable, size):
@@ -478,7 +478,7 @@ def batch(iterable, size):
 </code></pre>
 <p><strong>UPDATE</strong></p>
 <p>Starting with Python 3.12, this exact implementation is available as <a href="https://docs.python.org/3.12/library/itertools.html#itertools.batched" rel="noreferrer">itertools.batched</a></p>
------------------------------------------------------------------- <br><h3> Answer 5711993 ninjagecko: </h3><p>If you had a chunk size of 3 for example, you could do:</p>
+------------------------------------------------------------------ <br><h3> ninjagecko, Id: 5711993, Score: 30: </h3><p>If you had a chunk size of 3 for example, you could do:</p>
 
 <pre><code>zip(*[iterable[i::3] for i in range(3)]) 
 </code></pre>
@@ -487,14 +487,14 @@ def batch(iterable, size):
 <a href="http://code.activestate.com/recipes/303060-group-a-list-into-sequential-n-tuples/">http://code.activestate.com/recipes/303060-group-a-list-into-sequential-n-tuples/</a></p>
 
 <p>I would use this when my chunk size is fixed number I can type, e.g. '3', and would never change.</p>
-<h4> Comment 14896419 sherbang: </h4>This doesn&#39;t work if len(iterable)%3 != 0.  The last (short) group of numbers won&#39;t be returned.<br><h4> Comment 125031007 xuiqzy: </h4>@sherbang There is <code>zip_longest</code> from <code>itertools</code>: <a href="https://docs.python.org/3/library/itertools.html#itertools.zip_longest" rel="nofollow noreferrer">docs.python.org/3/library/itertools.html#itertools.zip_longe&zwnj;&#8203;st</a><br><h4> Comment 134521807 Karl Knechtel: </h4>See <a href="https://stackoverflow.com/questions/2233204">this other Stack Overflow question</a> for a detailed explanation of this technique.<br>------------------------------------------------------------------ <br><h3> Answer 20106816 zach: </h3><p>The <a href="https://github.com/pytoolz/toolz">toolz</a> library has the <code>partition</code> function for this:</p>
+<h4> sherbang, Comment 14896419 Score: 16: </h4>This doesn&#39;t work if len(iterable)%3 != 0.  The last (short) group of numbers won&#39;t be returned.<br><h4> xuiqzy, Comment 125031007 Score: 1: </h4>@sherbang There is <code>zip_longest</code> from <code>itertools</code>: <a href="https://docs.python.org/3/library/itertools.html#itertools.zip_longest" rel="nofollow noreferrer">docs.python.org/3/library/itertools.html#itertools.zip_longe&zwnj;&#8203;st</a><br><h4> Karl Knechtel, Comment 134521807 Score: 0: </h4>See <a href="https://stackoverflow.com/questions/2233204">this other Stack Overflow question</a> for a detailed explanation of this technique.<br>------------------------------------------------------------------ <br><h3> zach, Id: 20106816, Score: 27: </h3><p>The <a href="https://github.com/pytoolz/toolz">toolz</a> library has the <code>partition</code> function for this:</p>
 
 <pre><code>from toolz.itertoolz.core import partition
 
 list(partition(2, [1, 2, 3, 4]))
 [(1, 2), (3, 4)]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 48135727 Alex T: </h3><p>I was curious about the performance of different approaches and here it is:</p>
+------------------------------------------------------------------ <br><h3> Alex T, Id: 48135727, Score: 24: </h3><p>I was curious about the performance of different approaches and here it is:</p>
 
 <p>Tested on Python 3.5.1</p>
 
@@ -605,7 +605,7 @@ chunks
 grouper
 0.006506919860839844
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 41904532 Moinuddin Quadri: </h3><p>You may also use <a href="http://utilspie.readthedocs.io/en/latest/#get-chunks" rel="noreferrer"><code>get_chunks</code></a> function of <a href="http://utilspie.readthedocs.io" rel="noreferrer"><code>utilspie</code></a> library as:</p>
+------------------------------------------------------------------ <br><h3> Moinuddin Quadri, Id: 41904532, Score: 21: </h3><p>You may also use <a href="http://utilspie.readthedocs.io/en/latest/#get-chunks" rel="noreferrer"><code>get_chunks</code></a> function of <a href="http://utilspie.readthedocs.io" rel="noreferrer"><code>utilspie</code></a> library as:</p>
 
 <pre><code>&gt;&gt;&gt; from utilspie import iterutils
 &gt;&gt;&gt; a = [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -620,7 +620,7 @@ grouper
 </code></pre>
 
 <p><em>Disclaimer: I am the creator of <a href="https://github.com/moin18/utilspie" rel="noreferrer">utilspie</a> library</em>.</p>
------------------------------------------------------------------- <br><h3> Answer 19264525 nikipore: </h3><p>I like the Python doc's version proposed by tzot and J.F.Sebastian a lot,
+------------------------------------------------------------------ <br><h3> nikipore, Id: 19264525, Score: 19: </h3><p>I like the Python doc's version proposed by tzot and J.F.Sebastian a lot,
  but it has two shortcomings:</p>
 
 <ul>
@@ -647,7 +647,7 @@ def chunks(n, iterable):
    while True:
        yield chain([next(iterable)], islice(iterable, n-1))
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 31178232 Art B: </h3><p>code:</p>
+------------------------------------------------------------------ <br><h3> Art B, Id: 31178232, Score: 17: </h3><p>code:</p>
 
 <pre><code>def split_list(the_list, chunk_size):
     result_list = []
@@ -665,7 +665,7 @@ print split_list(a_list, 3)
 
 <pre><code>[[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 312472 slav0nic: </h3><p>heh, one line version</p>
+------------------------------------------------------------------ <br><h3> slav0nic, Id: 312472, Score: 13: </h3><p>heh, one line version</p>
 
 <pre><code>In [48]: chunk = lambda ulist, step:  map(lambda i: ulist[i:i+step],  xrange(0, len(ulist), step))
 
@@ -682,7 +682,7 @@ Out[49]:
  [81, 82, 83, 84, 85, 86, 87, 88, 89, 90],
  [91, 92, 93, 94, 95, 96, 97, 98, 99]]
 </code></pre>
-<h4> Comment 155125 S.Lott: </h4>Please, use &quot;def chunk&quot; instead of &quot;chunk = lambda&quot;.  It works the same.  One line.  Same features.  MUCH easier to the n00bz to read and understand.<br><h4> Comment 14734130 Terry Jan Reedy: </h4>The function object resulting from <code>def chunk</code> instead of <code>chunk=lambda</code> has .__name__ attribute &#39;chunk&#39; instead of &#39;&lt;lambda&gt;&#39;. The specific name is more useful in tracebacks.<br>------------------------------------------------------------------ <br><h3> Answer 28786255 Ranaivo: </h3><p>Another more explicit version.</p>
+<h4> S.Lott, Comment 155125 Score: 38: </h4>Please, use &quot;def chunk&quot; instead of &quot;chunk = lambda&quot;.  It works the same.  One line.  Same features.  MUCH easier to the n00bz to read and understand.<br><h4> Terry Jan Reedy, Comment 14734130 Score: 21: </h4>The function object resulting from <code>def chunk</code> instead of <code>chunk=lambda</code> has .__name__ attribute &#39;chunk&#39; instead of &#39;&lt;lambda&gt;&#39;. The specific name is more useful in tracebacks.<br>------------------------------------------------------------------ <br><h3> Ranaivo, Id: 28786255, Score: 13: </h3><p>Another more explicit version.</p>
 
 <pre><code>def chunkList(initialList, chunkSize):
     """
@@ -700,7 +700,7 @@ Out[49]:
         finalList.append(initialList[i:i+chunkSize])
     return finalList
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 33510840 sereizam: </h3><p>At this point, I think we need a <strong>recursive generator</strong>, just in case...</p>
+------------------------------------------------------------------ <br><h3> sereizam, Id: 33510840, Score: 13: </h3><p>At this point, I think we need a <strong>recursive generator</strong>, just in case...</p>
 
 <p>In python 2:</p>
 
@@ -737,7 +737,7 @@ def chunks(li, n):
     for e in chunks(li[n:], n):
         yield e
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 2270932 Mars: </h3><p>Without calling len() which is good for large lists:</p>
+------------------------------------------------------------------ <br><h3> Mars, Id: 2270932, Score: 12: </h3><p>Without calling len() which is good for large lists:</p>
 
 <pre><code>def splitter(l, n):
     i = 0
@@ -779,7 +779,7 @@ def chunks(li, n):
     continuous_slices = imap(islice, repeat(iter(seq)), repeat(0), repeat(n))
     return takewhile(bool,imap(tuple, continuous_slices))
 </code></pre>
-<h4> Comment 7179177 Thomas Wouters: </h4>There is no reason to avoid <code>len()</code> on large lists; it&#39;s a constant-time operation.<br>------------------------------------------------------------------ <br><h3> Answer 314771 Corey Goldberg: </h3><pre><code>def split_seq(seq, num_pieces):
+<h4> Thomas Wouters, Comment 7179177 Score: 18: </h4>There is no reason to avoid <code>len()</code> on large lists; it&#39;s a constant-time operation.<br>------------------------------------------------------------------ <br><h3> Corey Goldberg, Id: 314771, Score: 11: </h3><pre><code>def split_seq(seq, num_pieces):
     start = 0
     for i in xrange(num_pieces):
         stop = start + len(seq[i::num_pieces])
@@ -794,7 +794,7 @@ def chunks(li, n):
 for seq in split_seq(seq, 3):
     print seq
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 14937534 macm: </h3><p>See <a href="http://docs.python.org/3.3/library/functions.html?highlight=zip#zip" rel="noreferrer">this reference</a></p>
+------------------------------------------------------------------ <br><h3> macm, Id: 14937534, Score: 11: </h3><p>See <a href="http://docs.python.org/3.3/library/functions.html?highlight=zip#zip" rel="noreferrer">this reference</a></p>
 
 <pre><code>&gt;&gt;&gt; orange = range(1, 1001)
 &gt;&gt;&gt; otuples = list( zip(*[iter(orange)]*10))
@@ -807,7 +807,7 @@ for seq in split_seq(seq, 3):
 </code></pre>
 
 <p>Python3</p>
-<h4> Comment 26750302 Alfe: </h4>Nice, but drops elements at the end if the size does not match whole numbers of chunks, e. g. <code>zip(*[iter(range(7))]*3)</code> only returns <code>[(0, 1, 2), (3, 4, 5)]</code> and forgets the <code>6</code> from the input.<br><h4> Comment 134521823 Karl Knechtel: </h4>See <a href="https://stackoverflow.com/questions/2233204">this other Stack Overflow question</a> for a detailed explanation of this technique.<br>------------------------------------------------------------------ <br><h3> Answer 9255750 Rusty Rob: </h3><pre><code>def chunks(iterable,n):
+<h4> Alfe, Comment 26750302 Score: 4: </h4>Nice, but drops elements at the end if the size does not match whole numbers of chunks, e. g. <code>zip(*[iter(range(7))]*3)</code> only returns <code>[(0, 1, 2), (3, 4, 5)]</code> and forgets the <code>6</code> from the input.<br><h4> Karl Knechtel, Comment 134521823 Score: 0: </h4>See <a href="https://stackoverflow.com/questions/2233204">this other Stack Overflow question</a> for a detailed explanation of this technique.<br>------------------------------------------------------------------ <br><h3> Rusty Rob, Id: 9255750, Score: 8: </h3><pre><code>def chunks(iterable,n):
     """assumes n is an integer&gt;0
     """
     iterable=iter(iterable)
@@ -832,7 +832,7 @@ print g2
 print list(g2)
 '[[0, 1, 4], [9, 16, 25], [36, 49, 64], [81]]'
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 40409475 vishes_shell: </h3><p>Since everybody here talking about iterators. <a href="https://boltons.readthedocs.io/" rel="noreferrer"><code>boltons</code></a> has perfect method for that, called <a href="https://boltons.readthedocs.io/en/latest/iterutils.html#boltons.iterutils.chunked_iter" rel="noreferrer"><code>iterutils.chunked_iter</code></a>.</p>
+------------------------------------------------------------------ <br><h3> vishes_shell, Id: 40409475, Score: 8: </h3><p>Since everybody here talking about iterators. <a href="https://boltons.readthedocs.io/" rel="noreferrer"><code>boltons</code></a> has perfect method for that, called <a href="https://boltons.readthedocs.io/en/latest/iterutils.html#boltons.iterutils.chunked_iter" rel="noreferrer"><code>iterutils.chunked_iter</code></a>.</p>
 
 <pre><code>from boltons import iterutils
 
@@ -849,7 +849,7 @@ list(iterutils.chunked_iter(list(range(50)), 11))
 </code></pre>
 
 <p>But if you don't want to be mercy on memory, you can use old-way and store the full <code>list</code> in the first place with <a href="https://boltons.readthedocs.io/en/latest/iterutils.html#boltons.iterutils.chunked" rel="noreferrer"><code>iterutils.chunked</code></a>.</p>
------------------------------------------------------------------- <br><h3> Answer 5872632 schwater: </h3><p>Consider using <a href="http://matplotlib.sourceforge.net/" rel="noreferrer">matplotlib.cbook</a> pieces</p>
+------------------------------------------------------------------ <br><h3> schwater, Id: 5872632, Score: 7: </h3><p>Consider using <a href="http://matplotlib.sourceforge.net/" rel="noreferrer">matplotlib.cbook</a> pieces</p>
 
 <p>for example:</p>
 
@@ -858,18 +858,18 @@ segments = cbook.pieces(np.arange(20), 3)
 for s in segments:
      print s
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 31442939 AdvilUser: </h3><pre><code>a = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+------------------------------------------------------------------ <br><h3> AdvilUser, Id: 31442939, Score: 6: </h3><pre><code>a = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 CHUNK = 4
 [a[i*CHUNK:(i+1)*CHUNK] for i in xrange((len(a) + CHUNK - 1) / CHUNK )]
 </code></pre>
-<h4> Comment 50855622 Zulu: </h4>Can you explain more your answer please ?<br><h4> Comment 51320329 AdvilUser: </h4>Working from backwards:      (len(a) + CHUNK -1) / CHUNK  Gives you the number of chunks that you will end up with.  Then, for each chunk at index i, we are generating a sub-array of the original array like this:      a[ i * CHUNK : (i + 1) * CHUNK ]  where,      i * CHUNK is the index of the first element to put into the subarray, and,     (i + 1) * CHUNK is 1 past the last element to put into the subarray.  This solution uses list comprehension, so it might be faster for large arrays.<br>------------------------------------------------------------------ <br><h3> Answer 1668586 hcvst: </h3><pre><code>&gt;&gt;&gt; def f(x, n, acc=[]): return f(x[n:], n, acc+[(x[:n])]) if x else acc
+<h4> Zulu, Comment 50855622 Score: 0: </h4>Can you explain more your answer please ?<br><h4> AdvilUser, Comment 51320329 Score: 0: </h4>Working from backwards:      (len(a) + CHUNK -1) / CHUNK  Gives you the number of chunks that you will end up with.  Then, for each chunk at index i, we are generating a sub-array of the original array like this:      a[ i * CHUNK : (i + 1) * CHUNK ]  where,      i * CHUNK is the index of the first element to put into the subarray, and,     (i + 1) * CHUNK is 1 past the last element to put into the subarray.  This solution uses list comprehension, so it might be faster for large arrays.<br>------------------------------------------------------------------ <br><h3> hcvst, Id: 1668586, Score: 5: </h3><pre><code>&gt;&gt;&gt; def f(x, n, acc=[]): return f(x[n:], n, acc+[(x[:n])]) if x else acc
 &gt;&gt;&gt; f("Hallo Welt", 3)
 ['Hal', 'lo ', 'Wel', 't']
 &gt;&gt;&gt; 
 </code></pre>
 
 <p>If you are into brackets - I picked up a book on Erlang :)</p>
------------------------------------------------------------------- <br><h3> Answer 12150728 user1628890: </h3><p>I realise this question is old (stumbled over it on Google), but surely something like the following is far simpler and clearer than any of the huge complex suggestions and only uses slicing:</p>
+------------------------------------------------------------------ <br><h3> user1628890, Id: 12150728, Score: 5: </h3><p>I realise this question is old (stumbled over it on Google), but surely something like the following is far simpler and clearer than any of the huge complex suggestions and only uses slicing:</p>
 
 <pre><code>def chunker(iterable, chunksize):
     for i,c in enumerate(iterable[::chunksize]):
@@ -883,16 +883,16 @@ CHUNK = 4
 [20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
 ... etc ...
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 28756559 Saksham Varma: </h3><p>Use list comprehensions:</p>
+------------------------------------------------------------------ <br><h3> Saksham Varma, Id: 28756559, Score: 5: </h3><p>Use list comprehensions:</p>
 
 <pre><code>l = [1,2,3,4,5,6,7,8,9,10,11,12]
 k = 5 #chunk size
 print [tuple(l[x:y]) for (x, y) in [(x, x+k) for x in range(0, len(l), k)]]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 40700737 Alex: </h3><p>You could use numpy's array_split function e.g., <code>np.array_split(np.array(data), 20)</code> to split into 20 nearly equal size chunks.</p>
+------------------------------------------------------------------ <br><h3> Alex, Id: 40700737, Score: 5: </h3><p>You could use numpy's array_split function e.g., <code>np.array_split(np.array(data), 20)</code> to split into 20 nearly equal size chunks.</p>
 
 <p>To make sure chunks are exactly equal in size use <code>np.split</code>.</p>
------------------------------------------------------------------- <br><h3> Answer 43454601 Анатолий Панин: </h3><p>One more solution</p>
+------------------------------------------------------------------ <br><h3> Анатолий Панин, Id: 43454601, Score: 5: </h3><p>One more solution</p>
 
 <pre><code>def make_chunks(data, chunk_size): 
     while data:
@@ -908,7 +908,7 @@ print [tuple(l[x:y]) for (x, y) in [(x, x+k) for x in range(0, len(l), k)]]
 [7]
 &gt;&gt;&gt; 
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 47096024 George B: </h3><p>I don't think I saw this option, so just to add another one :)) :</p>
+------------------------------------------------------------------ <br><h3> George B, Id: 47096024, Score: 5: </h3><p>I don't think I saw this option, so just to add another one :)) :</p>
 
 <pre><code>def chunks(iterable, chunk_size):
   i = 0;
@@ -916,7 +916,7 @@ print [tuple(l[x:y]) for (x, y) in [(x, x+k) for x in range(0, len(l), k)]]
     yield iterable[i:i+chunk_size]
     i += chunk_size
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 56954384 Ravi Anand: </h3><p>python <code>pydash</code> package could be a good choice. </p>
+------------------------------------------------------------------ <br><h3> Ravi Anand, Id: 56954384, Score: 5: </h3><p>python <code>pydash</code> package could be a good choice. </p>
 
 <pre><code>from pydash.arrays import chunk
 ids = ['22', '89', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '1']
@@ -926,7 +926,7 @@ print(chunk_ids)
 </code></pre>
 
 <p>for more checkout <a href="https://pydash.readthedocs.io/en/latest/api.html?highlight=chunk%20list" rel="noreferrer">pydash chunk list</a></p>
-<h4> Comment 107725845 Dariusz Krynicki: </h4>neat! and this is what actualy sits under the hood of pydash.arrays.chunk: chunks = int(ceil(len(array) / float(size))) return [array[i * size:(i + 1) * size] for i in range(chunks)]<br>------------------------------------------------------------------ <br><h3> Answer 74120449 Raymond Hettinger: </h3><p>The <a href="https://docs.python.org/3/library/itertools.html#itertools-recipes" rel="nofollow noreferrer">recipes in the itertools module</a> provide two ways to do this depending on how you want to handle a final odd-sized lot (keep it, pad it with a fillvalue, ignore it, or raise an exception):</p>
+<h4> Dariusz Krynicki, Comment 107725845 Score: 0: </h4>neat! and this is what actualy sits under the hood of pydash.arrays.chunk: chunks = int(ceil(len(array) / float(size))) return [array[i * size:(i + 1) * size] for i in range(chunks)]<br>------------------------------------------------------------------ <br><h3> Raymond Hettinger, Id: 74120449, Score: 5: </h3><p>The <a href="https://docs.python.org/3/library/itertools.html#itertools-recipes" rel="nofollow noreferrer">recipes in the itertools module</a> provide two ways to do this depending on how you want to handle a final odd-sized lot (keep it, pad it with a fillvalue, ignore it, or raise an exception):</p>
 <pre><code>from itertools import islice, izip_longest
 
 def batched(iterable, n):
@@ -954,7 +954,7 @@ def grouper(iterable, n, *, incomplete='fill', fillvalue=None):
     else:
         raise ValueError('Expected fill, strict, or ignore')
 </code></pre>
-<h4> Comment 134072545 traal: </h4>The <code>grouper()</code> source is available in the docs in this form since 3.10; the <code>batched()</code> source is only in 3.11, but has become a built-in function since 3.12. Yaay! 😊<br>------------------------------------------------------------------ <br><h3> Answer 319970 J.T. Hurley: </h3><pre><code>def chunk(lst):
+<h4> traal, Comment 134072545 Score: 0: </h4>The <code>grouper()</code> source is available in the docs in this form since 3.10; the <code>batched()</code> source is only in 3.11, but has become a built-in function since 3.12. Yaay! 😊<br>------------------------------------------------------------------ <br><h3> J.T. Hurley, Id: 319970, Score: 4: </h3><pre><code>def chunk(lst):
     out = []
     for x in xrange(2, len(lst) + 1):
         if not len(lst) % x:
@@ -964,11 +964,11 @@ def grouper(iterable, n, *, incomplete='fill', fillvalue=None):
         out.append([lst.pop(0) for x in xrange(factor)])
     return out
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 27371167 Be Wake Pandey: </h3><p>letting r be the chunk size  and L be the initial list, you can do. </p>
+------------------------------------------------------------------ <br><h3> Be Wake Pandey, Id: 27371167, Score: 4: </h3><p>letting r be the chunk size  and L be the initial list, you can do. </p>
 
 <pre><code>chunkL = [ [i for i in L[r*k:r*(k+1)] ] for k in range(len(L)/r)] 
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 38808533 Claudiu: </h3><p>As per <a href="https://stackoverflow.com/a/21767522/15055">this answer</a>, the top-voted answer leaves a 'runt' at the end. Here's my solution to really get about as evenly-sized chunks as you can, with no runts. It basically tries to pick exactly the fractional spot where it should split the list, but just rounds it off to the nearest integer:</p>
+------------------------------------------------------------------ <br><h3> Claudiu, Id: 38808533, Score: 4: </h3><p>As per <a href="https://stackoverflow.com/a/21767522/15055">this answer</a>, the top-voted answer leaves a 'runt' at the end. Here's my solution to really get about as evenly-sized chunks as you can, with no runts. It basically tries to pick exactly the fractional spot where it should split the list, but just rounds it off to the nearest integer:</p>
 
 <pre><code>from __future__ import division  # not needed in Python 3
 def n_even_chunks(l, n):
@@ -1033,7 +1033,7 @@ def n_even_chunks(l, n):
  [90, 91, 92, 93, 94, 95, 96, 97, 98],
  [99]]
 </code></pre>
-<h4> Comment 65989136 DragonTux: </h4>This solution seems to fail in some situations:  - when n &gt; len(l)  - for l = [0,1,2,3,4] and n=3 it returns [[0], [1], [2]] instead of [[0,1], [2,3], [4]]<br><h4> Comment 66001830 Claudiu: </h4>@DragonTux: Ah I wrote the function for Python 3 - it gives <code>[[0, 1], [2], [3, 4]]</code>. I added the future import so it works in Python 2 as well<br>------------------------------------------------------------------ <br><h3> Answer 41586849 Peter Gerdes: </h3><p>I have one solution below which does work but more important than that solution is a few comments on other approaches.  First, a good solution shouldn't require that one loop through the sub-iterators in order.  If I run</p>
+<h4> DragonTux, Comment 65989136 Score: 1: </h4>This solution seems to fail in some situations:  - when n &gt; len(l)  - for l = [0,1,2,3,4] and n=3 it returns [[0], [1], [2]] instead of [[0,1], [2,3], [4]]<br><h4> Claudiu, Comment 66001830 Score: 0: </h4>@DragonTux: Ah I wrote the function for Python 3 - it gives <code>[[0, 1], [2], [3, 4]]</code>. I added the future import so it works in Python 2 as well<br>------------------------------------------------------------------ <br><h3> Peter Gerdes, Id: 41586849, Score: 4: </h3><p>I have one solution below which does work but more important than that solution is a few comments on other approaches.  First, a good solution shouldn't require that one loop through the sub-iterators in order.  If I run</p>
 
 <pre><code>g = paged_iter(list(range(50)), 11))
 i0 = next(g)
@@ -1085,7 +1085,7 @@ for it in paged_iter(data,5)
     except StopIteration:
         yield (i for i in deq)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 62643989 Kandarp: </h3><p>An abstraction would be</p>
+------------------------------------------------------------------ <br><h3> Kandarp, Id: 62643989, Score: 4: </h3><p>An abstraction would be</p>
 <pre><code>l = [1,2,3,4,5,6,7,8,9]
 n = 3
 outList = []
@@ -1098,26 +1098,26 @@ print(outList)
 <blockquote>
 <p>[[1, 2, 3], [4, 5, 6], [7, 8, 9]]</p>
 </blockquote>
------------------------------------------------------------------- <br><h3> Answer 22138685 rectangletangle: </h3><p>I wrote a small library expressly for this purpose, available <a href="https://github.com/rectangletangle/iterlib" rel="nofollow">here</a>. The library's <code>chunked</code> function is particularly efficient because it's implemented as a <a href="https://wiki.python.org/moin/Generators" rel="nofollow">generator</a>, so a substantial amount of memory can be saved in certain situations. It also doesn't rely on the slice notation, so any arbitrary iterator can be used.</p>
+------------------------------------------------------------------ <br><h3> rectangletangle, Id: 22138685, Score: 3: </h3><p>I wrote a small library expressly for this purpose, available <a href="https://github.com/rectangletangle/iterlib" rel="nofollow">here</a>. The library's <code>chunked</code> function is particularly efficient because it's implemented as a <a href="https://wiki.python.org/moin/Generators" rel="nofollow">generator</a>, so a substantial amount of memory can be saved in certain situations. It also doesn't rely on the slice notation, so any arbitrary iterator can be used.</p>
 
 <pre><code>import iterlib
 
 print list(iterlib.chunked(xrange(1, 1000), 10))
 # prints [(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), (11, 12, 13, 14, 15, 16, 17, 18, 19, 20), ...]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 29707187 Flo: </h3><p>The answer above (by koffein) has a little problem: the list is always split into an equal number of splits, not equal number of items per partition. This is my version. The "// chs + 1" takes into account that the number of items may not be divideable exactly by the partition size, so the last partition will only be partially filled.</p>
+------------------------------------------------------------------ <br><h3> Flo, Id: 29707187, Score: 3: </h3><p>The answer above (by koffein) has a little problem: the list is always split into an equal number of splits, not equal number of items per partition. This is my version. The "// chs + 1" takes into account that the number of items may not be divideable exactly by the partition size, so the last partition will only be partially filled.</p>
 
 <pre><code># Given 'l' is your list
 
 chs = 12 # Your chunksize
 partitioned = [ l[i*chs:(i*chs)+chs] for i in range((len(l) // chs)+1) ]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 33517774 Julien Palard: </h3><p>At this point, I think we need the obligatory anonymous-recursive function.</p>
+------------------------------------------------------------------ <br><h3> Julien Palard, Id: 33517774, Score: 3: </h3><p>At this point, I think we need the obligatory anonymous-recursive function.</p>
 
 <pre><code>Y = lambda f: (lambda x: x(x))(lambda y: f(lambda *args: y(y)(*args)))
 chunks = Y(lambda f: lambda n: [n[0][:n[1]]] + f((n[0][n[1]:], n[1])) if len(n[0]) &gt; 0 else [])
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 42677465 itub: </h3><p>Here's an idea using itertools.groupby:</p>
+------------------------------------------------------------------ <br><h3> itub, Id: 42677465, Score: 3: </h3><p>Here's an idea using itertools.groupby:</p>
 
 <pre><code>def chunks(l, n):
     c = itertools.count()
@@ -1136,7 +1136,7 @@ chunks = Y(lambda f: lambda n: [n[0][:n[1]]] + f((n[0][n[1]:], n[1])) if len(n[0
 </code></pre>
 
 <p>(So yes, this suffers form the "runt problem", which may or may not be a problem in a given situation.)</p>
------------------------------------------------------------------- <br><h3> Answer 47010604 guyskk: </h3><p>No magic, but simple and correct:</p>
+------------------------------------------------------------------ <br><h3> guyskk, Id: 47010604, Score: 3: </h3><p>No magic, but simple and correct:</p>
 
 <pre><code>def chunks(iterable, n):
     """Yield successive n-sized chunks from iterable."""
@@ -1149,7 +1149,7 @@ chunks = Y(lambda f: lambda n: [n[0][:n[1]]] + f((n[0][n[1]:], n[1])) if len(n[0
     if values:
         yield values
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 72960641 cottontail: </h3><p>Simply using <code>zip()</code> to produce similar round-robin zips and returning the remaining elements of <code>lst</code> (that cannot make a &quot;whole&quot; sublist) should do the trick.</p>
+------------------------------------------------------------------ <br><h3> cottontail, Id: 72960641, Score: 3: </h3><p>Simply using <code>zip()</code> to produce similar round-robin zips and returning the remaining elements of <code>lst</code> (that cannot make a &quot;whole&quot; sublist) should do the trick.</p>
 <pre class="lang-py prettyprint-override"><code>def chunkify(lst, n):
     for tup in zip(*[iter(lst)]*n):
         yield tup
@@ -1224,7 +1224,7 @@ print('    Chunk size         3      910\nFunctions')
 for func, val in out.items():
     print(&quot;{:&lt;15}  {:&gt;5.1f}ms  {:&gt;5.1f}ms&quot;.format(func, val[3], val[910]))
 </code></pre>
-<h4> Comment 134198228 bfontaine: </h4>Downvoted because this returns a list and so is very inefficient on large inputs where you would like to process the result one by one. See <a href="https://stackoverflow.com/a/59266741/735926">nirvana-msu’s answer</a> for an implementation that works on any iterable and return a generator with very simple code (= easier to read, understand, and debug).<br><h4> Comment 136143194 cottontail: </h4>@bfontaine my main argument to post the answer in the first place was based on runtime performance, so memory was never a concern. Besides, the generator version of my answer uses similar amount of peak memory as nirvana-msu&#39;s solution. Then again, now that Python 3.12 is out, all of these answers are obsolete and don&#39;t matter now.<br>------------------------------------------------------------------ <br><h3> Answer 25650543 CPBL: </h3><p>Like @AaronHall I got here looking for roughly evenly sized chunks. There are different interpretations of that. In my case, if the desired size is N, I would like each group to be of size>=N.
+<h4> bfontaine, Comment 134198228 Score: 0: </h4>Downvoted because this returns a list and so is very inefficient on large inputs where you would like to process the result one by one. See <a href="https://stackoverflow.com/a/59266741/735926">nirvana-msu’s answer</a> for an implementation that works on any iterable and return a generator with very simple code (= easier to read, understand, and debug).<br><h4> cottontail, Comment 136143194 Score: 0: </h4>@bfontaine my main argument to post the answer in the first place was based on runtime performance, so memory was never a concern. Besides, the generator version of my answer uses similar amount of peak memory as nirvana-msu&#39;s solution. Then again, now that Python 3.12 is out, all of these answers are obsolete and don&#39;t matter now.<br>------------------------------------------------------------------ <br><h3> CPBL, Id: 25650543, Score: 2: </h3><p>Like @AaronHall I got here looking for roughly evenly sized chunks. There are different interpretations of that. In my case, if the desired size is N, I would like each group to be of size>=N.
 Thus, the orphans which are created in most of the above should be redistributed to other groups.</p>
 
 <p>This can be done using:</p>
@@ -1240,13 +1240,13 @@ Thus, the orphans which are created in most of the above should be redistributed
 </code></pre>
 
 <p>(from <a href="https://stackoverflow.com/questions/2130016/splitting-a-list-of-arbitrary-size-into-only-roughly-n-equal-parts">Splitting a list of into N parts of approximately equal length</a>) by simply calling it as nChunks(l,l/n)  or nChunks(l,floor(l/n))</p>
------------------------------------------------------------------- <br><h3> Answer 44959796 Andrey Cizov: </h3><p>This works in v2/v3, is inlineable, generator-based and uses only the standard library:</p>
+------------------------------------------------------------------ <br><h3> Andrey Cizov, Id: 44959796, Score: 2: </h3><p>This works in v2/v3, is inlineable, generator-based and uses only the standard library:</p>
 
 <pre><code>import itertools
 def split_groups(iter_in, group_size):
     return ((x for _, x in item) for _, item in itertools.groupby(enumerate(iter_in), key=lambda x: x[0] // group_size))
 </code></pre>
-<h4> Comment 84941594 Andrey Cizov: </h4>Just do a <code>(list(x) for x in split_groups(&#39;abcdefghij&#39;, 4))</code>, then iterate through them: as opposed to many examples here this would work with groups of any size.<br>------------------------------------------------------------------ <br><h3> Answer 66967457 Brandt: </h3><h1>A <em>simple</em> solution</h1>
+<h4> Andrey Cizov, Comment 84941594 Score: 0: </h4>Just do a <code>(list(x) for x in split_groups(&#39;abcdefghij&#39;, 4))</code>, then iterate through them: as opposed to many examples here this would work with groups of any size.<br>------------------------------------------------------------------ <br><h3> Brandt, Id: 66967457, Score: 2: </h3><h1>A <em>simple</em> solution</h1>
 <blockquote>
 <p>The OP has requested &quot;equal sized chunk&quot;. I understand &quot;equal sized&quot; as &quot;balanced&quot; sizes: we are looking for groups of items of <em>approximately</em> the same sizes <em>if</em> equal sizes are not possible (e.g, 23/5).</p>
 </blockquote>
@@ -1289,7 +1289,7 @@ Leap every &quot;N&quot; items lists:
 [[0, 5, 10, 15, 20], [1, 6, 11, 16, 21], [2, 7, 12, 17, 22], [3, 8, 13, 18], [4, 9, 14, 19]]
 </code></pre>
 </blockquote>
------------------------------------------------------------------- <br><h3> Answer 18793562 balki: </h3><ul>
+------------------------------------------------------------------ <br><h3> balki, Id: 18793562, Score: 1: </h3><ul>
 <li>Works with any iterable</li>
 <li>Inner data is generator object (not a list)</li>
 <li>One liner</li>
@@ -1306,7 +1306,7 @@ Out[260]:
  [21, 22, 23, 24, 25, 26, 27],
  [28, 29]]
 </pre>
-<h4> Comment 82735464 Peter Gerdes: </h4>g =  get_in_chunks(range(30),7); i0=next(g);i1=next(g);list(i1);list(i0);  Last evaluation is empty.  Hidden requirement about accessing all the sublists in order seems really bad here to me because the goal with these kind of utils is often to shuffle data around in various ways.<br>------------------------------------------------------------------ <br><h3> Answer 32658232 Mikhail Lyundin: </h3><p>I have come up to following solution without creation temorary list object, which should work with any iterable object. Please note that this version for Python 2.x:</p>
+<h4> Peter Gerdes, Comment 82735464 Score: 0: </h4>g =  get_in_chunks(range(30),7); i0=next(g);i1=next(g);list(i1);list(i0);  Last evaluation is empty.  Hidden requirement about accessing all the sublists in order seems really bad here to me because the goal with these kind of utils is often to shuffle data around in various ways.<br>------------------------------------------------------------------ <br><h3> Mikhail Lyundin, Id: 32658232, Score: 1: </h3><p>I have come up to following solution without creation temorary list object, which should work with any iterable object. Please note that this version for Python 2.x:</p>
 
 <pre><code>def chunked(iterable, size):
     stop = []
@@ -1336,7 +1336,7 @@ for it in chunked(xrange(16), 4):
 </code></pre>
 
 <p>As you can see if len(iterable) % size == 0 then we have additional empty iterator object. But I do not think that it is big problem.</p>
------------------------------------------------------------------- <br><h3> Answer 33180285 Evan Zamir: </h3><p>Since I had to do something like this, here's my solution given a generator and a batch size:</p>
+------------------------------------------------------------------ <br><h3> Evan Zamir, Id: 33180285, Score: 1: </h3><p>Since I had to do something like this, here's my solution given a generator and a batch size:</p>
 
 <pre><code>def pop_n_elems_from_generator(g, n):
     elems = []
@@ -1347,7 +1347,7 @@ for it in chunked(xrange(16), 4):
     except StopIteration:
         return elems
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 57042866 J-L: </h3><p>This question reminds me of the Raku (formerly Perl 6) <code>.comb(n)</code> method.  It breaks up strings into <code>n</code>-sized chunks.  (There's more to it than that, but I'll leave out the details.)</p>
+------------------------------------------------------------------ <br><h3> J-L, Id: 57042866, Score: 1: </h3><p>This question reminds me of the Raku (formerly Perl 6) <code>.comb(n)</code> method.  It breaks up strings into <code>n</code>-sized chunks.  (There's more to it than that, but I'll leave out the details.)</p>
 <p>It's easy enough to implement a similar function in Python3 as a lambda expression:</p>
 <pre><code>comb = lambda s,n: (s[i:i+n] for i in range(0,len(s),n))
 </code></pre>
@@ -1364,7 +1364,7 @@ for sublist in generator:
 <p>As a bonus, this <code>comb()</code> function also operates on strings:</p>
 <pre><code>list( comb('catdogant', 3) )  # returns ['cat', 'dog', 'ant']
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 62216571 alani: </h3><p>A generic chunker for any iterable, which gives the user a choice of how to handle a partial chunk at the end.</p>
+------------------------------------------------------------------ <br><h3> alani, Id: 62216571, Score: 1: </h3><p>A generic chunker for any iterable, which gives the user a choice of how to handle a partial chunk at the end.</p>
 
 <p>Tested on Python 3.</p>
 
@@ -1495,7 +1495,7 @@ option PartialChunkOptions.ERROR used
 [106, 107, 108]
 
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 75855076 Shubh Patel: </h3><p>To split a list into equally-sized chunks we can use a loop to iterate through the list and use the <code>slice()</code> function to extract a portion of the list at each iteration.</p>
+------------------------------------------------------------------ <br><h3> Shubh Patel, Id: 75855076, Score: 1: </h3><p>To split a list into equally-sized chunks we can use a loop to iterate through the list and use the <code>slice()</code> function to extract a portion of the list at each iteration.</p>
 <pre><code>def chunkify(lst, size):
     &quot;&quot;&quot;Split a list into equally-sized chunks.&quot;&quot;&quot;
     chunks = []
@@ -1505,7 +1505,7 @@ option PartialChunkOptions.ERROR used
 </code></pre>
 <p>Here, <code>lst</code> is the list you want to split and <code>size</code> is the size of each chunk.
 The <code>range()</code> function is used to generate a sequence of indexes to slice the list. The <code>slice()</code> function extracts a portion of the list from index <code>i</code> to index <code>i+size</code>.</p>
-<h4> Comment 133865088 OneCricketeer: </h4>What does this improve on over <a href="https://stackoverflow.com/a/312464/2308683">existing answers</a>?<br>------------------------------------------------------------------ <br><h3> Answer 49456217 Arthur Sult: </h3><p>I dislike idea of splitting elements by chunk size, e.g. script can devide 101 to 3 chunks as [50, 50, 1]. For my needs I needed spliting proportionly, and keeping order same. First I wrote my own script, which works fine, and it's very simple. But I've seen later <a href="https://stackoverflow.com/a/21767522/3110300">this answer</a>, where script is better than mine, I reccomend it.
+<h4> OneCricketeer, Comment 133865088 Score: 0: </h4>What does this improve on over <a href="https://stackoverflow.com/a/312464/2308683">existing answers</a>?<br>------------------------------------------------------------------ <br><h3> Arthur Sult, Id: 49456217, Score: 0: </h3><p>I dislike idea of splitting elements by chunk size, e.g. script can devide 101 to 3 chunks as [50, 50, 1]. For my needs I needed spliting proportionly, and keeping order same. First I wrote my own script, which works fine, and it's very simple. But I've seen later <a href="https://stackoverflow.com/a/21767522/3110300">this answer</a>, where script is better than mine, I reccomend it.
 Here's my script:</p>
 
 <pre><code>def proportional_dividing(N, n):
@@ -1568,7 +1568,7 @@ split_items(range(101), 4)
 [range(0, 25), range(25, 50), range(50, 75), range(75, 99)]
 [range(0, 25), range(25, 50), range(50, 75), range(75, 101)]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 61212415 Matheus Vin&#237;cius de Andrade: </h3><pre><code>def main():
+------------------------------------------------------------------ <br><h3> Matheus Vin&#237;cius de Andrade, Id: 61212415, Score: 0: </h3><pre><code>def main():
   print(chunkify([1,2,3,4,5,6],2))
 
 def chunkify(list, n):
@@ -1581,7 +1581,7 @@ main()
 </code></pre>
 
 <p>I think that it's simple and can give you a chunk of an array.</p>
------------------------------------------------------------------- <br><h3> Answer 64041110 Arty: </h3><p>I've created these two fancy one-liners which are efficient and lazy, both input and output are iterables, also they doen't depend on any module:</p>
+------------------------------------------------------------------ <br><h3> Arty, Id: 64041110, Score: 0: </h3><p>I've created these two fancy one-liners which are efficient and lazy, both input and output are iterables, also they doen't depend on any module:</p>
 <p>First one-liner is totally lazy meaning that it returns iterator producing iterators (i.e. each chunk produced is iterator iterating over chunk's elements), this version is good for the case if chunks are very large or elements are produced slowly one by one and should become available immediately as they are produced:</p>
 <p><a href="https://tio.run/##RY/BCsIwDIbve4ocG6hg0dPAJxlDutltURdH7Q768jXpBvZQmvD9X9Llk6YXn3Lup5UfV0ohvuECTz93Nw@ULHANxgQYXhHIwgjEEHidQ/QpGGMGixZ6SogFuVsIinxpMdHzKIgTBxzAYUOtsONOSkZBoyPlQru1B22qr6q0ZC03kXjcGesK5CyROBm20DRdiXXK@ba8fVH8/7MvcpS8kwUYW8z5Bw" rel="nofollow noreferrer" title="Python 3 – Try It Online">Try it online!</a></p>
 <pre><code>chunk_iters = lambda it, n: ((e for i, g in enumerate(((f,), cit)) for j, e in zip(range((1, n - 1)[i]), g)) for cit in (iter(it),) for f in cit)
@@ -1601,7 +1601,7 @@ main()
     for f in cit:
         yield one_chunk(f)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 70927990 shanu khera: </h3><p>Let's say the list is <code>lst</code></p>
+------------------------------------------------------------------ <br><h3> shanu khera, Id: 70927990, Score: 0: </h3><p>Let's say the list is <code>lst</code></p>
 <pre><code>import math
 
 # length of the list len(lst) is ln
@@ -1611,7 +1611,7 @@ for num in range ( math.ceil(ln/size) ):
     start, end = num*size, min((num+1)*size, ln)
     print(lst[start:end])
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 73268211 mikey: </h3><p>You may use <code>more_itertools.chunked_even</code> along with <code>math.ceil</code>. Likely the easiest to reason?</p>
+------------------------------------------------------------------ <br><h3> mikey, Id: 73268211, Score: 0: </h3><p>You may use <code>more_itertools.chunked_even</code> along with <code>math.ceil</code>. Likely the easiest to reason?</p>
 <pre class="lang-py prettyprint-override"><code>from math import ceil
 import more_itertools as mit
 from pprint import pprint
@@ -1634,7 +1634,7 @@ pprint([*mit.chunked_even(range(3), ceil(3 / 5))])
 
 
 </code></pre>
-<h4> Comment 131072981 wim: </h4>It was already shown in a 2018 answer <a href="https://stackoverflow.com/a/52022535/674039">stackoverflow.com/a/52022535/674039</a><br>------------------------------------------------------------------ <br><h3> Answer 76267125 Tim: </h3><p>Here's a short and readable answer (different from all previous answers):</p>
+<h4> wim, Comment 131072981 Score: 0: </h4>It was already shown in a 2018 answer <a href="https://stackoverflow.com/a/52022535/674039">stackoverflow.com/a/52022535/674039</a><br>------------------------------------------------------------------ <br><h3> Tim, Id: 76267125, Score: 0: </h3><p>Here's a short and readable answer (different from all previous answers):</p>
 <ul>
 <li>No packages</li>
 <li>Works when list not evenly divisible into <code>n</code> chunks</li>
@@ -1654,7 +1654,7 @@ def chunk(lst, n):
 <code>[[0, 1, 2, 3], [4, 5, 6, 7], [8, 9]]</code></p>
 <p><code>chunk(lst=list(range(10)), n=3)</code> gives
 <code>[[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10]]</code></p>
------------------------------------------------------------------- <br><h3> Answer 77198393 iamkroot: </h3><p>With Python 3.12, this is now natively supported with <a href="https://docs.python.org/3.12/library/itertools.html#itertools.batched" rel="nofollow noreferrer"><code>itertools.batched</code></a></p>
+------------------------------------------------------------------ <br><h3> iamkroot, Id: 77198393, Score: 0: </h3><p>With Python 3.12, this is now natively supported with <a href="https://docs.python.org/3.12/library/itertools.html#itertools.batched" rel="nofollow noreferrer"><code>itertools.batched</code></a></p>
 <pre class="lang-py prettyprint-override"><code>from itertools import batched
 
 flattened_data = ['roses', 'red', 'violets', 'blue', 'sugar']
@@ -1662,7 +1662,7 @@ unflattened = list(batched(flattened_data, 2))
 assert unflattened == [('roses', 'red'), ('violets', 'blue'), ('sugar',)]
 </code></pre>
 <p>This is completely lazy - iterator is only ever consumed enough to fill the current chunk.</p>
------------------------------------------------------------------- <br><h3> Answer 55776536 luckydonald: </h3><h3>Lazy loading version</h3>
+------------------------------------------------------------------ <br><h3> luckydonald, Id: 55776536, Score: -1: </h3><h3>Lazy loading version</h3>
 
 <blockquote>
   <pre class="lang-py prettyprint-override"><code>import pprint
@@ -1720,7 +1720,7 @@ pprint.pprint(list(chunks(range(10, 75), 10)))
 <p>We now use that result of the slice, and calculate the length of that generated chunk. If it is less than what we expect, we know we can end the iteration.</p>
 
 <p>That way the iterator will not be executed unless access.</p>
------------------------------------------------------------------- <br><h3> Answer 59163343 Realfun: </h3><p>An old school approach that does not require itertools but still works with arbitrary generators:</p>
+------------------------------------------------------------------ <br><h3> Realfun, Id: 59163343, Score: -1: </h3><p>An old school approach that does not require itertools but still works with arbitrary generators:</p>
 
 <pre><code>def chunks(g, n):
   """divide a generator 'g' into small chunks
@@ -1737,7 +1737,7 @@ pprint.pprint(list(chunks(range(10, 75), 10)))
   if buff:
     yield buff
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 70381614 Amin Rezaei: </h3><p>This task can be easily done using the generator in the <a href="http://https:/https://stackoverflow.com/a/312464/8010865" rel="nofollow noreferrer">accepted answer</a>. I'm adding class implementation that implements length methods, which may be useful to somebody. I needed to know the progress (with <code>tqdm</code>) so the generator should've returned the number of chunks.</p>
+------------------------------------------------------------------ <br><h3> Amin Rezaei, Id: 70381614, Score: -1: </h3><p>This task can be easily done using the generator in the <a href="http://https:/https://stackoverflow.com/a/312464/8010865" rel="nofollow noreferrer">accepted answer</a>. I'm adding class implementation that implements length methods, which may be useful to somebody. I needed to know the progress (with <code>tqdm</code>) so the generator should've returned the number of chunks.</p>
 <pre class="lang-py prettyprint-override"><code>class ChunksIterator(object):
     def __init__(self, data, n):
         self._data = data
@@ -1758,14 +1758,14 @@ print(len(it))
 for i in it:
   print(i)
 </code></pre>
-<h4> Comment 127831440 Sam Mason: </h4>your <code>__len__</code> method might be nicer if you used <code>divmod()</code><br>------------------------------------------------------------------ <br><h3> Answer 76275047 Jatin: </h3><pre><code>def devideChunks(x, n):
+<h4> Sam Mason, Comment 127831440 Score: 0: </h4>your <code>__len__</code> method might be nicer if you used <code>divmod()</code><br>------------------------------------------------------------------ <br><h3> Jatin, Id: 76275047, Score: -1: </h3><pre><code>def devideChunks(x, n):
     newList = []
     for i in range(0, len(x), n):
         newList.append(x[i:i + n])
 
     print(newList)
 </code></pre>
-<h4> Comment 134506590 jmoerdyk: </h4>While this code may solve the question, <a href="https://meta.stackexchange.com/q/114762">including an explanation</a> of how and why this solves the problem would really help to improve the quality of your post, and probably result in more up-votes. Remember that you are answering the question for readers in the future, not just the person asking now. Please <a href="https://stackoverflow.com/posts/76275047/edit">edit</a> your answer to add explanations and give an indication of what limitations and assumptions apply<br><h4> Comment 134506623 Community: </h4>Your answer could be improved with additional supporting information. Please <a href="https://stackoverflow.com/posts/76275047/edit">edit</a> to add further details, such as citations or documentation, so that others can confirm that your answer is correct. You can find more information on how to write good answers <a href="/help/how-to-answer">in the help center</a>.<br>------------------------------------------------------------------ <br><h3> Answer 70555495 nikicat: </h3><p>One-liner version of <a href="https://stackoverflow.com/a/22045226/1022684">senderle's answer</a>:</p>
+<h4> jmoerdyk, Comment 134506590 Score: 3: </h4>While this code may solve the question, <a href="https://meta.stackexchange.com/q/114762">including an explanation</a> of how and why this solves the problem would really help to improve the quality of your post, and probably result in more up-votes. Remember that you are answering the question for readers in the future, not just the person asking now. Please <a href="https://stackoverflow.com/posts/76275047/edit">edit</a> your answer to add explanations and give an indication of what limitations and assumptions apply<br><h4> Community, Comment 134506623 Score: 3: </h4>Your answer could be improved with additional supporting information. Please <a href="https://stackoverflow.com/posts/76275047/edit">edit</a> to add further details, such as citations or documentation, so that others can confirm that your answer is correct. You can find more information on how to write good answers <a href="/help/how-to-answer">in the help center</a>.<br>------------------------------------------------------------------ <br><h3> nikicat, Id: 70555495, Score: -2: </h3><p>One-liner version of <a href="https://stackoverflow.com/a/22045226/1022684">senderle's answer</a>:</p>
 <pre><code>from itertools import islice
 from functools import partial
 

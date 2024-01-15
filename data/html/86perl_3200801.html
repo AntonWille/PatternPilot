@@ -1,5 +1,5 @@
- <h2> Title: How can I call a shell command in my Perl script? </h2> <h3> Yang, question_id: 3200801 </h3>Score: 86, Tags: {perl} <br><p>What would be an example of how I can call a shell command, say '<code>ls -a</code>' in a Perl script and the way to retrieve the output of the command as well?</p>
------------------------------------------------------------------- <br><h3> Answer 3200810 fire.eagle: </h3><p><a href="http://www.perlmonks.org/?node_id=78523" rel="noreferrer">How to run a shell script from a Perl program</a></p>
+ <h2> Title: How can I call a shell command in my Perl script? </h2> <h4> Yang, question_id: 3200801 </h4>Score: 86, Tags: {perl} <br><p>What would be an example of how I can call a shell command, say '<code>ls -a</code>' in a Perl script and the way to retrieve the output of the command as well?</p>
+------------------------------------------------------------------ <br><h3> fire.eagle, Id: 3200810, Score: 107: </h3><p><a href="http://www.perlmonks.org/?node_id=78523" rel="noreferrer">How to run a shell script from a Perl program</a></p>
 
 <blockquote>
   <p><strong>1. Using system <code>system($command, @arguments);</code></strong></p>
@@ -34,7 +34,7 @@ my $output = qx/script.sh --option/;
   
   <p>There are also ways to run external applications through creative use of <a href="http://perldoc.perl.org/functions/open.html" rel="noreferrer">open</a>, but this is advanced use; read the documentation for more.</p>
 </blockquote>
-<h4> Comment 83173741 Tyler: </h4>That is called a backtick ` ... for programming anyway, when used in foreign languages it is an accent. A tilde (notice the &quot;e&quot; at the end, rather than &quot;a&quot;) is the squiggly line; which in Perl is used for pattern matching and smart matching.<br><h4> Comment 63460321 ANjaNA: </h4>system() gives u output in run time.<br><h4> Comment 75549625 PMat: </h4>I don&#39;t think tilda ` works with latest perl(5.24.0)<br><h4> Comment 87639162 yerlilbilgin: </h4>for the qx/ or backtick one add 2&gt;&amp;1 to capture also stderr.<br>------------------------------------------------------------------ <br><h3> Answer 21153038 sjy: </h3><p>From <a href="http://www.perlhowto.com/executing_external_commands" rel="noreferrer">Perl HowTo</a>, the most common ways to execute external commands from Perl are:</p>
+<h4> Tyler, Comment 83173741 Score: 5: </h4>That is called a backtick ` ... for programming anyway, when used in foreign languages it is an accent. A tilde (notice the &quot;e&quot; at the end, rather than &quot;a&quot;) is the squiggly line; which in Perl is used for pattern matching and smart matching.<br><h4> ANjaNA, Comment 63460321 Score: 1: </h4>system() gives u output in run time.<br><h4> PMat, Comment 75549625 Score: 1: </h4>I don&#39;t think tilda ` works with latest perl(5.24.0)<br><h4> yerlilbilgin, Comment 87639162 Score: 0: </h4>for the qx/ or backtick one add 2&gt;&amp;1 to capture also stderr.<br>------------------------------------------------------------------ <br><h3> sjy, Id: 21153038, Score: 30: </h3><p>From <a href="http://www.perlhowto.com/executing_external_commands" rel="noreferrer">Perl HowTo</a>, the most common ways to execute external commands from Perl are:</p>
 
 <ul>
 <li><code>my $files = `ls -la`</code> — captures the output of the command in <code>$files</code></li>
@@ -42,16 +42,16 @@ my $output = qx/script.sh --option/;
 <li><code>exec "vim ~/foo"</code> — if you don't want to return to the script after executing the command</li>
 <li><code>open(my $file, '|-', "grep foo"); print $file "foo\nbar"</code> — if you want to pipe input into the command</li>
 </ul>
------------------------------------------------------------------- <br><h3> Answer 3201234 user376314: </h3><h2>Examples</h2>
+------------------------------------------------------------------ <br><h3> user376314, Id: 3201234, Score: 18: </h3><h2>Examples</h2>
 <ol>
 <li><code>`ls -l`;</code></li>
 <li><code>system(&quot;ls -l&quot;);</code></li>
 <li><code>exec(&quot;ls -l&quot;);</code></li>
 </ol>
-<h4> Comment 36370100 K.L.: </h4>You should explain what are the differences between these methods. Also, I believe not all of them solve the problem that OP has (calling exec does not return to the perl script AFAIR)<br><h4> Comment 39554020 scragar: </h4>@K.L. You are correct, without some nasty hacks exec will exit the perl script with the same exit code as the passed command.<br>------------------------------------------------------------------ <br><h3> Answer 3200858 Jonathan Leffler: </h3><p>Look at the <a href="http://perldoc.perl.org/functions/open.html" rel="noreferrer">open</a> function in Perl - especially the variants using a '|' (pipe) in the arguments.  Done correctly, you'll get a file handle that you can use to read the output of the command.  The back tick operators also do this.</p>
+<h4> K.L., Comment 36370100 Score: 7: </h4>You should explain what are the differences between these methods. Also, I believe not all of them solve the problem that OP has (calling exec does not return to the perl script AFAIR)<br><h4> scragar, Comment 39554020 Score: 1: </h4>@K.L. You are correct, without some nasty hacks exec will exit the perl script with the same exit code as the passed command.<br>------------------------------------------------------------------ <br><h3> Jonathan Leffler, Id: 3200858, Score: 12: </h3><p>Look at the <a href="http://perldoc.perl.org/functions/open.html" rel="noreferrer">open</a> function in Perl - especially the variants using a '|' (pipe) in the arguments.  Done correctly, you'll get a file handle that you can use to read the output of the command.  The back tick operators also do this.</p>
 
 <p>You might also want to review whether Perl has access to the C functions that the command itself uses.  For example, for <code>ls -a</code>, you could use the <a href="http://perldoc.perl.org/functions/opendir.html" rel="noreferrer">opendir</a> function, and then read the file names with the <a href="http://perldoc.perl.org/functions/readdir.html" rel="noreferrer">readdir</a> function, and finally close the directory with (surprise) the <a href="http://perldoc.perl.org/functions/closedir.html" rel="noreferrer">closedir</a> function.  This has a number of benefits - precision probably being more important than speed.  Using these functions, you can get the correct data even if the file names contain odd characters like newline.</p>
------------------------------------------------------------------- <br><h3> Answer 3216683 Grant McLean: </h3><p>As you become more experienced with using Perl, you'll find that there are fewer and fewer occasions when you need to run shell commands.  For example, one way to get a list of files is to use Perl's built-in <a href="http://perldoc.perl.org/functions/glob.html" rel="noreferrer">glob</a> function.  If you want the list in sorted order you could combine it with the built-in <a href="http://perldoc.perl.org/functions/sort.html" rel="noreferrer">sort</a> function.  If you want details about each file, you can use the <a href="http://perldoc.perl.org/functions/stat.html" rel="noreferrer">stat</a> function.  Here's an example:</p>
+------------------------------------------------------------------ <br><h3> Grant McLean, Id: 3216683, Score: 12: </h3><p>As you become more experienced with using Perl, you'll find that there are fewer and fewer occasions when you need to run shell commands.  For example, one way to get a list of files is to use Perl's built-in <a href="http://perldoc.perl.org/functions/glob.html" rel="noreferrer">glob</a> function.  If you want the list in sorted order you could combine it with the built-in <a href="http://perldoc.perl.org/functions/sort.html" rel="noreferrer">sort</a> function.  If you want details about each file, you can use the <a href="http://perldoc.perl.org/functions/stat.html" rel="noreferrer">stat</a> function.  Here's an example:</p>
 
 <pre><code>#!/usr/bin/perl
 
@@ -64,7 +64,7 @@ foreach my $file ( sort glob('/home/grant/*') ) {
     printf("%-40s %8u bytes\n", $file, $size);
 }
 </code></pre>
-<h4> Comment 108857905 M_M: </h4>Obviously this answer doesn&#39;t apply to commands other than <code>ls</code>, but in the case that the user was actually going to call <code>ls</code>, this answer deserves recognition for answering the user&#39;s intention rather than their actual question.<br>------------------------------------------------------------------ <br><h3> Answer 3201000 thegeek: </h3><p>There are a lot of ways you can call a shell command from a Perl script, such as:</p>
+<h4> M_M, Comment 108857905 Score: 0: </h4>Obviously this answer doesn&#39;t apply to commands other than <code>ls</code>, but in the case that the user was actually going to call <code>ls</code>, this answer deserves recognition for answering the user&#39;s intention rather than their actual question.<br>------------------------------------------------------------------ <br><h3> thegeek, Id: 3201000, Score: 6: </h3><p>There are a lot of ways you can call a shell command from a Perl script, such as:</p>
 
 <ol>
 <li>back tick
@@ -75,8 +75,8 @@ foreach my $file ( sort glob('/home/grant/*') ) {
 </ol>
 
 <p>Refer #17 here: <a href="http://www.thegeekstuff.com/2010/01/20-killer-perl-programming-tips-for-beginners-on-unix-linux-os/" rel="nofollow noreferrer">Perl programming tips</a></p>
------------------------------------------------------------------- <br><h3> Answer 3204931 miedwar: </h3><p>You might want to look into <a href="http://search.cpan.org/~dapm/perl-5.10.1/lib/IPC/Open2.pm" rel="nofollow noreferrer">open2</a> and <a href="http://search.cpan.org/~dapm/perl-5.10.1/lib/IPC/Open3.pm" rel="nofollow noreferrer">open3</a> in case you need bidirectional communication.</p>
------------------------------------------------------------------- <br><h3> Answer 69905356 Ulisses: </h3><p>I have been using system and qq to run linux programs inside perl. And it has worked well.</p>
+------------------------------------------------------------------ <br><h3> miedwar, Id: 3204931, Score: 1: </h3><p>You might want to look into <a href="http://search.cpan.org/~dapm/perl-5.10.1/lib/IPC/Open2.pm" rel="nofollow noreferrer">open2</a> and <a href="http://search.cpan.org/~dapm/perl-5.10.1/lib/IPC/Open3.pm" rel="nofollow noreferrer">open3</a> in case you need bidirectional communication.</p>
+------------------------------------------------------------------ <br><h3> Ulisses, Id: 69905356, Score: 1: </h3><p>I have been using system and qq to run linux programs inside perl. And it has worked well.</p>
 <pre><code>#!/usr/bin/perl   # A hashbang line in perl
     
 use strict;       # It can save you a lot of time and headache
@@ -103,4 +103,4 @@ system qq($chage -l $username);
 system qq($quota -s $username);
 
 </code></pre>
-<h4> Comment 123609838 holydragon: </h4>The answer would be more useful if you can add some explanation along with the code.<br><h4> Comment 123648444 Ulisses: </h4>Thanks for the review. now I put more comments to get a better understanding.<br>
+<h4> holydragon, Comment 123609838 Score: 0: </h4>The answer would be more useful if you can add some explanation along with the code.<br><h4> Ulisses, Comment 123648444 Score: 0: </h4>Thanks for the review. now I put more comments to get a better understanding.<br>

@@ -1,4 +1,4 @@
- <h2> Title: Use of &#39;use utf8;&#39; gives me &#39;Wide character in print&#39; </h2> <h3> Eric Johnson, question_id: 15210532 </h3>Score: 93, Tags: {perl,unicode,utf-8} <br><p>If I run the following Perl program:</p>
+ <h2> Title: Use of &#39;use utf8;&#39; gives me &#39;Wide character in print&#39; </h2> <h4> Eric Johnson, question_id: 15210532 </h4>Score: 93, Tags: {perl,unicode,utf-8} <br><p>If I run the following Perl program:</p>
 
 <pre><code>perl -e 'use utf8; print "鸡\n";'
 </code></pre>
@@ -16,7 +16,7 @@
 <p>I do not get a warning.</p>
 
 <p>I thought <code>use utf8</code> was required to use UTF-8 characters in a Perl script.  Why does this not work and how can I fix it? I'm using Perl 5.16.2. I have the same issue if this is in a file instead of being a one liner on the command line.</p>
-<h4> Comment 21439263 hobbs: </h4>&quot;Why does this not work?&quot; It <i>does</i> work, but it&#39;s been my experience with Unicode that there are a lot of very broken programs out there that <i>look</i> like they&#39;re working. When you fix one thing, making the code slightly less wrong, the results seem a lot worse. It&#39;s only when you fix the <i>last</i> part that everything looks good again.<br>------------------------------------------------------------------ <br><h3> Answer 15222005 Dave Cross: </h3><p>Without <code>use utf8</code> Perl interprets your string as a sequence of single byte characters. There are four bytes in your string as you can see from this:</p>
+<h4> hobbs, Id: 21439263 Score: 4: </h4>&quot;Why does this not work?&quot; It <i>does</i> work, but it&#39;s been my experience with Unicode that there are a lot of very broken programs out there that <i>look</i> like they&#39;re working. When you fix one thing, making the code slightly less wrong, the results seem a lot worse. It&#39;s only when you fix the <i>last</i> part that everything looks good again.<br>------------------------------------------------------------------ <br><h3> Dave Cross, Id: 15222005, Score: 116: </h3><p>Without <code>use utf8</code> Perl interprets your string as a sequence of single byte characters. There are four bytes in your string as you can see from this:</p>
 
 <pre><code>$ perl -E 'say join ":", map { ord } split //, "鸡\n";'
 233:184:161:10
@@ -58,21 +58,21 @@ Wide character in print at -e line 1.
 </code></pre>
 
 <p>Unicode is a big and complex area. As you've seen, many simple programs appear to do the right thing, but for the wrong reasons. When you start to fix part of the program, things will often get worse until you've fixed <em>all</em> of the program.</p>
-<h4> Comment 71822740 Lei Yang: </h4>How to spell <code>-Mutf8</code> if not in one liner perl?<br><h4> Comment 71833451 Dave Cross: </h4>@LeiYang: <code>use utf8;</code><br>------------------------------------------------------------------ <br><h3> Answer 15210608 ikegami: </h3><p>All <code>use utf8;</code> does is tell Perl the source code is encoded using UTF-8. You need to tell Perl how to encode your text:</p>
+<h4> Lei Yang, Comment 71822740 Score: 0: </h4>How to spell <code>-Mutf8</code> if not in one liner perl?<br><h4> Dave Cross, Comment 71833451 Score: 0: </h4>@LeiYang: <code>use utf8;</code><br>------------------------------------------------------------------ <br><h3> ikegami, Id: 15210608, Score: 84: </h3><p>All <code>use utf8;</code> does is tell Perl the source code is encoded using UTF-8. You need to tell Perl how to encode your text:</p>
 
 <pre><code>use open ':std', ':encoding(UTF-8)';
 </code></pre>
-<h4> Comment 59464664 squirl: </h4>Thanks, this works well for programs stored in files, as opposed to one-liners on the command line, which @DaveCross&#39;s answer covers.<br>------------------------------------------------------------------ <br><h3> Answer 21839448 Boris Ivanov: </h3><p>Encode all standard output as UTF-8:</p>
+<h4> squirl, Comment 59464664 Score: 1: </h4>Thanks, this works well for programs stored in files, as opposed to one-liners on the command line, which @DaveCross&#39;s answer covers.<br>------------------------------------------------------------------ <br><h3> Boris Ivanov, Id: 21839448, Score: 19: </h3><p>Encode all standard output as UTF-8:</p>
 
 <pre><code>binmode STDOUT, ":utf8";
 </code></pre>
-<h4> Comment 106868436 Stephen Ostermiller: </h4><code>use open &#39;:std&#39;, &#39;:encoding(UTF-8)&#39;;</code> as proposed by another answer does this for STDOUT but also marks STDERR, and STDIN as UTF-8, so you get three for the price of one statement.   See also <a href="https://stackoverflow.com/a/42194059">stackoverflow.com/a/42194059</a><br><h4> Comment 106870319 Boris Ivanov: </h4>Agree. This is even better.<br><h4> Comment 117818114 grjash: </h4>I can&#39;t get this simple program to correctly print curly quotes on a Windows 10 PC running Perl 5.32 .  Is something missing or is it just another thing Windows can&#39;t do right?  <code>BEGIN {binmode STDOUT, &quot;:utf8&quot;;} print &quot;\x{201C}in curly quotes\x{201D}\n&quot;;</code><br>------------------------------------------------------------------ <br><h3> Answer 15211444 Joel Berger: </h3><p>You can get close to "just do utf8 everywhere" by using the CPAN module <a href="http://metacpan.org/module/utf8::all" rel="noreferrer"><code>utf8::all</code></a>.</p>
+<h4> Stephen Ostermiller, Comment 106868436 Score: 3: </h4><code>use open &#39;:std&#39;, &#39;:encoding(UTF-8)&#39;;</code> as proposed by another answer does this for STDOUT but also marks STDERR, and STDIN as UTF-8, so you get three for the price of one statement.   See also <a href="https://stackoverflow.com/a/42194059">stackoverflow.com/a/42194059</a><br><h4> Boris Ivanov, Comment 106870319 Score: 0: </h4>Agree. This is even better.<br><h4> grjash, Comment 117818114 Score: 0: </h4>I can&#39;t get this simple program to correctly print curly quotes on a Windows 10 PC running Perl 5.32 .  Is something missing or is it just another thing Windows can&#39;t do right?  <code>BEGIN {binmode STDOUT, &quot;:utf8&quot;;} print &quot;\x{201C}in curly quotes\x{201D}\n&quot;;</code><br>------------------------------------------------------------------ <br><h3> Joel Berger, Id: 15211444, Score: 14: </h3><p>You can get close to "just do utf8 everywhere" by using the CPAN module <a href="http://metacpan.org/module/utf8::all" rel="noreferrer"><code>utf8::all</code></a>.</p>
 
 <pre><code>perl -Mutf8::all -e 'print "鸡\n";'
 </code></pre>
 
 <p>When <code>print</code> receives something that it can't print (character larger than 255 when no <code>:encoding</code> layer is provided), it assumes you meant to encode it using UTF-8. It does so, after warning about the problem.</p>
------------------------------------------------------------------- <br><h3> Answer 29536257 Karthikeyan.R.S: </h3><p>You can use this,</p>
+------------------------------------------------------------------ <br><h3> Karthikeyan.R.S, Id: 29536257, Score: 8: </h3><p>You can use this,</p>
 <pre><code>perl -CS filename.
 </code></pre>
 <p>It will also terminates that error.</p>
@@ -87,10 +87,10 @@ Wide character in print at -e line 1.
                 E     4   STDERR will be in UTF-8
                 S     7   I + O + E
 </code></pre>
-<h4> Comment 125599471 roli: </h4>If you&#39;re not just running Oneliner, see here: <a href="https://perldoc.perl.org/perlunicook#%E2%84%9E-15:-Declare-STD%7BIN,OUT,ERR%7D-to-be-utf8" rel="nofollow noreferrer">perldoc.perl.org/&hellip;</a><br><h4> Comment 133345143 Sridhar Sarnobat: </h4>Unlike other solutions, this one doesn&#39;t require libraries to be detected<br>------------------------------------------------------------------ <br><h3> Answer 30413729 DiegoAr: </h3><p>In Spanish you can find this error when beside of begin using:</p>
+<h4> roli, Comment 125599471 Score: 0: </h4>If you&#39;re not just running Oneliner, see here: <a href="https://perldoc.perl.org/perlunicook#%E2%84%9E-15:-Declare-STD%7BIN,OUT,ERR%7D-to-be-utf8" rel="nofollow noreferrer">perldoc.perl.org/&hellip;</a><br><h4> Sridhar Sarnobat, Comment 133345143 Score: 0: </h4>Unlike other solutions, this one doesn&#39;t require libraries to be detected<br>------------------------------------------------------------------ <br><h3> DiegoAr, Id: 30413729, Score: -1: </h3><p>In Spanish you can find this error when beside of begin using:</p>
 
 <pre><code>use utf8;
 </code></pre>
 
 <p>Your editor encoding is in a different encoding. So what you see on the editor is not what Perl does. To solve that error just change the editor encoding to <strong>Unicode/UTF-8</strong>.</p>
-<h4> Comment 51298284 Dave Cross: </h4>No. This isn&#39;t what was causing the error. The code was all properly encoded as UTF8 but the output filehandle didn&#39;t know that it was.<br>
+<h4> Dave Cross, Comment 51298284 Score: 2: </h4>No. This isn&#39;t what was causing the error. The code was all properly encoded as UTF8 but the output filehandle didn&#39;t know that it was.<br>

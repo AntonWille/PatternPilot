@@ -1,4 +1,4 @@
- <h2> Title: How do I get the name of a Ruby class? </h2> <h3> andi, question_id: 826210 </h3>Score: 436, Tags: {ruby-on-rails,ruby,rails-activerecord} <br><p>How can I get the class name from an ActiveRecord object?</p>
+ <h2> Title: How do I get the name of a Ruby class? </h2> <h4> andi, question_id: 826210 </h4>Score: 436, Tags: {ruby-on-rails,ruby,rails-activerecord} <br><p>How can I get the class name from an ActiveRecord object?</p>
 
 <p>I have:</p>
 
@@ -16,10 +16,10 @@ result.to_s
 <p>I need only the class name, in a string (<code>User</code> in this case). Is there a method for that? </p>
 
 <p>I know this is pretty basic, but I searched both Rails' and Ruby's docs, and I couldn't find it.</p>
-<h4> Comment 8362689 Andrew Grimm: </h4>@Oliver N.: With normal Ruby objects, <code>Object#class.inspect</code> gives the same as <code>Object#class.name</code>, whereas this isn&#39;t the case with ActiveRecord objects.<br>------------------------------------------------------------------ <br><h3> Answer 47668307 Chivorn Kouch: </h3><p>In my case when I use something like <code>result.class.name</code> I got something like <code>Module1::class_name</code>. But if we only want <code>class_name</code>, use </p>
+<h4> Andrew Grimm, Id: 8362689 Score: 1: </h4>@Oliver N.: With normal Ruby objects, <code>Object#class.inspect</code> gives the same as <code>Object#class.name</code>, whereas this isn&#39;t the case with ActiveRecord objects.<br>------------------------------------------------------------------ <br><h3> Chivorn Kouch, Id: 47668307, Score: 2: </h3><p>In my case when I use something like <code>result.class.name</code> I got something like <code>Module1::class_name</code>. But if we only want <code>class_name</code>, use </p>
 
 <p><code>result.class.table_name.singularize</code></p>
------------------------------------------------------------------- <br><h3> Answer 24832287 Darren Hicks: </h3><p>Here's the correct answer, extracted from comments by Daniel Rikowski and pseidemann.  I'm tired of having to weed through comments to find the right answer...</p>
+------------------------------------------------------------------ <br><h3> Darren Hicks, Id: 24832287, Score: 137: </h3><p>Here's the correct answer, extracted from comments by Daniel Rikowski and pseidemann.  I'm tired of having to weed through comments to find the right answer...</p>
 
 <p>If you use Rails (ActiveSupport):</p>
 
@@ -30,12 +30,12 @@ result.to_s
 
 <pre><code>result.class.name.split('::').last
 </code></pre>
-<h4> Comment 112467480 Dennis: </h4>An answer that is comparing a solution to others and claims to better, should also explain why.<br><h4> Comment 129651472 pseidemann: </h4>well, technically, my comment answered more than what was originally asked ;)<br>------------------------------------------------------------------ <br><h3> Answer 826227 flicken: </h3><p>You want to call <a href="https://www.ruby-doc.org/core/classes/Module.html#M001699" rel="noreferrer">.name</a> on the object's class:</p>
+<h4> Dennis, Comment 112467480 Score: 4: </h4>An answer that is comparing a solution to others and claims to better, should also explain why.<br><h4> pseidemann, Comment 129651472 Score: 0: </h4>well, technically, my comment answered more than what was originally asked ;)<br>------------------------------------------------------------------ <br><h3> flicken, Id: 826227, Score: 816: </h3><p>You want to call <a href="https://www.ruby-doc.org/core/classes/Module.html#M001699" rel="noreferrer">.name</a> on the object's class:</p>
 
 <pre><code>result.class.name
 </code></pre>
-<h4> Comment 9713719 pseidemann: </h4>@Abe: even cleaner (ActiveSupport): <code>result.class.name.demodulize</code><br><h4> Comment 9249395 Daniel Rikowski: </h4>@Abe: <code>result.class.name.split(&#39;::&#39;).last</code><br><h4> Comment 8769609 Abe Petrillo: </h4>When I do this I get the Module names before it, so &quot;Module::SubModule::Class&quot;, is there a way of getting just &quot;Class&quot;<br><h4> Comment 18445102 Dan Polites: </h4>For the newcomers out there, you can also obtain the class name as a string by using the class like this: <code>User.name</code>. <code>User.to_s</code> also seems to work.<br><h4> Comment 64062135 Per Lundberg: </h4>The demodulize method comes from here: <a href="http://apidock.com/rails/ActiveSupport/Inflector/demodulize" rel="nofollow noreferrer">apidock.com/rails/ActiveSupport/Inflector/demodulize</a>  (You need to load the ActiveSupport string inflections to be able to use if, if you are not a Rails project.)<br><h4> Comment 80415708 Cyril Duchon-Doris: </h4>How do you do when the class hides its name ? I wanted to get the full namespace + class of a proxy object, but its name was overriden with <code>[Proxy] Foo</code> ? EDIT : It&#39;s possible to show the name by triggering an error on the class and the real class name will be printed in the debug, but well..<br>------------------------------------------------------------------ <br><h3> Answer 826853 tal: </h3><p>Both <code>result.class.to_s</code> and <code>result.class.name</code> work.</p>
-<h4> Comment 635657 kch: </h4>But conceptually, #name returns the name, #to_s returns a string representation, which just happens to be identical to the name. I&#39;d stick to using #name, just out of anal-retentiveness.<br>------------------------------------------------------------------ <br><h3> Answer 49804985 jayhendren: </h3><p>If you want to get a class name from inside a class method, <code>class.name</code> or <code>self.class.name</code> won't work.  These will just output <code>Class</code>, since the class of a class is <code>Class</code>.  Instead, you can just use <code>name</code>:</p>
+<h4> pseidemann, Comment 9713719 Score: 97: </h4>@Abe: even cleaner (ActiveSupport): <code>result.class.name.demodulize</code><br><h4> Daniel Rikowski, Comment 9249395 Score: 29: </h4>@Abe: <code>result.class.name.split(&#39;::&#39;).last</code><br><h4> Abe Petrillo, Comment 8769609 Score: 6: </h4>When I do this I get the Module names before it, so &quot;Module::SubModule::Class&quot;, is there a way of getting just &quot;Class&quot;<br><h4> Dan Polites, Comment 18445102 Score: 3: </h4>For the newcomers out there, you can also obtain the class name as a string by using the class like this: <code>User.name</code>. <code>User.to_s</code> also seems to work.<br><h4> Per Lundberg, Comment 64062135 Score: 1: </h4>The demodulize method comes from here: <a href="http://apidock.com/rails/ActiveSupport/Inflector/demodulize" rel="nofollow noreferrer">apidock.com/rails/ActiveSupport/Inflector/demodulize</a>  (You need to load the ActiveSupport string inflections to be able to use if, if you are not a Rails project.)<br><h4> Cyril Duchon-Doris, Comment 80415708 Score: 0: </h4>How do you do when the class hides its name ? I wanted to get the full namespace + class of a proxy object, but its name was overriden with <code>[Proxy] Foo</code> ? EDIT : It&#39;s possible to show the name by triggering an error on the class and the real class name will be printed in the debug, but well..<br>------------------------------------------------------------------ <br><h3> tal, Id: 826853, Score: 38: </h3><p>Both <code>result.class.to_s</code> and <code>result.class.name</code> work.</p>
+<h4> kch, Comment 635657 Score: 43: </h4>But conceptually, #name returns the name, #to_s returns a string representation, which just happens to be identical to the name. I&#39;d stick to using #name, just out of anal-retentiveness.<br>------------------------------------------------------------------ <br><h3> jayhendren, Id: 49804985, Score: 12: </h3><p>If you want to get a class name from inside a class method, <code>class.name</code> or <code>self.class.name</code> won't work.  These will just output <code>Class</code>, since the class of a class is <code>Class</code>.  Instead, you can just use <code>name</code>:</p>
 
 <pre><code>module Foo
   class Bar
@@ -52,7 +52,7 @@ Foo::Bar.say_name
 
 <pre><code>I'm a Foo::Bar!
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 73680628 software_writer: </h3><p>In Ruby, you'd use the <code>object.class.name</code> method as follows.</p>
+------------------------------------------------------------------ <br><h3> software_writer, Id: 73680628, Score: 3: </h3><p>In Ruby, you'd use the <code>object.class.name</code> method as follows.</p>
 <pre class="lang-rb prettyprint-override"><code>module Bank
   class Account
   end

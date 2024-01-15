@@ -1,4 +1,4 @@
- <h2> Title: How do I make function decorators and chain them together? </h2> <h3> Imran, question_id: 739654 </h3>Score: 3147, Tags: {python,function,decorator,python-decorators,chain} <br><p>How do I make two decorators in Python that would do the following?</p>
+ <h2> Title: How do I make function decorators and chain them together? </h2> <h4> Imran, question_id: 739654 </h4>Score: 3147, Tags: {python,function,decorator,python-decorators,chain} <br><p>How do I make two decorators in Python that would do the following?</p>
 <pre><code>@make_bold
 @make_italic
 def say():
@@ -7,7 +7,7 @@ def say():
 <p>Calling <code>say()</code> should return:</p>
 <pre><code>&quot;&lt;b&gt;&lt;i&gt;Hello&lt;/i&gt;&lt;/b&gt;&quot;
 </code></pre>
-<h4> Comment 129523904 Karl Knechtel: </h4>See also: <a href="/questions/6392739">What does the &quot;at&quot; (@) symbol do in Python?</a><br>------------------------------------------------------------------ <br><h3> Answer 1594484 Bite code: </h3><p>If you are not into long explanations, see <a href="https://stackoverflow.com/questions/739654/understanding-python-decorators#answer-739665">Paolo Bergantino’s answer</a>.</p>
+<h4> Karl Knechtel, Id: 129523904 Score: 1: </h4>See also: <a href="/questions/6392739">What does the &quot;at&quot; (@) symbol do in Python?</a><br>------------------------------------------------------------------ <br><h3> Bite code, Id: 1594484, Score: 4769: </h3><p>If you are not into long explanations, see <a href="https://stackoverflow.com/questions/739654/understanding-python-decorators#answer-739665">Paolo Bergantino’s answer</a>.</p>
 <h1>Decorator Basics</h1>
 <h2>Python’s functions are objects</h2>
 <p>To understand decorators, you must first understand that functions are objects in Python. This has important consequences. Let’s see why with a simple example :</p>
@@ -772,7 +772,7 @@ print(get_random_futurama_quote())
 <li>Twisted to fake inlining asynchronous functions calls.</li>
 </ul>
 <p>This really is a large playground.</p>
-<h4> Comment 54343607 metatoaster: </h4>&quot;You cannot un-decorate a function.&quot; - While normally true, it is possible to reach inside the closure in the function return by a decorator (i.e. via its <code>__closure__</code> attribute) to pull out the original undecorated function.  One example usage is documented in <a href="http://stackoverflow.com/a/33254457/2904896">this answer</a> which covers how it is possible to inject a decorator function in a lower level in limited circumstances.<br><h4> Comment 60699659 Blckknght: </h4>While this is a great answer, I think it is a bit misleading in some ways. Python&#39;s <code>@decorator</code> syntax is probably most often used to replace a function with a wrapper closure (as the answer describes). But it can also replace the function with something else. The builtin <code>property</code>, <code>classmethod</code> and <code>staticmethod</code> decorators replace the function with a descriptor, for example. A decorator can also do something with a function, such as saving a reference to it in a registry of some sort, then return it, unmodified, without any wrapper.<br><h4> Comment 124101829 merwok: </h4>functools.wraps sets the attribute <code>__wrapped__</code> on the wrapper function, to allow retrieving the original wrapped function.  That’s more reliable than looking at closed-over variables.<br><h4> Comment 127849842 Mous: </h4>Adding on to what Blckknght said, a decorator doesn&#39;t just return something else, it can return any object.<br><h4> Comment 133581998 t3chb0t: </h4>Is there a way to preserve the agument information about the decorated function when stacking decorators so that <code>inspect.getfullargspec(decoratee)</code> would yield useful results?<br><h4> Comment 123132247 thoroc: </h4>The only thing missing is how to test a function that has been created as decorator (if that makes sense).<br>------------------------------------------------------------------ <br><h3> Answer 739665 Paolo Bergantino: </h3><p>Check out <a href="http://docs.python.org/reference/compound_stmts.html#function" rel="noreferrer">the documentation</a> to see how decorators work. Here is what you asked for:</p>
+<h4> metatoaster, Comment 54343607 Score: 26: </h4>&quot;You cannot un-decorate a function.&quot; - While normally true, it is possible to reach inside the closure in the function return by a decorator (i.e. via its <code>__closure__</code> attribute) to pull out the original undecorated function.  One example usage is documented in <a href="http://stackoverflow.com/a/33254457/2904896">this answer</a> which covers how it is possible to inject a decorator function in a lower level in limited circumstances.<br><h4> Blckknght, Comment 60699659 Score: 13: </h4>While this is a great answer, I think it is a bit misleading in some ways. Python&#39;s <code>@decorator</code> syntax is probably most often used to replace a function with a wrapper closure (as the answer describes). But it can also replace the function with something else. The builtin <code>property</code>, <code>classmethod</code> and <code>staticmethod</code> decorators replace the function with a descriptor, for example. A decorator can also do something with a function, such as saving a reference to it in a registry of some sort, then return it, unmodified, without any wrapper.<br><h4> merwok, Comment 124101829 Score: 2: </h4>functools.wraps sets the attribute <code>__wrapped__</code> on the wrapper function, to allow retrieving the original wrapped function.  That’s more reliable than looking at closed-over variables.<br><h4> Mous, Comment 127849842 Score: 0: </h4>Adding on to what Blckknght said, a decorator doesn&#39;t just return something else, it can return any object.<br><h4> t3chb0t, Comment 133581998 Score: 0: </h4>Is there a way to preserve the agument information about the decorated function when stacking decorators so that <code>inspect.getfullargspec(decoratee)</code> would yield useful results?<br><h4> thoroc, Comment 123132247 Score: 0: </h4>The only thing missing is how to test a function that has been created as decorator (if that makes sense).<br>------------------------------------------------------------------ <br><h3> Paolo Bergantino, Id: 739665, Score: 3088: </h3><p>Check out <a href="http://docs.python.org/reference/compound_stmts.html#function" rel="noreferrer">the documentation</a> to see how decorators work. Here is what you asked for:</p>
 <pre><code>from functools import wraps
 
 def makebold(fn):
@@ -801,7 +801,7 @@ print hello()        # returns &quot;&lt;b&gt;&lt;i&gt;hello world&lt;/i&gt;&lt;
 print hello.__name__ # with functools.wraps() this returns &quot;hello&quot;
 print log('hello')   # returns &quot;&lt;b&gt;&lt;i&gt;hello&lt;/i&gt;&lt;/b&gt;&quot;
 </code></pre>
-<h4> Comment 5934940 Marius Gedminas: </h4>Consider using <a href="http://docs.python.org/library/functools.html#functools.wraps" rel="nofollow noreferrer">functools.wraps</a> or, better yet, the <a href="http://pypi.python.org/pypi/decorator" rel="nofollow noreferrer">decorator module from PyPI</a>: they preserve certain important metadata (such as <code>__name__</code> and, speaking about the decorator package, function signature).<br><h4> Comment 73409873 Blusky: </h4><code>*args</code>and <code>**kwargs</code> should be added in the answer. Decorated function can have arguments, and they will be lost if not specified.<br><h4> Comment 96953340 smarie: </h4>Although this answer has the great advantage of only using the stdlib, and works for this simple example where there are no <i>decorator</i> arguments nor <i>decorated function</i> arguments, it has 3 major limitations: (1) no simple support for optional decorator arguments (2) not signature-preserving (3) no simple way to extract a named argument from <code>*args</code>, <code>**kwargs</code>.  An easy way to solve these 3 issues at once is to use <code>decopatch</code> as explained <a href="https://stackoverflow.com/a/55105198/7262247">here</a>. You can also use <code>decorator</code> as already mentioned by Marius Gedminas, to solve points 2 and 3.<br>------------------------------------------------------------------ <br><h3> Answer 739679 Trevor: </h3><p>Alternatively, you could write a factory function which return a decorator which wraps the return value of the decorated function in a tag passed to the factory function. For example:</p>
+<h4> Marius Gedminas, Comment 5934940 Score: 273: </h4>Consider using <a href="http://docs.python.org/library/functools.html#functools.wraps" rel="nofollow noreferrer">functools.wraps</a> or, better yet, the <a href="http://pypi.python.org/pypi/decorator" rel="nofollow noreferrer">decorator module from PyPI</a>: they preserve certain important metadata (such as <code>__name__</code> and, speaking about the decorator package, function signature).<br><h4> Blusky, Comment 73409873 Score: 35: </h4><code>*args</code>and <code>**kwargs</code> should be added in the answer. Decorated function can have arguments, and they will be lost if not specified.<br><h4> smarie, Comment 96953340 Score: 4: </h4>Although this answer has the great advantage of only using the stdlib, and works for this simple example where there are no <i>decorator</i> arguments nor <i>decorated function</i> arguments, it has 3 major limitations: (1) no simple support for optional decorator arguments (2) not signature-preserving (3) no simple way to extract a named argument from <code>*args</code>, <code>**kwargs</code>.  An easy way to solve these 3 issues at once is to use <code>decopatch</code> as explained <a href="https://stackoverflow.com/a/55105198/7262247">here</a>. You can also use <code>decorator</code> as already mentioned by Marius Gedminas, to solve points 2 and 3.<br>------------------------------------------------------------------ <br><h3> Trevor, Id: 739679, Score: 159: </h3><p>Alternatively, you could write a factory function which return a decorator which wraps the return value of the decorated function in a tag passed to the factory function. For example:</p>
 
 <pre><code>from functools import wraps
 
@@ -861,7 +861,7 @@ say('hello')
 
 <pre><code>say = wrap_in_tag('b')(wrap_in_tag('i')(say)))
 </code></pre>
-<h4> Comment 29212998 guneysus: </h4>In my opinion, it is better to avoid more than one decorator as far as possible. If i had to write a factory function i would code it with *kwargs like <code>def wrap_in_tag(*kwargs)</code> then <code>@wrap_in_tag(&#39;b&#39;,&#39;i&#39;)</code><br>------------------------------------------------------------------ <br><h3> Answer 739721 Unknown: </h3><p>Decorators are just syntactical sugar.</p>
+<h4> guneysus, Comment 29212998 Score: 8: </h4>In my opinion, it is better to avoid more than one decorator as far as possible. If i had to write a factory function i would code it with *kwargs like <code>def wrap_in_tag(*kwargs)</code> then <code>@wrap_in_tag(&#39;b&#39;,&#39;i&#39;)</code><br>------------------------------------------------------------------ <br><h3> Unknown, Id: 739721, Score: 145: </h3><p>Decorators are just syntactical sugar.</p>
 <p>This</p>
 <pre><code>@decorator
 def func():
@@ -872,7 +872,7 @@ def func():
     ...
 func = decorator(func)
 </code></pre>
-<h4> Comment 79889780 Omer Dagan: </h4>Great and simple answer. Would like to add that when using <code>@decorator()</code> (instead of <code>@decorator</code>) it is syntactic sugar for <code>func = decorator()(func)</code>. This is also common practice when you need to generate decorators &quot;on the fly&quot;<br><h4> Comment 78992106 eric: </h4>This is so elegant, simple, easy to understand. 10000 upvotes for you, Sir Ockham.<br><h4> Comment 124402234 leo848: </h4>@OmerDagan this is not syntactic sugar, but just regular python code. In the generator (after the @ sign) you can put a regular python expression that yields a decorator function.<br><h4> Comment 127923097 Gathide: </h4>In <code>func = decorator(func)</code>, must the variable name be <code>func</code> which is also the original function name? Can <code>var = decorator(func)</code> also work?<br><h4> Comment 130603477 Anirban Mukherjee: </h4>Yes. The left hand side variable name and the right hand side variable name need not be the same; <code>decorator(func)</code> is assigned to <code>var</code>. If they are the same then <code>func</code> is overwritten. Else not.<br><h4> Comment 130603495 Anirban Mukherjee: </h4>Put a different way, if you want <code>func</code> to be overwritten then <code>@decorator</code> is elegant shorthand. If you don&#39;t then <code>var = decorator(func)</code> has to be written out in detail.<br>------------------------------------------------------------------ <br><h3> Answer 4012213 Rune Kaagaard: </h3><p>And of course you can return lambdas as well from a decorator function:</p>
+<h4> Omer Dagan, Comment 79889780 Score: 7: </h4>Great and simple answer. Would like to add that when using <code>@decorator()</code> (instead of <code>@decorator</code>) it is syntactic sugar for <code>func = decorator()(func)</code>. This is also common practice when you need to generate decorators &quot;on the fly&quot;<br><h4> eric, Comment 78992106 Score: 3: </h4>This is so elegant, simple, easy to understand. 10000 upvotes for you, Sir Ockham.<br><h4> leo848, Comment 124402234 Score: 0: </h4>@OmerDagan this is not syntactic sugar, but just regular python code. In the generator (after the @ sign) you can put a regular python expression that yields a decorator function.<br><h4> Gathide, Comment 127923097 Score: 0: </h4>In <code>func = decorator(func)</code>, must the variable name be <code>func</code> which is also the original function name? Can <code>var = decorator(func)</code> also work?<br><h4> Anirban Mukherjee, Comment 130603477 Score: 0: </h4>Yes. The left hand side variable name and the right hand side variable name need not be the same; <code>decorator(func)</code> is assigned to <code>var</code>. If they are the same then <code>func</code> is overwritten. Else not.<br><h4> Anirban Mukherjee, Comment 130603495 Score: 0: </h4>Put a different way, if you want <code>func</code> to be overwritten then <code>@decorator</code> is elegant shorthand. If you don&#39;t then <code>var = decorator(func)</code> has to be written out in detail.<br>------------------------------------------------------------------ <br><h3> Rune Kaagaard, Id: 4012213, Score: 74: </h3><p>And of course you can return lambdas as well from a decorator function:</p>
 
 <pre><code>def makebold(f): 
     return lambda: "&lt;b&gt;" + f() + "&lt;/b&gt;"
@@ -886,7 +886,7 @@ def say():
 
 print say()
 </code></pre>
-<h4> Comment 31016621 martineau: </h4>@Robᵩ: To be syntactically correct: <code>makebold = lambda f: lambda: &quot;&lt;b&gt;&quot; + f() + &quot;&lt;&#47;b&gt;&quot;</code><br><h4> Comment 21440413 Robᵩ: </h4>And one step further: <code>makebold = lambda f : lambda &quot;&lt;b&gt;&quot; + f() + &quot;&lt;&#47;b&gt;&quot;</code><br><h4> Comment 45084827 seequ: </h4>Late to the party, but I really would suggest <code>makebold = lambda f: lambda *a, **k: &quot;&lt;b&gt;&quot; + f(*a, **k) + &quot;&lt;&#47;b&gt;&quot;</code><br><h4> Comment 91668716 Eric: </h4>This needs <code>functools.wraps</code> in order to not discard the docstring / signature / name of <code>say</code><br><h4> Comment 91729536 Eric: </h4>Well, what matters is whether it&#39;s mentioned in your answer. Having <code>@wraps</code> somewhere else on this page isn&#39;t going to help me when I print <code>help(say)</code> and get <i>&quot;Help on function &lt;lambda&gt;`</i> instead of <i>&quot;Help on function say&quot;</i>.<br>------------------------------------------------------------------ <br><h3> Answer 739667 Abhinav Gupta: </h3><p>Python decorators add extra functionality to another function</p>
+<h4> martineau, Comment 31016621 Score: 16: </h4>@Robᵩ: To be syntactically correct: <code>makebold = lambda f: lambda: &quot;&lt;b&gt;&quot; + f() + &quot;&lt;&#47;b&gt;&quot;</code><br><h4> Robᵩ, Comment 21440413 Score: 13: </h4>And one step further: <code>makebold = lambda f : lambda &quot;&lt;b&gt;&quot; + f() + &quot;&lt;&#47;b&gt;&quot;</code><br><h4> seequ, Comment 45084827 Score: 13: </h4>Late to the party, but I really would suggest <code>makebold = lambda f: lambda *a, **k: &quot;&lt;b&gt;&quot; + f(*a, **k) + &quot;&lt;&#47;b&gt;&quot;</code><br><h4> Eric, Comment 91668716 Score: 1: </h4>This needs <code>functools.wraps</code> in order to not discard the docstring / signature / name of <code>say</code><br><h4> Eric, Comment 91729536 Score: 0: </h4>Well, what matters is whether it&#39;s mentioned in your answer. Having <code>@wraps</code> somewhere else on this page isn&#39;t going to help me when I print <code>help(say)</code> and get <i>&quot;Help on function &lt;lambda&gt;`</i> instead of <i>&quot;Help on function say&quot;</i>.<br>------------------------------------------------------------------ <br><h3> Abhinav Gupta, Id: 739667, Score: 67: </h3><p>Python decorators add extra functionality to another function</p>
 
 <p>An italics decorator could be like</p>
 
@@ -933,7 +933,7 @@ But because I don't like repeating myself, I will make a decorator</p>
 
 <p>For more on decorators, check
 <a href="http://www.ibm.com/developerworks/linux/library/l-cpdecor.html" rel="noreferrer">http://www.ibm.com/developerworks/linux/library/l-cpdecor.html</a></p>
-<h4> Comment 25647861 martineau: </h4>@Phoenix: The <code>self</code> argument is needed because the <code>newFunction()</code> defined in <code>addDashes()</code> was specifically designed to be a <i>method</i> decorator not a general function decorator. The <code>self</code> argument represents the class instance and is passed to class methods whether they use it or not -- see the section titled <b>Decorating methods</b> in @e-satis&#39;s answer.<br><h4> Comment 49011060 user1767754: </h4>Print the output as well please.<br><h4> Comment 91668702 Eric: </h4>Missing <code>functools.wraps</code><br><h4> Comment 123973093 Rich Lysakowski PhD: </h4>The link to the IBM website is out-of-date clickbait.  Please update the link or delete it.  It goes nowhere except into the Big Blue Linux Developer Hole.  Thank you.<br><h4> Comment 8532286 rds: </h4>Note as elegant as the lambda functions proposed by @Rune Kaagaard<br>------------------------------------------------------------------ <br><h3> Answer 30283056 martineau: </h3><p>You <em>could</em> make two separate decorators that do what you want as illustrated directly below. Note the use of <code>*args, **kwargs</code> in the declaration of the <code>wrapped()</code> function which supports the decorated function having multiple arguments (which isn't really necessary for the example <code>say()</code> function, but is included for generality).</p>
+<h4> martineau, Comment 25647861 Score: 1: </h4>@Phoenix: The <code>self</code> argument is needed because the <code>newFunction()</code> defined in <code>addDashes()</code> was specifically designed to be a <i>method</i> decorator not a general function decorator. The <code>self</code> argument represents the class instance and is passed to class methods whether they use it or not -- see the section titled <b>Decorating methods</b> in @e-satis&#39;s answer.<br><h4> user1767754, Comment 49011060 Score: 1: </h4>Print the output as well please.<br><h4> Eric, Comment 91668702 Score: 0: </h4>Missing <code>functools.wraps</code><br><h4> Rich Lysakowski PhD, Comment 123973093 Score: 0: </h4>The link to the IBM website is out-of-date clickbait.  Please update the link or delete it.  It goes nowhere except into the Big Blue Linux Developer Hole.  Thank you.<br><h4> rds, Comment 8532286 Score: 0: </h4>Note as elegant as the lambda functions proposed by @Rune Kaagaard<br>------------------------------------------------------------------ <br><h3> martineau, Id: 30283056, Score: 44: </h3><p>You <em>could</em> make two separate decorators that do what you want as illustrated directly below. Note the use of <code>*args, **kwargs</code> in the declaration of the <code>wrapped()</code> function which supports the decorated function having multiple arguments (which isn't really necessary for the example <code>say()</code> function, but is included for generality).</p>
 
 <p>For similar reasons, the <code>functools.wraps</code> decorator is used to change the meta attributes of the wrapped function to be those of the one being decorated. This makes error messages and embedded function documentation (<code>func.__doc__</code>) be those of the decorated function instead of <code>wrapped()</code>'s.</p>
 
@@ -1034,7 +1034,7 @@ def greet(whom=''):
 
 print(greet('world'))  # -&gt; &lt;b&gt;&lt;i&gt;Hello world&lt;/i&gt;&lt;/b&gt;
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 8633375 qed: </h3><p>Another way of doing the same thing:</p>
+------------------------------------------------------------------ <br><h3> qed, Id: 8633375, Score: 22: </h3><p>Another way of doing the same thing:</p>
 
 <pre><code>class bol(object):
   def __init__(self, f):
@@ -1069,7 +1069,7 @@ def sayhi():
 def sayhi():
   return 'hi'
 </code></pre>
-<h4> Comment 91668693 Eric: </h4>Needs <code>functools.update_wrapper</code> in order to keep <code>sayhi.__name__ == &quot;sayhi&quot;</code><br>------------------------------------------------------------------ <br><h3> Answer 34073212 Russia Must Remove Putin: </h3><blockquote>
+<h4> Eric, Comment 91668693 Score: 0: </h4>Needs <code>functools.update_wrapper</code> in order to keep <code>sayhi.__name__ == &quot;sayhi&quot;</code><br>------------------------------------------------------------------ <br><h3> Russia Must Remove Putin, Id: 34073212, Score: 21: </h3><blockquote>
   <h1>How can I make two decorators in Python that would do the following?</h1>
 </blockquote>
 
@@ -1183,7 +1183,7 @@ say(*args, **kwargs)
 <p>So we see that <code>wraps</code> makes the wrapping function do almost everything except tell us exactly what the function takes as arguments. </p>
 
 <p>There are other modules that may attempt to tackle the problem, but the solution is not yet in the standard library.</p>
------------------------------------------------------------------- <br><h3> Answer 11673539 Davoud Taghawi-Nejad: </h3><p>A decorator takes the function definition and creates a new function that executes this function and transforms the result.</p>
+------------------------------------------------------------------ <br><h3> Davoud Taghawi-Nejad, Id: 11673539, Score: 14: </h3><p>A decorator takes the function definition and creates a new function that executes this function and transforms the result.</p>
 
 <pre><code>@deco
 def do():
@@ -1227,7 +1227,7 @@ print(do2(65))
 </code></pre>
 
 <p>To understand the decorator, it is important to notice, that decorator created a new function do which is inner that executes function and transforms the result.</p>
------------------------------------------------------------------- <br><h3> Answer 53176726 v4gil: </h3><p>This answer has long been answered, but I thought I would share my Decorator class which makes writing new decorators easy and compact.</p>
+------------------------------------------------------------------ <br><h3> v4gil, Id: 53176726, Score: 11: </h3><p>This answer has long been answered, but I thought I would share my Decorator class which makes writing new decorators easy and compact.</p>
 
 <pre><code>from abc import ABCMeta, abstractclassmethod
 
@@ -1308,7 +1308,7 @@ print(double([1, 2, 3, 4, 5]))
 </code></pre>
 
 <p>Notice that this example didn't include the <code>list</code> type in the instantiation of the decorator, so in the final print statement the method gets applied to the list itself, not the elements of the list.</p>
------------------------------------------------------------------- <br><h3> Answer 22833714 nickleefly: </h3><pre><code>#decorator.py
+------------------------------------------------------------------ <br><h3> nickleefly, Id: 22833714, Score: 9: </h3><pre><code>#decorator.py
 def makeHtmlTag(tag, *args, **kwds):
     def real_decorator(fn):
         css_class = " class='{0}'".format(kwds["css_class"]) \
@@ -1349,7 +1349,7 @@ def hello(name):
 
 print hello("Your name")
 </code></pre>
-<h4> Comment 39900963 Jon Jay Obermark: </h4>The reason to like a class here is that there is clearly related behavior, with two instances.  You can actually get your two decorators by assigning the constructed classes to the names you wanted, rather than re-iterating the parameters.  This is harder to do with a function.  Adding it to the example would point out why this is not just redundant.<br>------------------------------------------------------------------ <br><h3> Answer 17140530 resigned: </h3><p>Here is a simple example of chaining decorators.  Note the last line - it shows what is going on under the covers.</p>
+<h4> Jon Jay Obermark, Comment 39900963 Score: 1: </h4>The reason to like a class here is that there is clearly related behavior, with two instances.  You can actually get your two decorators by assigning the constructed classes to the names you wanted, rather than re-iterating the parameters.  This is harder to do with a function.  Adding it to the example would point out why this is not just redundant.<br>------------------------------------------------------------------ <br><h3> resigned, Id: 17140530, Score: 7: </h3><p>Here is a simple example of chaining decorators.  Note the last line - it shows what is going on under the covers.</p>
 
 <pre><code>############################################################
 #
@@ -1407,7 +1407,7 @@ print bold(uk(getDate))()
 &lt;b&gt;6/17/2013&lt;/b&gt;
 &lt;b&gt;6/17/2013&lt;/b&gt;
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 55105198 smarie: </h3><p><a href="https://stackoverflow.com/a/739665/7262247">Paolo Bergantino's answer</a> has the great advantage of only using the stdlib, and works for this simple example where there are no <em>decorator</em> arguments nor <em>decorated function</em> arguments. </p>
+------------------------------------------------------------------ <br><h3> smarie, Id: 55105198, Score: 7: </h3><p><a href="https://stackoverflow.com/a/739665/7262247">Paolo Bergantino's answer</a> has the great advantage of only using the stdlib, and works for this simple example where there are no <em>decorator</em> arguments nor <em>decorated function</em> arguments. </p>
 
 <p>However it has 3 major limitations if you want to tackle more general cases:</p>
 
@@ -1458,7 +1458,7 @@ assert hello('world') == '&lt;b&gt;&lt;i&gt;hello world&lt;/i&gt;&lt;/b&gt;'
 </code></pre>
 
 <p>Please refer to the <a href="https://smarie.github.io/python-decopatch/" rel="noreferrer">documentation</a> for details.</p>
------------------------------------------------------------------- <br><h3> Answer 9540819 marqueed: </h3><p>Speaking of the counter example - as given above, the counter will be shared between all functions that use the decorator:</p>
+------------------------------------------------------------------ <br><h3> marqueed, Id: 9540819, Score: 6: </h3><p>Speaking of the counter example - as given above, the counter will be shared between all functions that use the decorator:</p>
 
 <pre><code>def counter(func):
     def wrapped(*args, **kws):
@@ -1470,7 +1470,7 @@ assert hello('world') == '&lt;b&gt;&lt;i&gt;hello world&lt;/i&gt;&lt;/b&gt;'
 </code></pre>
 
 <p>That way, your decorator can be reused for different functions (or used to decorate the same function multiple times: <code>func_counter1 = counter(func); func_counter2 = counter(func)</code>), and the counter variable will remain private to each. </p>
------------------------------------------------------------------- <br><h3> Answer 15840821 rabin utam: </h3><h1>Decorate functions with different number of arguments:</h1>
+------------------------------------------------------------------ <br><h3> rabin utam, Id: 15840821, Score: 6: </h3><h1>Decorate functions with different number of arguments:</h1>
 <pre><code>def frame_tests(fn):
     def wrapper(*args):
         print &quot;\nStart: %s&quot; %(fn.__name__)
@@ -1510,7 +1510,7 @@ Start: test_fn3
 This is only a test! OK! Just a test!  
 End: test_fn3  
 </code></pre>
-<h4> Comment 48663733 martineau: </h4>This could easily be made even more versatile by also providing support for keyword arguments via <code>def wrapper(*args, **kwargs):</code> and <code>fn(*args, **kwargs)</code>.<br>------------------------------------------------------------------ <br><h3> Answer 74888820 user3844097: </h3><p>Consider the following decorator, note that we are returning the wrapper() function as an object</p>
+<h4> martineau, Comment 48663733 Score: 1: </h4>This could easily be made even more versatile by also providing support for keyword arguments via <code>def wrapper(*args, **kwargs):</code> and <code>fn(*args, **kwargs)</code>.<br>------------------------------------------------------------------ <br><h3> user3844097, Id: 74888820, Score: 2: </h3><p>Consider the following decorator, note that we are returning the wrapper() function as an object</p>
 <pre><code>def make_bold(func):
     def wrapper():
         return '&lt;b&gt;'+func()+'&lt;/b&gt;'
@@ -1567,7 +1567,7 @@ if __name__ == '__main__':
 
 </code></pre>
 <p>Hope this helps</p>
------------------------------------------------------------------- <br><h3> Answer 67247689 Alexey Nikonov: </h3><p>I add a case when you need to add custom parameters in decorator, pass it to final function and then work it with.</p>
+------------------------------------------------------------------ <br><h3> Alexey Nikonov, Id: 67247689, Score: 0: </h3><p>I add a case when you need to add custom parameters in decorator, pass it to final function and then work it with.</p>
 <p>the very decorators:</p>
 <pre><code>def jwt_or_redirect(fn):
   @wraps(fn)
@@ -1592,7 +1592,7 @@ def jwt_refresh(fn):
 def home_page(*args, **kwargs):
   return kwargs['refreched_jwt']
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 71546227 Sandipan Dey: </h3><p>Yet another example of nested decorators for plotting an image:</p>
+------------------------------------------------------------------ <br><h3> Sandipan Dey, Id: 71546227, Score: 0: </h3><p>Yet another example of nested decorators for plotting an image:</p>
 <pre><code>import matplotlib.pylab as plt
 
 def remove_axis(func):
@@ -1624,7 +1624,7 @@ def plot_image(img, alpha):
 <p>The above function call reduces down to the following nested call</p>
 <pre><code>remove_axis(plot_gray(plot_image))(img, alpha)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 74413269 Super Kai - Kazuya Ito: </h3><p>With <code>make_bold()</code> and <code>make_italic()</code> below:</p>
+------------------------------------------------------------------ <br><h3> Super Kai - Kazuya Ito, Id: 74413269, Score: 0: </h3><p>With <code>make_bold()</code> and <code>make_italic()</code> below:</p>
 <pre class="lang-py prettyprint-override"><code>def make_bold(func):
     def core(*args, **kwargs):
         result = func(*args, **kwargs)
@@ -1667,7 +1667,7 @@ print(result)
 <p>Output:</p>
 <pre class="lang-none prettyprint-override"><code>&lt;b&gt;&lt;i&gt;Hello&lt;/i&gt;&lt;/b&gt;
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 77251949 Pavan Chandaka: </h3><p>python 3.9 the lambda expressions can be used as decorators.</p>
+------------------------------------------------------------------ <br><h3> Pavan Chandaka, Id: 77251949, Score: 0: </h3><p>python 3.9 the lambda expressions can be used as decorators.</p>
 <p>For your question</p>
 <pre><code>@lambda func: (lambda *variable: '&lt;b&gt;' + func(*variable) + '&lt;/b&gt;')
 @lambda func: (lambda *variable: '&lt;i&gt;' + func(*variable) + '&lt;/i&gt;')
@@ -1690,7 +1690,7 @@ def say2():
 print(say())
 print(say2())
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 76082534 Toothpick Anemone: </h3><h1>Problem</h1>
+------------------------------------------------------------------ <br><h3> Toothpick Anemone, Id: 76082534, Score: -1: </h3><h1>Problem</h1>
 <blockquote>
 <p>How do we make two decorators in Python that would do the following?</p>
 <pre><code>@make_bold

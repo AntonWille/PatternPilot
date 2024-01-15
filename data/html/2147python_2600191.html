@@ -1,7 +1,7 @@
- <h2> Title: How do I count the occurrences of a list item? </h2> <h3> weakish, question_id: 2600191 </h3>Score: 2147, Tags: {python,list,count} <br><p>Given a single item, how do I count occurrences of it in a list, in Python?</p>
+ <h2> Title: How do I count the occurrences of a list item? </h2> <h4> weakish, question_id: 2600191 </h4>Score: 2147, Tags: {python,list,count} <br><p>Given a single item, how do I count occurrences of it in a list, in Python?</p>
 <hr />
 <p><sub>A related but different problem is counting occurrences of <strong>each different element</strong> in a collection, getting a dictionary or list as a histogram result instead of a single integer. For that problem, see <a href="https://stackoverflow.com/questions/3496518">Using a dictionary to count the items in a list</a>.</sub></p>
-<h4> Comment 129210277 metatoaster: </h4>For reference, <a href="https://meta.stackoverflow.com/questions/419484/what-to-do-when-the-question-is-fine-but-existing-answers-need-more-focus-or-a">this thread on meta</a> discussed the reason why both these threads remained open as-is.<br><h4> Comment 129230742 Peter Cordes: </h4>As <a href="https://meta.stackoverflow.com/questions/419484/what-should-i-do-when-the-question-is-fine-but-existing-answers-need-more-focu">discussed on meta</a>, this question is nominally about counting a single item.  Over the years, it&#39;s attracted multiple (good) answers about the related but significantly different problem of histogramming; counting every different element, which should use an O(n) algorithm, not <code>.count</code> for every element which is O(n^2).  Ideally those should be in (a) different Q&amp;A(s), but for now they&#39;re here.<br>------------------------------------------------------------------ <br><h3> Answer 20069518 flonk: </h3><p>If you want to <strong>count all values at once</strong> you can do it very fast using numpy arrays and <code>bincount</code> as follows</p>
+<h4> metatoaster, Id: 129210277 Score: 2: </h4>For reference, <a href="https://meta.stackoverflow.com/questions/419484/what-to-do-when-the-question-is-fine-but-existing-answers-need-more-focus-or-a">this thread on meta</a> discussed the reason why both these threads remained open as-is.<br><h4> Peter Cordes, Id: 129230742 Score: 2: </h4>As <a href="https://meta.stackoverflow.com/questions/419484/what-should-i-do-when-the-question-is-fine-but-existing-answers-need-more-focu">discussed on meta</a>, this question is nominally about counting a single item.  Over the years, it&#39;s attracted multiple (good) answers about the related but significantly different problem of histogramming; counting every different element, which should use an O(n) algorithm, not <code>.count</code> for every element which is O(n^2).  Ideally those should be in (a) different Q&amp;A(s), but for now they&#39;re here.<br>------------------------------------------------------------------ <br><h3> flonk, Id: 20069518, Score: 43: </h3><p>If you want to <strong>count all values at once</strong> you can do it very fast using numpy arrays and <code>bincount</code> as follows</p>
 
 <pre><code>import numpy as np
 a = np.array([1, 2, 3, 4, 1, 4, 1])
@@ -12,7 +12,7 @@ np.bincount(a)
 
 <pre><code>&gt;&gt;&gt; array([0, 3, 1, 1, 2])
 </code></pre>
-<h4> Comment 131335045 Rainald62: </h4>Downsides: <code>bincount</code> works only on non-negative <code>int</code>s, and it counts also all &quot;missing values&quot;, so that the size of the result is <code>1+ max(a)</code>, which is quite large even if <code>a</code> contains only the <b>Julian Day</b> of today, 2459893.<br>------------------------------------------------------------------ <br><h3> Answer 7057878 eyquem: </h3><p>To count the number of diverse elements having a common type:</p>
+<h4> Rainald62, Comment 131335045 Score: 0: </h4>Downsides: <code>bincount</code> works only on non-negative <code>int</code>s, and it counts also all &quot;missing values&quot;, so that the size of the result is <code>1+ max(a)</code>, which is quite large even if <code>a</code> contains only the <b>Julian Day</b> of today, 2459893.<br>------------------------------------------------------------------ <br><h3> eyquem, Id: 7057878, Score: 6: </h3><p>To count the number of diverse elements having a common type:</p>
 
 <pre><code>li = ['A0','c5','A8','A2','A5','c2','A3','A9']
 
@@ -22,7 +22,7 @@ print sum(1 for el in li if el[0]=='A' and el[1] in '01234')
 <p>gives</p>
 
 <p><code>3</code>  , not 6</p>
-<h4> Comment 126920477 ljden: </h4>you can also write this as <code>sum(bool(el[0]==&#39;A&#39; and el[1] in &#39;01234&#39;) for el in li)</code><br>------------------------------------------------------------------ <br><h3> Answer 40092132 Shoresh: </h3><p>Why not using Pandas?</p>
+<h4> ljden, Comment 126920477 Score: 0: </h4>you can also write this as <code>sum(bool(el[0]==&#39;A&#39; and el[1] in &#39;01234&#39;) for el in li)</code><br>------------------------------------------------------------------ <br><h3> Shoresh, Id: 40092132, Score: 29: </h3><p>Why not using Pandas?</p>
 <pre><code>import pandas as pd
 
 my_list = ['a', 'b', 'c', 'd', 'a', 'd', 'a']
@@ -44,7 +44,7 @@ dtype: int64
 <p>Output:</p>
 <pre><code>3
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 2600208 Łukasz: </h3><p>If you only want a single item's count, use the <code>count</code> method:</p>
+------------------------------------------------------------------ <br><h3> Łukasz, Id: 2600208, Score: 2494: </h3><p>If you only want a single item's count, use the <code>count</code> method:</p>
 <pre><code>&gt;&gt;&gt; [1, 2, 3, 4, 1, 4, 1].count(1)
 3
 </code></pre>
@@ -52,13 +52,13 @@ dtype: int64
 <h4><strong>Important: this is very slow if you are counting <em>multiple</em> different items</strong></h4>
 <p>Each <code>count</code> call goes over the entire list of <code>n</code> elements. Calling <code>count</code> in a loop <code>n</code> times means <code>n * n</code> total checks, which can be catastrophic for performance.</p>
 <p>If you want to count multiple items, use <a href="https://stackoverflow.com/a/5829377/365102"><code>Counter</code></a>, which only does <code>n</code> total checks.</p>
-<h4> Comment 79230654 cpp-coder: </h4><code>mylist = [1,7,7,7,3,9,9,9,7,9,10,0]   print sorted(set([i for i in mylist if mylist.count(i)&gt;2]))</code><br><h4> Comment 125635466 Konstantinos: </h4>Counting unique elements in my case yielded the following timings: <b>114.19</b>seconds with <code>list.count()</code>, <b>0.53</b> seconds with <code>numpy.unique(list, return_counts = True)</code> and <b>0.17</b> seconds with <code>Counter</code>. The difference is striking.<br>------------------------------------------------------------------ <br><h3> Answer 5829377 user52028778: </h3><p>Use <a href="https://docs.python.org/3/library/collections.html#collections.Counter" rel="noreferrer"><code>Counter</code></a> if you are using Python 2.7 or 3.x and you want the number of occurrences for each element:</p>
+<h4> cpp-coder, Comment 79230654 Score: 19: </h4><code>mylist = [1,7,7,7,3,9,9,9,7,9,10,0]   print sorted(set([i for i in mylist if mylist.count(i)&gt;2]))</code><br><h4> Konstantinos, Comment 125635466 Score: 8: </h4>Counting unique elements in my case yielded the following timings: <b>114.19</b>seconds with <code>list.count()</code>, <b>0.53</b> seconds with <code>numpy.unique(list, return_counts = True)</code> and <b>0.17</b> seconds with <code>Counter</code>. The difference is striking.<br>------------------------------------------------------------------ <br><h3> user52028778, Id: 5829377, Score: 2387: </h3><p>Use <a href="https://docs.python.org/3/library/collections.html#collections.Counter" rel="noreferrer"><code>Counter</code></a> if you are using Python 2.7 or 3.x and you want the number of occurrences for each element:</p>
 <pre class="lang-py prettyprint-override"><code>&gt;&gt;&gt; from collections import Counter
 &gt;&gt;&gt; z = ['blue', 'red', 'blue', 'yellow', 'blue', 'red']
 &gt;&gt;&gt; Counter(z)
 Counter({'blue': 3, 'red': 2, 'yellow': 1})
 </code></pre>
-<h4> Comment 115635165 Javi: </h4>In case you want to sort the results <a href="https://stackoverflow.com/questions/20950650/how-to-sort-counter-by-value-python">how-to-sort-counter-by-value-python</a>  --&gt;  <code>x = Counter({&#39;a&#39;:5, &#39;b&#39;:3, &#39;c&#39;:7})</code>  <code>x.most_common()</code><br><h4> Comment 93493696 user2357112: </h4>@BramVanroy: If you&#39;re performing millions of <i>updates</i> rather than just counting millions of strings, that&#39;s a different story. The optimization effort in <code>Counter</code> has gone into counting large iterables, rather than counting many iterables. Counting a million-string iterable will go faster with <code>Counter</code> than with a manual implementation. If you want to call <code>update</code> with many iterables, you may be able to speed things up by joining them into one iterable with <code>itertools.chain</code>.<br><h4> Comment 93467326 user2357112: </h4>@BramVanroy: What <code>isinstance</code> calls? Even with millions of strings, calling <code>Counter</code> only involves one <code>isinstance</code> call, to check whether its argument is a mapping. You most likely misjudged what&#39;s eating all your time.<br><h4> Comment 88872768 Bram Vanroy: </h4>I have found that when using this a lot (talking about millions of strings) that it is very slow because of its calls to <code>isinstance</code>. So if you are certain about the data that you&#39;re working with, it might be better to write a custom function without type and instance checking.<br><h4> Comment 93473026 Bram Vanroy: </h4>You misinterpreted what I meant: Counter checks the types of your data before it creates the Counter. This takes relatively much time and if you know the type of your data in advance. If you look at Counter&#39;s update method, you&#39;ll see it has to go through three if-statements before doing something. If you call update frequently, this adds up quickly. When you have control over your data and you <i>know</i> that the input will be indeed an iterable, then you can skip the first two checks. As I said, I only noticed this when working with millions of updates so it&#39;s an edge case.<br><h4> Comment 121484367 Antoine: </h4>When the large iterable is a column of a pandas data frame (in my case ~0.5M of strings), I have found pandas&#39; <code>value_counts</code> method to be orders of magnitude faster than Counter.<br><h4> Comment 124473948 Mehmet Burak Sayıcı: </h4>And to have the dict instead of Counter, <code>dict(Counter(z))</code>.<br>------------------------------------------------------------------ <br><h3> Answer 23909767 user2314737: </h3><p><strong>Counting the occurrences of one item in a list</strong></p>
+<h4> Javi, Comment 115635165 Score: 17: </h4>In case you want to sort the results <a href="https://stackoverflow.com/questions/20950650/how-to-sort-counter-by-value-python">how-to-sort-counter-by-value-python</a>  --&gt;  <code>x = Counter({&#39;a&#39;:5, &#39;b&#39;:3, &#39;c&#39;:7})</code>  <code>x.most_common()</code><br><h4> user2357112, Comment 93493696 Score: 9: </h4>@BramVanroy: If you&#39;re performing millions of <i>updates</i> rather than just counting millions of strings, that&#39;s a different story. The optimization effort in <code>Counter</code> has gone into counting large iterables, rather than counting many iterables. Counting a million-string iterable will go faster with <code>Counter</code> than with a manual implementation. If you want to call <code>update</code> with many iterables, you may be able to speed things up by joining them into one iterable with <code>itertools.chain</code>.<br><h4> user2357112, Comment 93467326 Score: 8: </h4>@BramVanroy: What <code>isinstance</code> calls? Even with millions of strings, calling <code>Counter</code> only involves one <code>isinstance</code> call, to check whether its argument is a mapping. You most likely misjudged what&#39;s eating all your time.<br><h4> Bram Vanroy, Comment 88872768 Score: 4: </h4>I have found that when using this a lot (talking about millions of strings) that it is very slow because of its calls to <code>isinstance</code>. So if you are certain about the data that you&#39;re working with, it might be better to write a custom function without type and instance checking.<br><h4> Bram Vanroy, Comment 93473026 Score: 1: </h4>You misinterpreted what I meant: Counter checks the types of your data before it creates the Counter. This takes relatively much time and if you know the type of your data in advance. If you look at Counter&#39;s update method, you&#39;ll see it has to go through three if-statements before doing something. If you call update frequently, this adds up quickly. When you have control over your data and you <i>know</i> that the input will be indeed an iterable, then you can skip the first two checks. As I said, I only noticed this when working with millions of updates so it&#39;s an edge case.<br><h4> Antoine, Comment 121484367 Score: 1: </h4>When the large iterable is a column of a pandas data frame (in my case ~0.5M of strings), I have found pandas&#39; <code>value_counts</code> method to be orders of magnitude faster than Counter.<br><h4> Mehmet Burak Sayıcı, Comment 124473948 Score: 0: </h4>And to have the dict instead of Counter, <code>dict(Counter(z))</code>.<br>------------------------------------------------------------------ <br><h3> user2314737, Id: 23909767, Score: 365: </h3><p><strong>Counting the occurrences of one item in a list</strong></p>
 
 <p>For counting the occurrences of just one list item you can use <code>count()</code></p>
 
@@ -130,7 +130,7 @@ print("count():   ", t2.repeat(repeat=3,number=10000)
 <pre><code>Counter():  [0.46062711701961234, 0.4022796869976446, 0.3974247490405105]
 count():    [7.779430688009597, 7.962715800967999, 8.420845870045014]
 </code></pre>
-<h4> Comment 55095870 fhucho: </h4><code>Counter</code> is <i>way</i> faster for bigger lists. The list comprehension method is O(n^2), <code>Counter</code> should be O(n).<br><h4> Comment 75282239 Martijn Pieters: </h4>Counter is not faster by a factor of 2, Counter is faster by a <i>factor of n</i> (O(n^2) vs O(n)).<br><h4> Comment 88872794 Bram Vanroy: </h4>I have found that when using this a lot (talking about millions of strings) that it is very slow because of its calls to <code>isinstance</code>. So if you are certain about the data that you&#39;re working with, it might be better to write a custom function without type and instance checking.<br>------------------------------------------------------------------ <br><h3> Answer 8041395 D Blanc: </h3><p>I had this problem today and rolled my own solution before I thought to check SO.  This:</p>
+<h4> fhucho, Comment 55095870 Score: 50: </h4><code>Counter</code> is <i>way</i> faster for bigger lists. The list comprehension method is O(n^2), <code>Counter</code> should be O(n).<br><h4> Martijn Pieters, Comment 75282239 Score: 45: </h4>Counter is not faster by a factor of 2, Counter is faster by a <i>factor of n</i> (O(n^2) vs O(n)).<br><h4> Bram Vanroy, Comment 88872794 Score: 2: </h4>I have found that when using this a lot (talking about millions of strings) that it is very slow because of its calls to <code>isinstance</code>. So if you are certain about the data that you&#39;re working with, it might be better to write a custom function without type and instance checking.<br>------------------------------------------------------------------ <br><h3> D Blanc, Id: 8041395, Score: 15: </h3><p>I had this problem today and rolled my own solution before I thought to check SO.  This:</p>
 
 <pre><code>dict((i,a.count(i)) for i in a)
 </code></pre>
@@ -148,11 +148,11 @@ return d
 </code></pre>
 
 <p>is actually a bit faster than the Counter solution, at least for Python 2.7.</p>
-<h4> Comment 74176293 Martijn Pieters: </h4>Counter in Python 2 was a little on the slow side, yes. It uses C-optimised code to do the counting in Python 3 however, and now beats your loop with ease.<br><h4> Comment 49496268 chaosflaws: </h4>Counter sorts the entries while yours does not, hence the speed difference (True at the time of writing, not sure if it was when you wrote the answer. Still, it might be relevant for someone scrolling down.)<br>------------------------------------------------------------------ <br><h3> Answer 7843090 tj80: </h3><p>Another way to get the number of occurrences of each item, in a dictionary:</p>
+<h4> Martijn Pieters, Comment 74176293 Score: 7: </h4>Counter in Python 2 was a little on the slow side, yes. It uses C-optimised code to do the counting in Python 3 however, and now beats your loop with ease.<br><h4> chaosflaws, Comment 49496268 Score: 1: </h4>Counter sorts the entries while yours does not, hence the speed difference (True at the time of writing, not sure if it was when you wrote the answer. Still, it might be relevant for someone scrolling down.)<br>------------------------------------------------------------------ <br><h3> tj80, Id: 7843090, Score: 86: </h3><p>Another way to get the number of occurrences of each item, in a dictionary:</p>
 
 <pre><code>dict((i, a.count(i)) for i in a)
 </code></pre>
-<h4> Comment 27023182 hugo24: </h4>would dict((i,a.count(i)) for i in set(a)) be more correct and faster?<br><h4> Comment 28446659 Cl&#233;ment: </h4>@hugo24: A bit, but it won&#39;t be asymptotically faster in the worst case; it will take <code>n * (number of different items)</code> operations, not counting the time it takes to build the set. Using <code>collections.Counter</code> is really much better.<br><h4> Comment 17325223 Nicolas78: </h4>this looks like one of the constructs I often come up with in the heat of the battle, but it will run through a len(a) times which means quadratic runtime complexity (as each run depends on len(a) again).<br><h4> Comment 102312461 rp1: </h4>very late to the party but wouldn&#39;t following code throw an error if a list contained more than one instance of <code>i</code>, because it will try to enter multiple keys of same value in a dictionary.       <code>dict((i, a.count(i)) for i in a)</code><br><h4> Comment 114655960 xuiqzy: </h4>@rp1 you can try it for yourself and see that later key-value pairs just overwrite the previous entry for the same key, for example <code>dict([(1, 2), (1, 3)])</code> returns <code>{1: 3}</code><br>------------------------------------------------------------------ <br><h3> Answer 36598953 Russia Must Remove Putin: </h3><blockquote>
+<h4> hugo24, Comment 27023182 Score: 6: </h4>would dict((i,a.count(i)) for i in set(a)) be more correct and faster?<br><h4> Cl&#233;ment, Comment 28446659 Score: 9: </h4>@hugo24: A bit, but it won&#39;t be asymptotically faster in the worst case; it will take <code>n * (number of different items)</code> operations, not counting the time it takes to build the set. Using <code>collections.Counter</code> is really much better.<br><h4> Nicolas78, Comment 17325223 Score: 61: </h4>this looks like one of the constructs I often come up with in the heat of the battle, but it will run through a len(a) times which means quadratic runtime complexity (as each run depends on len(a) again).<br><h4> rp1, Comment 102312461 Score: 0: </h4>very late to the party but wouldn&#39;t following code throw an error if a list contained more than one instance of <code>i</code>, because it will try to enter multiple keys of same value in a dictionary.       <code>dict((i, a.count(i)) for i in a)</code><br><h4> xuiqzy, Comment 114655960 Score: 0: </h4>@rp1 you can try it for yourself and see that later key-value pairs just overwrite the previous entry for the same key, for example <code>dict([(1, 2), (1, 3)])</code> returns <code>{1: 3}</code><br>------------------------------------------------------------------ <br><h3> Russia Must Remove Putin, Id: 36598953, Score: 72: </h3><blockquote>
 <h1>Given an item, how can I count its occurrences in a list in Python?</h1>
 </blockquote>
 <p>Here's an example list:</p>
@@ -215,7 +215,7 @@ Counter({'a': 2, 'b': 2})
 <p>Pandas is a common library, but it's not in the standard library. Adding it as a requirement is non-trivial.</p>
 <p>There are builtin solutions for this use-case in the list object itself as well as in the standard library.</p>
 <p>If your project does not already require pandas, it would be foolish to make it a requirement just for this functionality.</p>
-<h4> Comment 94867679 jpp: </h4>While &quot;why not Pandas&quot; is appropriate, it should probably be accompanied by &quot;when to use NumPy&quot;, i.e. for large numeric arrays. The deciding factor isn&#39;t just project limitations, there are memory efficiencies with NumPy which become apparent with big data.<br><h4> Comment 103933399 Marc: </h4>Thanks for mentioning Pandas/etc as a serious dependency.  Some of these packages have negative side effects. So addition of these assets for trivial needs can cost a lot of time and $.  Personally I have experienced Numpy and SciPi adding 30 min to our CI pipeline and it took days to get the package caching correctly. Great packages, but sometimes there is hidden expense. +1&#39;d<br>------------------------------------------------------------------ <br><h3> Answer 46195192 Nico Schl&#246;mer: </h3><p>I've compared all suggested solutions (and a few new ones) with <a href="https://github.com/nschloe/perfplot" rel="noreferrer">perfplot</a> (a small project of mine).</p>
+<h4> jpp, Comment 94867679 Score: 8: </h4>While &quot;why not Pandas&quot; is appropriate, it should probably be accompanied by &quot;when to use NumPy&quot;, i.e. for large numeric arrays. The deciding factor isn&#39;t just project limitations, there are memory efficiencies with NumPy which become apparent with big data.<br><h4> Marc, Comment 103933399 Score: 2: </h4>Thanks for mentioning Pandas/etc as a serious dependency.  Some of these packages have negative side effects. So addition of these assets for trivial needs can cost a lot of time and $.  Personally I have experienced Numpy and SciPi adding 30 min to our CI pipeline and it took days to get the package caching correctly. Great packages, but sometimes there is hidden expense. +1&#39;d<br>------------------------------------------------------------------ <br><h3> Nico Schl&#246;mer, Id: 46195192, Score: 61: </h3><p>I've compared all suggested solutions (and a few new ones) with <a href="https://github.com/nschloe/perfplot" rel="noreferrer">perfplot</a> (a small project of mine).</p>
 <h3 id="counting-one-item-ikoj">Counting <em>one</em> item</h3>
 <p>For large enough arrays, it turns out that</p>
 <pre class="lang-py prettyprint-override"><code>numpy.sum(numpy.array(a) == 1)
@@ -353,11 +353,11 @@ b = perfplot.bench(
 b.save(&quot;out.png&quot;)
 b.show()
 </code></pre>
-<h4> Comment 85170451 Mukarram Pasha: </h4>numpy.bincount() will work only for lists with int items.<br><h4> Comment 125532335 Kelly Bundy: </h4>The first program doesn&#39;t actually measure counting one item, does it? Looks like it&#39;s doing the same as the second program. Can you check/fix that? And I think <code>numpy.random.randint(0, 100, n).tolist()</code> would be better. With your <code>list(numpy.random.randint(0, 100, n))</code> you have NumPy ints in a Python list, which seems weird/unrealistic.<br>------------------------------------------------------------------ <br><h3> Answer 2600231 Silfverstrom: </h3><p><code>list.count(x)</code> returns the number of times <code>x</code> appears in a list</p>
+<h4> Mukarram Pasha, Comment 85170451 Score: 11: </h4>numpy.bincount() will work only for lists with int items.<br><h4> Kelly Bundy, Comment 125532335 Score: 0: </h4>The first program doesn&#39;t actually measure counting one item, does it? Looks like it&#39;s doing the same as the second program. Can you check/fix that? And I think <code>numpy.random.randint(0, 100, n).tolist()</code> would be better. With your <code>list(numpy.random.randint(0, 100, n))</code> you have NumPy ints in a Python list, which seems weird/unrealistic.<br>------------------------------------------------------------------ <br><h3> Silfverstrom, Id: 2600231, Score: 57: </h3><p><code>list.count(x)</code> returns the number of times <code>x</code> appears in a list</p>
 
 <p>see:
 <a href="http://docs.python.org/tutorial/datastructures.html#more-on-lists">http://docs.python.org/tutorial/datastructures.html#more-on-lists</a></p>
------------------------------------------------------------------- <br><h3> Answer 48296129 Thirupathi Thangavel: </h3><p>If you can use <code>pandas</code>, then <code>value_counts</code> is there for rescue. </p>
+------------------------------------------------------------------ <br><h3> Thirupathi Thangavel, Id: 48296129, Score: 28: </h3><p>If you can use <code>pandas</code>, then <code>value_counts</code> is there for rescue. </p>
 
 <pre><code>&gt;&gt;&gt; import pandas as pd
 &gt;&gt;&gt; a = [1, 2, 3, 4, 1, 4, 1]
@@ -376,7 +376,7 @@ dtype: int64
 <pre><code>&gt;&gt;&gt; pd.Series(a).value_counts().reset_index().values.tolist()
 [[1, 3], [4, 2], [3, 1], [2, 1]]
 </code></pre>
-<h4> Comment 101613005 endolith: </h4>pandas has lots of overhead, though, so it&#39;s the slowest solution with small amounts of data.  <a href="https://stackoverflow.com/a/46195192/125507">stackoverflow.com/a/46195192/125507</a><br>------------------------------------------------------------------ <br><h3> Answer 53063965 Tim Skov Jacobsen: </h3><h2>Count of all elements with <code>itertools.groupby()</code></h2>
+<h4> endolith, Comment 101613005 Score: 1: </h4>pandas has lots of overhead, though, so it&#39;s the slowest solution with small amounts of data.  <a href="https://stackoverflow.com/a/46195192/125507">stackoverflow.com/a/46195192/125507</a><br>------------------------------------------------------------------ <br><h3> Tim Skov Jacobsen, Id: 53063965, Score: 14: </h3><h2>Count of all elements with <code>itertools.groupby()</code></h2>
 
 <p>Antoher possiblity for getting the count of all elements in the list could be by means of <code>itertools.groupby()</code>.</p>
 
@@ -411,7 +411,7 @@ print(counts)
 </code></pre>
 
 <p><strong>Note:</strong> For creating unique counts, many of the other answers provide easier and more readable code compared to the <code>groupby</code> solution. But it is shown here to draw a parallel to the duplicate count example. </p>
------------------------------------------------------------------- <br><h3> Answer 56881516 Harsh Gundecha: </h3><p>Although it is very old question, since i didn't find a one liner, i made one.</p>
+------------------------------------------------------------------ <br><h3> Harsh Gundecha, Id: 56881516, Score: 14: </h3><p>Although it is very old question, since i didn't find a one liner, i made one.</p>
 <pre><code># original numbers in list
 l = [1, 2, 2, 3, 3, 3, 4]
 
@@ -424,7 +424,7 @@ d = {}
 print(d)
 # {1: 1, 2: 2, 3: 3, 4: 1}
 </code></pre>
-<h4> Comment 100313905 Georgy: </h4>Don&#39;t use list comprehensions for side effects. See: <a href="https://stackoverflow.com/questions/5753597/is-it-pythonic-to-use-list-comprehensions-for-just-side-effects">Is it Pythonic to use list comprehensions for just side effects?</a><br>------------------------------------------------------------------ <br><h3> Answer 7055873 Wes Turner: </h3><pre class="lang-py prettyprint-override"><code># Python &gt;= 2.6 (defaultdict) &amp;&amp; &lt; 2.7 (Counter, OrderedDict)
+<h4> Georgy, Comment 100313905 Score: 3: </h4>Don&#39;t use list comprehensions for side effects. See: <a href="https://stackoverflow.com/questions/5753597/is-it-pythonic-to-use-list-comprehensions-for-just-side-effects">Is it Pythonic to use list comprehensions for just side effects?</a><br>------------------------------------------------------------------ <br><h3> Wes Turner, Id: 7055873, Score: 13: </h3><pre class="lang-py prettyprint-override"><code># Python &gt;= 2.6 (defaultdict) &amp;&amp; &lt; 2.7 (Counter, OrderedDict)
 from collections import defaultdict
 def count_unsorted_list_items(items):
     """
@@ -501,7 +501,7 @@ class TestListCounters(unittest.TestCase):
         self.assertEqual(exp_outp, list( count_sorted_list_items(inp) ))
         # ... [(2,2), (4,1), (2,1)]
 </code></pre>
-<h4> Comment 8559520 Wes Turner: </h4>@plaes : How so? If by &#39;enterprisey&#39;, you mean &quot;documented&quot; in preparation for Py3k annotations, I agree.<br><h4> Comment 21282685 Adam Lewis: </h4>This is a great example, as I am developing mainly in 2.7, but have to have migration paths to 2.4.<br>------------------------------------------------------------------ <br><h3> Answer 53115212 Akash Swain: </h3><h2>Below are the three solutions:</h2>
+<h4> Wes Turner, Comment 8559520 Score: 2: </h4>@plaes : How so? If by &#39;enterprisey&#39;, you mean &quot;documented&quot; in preparation for Py3k annotations, I agree.<br><h4> Adam Lewis, Comment 21282685 Score: 1: </h4>This is a great example, as I am developing mainly in 2.7, but have to have migration paths to 2.4.<br>------------------------------------------------------------------ <br><h3> Akash Swain, Id: 53115212, Score: 12: </h3><h2>Below are the three solutions:</h2>
 
 <p><strong>Fastest is using a for loop and storing it in a Dict.</strong></p>
 
@@ -575,7 +575,7 @@ Using collections.Counter - Duration: 15.889999999999418
 <pre><code>{1: 4, 2: 5, 3: 4, 4: 6, 5: 2, 34: 4, 423: 3, 234: 3, 42: 5, 12: 2, 13: 1, 23: 10, 123: 1, 31: 1}
 Using list comprehension - Duration: 33.0
 </code></pre>
-<h4> Comment 114882750 Akash Swain: </h4>@KishanK If you see my answer, I have tried with Counter(Solution 2) as well, but still the Solution1 using the loop runs faster than it.<br><h4> Comment 114857129 Kishan K: </h4>Rather Use Counter as mentioned in the solution above by @user52028778<br><h4> Comment 122282206 loco.loop: </h4>@AkashSwain In the method you implemented I guess you could make it run a bit faster by removing already counted elements from the list as the for loop wouldn&#39;t have to check those... I would copy the list and then remove from the copied list and do the for loop, also I guess you would have to do the loop in reverse order since you would be removing things from the list...<br>------------------------------------------------------------------ <br><h3> Answer 52920275 Andreas K.: </h3><p>It was suggested to use numpy's <a href="https://docs.scipy.org/doc/numpy-1.15.0/reference/generated/numpy.bincount.html" rel="noreferrer">bincount</a>, however it works only for 1d arrays with <em>non-negative integers</em>. Also, the resulting array might be confusing (it contains the occurrences of the integers from min to max of the original list, and sets to 0 the missing integers).</p>
+<h4> Akash Swain, Comment 114882750 Score: 2: </h4>@KishanK If you see my answer, I have tried with Counter(Solution 2) as well, but still the Solution1 using the loop runs faster than it.<br><h4> Kishan K, Comment 114857129 Score: 0: </h4>Rather Use Counter as mentioned in the solution above by @user52028778<br><h4> loco.loop, Comment 122282206 Score: 0: </h4>@AkashSwain In the method you implemented I guess you could make it run a bit faster by removing already counted elements from the list as the for loop wouldn&#39;t have to check those... I would copy the list and then remove from the copied list and do the for loop, also I guess you would have to do the loop in reverse order since you would be removing things from the list...<br>------------------------------------------------------------------ <br><h3> Andreas K., Id: 52920275, Score: 9: </h3><p>It was suggested to use numpy's <a href="https://docs.scipy.org/doc/numpy-1.15.0/reference/generated/numpy.bincount.html" rel="noreferrer">bincount</a>, however it works only for 1d arrays with <em>non-negative integers</em>. Also, the resulting array might be confusing (it contains the occurrences of the integers from min to max of the original list, and sets to 0 the missing integers).</p>
 
 <p>A better way to do it with numpy is to use the <a href="https://docs.scipy.org/doc/numpy-1.15.0/reference/generated/numpy.unique.html" rel="noreferrer">unique</a> function with the attribute <code>return_counts</code> set to True. It returns a tuple with an array of the unique values and an array of the occurrences of each unique value.</p>
 
@@ -594,25 +594,25 @@ a_uniq, counts = np.unique(a, return_counts=True)  # array([0, 1, 2, 3]), array(
 &gt;&gt;&gt; dict(zip(*np.unique(a, return_counts=True)))
 {'a': 3, 'b': 3, 'c': 2}
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 39562168 vishes_shell: </h3><p>You can also use <a href="https://docs.python.org/3/library/operator.html#operator.countOf" rel="noreferrer"><code>countOf</code></a> method of a built-in module <a href="https://docs.python.org/3/library/operator.html" rel="noreferrer"><code>operator</code></a>.</p>
+------------------------------------------------------------------ <br><h3> vishes_shell, Id: 39562168, Score: 6: </h3><p>You can also use <a href="https://docs.python.org/3/library/operator.html#operator.countOf" rel="noreferrer"><code>countOf</code></a> method of a built-in module <a href="https://docs.python.org/3/library/operator.html" rel="noreferrer"><code>operator</code></a>.</p>
 
 <pre><code>&gt;&gt;&gt; import operator
 &gt;&gt;&gt; operator.countOf([1, 2, 3, 4, 1, 4, 1], 1)
 3
 </code></pre>
-<h4> Comment 75280780 Chris_Rands: </h4>How is <code>countOf</code> is implemented? How does it compare to the more obvious <code>list.count</code> (which benefits from C implementation)? Are there any advantages?<br>------------------------------------------------------------------ <br><h3> Answer 59955500 IPython: </h3><p>I would use <code>filter()</code>, take Lukasz's example:</p>
+<h4> Chris_Rands, Comment 75280780 Score: 2: </h4>How is <code>countOf</code> is implemented? How does it compare to the more obvious <code>list.count</code> (which benefits from C implementation)? Are there any advantages?<br>------------------------------------------------------------------ <br><h3> IPython, Id: 59955500, Score: 5: </h3><p>I would use <code>filter()</code>, take Lukasz's example:</p>
 
 <pre><code>&gt;&gt;&gt; lst = [1, 2, 3, 4, 1, 4, 1]
 &gt;&gt;&gt; len(filter(lambda x: x==1, lst))
 3
 </code></pre>
-<h4> Comment 110212186 yozniak: </h4>This raises exception &#39;object filter doesn&#39;t have len()&#39; in python 3.5<br><h4> Comment 111244948 IPython: </h4>In Python 3, you have to use list() to convert the filter object into a list.<br>------------------------------------------------------------------ <br><h3> Answer 65980602 Golden Lion: </h3><p>use %timeit to see which operation is more efficient.   np.array counting operations should be faster.</p>
+<h4> yozniak, Comment 110212186 Score: 0: </h4>This raises exception &#39;object filter doesn&#39;t have len()&#39; in python 3.5<br><h4> IPython, Comment 111244948 Score: 0: </h4>In Python 3, you have to use list() to convert the filter object into a list.<br>------------------------------------------------------------------ <br><h3> Golden Lion, Id: 65980602, Score: 5: </h3><p>use %timeit to see which operation is more efficient.   np.array counting operations should be faster.</p>
 <pre><code> from collections import Counter
  mylist = [1,7,7,7,3,9,9,9,7,9,10,0] 
  types_counts=Counter(mylist)
  print(types_counts)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 49047825 blue-sky: </h3><p>May not be the most efficient, requires an extra pass to remove duplicates. </p>
+------------------------------------------------------------------ <br><h3> blue-sky, Id: 49047825, Score: 4: </h3><p>May not be the most efficient, requires an extra pass to remove duplicates. </p>
 
 <p>Functional implementation : </p>
 
@@ -634,7 +634,7 @@ print(set(map(lambda x  : (x , list(arr).count(x)) , arr)))
 
 <pre><code>{'b': 3, 'c': 1, 'a': 2}
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 63964367 Fatemeh Asgarinejad: </h3><p>Given a list X</p>
+------------------------------------------------------------------ <br><h3> Fatemeh Asgarinejad, Id: 63964367, Score: 4: </h3><p>Given a list X</p>
 <pre><code> import numpy as np
  X = [1, -1, 1, -1, 1]
 </code></pre>
@@ -644,14 +644,14 @@ print(set(map(lambda x  : (x , list(arr).count(x)) , arr)))
 <p>Output:</p>
 <pre><code>{-1: 2, 1: 3}
 </code></pre>
-<h4> Comment 117439703 Pavel Gurkov: </h4>Does numpy precompute this in an intelligent way as the list is created? If not, this is a O(n^2).<br><h4> Comment 129235967 MisterMiyagi: </h4>There is no need to use numpy here. <code>set</code> provides the same functionality in a more general way without external dependency.<br>------------------------------------------------------------------ <br><h3> Answer 70799872 ben othman zied: </h3><pre><code>mot = [&quot;compte&quot;, &quot;france&quot;, &quot;zied&quot;]
+<h4> Pavel Gurkov, Comment 117439703 Score: 0: </h4>Does numpy precompute this in an intelligent way as the list is created? If not, this is a O(n^2).<br><h4> MisterMiyagi, Comment 129235967 Score: 0: </h4>There is no need to use numpy here. <code>set</code> provides the same functionality in a more general way without external dependency.<br>------------------------------------------------------------------ <br><h3> ben othman zied, Id: 70799872, Score: 4: </h3><pre><code>mot = [&quot;compte&quot;, &quot;france&quot;, &quot;zied&quot;]
 lst = [&quot;compte&quot;, &quot;france&quot;, &quot;france&quot;, &quot;france&quot;, &quot;france&quot;]
 dict((x, lst.count(x)) for x in set(mot))
 </code></pre>
 <p>this gives</p>
 <pre><code>{'compte': 1, 'france': 4, 'zied': 0}
 </code></pre>
-<h4> Comment 127801533 sean: </h4>This worked for me, though the additional de-duped &#39;mot&#39; variable is redundant because of the set function, so this works also:  lst = [&quot;compte&quot;, &quot;france&quot;, &quot;france&quot;, &quot;france&quot;, &quot;france&quot;] dict((x, lst.count(x)) for x in set(lst))<br>------------------------------------------------------------------ <br><h3> Answer 67348583 Abel Rodr&#237;guez: </h3><p>Alternatively, you can also implement the counter by yourself. This is the way I do:</p>
+<h4> sean, Comment 127801533 Score: 0: </h4>This worked for me, though the additional de-duped &#39;mot&#39; variable is redundant because of the set function, so this works also:  lst = [&quot;compte&quot;, &quot;france&quot;, &quot;france&quot;, &quot;france&quot;, &quot;france&quot;] dict((x, lst.count(x)) for x in set(lst))<br>------------------------------------------------------------------ <br><h3> Abel Rodr&#237;guez, Id: 67348583, Score: 3: </h3><p>Alternatively, you can also implement the counter by yourself. This is the way I do:</p>
 <pre class="lang-py prettyprint-override"><code>item_list = ['me', 'me', 'you', 'you', 'you', 'they']
 
 occ_dict = {}
@@ -665,16 +665,16 @@ for item in item_list:
 print(occ_dict)
 </code></pre>
 <p>Output: <code>{'me': 2, 'you': 3, 'they': 1}</code></p>
------------------------------------------------------------------- <br><h3> Answer 45829195 whackamadoodle3000: </h3><pre><code>sum([1 for elem in &lt;yourlist&gt; if elem==&lt;your_value&gt;])
+------------------------------------------------------------------ <br><h3> whackamadoodle3000, Id: 45829195, Score: 2: </h3><pre><code>sum([1 for elem in &lt;yourlist&gt; if elem==&lt;your_value&gt;])
 </code></pre>
 
 <p>This will return the amount of occurences of your_value</p>
------------------------------------------------------------------- <br><h3> Answer 66653682 ash: </h3><pre><code>test = [409.1, 479.0, 340.0, 282.4, 406.0, 300.0, 374.0, 253.3, 195.1, 269.0, 329.3, 250.7, 250.7, 345.3, 379.3, 275.0, 215.2, 300.0]
+------------------------------------------------------------------ <br><h3> ash, Id: 66653682, Score: -1: </h3><pre><code>test = [409.1, 479.0, 340.0, 282.4, 406.0, 300.0, 374.0, 253.3, 195.1, 269.0, 329.3, 250.7, 250.7, 345.3, 379.3, 275.0, 215.2, 300.0]
 
 for i in test:
     print('{} numbers {}'.format(i, test.count(i)))
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 71755247 Mehdi Fekih: </h3><pre><code>import pandas as pd
+------------------------------------------------------------------ <br><h3> Mehdi Fekih, Id: 71755247, Score: -1: </h3><pre><code>import pandas as pd
 test = [409.1, 479.0, 340.0, 282.4, 406.0, 300.0, 374.0, 253.3, 195.1, 269.0, 329.3, 250.7, 250.7, 345.3, 379.3, 275.0, 215.2, 300.0]
 
 #turning the list into a temporary dataframe
@@ -685,7 +685,7 @@ df_counts = test.value_counts()
 df_counts
 </code></pre>
 <p>then you can use <code>df_counts.index</code> and <code>df_counts.values</code> to get the data.</p>
------------------------------------------------------------------- <br><h3> Answer 72001045 LunaticXXD10: </h3><pre><code>x = ['Jess', 'Jack', 'Mary', 'Sophia', 'Karen',
+------------------------------------------------------------------ <br><h3> LunaticXXD10, Id: 72001045, Score: -1: </h3><pre><code>x = ['Jess', 'Jack', 'Mary', 'Sophia', 'Karen',
      'Addison', 'Joseph','Jack', 'Jack', 'Eric', 'Ilona', 'Jason']
 the_item = input('Enter the item that you wish to find : ')
 how_many_times = 0 
@@ -698,14 +698,14 @@ print('The occurrence of', the_item, 'in', x,'is',how_many_times)
 In order to check its Occurrence, I ran a for loop in the list named <code>x</code>.
 Upon each iteration, if the loop variable attains the value same that of received from the user and stored in the variable <code>the_item</code>, the variable <code>how_many_times</code> gets incremented by 1.
 After attaining some value...We print <code>how_many_times</code> which stores the value of the occurance of the word 'jack'</p>
------------------------------------------------------------------- <br><h3> Answer 51221372 ravi tanwar: </h3><pre><code>def countfrequncyinarray(arr1):
+------------------------------------------------------------------ <br><h3> ravi tanwar, Id: 51221372, Score: -2: </h3><pre><code>def countfrequncyinarray(arr1):
     r=len(arr1)
     return {i:arr1.count(i) for i in range(1,r+1)}
 arr1=[4,4,4,4]
 a=countfrequncyinarray(arr1)
 print(a)
 </code></pre>
-<h4> Comment 89423577 Alex Riabov: </h4>While this code may answer the question, providing additional context regarding why and/or how this code answers the question improves its long-term value.<br><h4> Comment 129235998 MisterMiyagi: </h4>This solution does not actually work; the input must be constructed in a very specific way to seemingly work. For example, <code>countfrequncyinarray([4, 4, 4])</code> will fail to count the <code>4</code>s. There is just no way to construct an input to count a <code>-1</code>, <code>sys.maxsize + 1</code> or similar entry.<br>------------------------------------------------------------------ <br><h3> Answer 75565317 Nathindu Himansha: </h3><p>If you only want to get a single item's count, use the python in-built <strong>count</strong> method:</p>
+<h4> Alex Riabov, Comment 89423577 Score: 5: </h4>While this code may answer the question, providing additional context regarding why and/or how this code answers the question improves its long-term value.<br><h4> MisterMiyagi, Comment 129235998 Score: 0: </h4>This solution does not actually work; the input must be constructed in a very specific way to seemingly work. For example, <code>countfrequncyinarray([4, 4, 4])</code> will fail to count the <code>4</code>s. There is just no way to construct an input to count a <code>-1</code>, <code>sys.maxsize + 1</code> or similar entry.<br>------------------------------------------------------------------ <br><h3> Nathindu Himansha, Id: 75565317, Score: -2: </h3><p>If you only want to get a single item's count, use the python in-built <strong>count</strong> method:</p>
 <pre><code>list = [2,5,4,3,10,3,5,6,5]
 elmenet_count = list.count(5)
 print('The count of element 5 is ', elmenet_count )
@@ -713,4 +713,4 @@ print('The count of element 5 is ', elmenet_count )
 <p>Output:</p>
 <pre><code>The count of element 5 is 3
 </code></pre>
-<h4> Comment 133318216 MisterMiyagi: </h4>This has already been suggested by the accepted answer. What does this answer add?<br>
+<h4> MisterMiyagi, Comment 133318216 Score: 1: </h4>This has already been suggested by the accepted answer. What does this answer add?<br>

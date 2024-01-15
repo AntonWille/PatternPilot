@@ -1,17 +1,17 @@
- <h2> Title: Iterating over dictionaries using &#39;for&#39; loops </h2> <h3> TopChef, question_id: 3294889 </h3>Score: 4266, Tags: {python,dictionary} <br><pre class="lang-py prettyprint-override"><code>d = {'x': 1, 'y': 2, 'z': 3}
+ <h2> Title: Iterating over dictionaries using &#39;for&#39; loops </h2> <h4> TopChef, question_id: 3294889 </h4>Score: 4266, Tags: {python,dictionary} <br><pre class="lang-py prettyprint-override"><code>d = {'x': 1, 'y': 2, 'z': 3}
 
 for key in d:
     print(key, 'corresponds to', d[key])
 </code></pre>
 <p>How does Python recognize that it needs only to read the <code>key</code> from the dictionary? Is <code>key</code> a special keyword, or is it simply a variable?</p>
-<h4> Comment 117844974 Charlie Parker: </h4>did you try: <code>for key, value in d.items():</code>?<br><h4> Comment 129288802 Siva Sankar: </h4>Keys are immutable data types. Keys are unique.<br><h4> Comment 129481289 Karl Knechtel: </h4>&quot;Is key a special keyword, or is it simply a variable?&quot; There are no such &quot;special keywords&quot; for <code>for</code> loop syntax. See <a href="/q19257862">Understanding for loops in Python</a>.<br><h4> Comment 116072226 Raksha Saini: </h4>As we know that in Python Dictionary as a set of key: value pairs, with the requirement that the keys are unique (within one dictionary). A pair of braces creates an empty dictionary: {}. Placing a comma-separated list of key:value pairs within the braces adds initial key:value pairs to the dictionary. No, key is not a special word in Python. Here key is Just a variable name.<br>------------------------------------------------------------------ <br><h3> Answer 3294897 Alexander Gessler: </h3><p>When you iterate through dictionaries using the <code>for .. in ..</code>-syntax, it always iterates over the keys (the values are accessible using <code>dictionary[key]</code>).</p>
+<h4> Charlie Parker, Id: 117844974 Score: 12: </h4>did you try: <code>for key, value in d.items():</code>?<br><h4> Siva Sankar, Id: 129288802 Score: 0: </h4>Keys are immutable data types. Keys are unique.<br><h4> Karl Knechtel, Id: 129481289 Score: 0: </h4>&quot;Is key a special keyword, or is it simply a variable?&quot; There are no such &quot;special keywords&quot; for <code>for</code> loop syntax. See <a href="/q19257862">Understanding for loops in Python</a>.<br><h4> Raksha Saini, Id: 116072226 Score: 0: </h4>As we know that in Python Dictionary as a set of key: value pairs, with the requirement that the keys are unique (within one dictionary). A pair of braces creates an empty dictionary: {}. Placing a comma-separated list of key:value pairs within the braces adds initial key:value pairs to the dictionary. No, key is not a special word in Python. Here key is Just a variable name.<br>------------------------------------------------------------------ <br><h3> Alexander Gessler, Id: 3294897, Score: 123: </h3><p>When you iterate through dictionaries using the <code>for .. in ..</code>-syntax, it always iterates over the keys (the values are accessible using <code>dictionary[key]</code>).</p>
 <p>To iterate over key-value pairs, use the following:</p>
 <ul>
 <li><code>for k,v in dict.iteritems()</code> in Python 2</li>
 <li><code>for k,v in dict.items()</code> in Python 3</li>
 </ul>
-<h4> Comment 46753073 Andreas Fester: </h4>Note that for Python 3, it is <code>items()</code> instead of <code>iteritems()</code><br>------------------------------------------------------------------ <br><h3> Answer 3294969 chryss: </h3><p>This is a very common looping idiom. <code>in</code> is an operator. For when to use <code>for key in dict</code> and when it must be <code>for key in dict.keys()</code> see <a href="https://web.archive.org/web/20180411011411/http://python.net/~goodger/projects/pycon/2007/idiomatic/handout.html" rel="noreferrer">David Goodger's Idiomatic Python article (archived copy)</a>.</p>
-<h4> Comment 62165165 Wolf: </h4>As I read these sections about <code>in</code>, the operator part is <a href="http://python.net/~goodger/projects/pycon/2007/idiomatic/handout.html#use-in-where-possible-2" rel="nofollow noreferrer">where you check for existence</a>. Maybe the better delete this <i><code>in is an operator</code></i> information.<br>------------------------------------------------------------------ <br><h3> Answer 3294899 sberry: </h3><p><code>key</code> is just a variable name.  </p>
+<h4> Andreas Fester, Comment 46753073 Score: 54: </h4>Note that for Python 3, it is <code>items()</code> instead of <code>iteritems()</code><br>------------------------------------------------------------------ <br><h3> chryss, Id: 3294969, Score: 39: </h3><p>This is a very common looping idiom. <code>in</code> is an operator. For when to use <code>for key in dict</code> and when it must be <code>for key in dict.keys()</code> see <a href="https://web.archive.org/web/20180411011411/http://python.net/~goodger/projects/pycon/2007/idiomatic/handout.html" rel="noreferrer">David Goodger's Idiomatic Python article (archived copy)</a>.</p>
+<h4> Wolf, Comment 62165165 Score: 1: </h4>As I read these sections about <code>in</code>, the operator part is <a href="http://python.net/~goodger/projects/pycon/2007/idiomatic/handout.html#use-in-where-possible-2" rel="nofollow noreferrer">where you check for existence</a>. Maybe the better delete this <i><code>in is an operator</code></i> information.<br>------------------------------------------------------------------ <br><h3> sberry, Id: 3294899, Score: 6814: </h3><p><code>key</code> is just a variable name.  </p>
 
 <pre><code>for key in d:
 </code></pre>
@@ -34,7 +34,7 @@ for key in d:
 This is also available in 2.7 as <code>viewitems()</code>. </p>
 
 <p>The operation <code>items()</code> will work for both 2 and 3, but in 2 it will return a list of the dictionary's <code>(key, value)</code> pairs, which will not reflect changes to the dict that happen after the <code>items()</code> call. If you want the 2.x behavior in 3.x, you can call <code>list(d.items())</code>.</p>
-<h4> Comment 77700753 quiet_penguin: </h4>Adding an overlooked reason not to access value like this: d[key] inside the for loop causes the key to be hashed again (to get the value). When the dictionary is large this extra hash will add to the overall time. This is discussed in Raymond Hettinger&#39;s tech talk <a href="https://www.youtube.com/watch?v=anrOzOapJ2E" rel="nofollow noreferrer">youtube.com/watch?v=anrOzOapJ2E</a><br><h4> Comment 102139254 Aimery: </h4>@yugr From Python 3.7, dictionaries are insertion-ordered and this is a language feature. See <a href="https://stackoverflow.com/a/39980744/9428564">stackoverflow.com/a/39980744/9428564</a><br><h4> Comment 100571684 Geza Turi: </h4>@yugr Why do you say that ? The docs says <code>Keys and values are iterated over in insertion order. </code> [<a href="https://docs.python.org/3/library/stdtypes.html#dictionary-view-objects]" rel="nofollow noreferrer">docs.python.org/3/library/&hellip;</a><br><h4> Comment 93291724 JoeyC: </h4>@HarisankarKrishnaSwamy what is the alternative?<br><h4> Comment 100575661 yugr: </h4>@GezaTuri Only starting from Python 3.6 (and there have been rumors this &quot;feature&quot; may be removed again in future versions).<br><h4> Comment 102140719 yugr: </h4>@Aimery That&#39;s great, maybe it&#39;ll be usable in portable code 10 years from now. Do IronPython and Pypy support this as well?<br><h4> Comment 125009686 ShadowRanger: </h4>@yugr: PyPy is the interpreter that actually introduced the <code>dict</code> design that was implicitly insertion-ordered (so it&#39;s been in PyPy as an implementation detail for longer than it&#39;s been in the CPython reference interpreter). IronPython barely supports Python 3 at all (it&#39;s first alpha release was in early 2021 and only supports the 3.4 language standard), and to my knowledge C#/.NET lacks an insertion ordered hashmap as a built-in, so it probably doesn&#39;t support it, and won&#39;t, until they release a 3.7 or higher compatible release (at which point the language standard requires it).<br><h4> Comment 124344487 Nate T: </h4>I dunno... the &#39;test for yourself&#39; logic seems like a <i>crappy</i> way of going about it.<br><h4> Comment 106124652 mrT: </h4>How do you get the key for a given value with the use of a condition, for example if I had some pets and I wanted to check what pet corresponds to the number 4 <code>dict = {&#39;cats&#39; : 5, &#39;dogs&#39; : 4, &#39;fish&#39; : 7}</code> how would you use a condition to get key &#39;dogs&#39; from a given value e.g. 4?<br><h4> Comment 98649829 Ikbel: </h4>by using the <code>items()</code>  method the values in the dictionary will be switched, thus using  <code>d[key]</code> would be more accurate.<br><h4> Comment 99686375 Russell Lego: </h4>this actually  does not work <code>In [10]: d Out[10]: {&#39;id&#39;: [1, 2, 3], &#39;name&#39;: [&#39;russell&#39;, &#39;priya&#39;, &#39;ravi&#39;]}  In [11]: for key, value in d.iteritems():     ...:     print key     ...:     print value     ...:      name [&#39;russell&#39;, &#39;priya&#39;, &#39;ravi&#39;] id [1, 2, 3]</code><br><h4> Comment 120322252 842Mono: </h4>There&#39;s also <code>for value in d.values() :</code> in Python 3.x<br>------------------------------------------------------------------ <br><h3> Answer 3295295 ars: </h3><p>It's not that key is a special word, but that dictionaries implement the iterator protocol.  You could do this in your class, e.g. see <a href="https://stackoverflow.com/questions/19151/build-a-basic-python-iterator/24377#24377">this question</a> for how to build class iterators.</p>
+<h4> quiet_penguin, Comment 77700753 Score: 256: </h4>Adding an overlooked reason not to access value like this: d[key] inside the for loop causes the key to be hashed again (to get the value). When the dictionary is large this extra hash will add to the overall time. This is discussed in Raymond Hettinger&#39;s tech talk <a href="https://www.youtube.com/watch?v=anrOzOapJ2E" rel="nofollow noreferrer">youtube.com/watch?v=anrOzOapJ2E</a><br><h4> Aimery, Comment 102139254 Score: 26: </h4>@yugr From Python 3.7, dictionaries are insertion-ordered and this is a language feature. See <a href="https://stackoverflow.com/a/39980744/9428564">stackoverflow.com/a/39980744/9428564</a><br><h4> Geza Turi, Comment 100571684 Score: 12: </h4>@yugr Why do you say that ? The docs says <code>Keys and values are iterated over in insertion order. </code> [<a href="https://docs.python.org/3/library/stdtypes.html#dictionary-view-objects]" rel="nofollow noreferrer">docs.python.org/3/library/&hellip;</a><br><h4> JoeyC, Comment 93291724 Score: 9: </h4>@HarisankarKrishnaSwamy what is the alternative?<br><h4> yugr, Comment 100575661 Score: 3: </h4>@GezaTuri Only starting from Python 3.6 (and there have been rumors this &quot;feature&quot; may be removed again in future versions).<br><h4> yugr, Comment 102140719 Score: 1: </h4>@Aimery That&#39;s great, maybe it&#39;ll be usable in portable code 10 years from now. Do IronPython and Pypy support this as well?<br><h4> ShadowRanger, Comment 125009686 Score: 1: </h4>@yugr: PyPy is the interpreter that actually introduced the <code>dict</code> design that was implicitly insertion-ordered (so it&#39;s been in PyPy as an implementation detail for longer than it&#39;s been in the CPython reference interpreter). IronPython barely supports Python 3 at all (it&#39;s first alpha release was in early 2021 and only supports the 3.4 language standard), and to my knowledge C#/.NET lacks an insertion ordered hashmap as a built-in, so it probably doesn&#39;t support it, and won&#39;t, until they release a 3.7 or higher compatible release (at which point the language standard requires it).<br><h4> Nate T, Comment 124344487 Score: 1: </h4>I dunno... the &#39;test for yourself&#39; logic seems like a <i>crappy</i> way of going about it.<br><h4> mrT, Comment 106124652 Score: 0: </h4>How do you get the key for a given value with the use of a condition, for example if I had some pets and I wanted to check what pet corresponds to the number 4 <code>dict = {&#39;cats&#39; : 5, &#39;dogs&#39; : 4, &#39;fish&#39; : 7}</code> how would you use a condition to get key &#39;dogs&#39; from a given value e.g. 4?<br><h4> Ikbel, Comment 98649829 Score: 0: </h4>by using the <code>items()</code>  method the values in the dictionary will be switched, thus using  <code>d[key]</code> would be more accurate.<br><h4> Russell Lego, Comment 99686375 Score: 0: </h4>this actually  does not work <code>In [10]: d Out[10]: {&#39;id&#39;: [1, 2, 3], &#39;name&#39;: [&#39;russell&#39;, &#39;priya&#39;, &#39;ravi&#39;]}  In [11]: for key, value in d.iteritems():     ...:     print key     ...:     print value     ...:      name [&#39;russell&#39;, &#39;priya&#39;, &#39;ravi&#39;] id [1, 2, 3]</code><br><h4> 842Mono, Comment 120322252 Score: 0: </h4>There&#39;s also <code>for value in d.values() :</code> in Python 3.x<br>------------------------------------------------------------------ <br><h3> ars, Id: 3295295, Score: 554: </h3><p>It's not that key is a special word, but that dictionaries implement the iterator protocol.  You could do this in your class, e.g. see <a href="https://stackoverflow.com/questions/19151/build-a-basic-python-iterator/24377#24377">this question</a> for how to build class iterators.</p>
 
 <p>In the case of dictionaries, it's implemented at the C level.  The details are available in <a href="http://www.python.org/dev/peps/pep-0234/" rel="noreferrer">PEP 234</a>.  In particular, the section titled "Dictionary Iterators":</p>
 
@@ -70,7 +70,7 @@ for key, value in dict.iteritems(): ...
 </blockquote>
 
 <p>In Python 3, <code>dict.iterkeys()</code>, <code>dict.itervalues()</code> and <code>dict.iteritems()</code> are no longer supported. Use <code>dict.keys()</code>, <code>dict.values()</code> and <code>dict.items()</code> instead.</p>
------------------------------------------------------------------- <br><h3> Answer 3295662 John La Rooy: </h3><p>Iterating over a <code>dict</code> iterates through its keys in no particular order, as you can see here:</p>
+------------------------------------------------------------------ <br><h3> John La Rooy, Id: 3295662, Score: 274: </h3><p>Iterating over a <code>dict</code> iterates through its keys in no particular order, as you can see here:</p>
 <p>(This is practically <a href="https://stackoverflow.com/questions/39980323/dictionaries-are-ordered-in-python-3-6">no longer the case since Python 3.6</a>, but note that it's only guaranteed behaviour since Python 3.7.)</p>
 <pre><code>&gt;&gt;&gt; d = {'x': 1, 'y': 2, 'z': 3}
 &gt;&gt;&gt; list(d)
@@ -94,7 +94,7 @@ for key, value in dict.iteritems(): ...
 <pre><code>for letter, number in d.items():
     print('{0} corresponds to {1}'.format(letter, number))
 </code></pre>
-<h4> Comment 89784964 Gregory Arenius: </h4>From the Python 3.7 release notes: &quot;The insertion-order preservation nature of dict objects is now an official part of the Python language spec.&quot;<br>------------------------------------------------------------------ <br><h3> Answer 3295279 ssoler: </h3><p><code>key</code> is simply a variable.</p>
+<h4> Gregory Arenius, Comment 89784964 Score: 24: </h4>From the Python 3.7 release notes: &quot;The insertion-order preservation nature of dict objects is now an official part of the Python language spec.&quot;<br>------------------------------------------------------------------ <br><h3> ssoler, Id: 3295279, Score: 153: </h3><p><code>key</code> is simply a variable.</p>
 <p>For <strong>Python 3.x</strong>:</p>
 <pre><code>&gt;&gt;&gt; d = {'x': 1, 'y': 2, 'z': 3}
 &gt;&gt;&gt; for the_key, the_value in d.items():
@@ -119,13 +119,13 @@ z corresponds to 3
 for the_key, the_value in d.iteritems():
     print the_key, 'corresponds to', the_value
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 44182134 jdhao: </h3><p>I have a use case where I have to iterate through the dict to get the key, value pair, also the index indicating where I am. This is how I do it:</p>
+------------------------------------------------------------------ <br><h3> jdhao, Id: 44182134, Score: 38: </h3><p>I have a use case where I have to iterate through the dict to get the key, value pair, also the index indicating where I am. This is how I do it:</p>
 <pre><code>d = {'x': 1, 'y': 2, 'z': 3} 
 for i, (key, value) in enumerate(d.items()):
    print(i, key, value)
 </code></pre>
 <p>Note that the parentheses around the key, value are important, without them, you'd get an <code>ValueError</code> &quot;not enough values to unpack&quot;.</p>
-<h4> Comment 108239947 gosuto: </h4>How is this relevant to the question?<br>------------------------------------------------------------------ <br><h3> Answer 70724260 Gowdham V: </h3><p>For Iterating through dictionaries, The below code can be used.</p>
+<h4> gosuto, Comment 108239947 Score: 2: </h4>How is this relevant to the question?<br>------------------------------------------------------------------ <br><h3> Gowdham V, Id: 70724260, Score: 35: </h3><p>For Iterating through dictionaries, The below code can be used.</p>
 <pre><code>dictionary= {1: &quot;a&quot;, 2: &quot;b&quot;, 3: &quot;c&quot;}
 
 #To iterate over the keys
@@ -140,7 +140,7 @@ for value in dictionary.values():
 for key, value in dictionary.items():
     print(key, '\t', value)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 44666083 Russia Must Remove Putin: </h3><blockquote>
+------------------------------------------------------------------ <br><h3> Russia Must Remove Putin, Id: 44666083, Score: 32: </h3><blockquote>
   <h2>Iterating over dictionaries using 'for' loops</h2>
 
 <pre><code>d = {'x': 1, 'y': 2, 'z': 3} 
@@ -245,19 +245,19 @@ z =&gt; 3
 </code></pre>
 
 <p>But for academic purposes, the question's example is just fine.</p>
------------------------------------------------------------------- <br><h3> Answer 47088919 Ankur Agarwal: </h3><p>You can check the implementation of CPython's <code>dicttype</code> on GitHub. This is the signature of method that implements the dict iterator:</p>
+------------------------------------------------------------------ <br><h3> Ankur Agarwal, Id: 47088919, Score: 13: </h3><p>You can check the implementation of CPython's <code>dicttype</code> on GitHub. This is the signature of method that implements the dict iterator:</p>
 
 <pre><code>_PyDict_Next(PyObject *op, Py_ssize_t *ppos, PyObject **pkey,
              PyObject **pvalue, Py_hash_t *phash)
 </code></pre>
 
 <p><a href="https://github.com/python/cpython/blob/b2e5794870eb4728ddfaafc0f79a40299576434f/Objects/dictobject.c" rel="noreferrer">CPython dictobject.c</a></p>
------------------------------------------------------------------- <br><h3> Answer 34550429 Neil Chowdhury  o_O: </h3><p>To iterate over keys, it is slower but better to use <code>my_dict.keys()</code>. If you tried to do something like this:</p>
+------------------------------------------------------------------ <br><h3> Neil Chowdhury  o_O, Id: 34550429, Score: 8: </h3><p>To iterate over keys, it is slower but better to use <code>my_dict.keys()</code>. If you tried to do something like this:</p>
 <pre><code>for key in my_dict:
     my_dict[key+&quot;-1&quot;] = my_dict[key]-1
 </code></pre>
 <p>it would create a runtime error because you are changing the keys while the program is running. If you are absolutely set on reducing time, use the <code>for key in my_dict</code> way, but you have been warned.</p>
-<h4> Comment 113767417 Martijn Pieters: </h4>Why is it &#39;better&#39; to use <code>my_dict.keys()</code> over iterating directly over the dictionary? Iteration over a dictionary is clearly documented as yielding keys. It appears you had Python 2 in mind when you answered this, because in Python 3 <code>for key in my_dict.keys()</code> will <i>still have the same problem with changing the dictionary size during iteration</i>.<br>------------------------------------------------------------------ <br><h3> Answer 63814044 Mister Verleg: </h3><p>If you are looking for a clear and visual example:</p>
+<h4> Martijn Pieters, Comment 113767417 Score: 1: </h4>Why is it &#39;better&#39; to use <code>my_dict.keys()</code> over iterating directly over the dictionary? Iteration over a dictionary is clearly documented as yielding keys. It appears you had Python 2 in mind when you answered this, because in Python 3 <code>for key in my_dict.keys()</code> will <i>still have the same problem with changing the dictionary size during iteration</i>.<br>------------------------------------------------------------------ <br><h3> Mister Verleg, Id: 63814044, Score: 7: </h3><p>If you are looking for a clear and visual example:</p>
 <pre><code>cat  = {'name': 'Snowy', 'color': 'White' ,'age': 14}
 for key , value in cat.items():
    print(key, ': ', value)
@@ -267,8 +267,8 @@ for key , value in cat.items():
 color:  White
 age:  14
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 70747846 theAccountant.py: </h3><p>A dictionary in Python is a collection of key-value pairs. Each key is connected to a value, and you can use a key to access the value associated with that key. A key's value can be a number, a string, a list, or even another dictionary. In this case, threat each &quot;key-value pair&quot; as a separate row in the table: d is your table with two columns. the key is the first column, key[value] is your second column. Your for loop is a standard way to iterate over a table.</p>
------------------------------------------------------------------- <br><h3> Answer 61296126 Amar Kumar: </h3><p>This will print the output in <em>sorted</em> order by <em>values</em> in ascending order.</p>
+------------------------------------------------------------------ <br><h3> theAccountant.py, Id: 70747846, Score: -1: </h3><p>A dictionary in Python is a collection of key-value pairs. Each key is connected to a value, and you can use a key to access the value associated with that key. A key's value can be a number, a string, a list, or even another dictionary. In this case, threat each &quot;key-value pair&quot; as a separate row in the table: d is your table with two columns. the key is the first column, key[value] is your second column. Your for loop is a standard way to iterate over a table.</p>
+------------------------------------------------------------------ <br><h3> Amar Kumar, Id: 61296126, Score: 6: </h3><p>This will print the output in <em>sorted</em> order by <em>values</em> in ascending order.</p>
 <pre><code>d = {'x': 3, 'y': 1, 'z': 2}
 
 def by_value(item):
@@ -284,7 +284,7 @@ z -&gt; 2
 x -&gt; 3
 </code></pre>
 </blockquote>
-<h4> Comment 115801955 Joe Ferndz: </h4>I dont think this was the question asked. The question was about key and why python picks up the keys from the dictionary without the .items() or .keys() option.<br>------------------------------------------------------------------ <br><h3> Answer 76494930 cottontail: </h3><p>If you want to loop over a dictionary and modify it in iteration (perhaps add/delete a key), in Python 2, it was possible by looping over <code>my_dict.keys()</code>. In Python 3, the iteration has to be over an explicit copy of the keys (otherwise it throws a <code>RuntimeError</code>) because <code>my_dict.keys()</code> returns a view of the dictionary keys, so any change to <code>my_dict</code> changes the view as well.</p>
+<h4> Joe Ferndz, Comment 115801955 Score: 1: </h4>I dont think this was the question asked. The question was about key and why python picks up the keys from the dictionary without the .items() or .keys() option.<br>------------------------------------------------------------------ <br><h3> cottontail, Id: 76494930, Score: 1: </h3><p>If you want to loop over a dictionary and modify it in iteration (perhaps add/delete a key), in Python 2, it was possible by looping over <code>my_dict.keys()</code>. In Python 3, the iteration has to be over an explicit copy of the keys (otherwise it throws a <code>RuntimeError</code>) because <code>my_dict.keys()</code> returns a view of the dictionary keys, so any change to <code>my_dict</code> changes the view as well.</p>
 <pre class="lang-py prettyprint-override"><code>my_dict = {'a': 1, 'b': 2, 'c': 3}
 for k in my_dict:
     my_dict.pop(k)        # &lt;---- error
@@ -294,7 +294,7 @@ for k in my_dict:
 for k in list(my_dict):
     my_dict.pop(k)        # &lt;---- OK
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 67599090 Rohit_VE: </h3><p>Let's get straight to the point. If the word key is just a variable, as you have mentioned then the main thing to note is that when you run a <strong>'FOR LOOP'</strong> over a dictionary it runs through only the <em>'keys'</em> and ignores the <em>'values'</em>.</p>
+------------------------------------------------------------------ <br><h3> Rohit_VE, Id: 67599090, Score: -1: </h3><p>Let's get straight to the point. If the word key is just a variable, as you have mentioned then the main thing to note is that when you run a <strong>'FOR LOOP'</strong> over a dictionary it runs through only the <em>'keys'</em> and ignores the <em>'values'</em>.</p>
 <pre><code>d = {'x': 1, 'y': 2, 'z': 3} 
 for key in d:
     print (key, 'corresponds to', d[key])
@@ -309,7 +309,7 @@ for i in d:
 print(d.keys())
 </code></pre>
 <p>in the above case <strong>'keys'</strong> is just not a variable, its a function.</p>
------------------------------------------------------------------- <br><h3> Answer 75836459 m.r: </h3><p>When you loop over a dict, this is what actually happening:</p>
+------------------------------------------------------------------ <br><h3> m.r, Id: 75836459, Score: -1: </h3><p>When you loop over a dict, this is what actually happening:</p>
 <pre><code>&gt;&gt;&gt; d = {'x': 1, 'y': 2, 'z': 3}
 &gt;&gt;&gt; iter(d)
 Out[408]: &lt;dict_keyiterator at 0x2b240fc6d40&gt;

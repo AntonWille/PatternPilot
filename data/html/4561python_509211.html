@@ -1,9 +1,9 @@
- <h2> Title: How slicing in Python works </h2> <h3> Simon, question_id: 509211 </h3>Score: 4561, Tags: {python,slice,sequence} <br><p>How does Python's <em>slice notation</em> work? That is: when I write code like <code>a[x:y:z]</code>, <code>a[:]</code>, <code>a[::2]</code> etc., how can I understand which elements end up in the slice?</p>
+ <h2> Title: How slicing in Python works </h2> <h4> Simon, question_id: 509211 </h4>Score: 4561, Tags: {python,slice,sequence} <br><p>How does Python's <em>slice notation</em> work? That is: when I write code like <code>a[x:y:z]</code>, <code>a[:]</code>, <code>a[::2]</code> etc., how can I understand which elements end up in the slice?</p>
 <hr />
 <p><sub>See <a href="https://stackoverflow.com/questions/11364533">Why are slice and range upper-bound exclusive?</a> to learn why <code>xs[0:2] == [xs[0], xs[1]]</code>, <em>not</em> <code>[..., xs[2]]</code>.</sub><br />
 <sub>See <a href="https://stackoverflow.com/questions/1403674/">Make a new list containing every Nth item in the original list</a> for <code>xs[::N]</code>.</sub><br />
 <sub>See <a href="https://stackoverflow.com/questions/10623302">How does assignment work with list slices?</a> to learn what <code>xs[0:2] = [&quot;a&quot;, &quot;b&quot;]</code> does.</sub></p>
------------------------------------------------------------------- <br><h3> Answer 509295 Greg Hewgill: </h3><p>The syntax is:</p>
+------------------------------------------------------------------ <br><h3> Greg Hewgill, Id: 509295, Score: 6458: </h3><p>The syntax is:</p>
 <pre><code>a[start:stop]  # items start through stop-1
 a[start:]      # items start through the rest of the array
 a[:stop]       # items from the beginning through stop-1
@@ -35,7 +35,7 @@ a[-3::-1]  # everything except the last two items, reversed
 <p>Slice objects also behave slightly differently depending on the number of arguments, similar to <code>range()</code>, i.e. both <code>slice(stop)</code> and <code>slice(start, stop[, step])</code> are supported.
 To skip specifying a given argument, one might use <code>None</code>, so that e.g. <code>a[start:]</code> is equivalent to <code>a[slice(start, None)]</code> or <code>a[::-1]</code> is equivalent to <code>a[slice(None, None, -1)]</code>.</p>
 <p>While the <code>:</code>-based notation is very helpful for simple slicing, the explicit use of <code>slice()</code> objects simplifies the programmatic generation of slicing.</p>
-<h4> Comment 27984940 Beni Cherniavsky-Paskin: </h4>Slicing builtin types returns a copy but that&#39;s not universal.  Notably, <a href="http://docs.scipy.org/doc/numpy/reference/arrays.indexing.html" rel="nofollow noreferrer">slicing NumPy arrays</a> returns a view that shares memory with the original.<br><h4> Comment 95272803 Mark Ransom: </h4>This is a beautiful answer with the votes to prove it, but it misses one thing: you can substitute <code>None</code> for any of the empty spaces. For example <code>[None:None]</code> makes a whole copy. This is useful when you need to specify the end of the range using a variable and need to include the last item.<br><h4> Comment 100203434 axell-brendow: </h4>And I know that &quot;abcdef&quot;[::-1] is transformed to &quot;abcdef&quot;[6:-7:-1], so, the best way to explain would be: let <i>len</i> be the length of the sequence. <b>If step is positive</b>, the defaults for start and end are 0 and <i>len</i>. <b>Else if step is negative</b>, the defaults for start and end are <i>len</i> and -<i>len</i> - 1.<br><h4> Comment 100203161 axell-brendow: </h4>What really annoys me is that python says that when you don&#39;t set the start and the end, they default to 0 and the length of sequence. So, in theory, when you use &quot;abcdef&quot;[::-1] it should be transformed to &quot;abcdef&quot;[0:6:-1], but these two expressions does not get the same output. I feel that something is missing in python documentation since the creation of the language.<br><h4> Comment 99325528 vreyespue: </h4>Note that contrary to usual Python slices (see above), in Pandas Dataframes both the start and the stop are included when present in the index. For further info see the <a href="https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#indexing-slicing-with-labels" rel="nofollow noreferrer">Pandas indexing documentation</a>.<br><h4> Comment 119801614 mLstudent33: </h4>Why does it seem like start: stop are in the wrong order for these: <code>a[1::-1]   # the first two items, reversed a[:-3:-1]  # the last two items, reversed a[-3::-1]  # everything except the last two items, reversed</code> I checked on iPython console that your answer is correct but it seems to not be in line with the start:stop: step.  I would think reverse first two items would be <code>a[:2:-1]</code><br><h4> Comment 122166265 Joe: </h4>@James_ <code>a[-1]</code> isn&#39;t slicing, it&#39;s indexing, which is why it returns the last object in the list, instead of the sublist containing only the last object in the list, which is what <code>a[-1:]</code> returns.<br><h4> Comment 122166482 Joe: </h4>@mLstudent33, <code>a[:2:-1]</code> does not specify a <code>START</code>, but specifies that you want to index in reverse and <code>STOP</code> at index 2 (not inclusive), so it will return all but the first three elements, in reverse order (i.e. <code>a[-1], a[-2],...,a[3]</code>).  <code>a[1::-1]</code> specifies the <code>START</code> at index 1 (inclusive), does not specify a <code>STOP</code>, and specifies that you want to index in reverse, so it will return the first two entries in the list, in reverse order (i.e. <code>a[1], a[0]</code>).<br><h4> Comment 116525996 gaoithe: </h4>Somewhat interestingly the third step or stride argument was a later addition slice[start:stop:stride] <a href="http://docs.python.org/2.3/whatsnew/section-slices.html" rel="nofollow noreferrer">docs.python.org/2.3/whatsnew/section-slices.html</a><br><h4> Comment 129415049 Binh Thien: </h4>Does anyone see something like this <code>dc[:, i : i + 1, :]</code>?<br><h4> Comment 132943166 wjandrea: </h4>@axell-brendow That&#39;s documented under <a href="https://docs.python.org/3/library/stdtypes.html#common-sequence-operations" rel="nofollow noreferrer">Common Sequence Operations</a>: &quot;<code>s[i:j:k]</code> slice of <i>s</i> from <i>i</i> to <i>j</i> with step <i>k</i> ... [Note 5] ... If <i>i</i> or <i>j</i> are omitted or <code>None</code>, they become “end” values (which end depends on the sign of <code>k</code>).&quot; Also, the canonical equivalent for <code>&quot;abcdef&quot;[::-1]</code> is <code>&quot;abcdef&quot;[-1:-7:-1]</code>.<br><h4> Comment 135483187 Joe: </h4>One thing I was surprised to find is that &quot;the difference between stop and start is the number of elements selected (if step is 1, the default).&quot; is not necessarily true if you mix positive and negative indices. Try <code>&#39;0123456789&#39;[-8:7:1]</code><br><h4> Comment 129609400 Invictus: </h4>I  was trying to evaluate how slice.indices results the range and step &gt;&gt;&gt; slice(None,None,-1).indices(6) (5, -1, -1)  &gt;&gt;&gt; seq=&#39;python&#39; &gt;&gt;&gt; seq[::-1] &#39;nohtyp&#39;  But when i try and use the evaluated value from slice.indices call , it results &gt;&gt;&gt; seq[5:-1:-1] &#39;&#39; It was resulted into an empty slice rather reversing the python. Why so ?<br><h4> Comment 130014875 JustLearn: </h4>@Joe could you please help me out? I don&#39;t understand one thing: why does a[:2:-1] return all elements except first three of them instead of returning all elements except first two of them?  For example if I do this: a[:3] it returns first two elements (except the 3rd)<br><h4> Comment 130040094 Joe: </h4>@JustLearn, <code>a[:3]</code> should return the first <b><i>three</i></b> elements, i.e. elements 0, 1, and 2; stopping before returning element 3 (the fourth element).  <code>[:2:-1]</code> should return all except the first three elements (assuming there are at least 4 elements), because it should return element -1 (the last element), then the one before that, and so on, stopping before returning element 2, and therefore not returning elements 2, 1, or 0. (Python is zero indexed)<br><h4> Comment 119593308 James_: </h4>&quot;a[-1]    # last item in the array&quot; Is this the only way to retrieve last item using Slicing? It seems like a[-1:] doesn&#39;t work. Why?<br>------------------------------------------------------------------ <br><h3> Answer 509297 Hans Nowak: </h3><p>The <a href="https://docs.python.org/3/tutorial/introduction.html#text" rel="nofollow noreferrer">Python tutorial</a> talks about it (scroll down a bit until you get to the part about slicing).</p>
+<h4> Beni Cherniavsky-Paskin, Comment 27984940 Score: 198: </h4>Slicing builtin types returns a copy but that&#39;s not universal.  Notably, <a href="http://docs.scipy.org/doc/numpy/reference/arrays.indexing.html" rel="nofollow noreferrer">slicing NumPy arrays</a> returns a view that shares memory with the original.<br><h4> Mark Ransom, Comment 95272803 Score: 147: </h4>This is a beautiful answer with the votes to prove it, but it misses one thing: you can substitute <code>None</code> for any of the empty spaces. For example <code>[None:None]</code> makes a whole copy. This is useful when you need to specify the end of the range using a variable and need to include the last item.<br><h4> axell-brendow, Comment 100203434 Score: 41: </h4>And I know that &quot;abcdef&quot;[::-1] is transformed to &quot;abcdef&quot;[6:-7:-1], so, the best way to explain would be: let <i>len</i> be the length of the sequence. <b>If step is positive</b>, the defaults for start and end are 0 and <i>len</i>. <b>Else if step is negative</b>, the defaults for start and end are <i>len</i> and -<i>len</i> - 1.<br><h4> axell-brendow, Comment 100203161 Score: 34: </h4>What really annoys me is that python says that when you don&#39;t set the start and the end, they default to 0 and the length of sequence. So, in theory, when you use &quot;abcdef&quot;[::-1] it should be transformed to &quot;abcdef&quot;[0:6:-1], but these two expressions does not get the same output. I feel that something is missing in python documentation since the creation of the language.<br><h4> vreyespue, Comment 99325528 Score: 14: </h4>Note that contrary to usual Python slices (see above), in Pandas Dataframes both the start and the stop are included when present in the index. For further info see the <a href="https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#indexing-slicing-with-labels" rel="nofollow noreferrer">Pandas indexing documentation</a>.<br><h4> mLstudent33, Comment 119801614 Score: 4: </h4>Why does it seem like start: stop are in the wrong order for these: <code>a[1::-1]   # the first two items, reversed a[:-3:-1]  # the last two items, reversed a[-3::-1]  # everything except the last two items, reversed</code> I checked on iPython console that your answer is correct but it seems to not be in line with the start:stop: step.  I would think reverse first two items would be <code>a[:2:-1]</code><br><h4> Joe, Comment 122166265 Score: 3: </h4>@James_ <code>a[-1]</code> isn&#39;t slicing, it&#39;s indexing, which is why it returns the last object in the list, instead of the sublist containing only the last object in the list, which is what <code>a[-1:]</code> returns.<br><h4> Joe, Comment 122166482 Score: 3: </h4>@mLstudent33, <code>a[:2:-1]</code> does not specify a <code>START</code>, but specifies that you want to index in reverse and <code>STOP</code> at index 2 (not inclusive), so it will return all but the first three elements, in reverse order (i.e. <code>a[-1], a[-2],...,a[3]</code>).  <code>a[1::-1]</code> specifies the <code>START</code> at index 1 (inclusive), does not specify a <code>STOP</code>, and specifies that you want to index in reverse, so it will return the first two entries in the list, in reverse order (i.e. <code>a[1], a[0]</code>).<br><h4> gaoithe, Comment 116525996 Score: 1: </h4>Somewhat interestingly the third step or stride argument was a later addition slice[start:stop:stride] <a href="http://docs.python.org/2.3/whatsnew/section-slices.html" rel="nofollow noreferrer">docs.python.org/2.3/whatsnew/section-slices.html</a><br><h4> Binh Thien, Comment 129415049 Score: 0: </h4>Does anyone see something like this <code>dc[:, i : i + 1, :]</code>?<br><h4> wjandrea, Comment 132943166 Score: 0: </h4>@axell-brendow That&#39;s documented under <a href="https://docs.python.org/3/library/stdtypes.html#common-sequence-operations" rel="nofollow noreferrer">Common Sequence Operations</a>: &quot;<code>s[i:j:k]</code> slice of <i>s</i> from <i>i</i> to <i>j</i> with step <i>k</i> ... [Note 5] ... If <i>i</i> or <i>j</i> are omitted or <code>None</code>, they become “end” values (which end depends on the sign of <code>k</code>).&quot; Also, the canonical equivalent for <code>&quot;abcdef&quot;[::-1]</code> is <code>&quot;abcdef&quot;[-1:-7:-1]</code>.<br><h4> Joe, Comment 135483187 Score: 0: </h4>One thing I was surprised to find is that &quot;the difference between stop and start is the number of elements selected (if step is 1, the default).&quot; is not necessarily true if you mix positive and negative indices. Try <code>&#39;0123456789&#39;[-8:7:1]</code><br><h4> Invictus, Comment 129609400 Score: 0: </h4>I  was trying to evaluate how slice.indices results the range and step &gt;&gt;&gt; slice(None,None,-1).indices(6) (5, -1, -1)  &gt;&gt;&gt; seq=&#39;python&#39; &gt;&gt;&gt; seq[::-1] &#39;nohtyp&#39;  But when i try and use the evaluated value from slice.indices call , it results &gt;&gt;&gt; seq[5:-1:-1] &#39;&#39; It was resulted into an empty slice rather reversing the python. Why so ?<br><h4> JustLearn, Comment 130014875 Score: 0: </h4>@Joe could you please help me out? I don&#39;t understand one thing: why does a[:2:-1] return all elements except first three of them instead of returning all elements except first two of them?  For example if I do this: a[:3] it returns first two elements (except the 3rd)<br><h4> Joe, Comment 130040094 Score: 0: </h4>@JustLearn, <code>a[:3]</code> should return the first <b><i>three</i></b> elements, i.e. elements 0, 1, and 2; stopping before returning element 3 (the fourth element).  <code>[:2:-1]</code> should return all except the first three elements (assuming there are at least 4 elements), because it should return element -1 (the last element), then the one before that, and so on, stopping before returning element 2, and therefore not returning elements 2, 1, or 0. (Python is zero indexed)<br><h4> James_, Comment 119593308 Score: 0: </h4>&quot;a[-1]    # last item in the array&quot; Is this the only way to retrieve last item using Slicing? It seems like a[-1:] doesn&#39;t work. Why?<br>------------------------------------------------------------------ <br><h3> Hans Nowak, Id: 509297, Score: 698: </h3><p>The <a href="https://docs.python.org/3/tutorial/introduction.html#text" rel="nofollow noreferrer">Python tutorial</a> talks about it (scroll down a bit until you get to the part about slicing).</p>
 <p>The ASCII art diagram is helpful too for remembering how slices work:</p>
 <pre><code> +---+---+---+---+---+---+
  | P | y | t | h | o | n |
@@ -46,7 +46,7 @@ To skip specifying a given argument, one might use <code>None</code>, so that e.
 <blockquote>
 <p>One way to remember how slices work is to think of the indices as pointing <em>between</em> characters, with the left edge of the first character numbered 0. Then the right edge of the last character of a string of <em>n</em> characters has index <em>n</em>.</p>
 </blockquote>
-<h4> Comment 99270489 aguadopd: </h4>This suggestion works for positive stride, but does not for a negative stride. From the diagram, I expect <code>a[-4,-6,-1]</code> to be <code>yP</code> but it is <code>ty</code>. What always work is to think in characters or slots and use indexing as a half-open interval -- right-open if positive stride, left-open if negative stride.<br><h4> Comment 118360396 Javier Ruiz: </h4>@aguadopd You are absolutely right. The solution is to have the indices shifted to the right, centered just below the characters, and notice that the stop is always excluded. See another response just below.<br><h4> Comment 118606940 aguadopd: </h4>Addendum to my comment: see my answer with diagrams below: <a href="https://stackoverflow.com/a/56332104/2343869">stackoverflow.com/a/56332104/2343869</a><br><h4> Comment 100377224 endolith: </h4>But there&#39;s no way to collapse to an empty set starting from the end (like <code>x[:0]</code> does when starting from the beginning), so you have to special-case small arrays.  :/<br>------------------------------------------------------------------ <br><h3> Answer 509377 ephemient: </h3><p>Enumerating the possibilities allowed by the grammar for the sequence <code>x</code>:</p>
+<h4> aguadopd, Comment 99270489 Score: 43: </h4>This suggestion works for positive stride, but does not for a negative stride. From the diagram, I expect <code>a[-4,-6,-1]</code> to be <code>yP</code> but it is <code>ty</code>. What always work is to think in characters or slots and use indexing as a half-open interval -- right-open if positive stride, left-open if negative stride.<br><h4> Javier Ruiz, Comment 118360396 Score: 4: </h4>@aguadopd You are absolutely right. The solution is to have the indices shifted to the right, centered just below the characters, and notice that the stop is always excluded. See another response just below.<br><h4> aguadopd, Comment 118606940 Score: 1: </h4>Addendum to my comment: see my answer with diagrams below: <a href="https://stackoverflow.com/a/56332104/2343869">stackoverflow.com/a/56332104/2343869</a><br><h4> endolith, Comment 100377224 Score: 0: </h4>But there&#39;s no way to collapse to an empty set starting from the end (like <code>x[:0]</code> does when starting from the beginning), so you have to special-case small arrays.  :/<br>------------------------------------------------------------------ <br><h3> ephemient, Id: 509377, Score: 540: </h3><p>Enumerating the possibilities allowed by the grammar for the sequence <code>x</code>:</p>
 <pre><code>&gt;&gt;&gt; x[:]                # [x[0],   x[1],          ..., x[-1]    ]
 &gt;&gt;&gt; x[low:]             # [x[low], x[low+1],      ..., x[-1]    ]
 &gt;&gt;&gt; x[:high]            # [x[0],   x[1],          ..., x[high-1]]
@@ -71,7 +71,7 @@ To skip specifying a given argument, one might use <code>None</code>, so that e.
 &gt;&gt;&gt; slicee()[0, 1:2, ::5, ...]
 '(0, slice(1, 2, None), slice(None, None, 5), Ellipsis)'
 </code></pre>
-<h4> Comment 102170688 chepner: </h4>@liyuan The type implementing <code>__getitem__</code> is; your example is equivalent to <code>apple[slice(4, -4, -1)]</code>.<br><h4> Comment 124476274 Bananeen: </h4>The first two tables are pure gold.<br><h4> Comment 83074550 liyuan: </h4>Actually there is still something left out e.g. if I type &#39;apple&#39;[4:-4:-1] I get &#39;elp&#39;, python is translating the -4 to a 1 maybe?<br><h4> Comment 95581586 wjandrea: </h4>note that backticks are deprecated in favour of <code>repr</code><br>------------------------------------------------------------------ <br><h3> Answer 4729334 David M. Perlman: </h3><p>The answers above don't discuss slice assignment. To understand slice assignment, it's helpful to add another concept to the ASCII art:</p>
+<h4> chepner, Comment 102170688 Score: 0: </h4>@liyuan The type implementing <code>__getitem__</code> is; your example is equivalent to <code>apple[slice(4, -4, -1)]</code>.<br><h4> Bananeen, Comment 124476274 Score: 0: </h4>The first two tables are pure gold.<br><h4> liyuan, Comment 83074550 Score: 0: </h4>Actually there is still something left out e.g. if I type &#39;apple&#39;[4:-4:-1] I get &#39;elp&#39;, python is translating the -4 to a 1 maybe?<br><h4> wjandrea, Comment 95581586 Score: 0: </h4>note that backticks are deprecated in favour of <code>repr</code><br>------------------------------------------------------------------ <br><h3> David M. Perlman, Id: 4729334, Score: 446: </h3><p>The answers above don't discuss slice assignment. To understand slice assignment, it's helpful to add another concept to the ASCII art:</p>
 
 <pre><code>                +---+---+---+---+---+---+
                 | P | y | t | h | o | n |
@@ -252,7 +252,7 @@ IndexError: list index out of range
 </code></pre>
 
 <p>This may also clarify the difference between slicing and indexing.</p>
-<h4> Comment 129107053 Alex O: </h4>If I wanted to remove the 1st x elements of a list, what will be better: <code>l = l[6:]</code> or <code>l[:] = l[6:]</code>?<br><h4> Comment 129131819 David M. Perlman: </h4>The first way works for a list or a string; the second way only works for a list, because slice assignment isn&#39;t allowed for strings. Other than that I think the only difference is speed: it looks like it&#39;s a little faster the first way. Try it yourself with timeit.timeit() or preferably  timeit.repeat(). They are <i>super</i> easy to use and very educational, it&#39;s worth getting used to playing with them all the time!<br><h4> Comment 129923223 Edamame: </h4>Curious about what&#39;s the time complexity of doing <code>r[1:1]=[&#39;blah&#39;]</code> ? thanks!<br><h4> Comment 133957364 Simo: </h4>p[2:3] = &#39;t&#39; works fine ! there should be no TypeError !<br>------------------------------------------------------------------ <br><h3> Answer 24713353 Russia Must Remove Putin: </h3><blockquote>
+<h4> Alex O, Comment 129107053 Score: 0: </h4>If I wanted to remove the 1st x elements of a list, what will be better: <code>l = l[6:]</code> or <code>l[:] = l[6:]</code>?<br><h4> David M. Perlman, Comment 129131819 Score: 0: </h4>The first way works for a list or a string; the second way only works for a list, because slice assignment isn&#39;t allowed for strings. Other than that I think the only difference is speed: it looks like it&#39;s a little faster the first way. Try it yourself with timeit.timeit() or preferably  timeit.repeat(). They are <i>super</i> easy to use and very educational, it&#39;s worth getting used to playing with them all the time!<br><h4> Edamame, Comment 129923223 Score: 0: </h4>Curious about what&#39;s the time complexity of doing <code>r[1:1]=[&#39;blah&#39;]</code> ? thanks!<br><h4> Simo, Comment 133957364 Score: 0: </h4>p[2:3] = &#39;t&#39; works fine ! there should be no TypeError !<br>------------------------------------------------------------------ <br><h3> Russia Must Remove Putin, Id: 24713353, Score: 293: </h3><blockquote>
 <h2>Explain Python's slice notation</h2>
 </blockquote>
 <p>In short, the colons (<code>:</code>) in subscript notation (<code>subscriptable[subscriptarg]</code>) make slice notation, which has the optional arguments <code>start</code>, <code>stop</code>, and <code>step</code>:</p>
@@ -372,7 +372,7 @@ list_last_nine = list(last_nine_iter)
 [91, 92, 93, 94, 95, 96, 97, 98, 99]
 </code></pre>
 <p>The fact that list slices make a copy is a feature of lists themselves. If you're slicing advanced objects like a Pandas DataFrame, it may return a view on the original, and not a copy.</p>
-<h4> Comment 113403311 Russia Must Remove Putin: </h4>@WinEunuuchs2Unix that&#39;s great feedback - this is a standard Python behavior, but it could be made clearer in that sort of way, so I&#39;ll consider updating my material to include this semantic.<br><h4> Comment 131714276 Max: </h4>Your answer is the only one (?) that touches the tip of what would be interesting here, when you write &quot;slicable&quot; - the rest is triviality. I wanted to know how the slicing is done, using the <code>__getitem__</code> method. But if I understand well, you have to do all of it on your own: check whether the arg to your <code>__getitem__</code> is an int or a slice (or what else could it be?), and in that (slice) case, deal with all possible cases ((A) or (A,B) or (A,B,C), and all possible sign combinations) on your own.... is that right?<br>------------------------------------------------------------------ <br><h3> Answer 509415 Dana: </h3><p>And a couple of things that weren't immediately obvious to me when I first saw the slicing syntax:</p>
+<h4> Russia Must Remove Putin, Comment 113403311 Score: 0: </h4>@WinEunuuchs2Unix that&#39;s great feedback - this is a standard Python behavior, but it could be made clearer in that sort of way, so I&#39;ll consider updating my material to include this semantic.<br><h4> Max, Comment 131714276 Score: 0: </h4>Your answer is the only one (?) that touches the tip of what would be interesting here, when you write &quot;slicable&quot; - the rest is triviality. I wanted to know how the slicing is done, using the <code>__getitem__</code> method. But if I understand well, you have to do all of it on your own: check whether the arg to your <code>__getitem__</code> is an int or a slice (or what else could it be?), and in that (slice) case, deal with all possible cases ((A) or (A,B) or (A,B,C), and all possible sign combinations) on your own.... is that right?<br>------------------------------------------------------------------ <br><h3> Dana, Id: 509415, Score: 161: </h3><p>And a couple of things that weren't immediately obvious to me when I first saw the slicing syntax:</p>
 
 <pre><code>&gt;&gt;&gt; x = [1,2,3,4,5,6]
 &gt;&gt;&gt; x[::-1]
@@ -387,7 +387,7 @@ list_last_nine = list(last_nine_iter)
 &gt;&gt;&gt; x[::-2]
 [6,4,2]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 13005464 Ankur Agarwal: </h3><p>In Python 2.7</p>
+------------------------------------------------------------------ <br><h3> Ankur Agarwal, Id: 13005464, Score: 112: </h3><p>In Python 2.7</p>
 
 <p>Slicing in Python</p>
 
@@ -476,7 +476,7 @@ In backward direction, starts at -1 and ends at -len
 &gt;&gt;&gt; l1[:-2:-2] # a default is -1, stop(b) at -2 , step(c) by 2 in reverse direction
 [4]
 </code></pre>
-<h4> Comment 77001814 Deviacium: </h4>another one interesting example: <code>a = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ]; a[:-2:-2]</code> which results to <code>[9]</code><br>------------------------------------------------------------------ <br><h3> Answer 7315935 AdrianoFerrari: </h3><p>Found this great table at <a href="http://wiki.python.org/moin/MovingToPythonFromOtherLanguages" rel="noreferrer">http://wiki.python.org/moin/MovingToPythonFromOtherLanguages</a></p>
+<h4> Deviacium, Comment 77001814 Score: 4: </h4>another one interesting example: <code>a = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ]; a[:-2:-2]</code> which results to <code>[9]</code><br>------------------------------------------------------------------ <br><h3> AdrianoFerrari, Id: 7315935, Score: 103: </h3><p>Found this great table at <a href="http://wiki.python.org/moin/MovingToPythonFromOtherLanguages" rel="noreferrer">http://wiki.python.org/moin/MovingToPythonFromOtherLanguages</a></p>
 
 <pre><code>Python indexes and slices for a six-element list.
 Indexes enumerate the elements, slices enumerate the spaces between the elements.
@@ -490,7 +490,7 @@ Slice from front:  :   1   2   3   4   5   :    a[-2]==4
 Slice from rear:   :  -5  -4  -3  -2  -1   :
                                                 b=a[:]
                                                 b==[0,1,2,3,4,5] (shallow copy of a)</code></pre>
------------------------------------------------------------------- <br><h3> Answer 567094 Simon: </h3><p>After using it a bit I realise that the simplest description is that it is exactly the same as the arguments in a <code>for</code> loop...</p>
+------------------------------------------------------------------ <br><h3> Simon, Id: 567094, Score: 70: </h3><p>After using it a bit I realise that the simplest description is that it is exactly the same as the arguments in a <code>for</code> loop...</p>
 
 <pre><code>(from:to:step)
 </code></pre>
@@ -505,7 +505,7 @@ Slice from rear:   :  -5  -4  -3  -2  -1   :
 <p>Then the negative indexing just needs you to add the length of the string to the negative indices to understand it.</p>
 
 <p>This works for me anyway...</p>
------------------------------------------------------------------- <br><h3> Answer 9923354 Beni Cherniavsky-Paskin: </h3><p>I find it easier to remember how it works, and then I can figure out any specific start/stop/step combination.</p>
+------------------------------------------------------------------ <br><h3> Beni Cherniavsky-Paskin, Id: 9923354, Score: 55: </h3><p>I find it easier to remember how it works, and then I can figure out any specific start/stop/step combination.</p>
 
 <p>It's instructive to understand <code>range()</code> first:</p>
 
@@ -544,7 +544,7 @@ Slice from rear:   :  -5  -4  -3  -2  -1   :
 
 <p>Normalizing negative indexes first allows start and/or stop to be counted from the end independently: <code>'abcde'[1:-2] == 'abcde'[1:3] == 'bc'</code> despite <code>range(1,-2) == []</code>.
 The normalization is sometimes thought of as "modulo the length", but note it adds the length just once: e.g. <code>'abcde'[-53:42]</code> is just the whole string.</p>
-<h4> Comment 67894582 Eastsun: </h4>The <code>this_is_how_slicing_works</code> is not the same as python slice. E.G. <code>[0, 1, 2][-5:3:3]</code> will get [0] in python, but <code>list(this_is_how_slicing_works([0, 1, 2], -5, 3, 3))</code> get [1].<br><h4> Comment 67913261 Beni Cherniavsky-Paskin: </h4>@Eastsun Oops, you&#39;re right!  A clearer case: <code>range(4)[-200:200:3] == [0, 3]</code> but <code>list(this_is_how_slicing_works([0, 1, 2, 3], -200, 200, 3)) == [2]</code>. My <code>if 0 &lt;= i &lt; len(seq):</code> was an attempt to implement &quot;never go outside the sequence&quot; simply but is wrong for step&gt;1.  I&#39;ll rewrite it later today (with tests).<br>------------------------------------------------------------------ <br><h3> Answer 29237560 Chillar Anand: </h3><p>This is how I teach slices to newbies:</p>
+<h4> Eastsun, Comment 67894582 Score: 3: </h4>The <code>this_is_how_slicing_works</code> is not the same as python slice. E.G. <code>[0, 1, 2][-5:3:3]</code> will get [0] in python, but <code>list(this_is_how_slicing_works([0, 1, 2], -5, 3, 3))</code> get [1].<br><h4> Beni Cherniavsky-Paskin, Comment 67913261 Score: 0: </h4>@Eastsun Oops, you&#39;re right!  A clearer case: <code>range(4)[-200:200:3] == [0, 3]</code> but <code>list(this_is_how_slicing_works([0, 1, 2, 3], -200, 200, 3)) == [2]</code>. My <code>if 0 &lt;= i &lt; len(seq):</code> was an attempt to implement &quot;never go outside the sequence&quot; simply but is wrong for step&gt;1.  I&#39;ll rewrite it later today (with tests).<br>------------------------------------------------------------------ <br><h3> Chillar Anand, Id: 29237560, Score: 40: </h3><p>This is how I teach slices to newbies:</p>
 
 <p><strong>Understanding the difference between indexing and slicing:</strong></p>
 
@@ -696,14 +696,14 @@ Out[29]: [5, 4]
 </code></pre>
 
 <p><strong>Note:</strong> This post was originally written in my blog, <em><a href="https://avilpage.com/2015/03/a-slice-of-python-intelligence-behind.html" rel="noreferrer">The Intelligence Behind Python Slices</a></em>.</p>
-<h4> Comment 125358697 Olivier: </h4>At last, I found here some explanation on why the slicing parameters <code>start</code> and <code>stop</code> and error-proof.<br>------------------------------------------------------------------ <br><h3> Answer 522212 Steve Losh: </h3><p>I use the "an index points between elements" method of thinking about it myself, but one way of describing it which sometimes helps others get it is this:</p>
+<h4> Olivier, Comment 125358697 Score: 1: </h4>At last, I found here some explanation on why the slicing parameters <code>start</code> and <code>stop</code> and error-proof.<br>------------------------------------------------------------------ <br><h3> Steve Losh, Id: 522212, Score: 45: </h3><p>I use the "an index points between elements" method of thinking about it myself, but one way of describing it which sometimes helps others get it is this:</p>
 
 <pre><code>mylist[X:Y]
 </code></pre>
 
 <p>X is the index of the first element you want.<br>
 Y is the index of the first element you <em>don't</em> want.</p>
-<h4> Comment 132868897 contactmatt: </h4>This is helpful; I had pondered why the ending index (in this case, Y of [X:Y]) was not included. i.e. Why [0:0] would not include the first index.<br>------------------------------------------------------------------ <br><h3> Answer 14682039 xiaoyu: </h3><pre><code>Index:
+<h4> contactmatt, Comment 132868897 Score: 0: </h4>This is helpful; I had pondered why the ending index (in this case, Y of [X:Y]) was not included. i.e. Why [0:0] would not include the first index.<br>------------------------------------------------------------------ <br><h3> xiaoyu, Id: 14682039, Score: 43: </h3><pre><code>Index:
       ------------&gt;
   0   1   2   3   4
 +---+---+---+---+---+
@@ -727,7 +727,7 @@ Slice:
 <p>I hope this will help you to model the list in Python.</p>
 
 <p>Reference: <a href="http://wiki.python.org/moin/MovingToPythonFromOtherLanguages" rel="noreferrer">http://wiki.python.org/moin/MovingToPythonFromOtherLanguages</a></p>
------------------------------------------------------------------- <br><h3> Answer 16267103 Brent Bradburn: </h3><p>Python slicing notation:</p>
+------------------------------------------------------------------ <br><h3> Brent Bradburn, Id: 16267103, Score: 39: </h3><p>Python slicing notation:</p>
 
 <pre><code>a[start:end:step]
 </code></pre>
@@ -745,7 +745,7 @@ Slice:
 </code></pre>
 
 <p>Slices hold references, not copies, of the array elements.  If you want to make a separate copy an array, you can use <a href="https://stackoverflow.com/questions/6532881/how-to-make-a-copy-of-a-2d-array-in-python"><code>deepcopy()</code></a>.</p>
------------------------------------------------------------------- <br><h3> Answer 9827284 Arindam Roychowdhury: </h3><p>This is just for some extra info...
+------------------------------------------------------------------ <br><h3> Arindam Roychowdhury, Id: 9827284, Score: 34: </h3><p>This is just for some extra info...
 Consider the list below </p>
 
 <pre><code>&gt;&gt;&gt; l=[12,23,345,456,67,7,945,467]
@@ -768,14 +768,14 @@ Consider the list below </p>
 &gt;&gt;&gt; l[-1:-len(l)-1:-1]
 [467, 945, 7, 67, 456, 345, 23, 12]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 15824717 dansalmo: </h3><p>You can also use slice assignment to remove one or more elements from a list:</p>
+------------------------------------------------------------------ <br><h3> dansalmo, Id: 15824717, Score: 35: </h3><p>You can also use slice assignment to remove one or more elements from a list:</p>
 
 <pre><code>r = [1, 'blah', 9, 8, 2, 3, 4]
 &gt;&gt;&gt; r[1:4] = []
 &gt;&gt;&gt; r
 [1, 2, 3, 4]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 41548529 cizixs: </h3><h2>1. Slice Notation</h2>
+------------------------------------------------------------------ <br><h3> cizixs, Id: 41548529, Score: 31: </h3><h2>1. Slice Notation</h2>
 
 <p>To make it simple, remember <strong>slice has only one form：</strong></p>
 
@@ -900,7 +900,7 @@ IndexError                                Traceback (most recent call last)
 
 IndexError: list index out of range
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 20443928 Python_Dude: </h3><p>As a general rule, writing code with a lot of hardcoded index values leads to a readability
+------------------------------------------------------------------ <br><h3> Python_Dude, Id: 20443928, Score: 29: </h3><p>As a general rule, writing code with a lot of hardcoded index values leads to a readability
 and maintenance mess. For example, if you come back to the code a year later, you’ll
 look at it and wonder what you were thinking when you wrote it. The solution shown
 is simply a way of more clearly stating what your code is actually doing.
@@ -935,7 +935,7 @@ s.start, s.stop, and s.step attributes, respectively. For example:</p>
 &gt;&gt;&gt;
 </code></pre>
 </blockquote>
------------------------------------------------------------------- <br><h3> Answer 42522149 Statham: </h3><p>The previous answers don't discuss multi-dimensional array slicing which is possible using the famous <a href="http://en.wikipedia.org/wiki/NumPy" rel="noreferrer">NumPy</a> package:</p>
+------------------------------------------------------------------ <br><h3> Statham, Id: 42522149, Score: 29: </h3><p>The previous answers don't discuss multi-dimensional array slicing which is possible using the famous <a href="http://en.wikipedia.org/wiki/NumPy" rel="noreferrer">NumPy</a> package:</p>
 
 <p><strong>Slicing can also be applied to multi-dimensional arrays.</strong></p>
 
@@ -951,7 +951,7 @@ array([[1, 3],
 </code></pre>
 
 <p>The "<code>:2</code>" before the comma operates on the first dimension and the "<code>0:3:2</code>" after the comma operates on the second dimension.</p>
-<h4> Comment 100958827 Mars Lee: </h4>Just a friendly reminder that you cannot do this on Python <code>list</code> but only on <code>array</code> in Numpy<br>------------------------------------------------------------------ <br><h3> Answer 63047385 Anshika Singh: </h3><h3>The rules of slicing are as follows:</h3>
+<h4> Mars Lee, Comment 100958827 Score: 4: </h4>Just a friendly reminder that you cannot do this on Python <code>list</code> but only on <code>array</code> in Numpy<br>------------------------------------------------------------------ <br><h3> Anshika Singh, Id: 63047385, Score: 20: </h3><h3>The rules of slicing are as follows:</h3>
 <pre><code>[lower bound : upper bound : step size]
 </code></pre>
 <p><strong>I-</strong> Convert <code>upper bound</code>  and <code>lower bound</code> into common signs.</p>
@@ -994,7 +994,7 @@ print(str2)
 </code></pre>
 <p>In the first <code>str2=str[l-1:0:-1]</code>, the <code>upper bound</code> is <strong>lesser than</strong> the <code>lower bound</code>, thus <code>dcb</code> is printed.</p>
 <p>However in <code>str2=str[l-1:-1:-1]</code>, the <code>upper bound</code> is <strong>not less than</strong> the <code>lower bound</code> (upon converting <code>lower bound</code> into <strong>negative value</strong> which is <code>-1</code>: since <code>index</code> of last element is -1 as well as 3).</p>
------------------------------------------------------------------- <br><h3> Answer 47765245 asiby: </h3><p>In my opinion, you will understand and memorize better the Python string slicing notation if you look at it the following way (read on).</p>
+------------------------------------------------------------------ <br><h3> asiby, Id: 47765245, Score: 18: </h3><p>In my opinion, you will understand and memorize better the Python string slicing notation if you look at it the following way (read on).</p>
 
 <p>Let's work with the following string ...</p>
 
@@ -1026,14 +1026,14 @@ cdefgh    index1       index2
 <p>a b <strong>[</strong> c d e f g h <strong>]</strong> i j</p>
 
 <p>That trick works all the time and is easy to memorize.</p>
------------------------------------------------------------------- <br><h3> Answer 57628026 Raman: </h3><p>I personally think about it like a <code>for</code> loop:</p>
+------------------------------------------------------------------ <br><h3> Raman, Id: 57628026, Score: 18: </h3><p>I personally think about it like a <code>for</code> loop:</p>
 
 <pre><code>a[start:end:step]
 # for(i = start; i &lt; end; i += step)
 </code></pre>
 
 <p>Also, note that negative values for <code>start</code> and <code>end</code> are relative to the end of the list and computed in the example above by <code>given_index + a.shape[0]</code>.</p>
------------------------------------------------------------------- <br><h3> Answer 26442691 mahmoh: </h3><pre><code>#!/usr/bin/env python
+------------------------------------------------------------------ <br><h3> mahmoh, Id: 26442691, Score: 17: </h3><pre><code>#!/usr/bin/env python
 
 def slicegraphical(s, lista):
 
@@ -1142,7 +1142,7 @@ COMPUTERS[-1 : 1 :-2 ] =  SEUM
 </code></pre>
 
 <p>When using a negative step, notice that the answer is shifted to the right by 1.</p>
------------------------------------------------------------------- <br><h3> Answer 37455246 Robert: </h3><p>My brain seems happy to accept that <code>lst[start:end]</code> contains the <code>start</code>-th item. I might even say that it is a 'natural assumption'.</p>
+------------------------------------------------------------------ <br><h3> Robert, Id: 37455246, Score: 14: </h3><p>My brain seems happy to accept that <code>lst[start:end]</code> contains the <code>start</code>-th item. I might even say that it is a 'natural assumption'.</p>
 
 <p>But occasionally a doubt creeps in and my brain asks for reassurance that it does not contain the <code>end</code>-th element.</p>
 
@@ -1160,7 +1160,7 @@ lst[:-42] + lst[-42:] == lst
 </code></pre>
 
 <p>returns <code>True</code>.</p>
------------------------------------------------------------------- <br><h3> Answer 46040689 lmiguelvargasf: </h3><p>In Python, the most basic form for slicing is the following:</p>
+------------------------------------------------------------------ <br><h3> lmiguelvargasf, Id: 46040689, Score: 13: </h3><p>In Python, the most basic form for slicing is the following:</p>
 
 <pre><code>l[start:end]
 </code></pre>
@@ -1272,7 +1272,7 @@ In [31]: l = l[1:-1] # This step is for slicing
 In [32]: l
 Out[32]: [2, 4, 6]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 49647978 Jeyekomon: </h3><p>I want to add one <em>Hello, World!</em> example that explains the basics of slices for the very beginners. It helped me a lot.</p>
+------------------------------------------------------------------ <br><h3> Jeyekomon, Id: 49647978, Score: 12: </h3><p>I want to add one <em>Hello, World!</em> example that explains the basics of slices for the very beginners. It helped me a lot.</p>
 
 <p>Let's have a list with six values <code>['P', 'Y', 'T', 'H', 'O', 'N']</code>:</p>
 
@@ -1297,14 +1297,14 @@ Out[32]: [2, 4, 6]
 </code></pre>
 
 <p>You made a cut <strong>before</strong> the element with index <code>2</code> and another cut <strong>before</strong> the element with index <code>5</code>. So the result will be a slice between those two cuts, a list <code>['T', 'H', 'O']</code>.</p>
------------------------------------------------------------------- <br><h3> Answer 46614773 Roshan Bagdiya: </h3><p>Most of the previous answers clears up questions about slice notation.</p>
+------------------------------------------------------------------ <br><h3> Roshan Bagdiya, Id: 46614773, Score: 11: </h3><p>Most of the previous answers clears up questions about slice notation.</p>
 
 <p>The extended indexing syntax used for slicing is <code>aList[start:stop:step]</code>, and basic examples are:</p>
 
 <p><a href="https://i.stack.imgur.com/IVkET.jpg" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/IVkET.jpg" alt="Enter image description here"></a>:</p>
 
 <p>More slicing examples: <a href="https://docs.python.org/2.3/whatsnew/section-slices.html" rel="nofollow noreferrer">15 Extended Slices</a></p>
------------------------------------------------------------------- <br><h3> Answer 45370737 Prince Dhadwal: </h3><p>The below is the example of an index of a string:</p>
+------------------------------------------------------------------ <br><h3> Prince Dhadwal, Id: 45370737, Score: 9: </h3><p>The below is the example of an index of a string:</p>
 
 <pre><code> +---+---+---+---+---+
  | H | e | l | p | A |
@@ -1331,7 +1331,7 @@ print str[0:7] = Name st
 print str[0:7:2] = Nm t
 print str[0:-1:2] = Nm ti
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 71640042 G&#233;ry Ogam: </h3><p>The important idea to remember about indices of a sequence is that</p>
+------------------------------------------------------------------ <br><h3> G&#233;ry Ogam, Id: 71640042, Score: 9: </h3><p>The important idea to remember about indices of a sequence is that</p>
 <ul>
 <li><em>nonnegative</em> indices begin at the <em>first</em> item in the sequence;</li>
 <li><em>negative</em> indices begin at the <em>last</em> item in the sequence (so only apply to finite sequences).</li>
@@ -1421,7 +1421,7 @@ ValueError: slice step cannot be zero
 <p>* The expressions <code>sequence[index]</code> and <code>sequence.__getitem__(index)</code> are equivalent.</p>
 <p>** The expressions <code>sequence[start:stop:step]</code>, <code>sequence[slice(start, stop, step)]</code>, and <code>sequence.__getitem__(slice(start, stop, step))</code> are equivalent, where the <a href="https://docs.python.org/3/library/functions.html#slice" rel="nofollow noreferrer">built-in class <code>slice</code></a> instance packs <code>start</code>, <code>stop</code>, and <code>step</code>.</p>
 <p>*** The expressions <code>sequence[:]</code>, <code>sequence[::]</code>, and <code>sequence[None:None:None]</code> use default values for <code>start</code>, <code>stop</code>, and <code>step</code>.</p>
------------------------------------------------------------------- <br><h3> Answer 47880987 Shital Shah: </h3><p>If you feel negative indices in slicing is confusing, here's a very easy way to think about it: just replace the negative index with <code>len - index</code>. So for example, replace -3 with <code>len(list) - 3</code>.</p>
+------------------------------------------------------------------ <br><h3> Shital Shah, Id: 47880987, Score: 8: </h3><p>If you feel negative indices in slicing is confusing, here's a very easy way to think about it: just replace the negative index with <code>len - index</code>. So for example, replace -3 with <code>len(list) - 3</code>.</p>
 
 <p>The best way to illustrate what slicing does internally is just show it in code that implements this operation:</p>
 
@@ -1437,7 +1437,7 @@ ValueError: slice step cannot be zero
   # Now just execute a for-loop with start, end and step
   return [list[i] for i in range(start, end, step)]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 56332104 aguadopd: </h3><p>I don't think that the <a href="https://docs.python.org/3/tutorial/introduction.html#strings" rel="noreferrer">Python tutorial</a> diagram (cited in various other answers) is good as this suggestion works for positive stride, but does not for a negative stride.</p>
+------------------------------------------------------------------ <br><h3> aguadopd, Id: 56332104, Score: 8: </h3><p>I don't think that the <a href="https://docs.python.org/3/tutorial/introduction.html#strings" rel="noreferrer">Python tutorial</a> diagram (cited in various other answers) is good as this suggestion works for positive stride, but does not for a negative stride.</p>
 
 <p>This is the diagram:</p>
 
@@ -1473,7 +1473,7 @@ ValueError: slice step cannot be zero
  +---+---+---+---+---+---+---+---+---+---+---+---+
   -6  -5  -4  -3  -2  -1   0   1   2   3   4   5  
 </code></pre>
-<h4> Comment 124872981 CoolHandLouis: </h4>As a newbie, this is an interesting way of thinking about it.  However, the last example, counting from -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5 is a bit misleading because the string is NOT doubled like that.  Furthermore, one can refer to the positive and negate positions like the following: a[-4:-6:-1] is the same as a[-4:0:-1] since the 0th position is the same as the -6th position.  So I would just delete/ignore that example.<br><h4> Comment 120967561 aguadopd: </h4>Used today 2021/07/19 by myself, qu&#233; capo aguadopd del pasado<br>------------------------------------------------------------------ <br><h3> Answer 51479594 Babu Chandermani: </h3><p>The basic slicing technique is to define the starting point, the stopping point, and the step size—also known as stride.</p>
+<h4> CoolHandLouis, Comment 124872981 Score: 1: </h4>As a newbie, this is an interesting way of thinking about it.  However, the last example, counting from -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5 is a bit misleading because the string is NOT doubled like that.  Furthermore, one can refer to the positive and negate positions like the following: a[-4:-6:-1] is the same as a[-4:0:-1] since the 0th position is the same as the -6th position.  So I would just delete/ignore that example.<br><h4> aguadopd, Comment 120967561 Score: 0: </h4>Used today 2021/07/19 by myself, qu&#233; capo aguadopd del pasado<br>------------------------------------------------------------------ <br><h3> Babu Chandermani, Id: 51479594, Score: 7: </h3><p>The basic slicing technique is to define the starting point, the stopping point, and the step size—also known as stride.</p>
 <p>First, we will create a list of values to use in our slicing.</p>
 <p>Create two lists to slice. The first is a numeric list from 1 to 9 (List A). The second is also a numeric list, from 0 to 9 (List B):</p>
 <pre><code>A = list(range(1, 10, 1)) # Start, stop, and step
@@ -1495,7 +1495,7 @@ print(B[6])
 </code></pre>
 <p>To retrieve a subset of elements, the start and stop positions need to be defined.</p>
 <p>Given the pattern <code>aList[start:stop]</code>, retrieve the first two elements from List A.</p>
------------------------------------------------------------------- <br><h3> Answer 75061865 H.Elci: </h3><blockquote>
+------------------------------------------------------------------ <br><h3> H.Elci, Id: 75061865, Score: 5: </h3><blockquote>
 <p>For <strong>simple way</strong> and <strong>simple understandable</strong>:</p>
 </blockquote>
 <p>In Python, the slice notation <strong><code>a[start:stop:step]</code></strong> can be used to select a range of elements from a sequence (such as a list, tuple, or string).</p>
@@ -1531,7 +1531,7 @@ print(B[6])
 </code></pre>
 <p>If you want to learn more about slice notation, you can refer to the official <strong>Python documentation</strong>:
 <a href="https://docs.python.org/3/library/functions.html#slice" rel="noreferrer">Link 1</a> <a href="https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range" rel="noreferrer">Link 2</a></p>
------------------------------------------------------------------- <br><h3> Answer 56591541 grbruns: </h3><p>I got a little frustrated in not finding an online source, or Python documentation that describes precisely what slicing does.</p>
+------------------------------------------------------------------ <br><h3> grbruns, Id: 56591541, Score: 4: </h3><p>I got a little frustrated in not finding an online source, or Python documentation that describes precisely what slicing does.</p>
 <p>I took Aaron Hall's suggestion, read the relevant parts of the CPython source code, and wrote some Python code that performs slicing similarly to how it's done in CPython. I've tested my code in Python 3 on millions of random tests on integer lists.</p>
 <p>You may find the references in my code to the relevant functions in CPython helpful.</p>
 <pre><code>def slicer(x, start=None, stop=None, step=None):
@@ -1599,7 +1599,7 @@ print(B[6])
             cur += step
         return result
 </code></pre>
-<h4> Comment 118125881 Andy: </h4>I read all the relevant documents and found that there was no description of this syntax. I doubted my ability and felt relieved after seeing this answer. Maybe there was none.<br>------------------------------------------------------------------ <br><h3> Answer 53953716 Banghua Zhao: </h3><p>It is easy to understand if we could relate slicing to <code>range</code>, which gives the indexes. We can categorize slicing into the following two categories:</p>
+<h4> Andy, Comment 118125881 Score: 0: </h4>I read all the relevant documents and found that there was no description of this syntax. I doubted my ability and felt relieved after seeing this answer. Maybe there was none.<br>------------------------------------------------------------------ <br><h3> Banghua Zhao, Id: 53953716, Score: 2: </h3><p>It is easy to understand if we could relate slicing to <code>range</code>, which gives the indexes. We can categorize slicing into the following two categories:</p>
 
 <hr>
 
@@ -1682,7 +1682,7 @@ print(B[6])
 <h2>In summary</h2>
 
 <p><a href="https://i.stack.imgur.com/4DLrK.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/4DLrK.png" alt="enter image description here"></a></p>
------------------------------------------------------------------- <br><h3> Answer 72372369 Kyle Meador: </h3><p>There are lots of answers already, but I wanted to add a performance comparison:</p>
+------------------------------------------------------------------ <br><h3> Kyle Meador, Id: 72372369, Score: 1: </h3><p>There are lots of answers already, but I wanted to add a performance comparison:</p>
 <pre class="lang-none prettyprint-override"><code>python3.8 -m timeit -s 'fun = &quot;this is fun;slicer = slice(0, 3)&quot;' &quot;fun_slice = fun[slicer]&quot;
 10000000 loops, best of 5: 29.8 nsec per loop
 
@@ -1696,7 +1696,7 @@ python3.8 -m timeit -s 'fun = &quot;this is fun&quot;' &quot;slicer = slice(0, 3
 5000000 loops, best of 5: 42.8 nsec per loop
 </code></pre>
 <p>So, if you are using the same slice repeatedly, it would be beneficial and improve readability to use a slice object. However, if you are slicing only a handful of times, the <code>[:]</code> notation should be preferred.</p>
------------------------------------------------------------------- <br><h3> Answer 74979870 My Car: </h3><p>You can use slice syntax to return a sequence of characters.</p>
+------------------------------------------------------------------ <br><h3> My Car, Id: 74979870, Score: 1: </h3><p>You can use slice syntax to return a sequence of characters.</p>
 <p>Specify a start and end index, separated by colons, to return part of the string.</p>
 <p>Example:</p>
 <p>Get the characters from position 2 to position 5 (not included):</p>
@@ -1726,11 +1726,11 @@ example.</p>
 <pre><code>b = &quot;Hello, World!&quot;
 print(b[-5:-2])
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 73011643 Robert: </h3><p>Here's a simple mnemonic for remembering how it works:</p>
+------------------------------------------------------------------ <br><h3> Robert, Id: 73011643, Score: -9: </h3><p>Here's a simple mnemonic for remembering how it works:</p>
 <ul>
 <li><code>S L *I* C *E*</code></li>
 <li>the 'i' of slice comes first and stands for <em>inclusive</em>,</li>
 <li>the 'e' comes last and stands for <em>exclusive</em>.</li>
 </ul>
 <p>So <code>array[j:k]</code> will <em>include</em> the <code>j</code>th element and <em>exclude</em> the <code>k</code>th element.</p>
-<h4> Comment 128986129 OneCricketeer: </h4>You forgot the <code>step</code> like <code>[j:k:s]</code>. And slicing wraps around the list<br><h4> Comment 128998986 OneCricketeer: </h4>Your answer is incomplete, though, as it doesn&#39;t completely answer about different ways to slice. Other answers given already specify the inclusive/exclusive details<br><h4> Comment 128993361 Robert: </h4>But for the case I cover, <code>array[j:k]</code>, I believe my mnemonic is correct and helpful. I don&#39;t believe it is wrong in any way. Please reconsider your downvote.<br>
+<h4> OneCricketeer, Comment 128986129 Score: 1: </h4>You forgot the <code>step</code> like <code>[j:k:s]</code>. And slicing wraps around the list<br><h4> OneCricketeer, Comment 128998986 Score: 1: </h4>Your answer is incomplete, though, as it doesn&#39;t completely answer about different ways to slice. Other answers given already specify the inclusive/exclusive details<br><h4> Robert, Comment 128993361 Score: 0: </h4>But for the case I cover, <code>array[j:k]</code>, I believe my mnemonic is correct and helpful. I don&#39;t believe it is wrong in any way. Please reconsider your downvote.<br>

@@ -1,6 +1,6 @@
- <h2> Title: What does $1 mean in Perl? </h2> <h3> Chad DeShon, question_id: 1036285 </h3>Score: 78, Tags: {regex,perl} <br><p>What does $1 mean in Perl? Further, what does $2 mean?
+ <h2> Title: What does $1 mean in Perl? </h2> <h4> Chad DeShon, question_id: 1036285 </h4>Score: 78, Tags: {regex,perl} <br><p>What does $1 mean in Perl? Further, what does $2 mean?
 How many $number variables are there?</p>
-<h4> Comment 850438 brian d foy: </h4>You might do well to check out something like <i>Learning Perl</i> or other introduction to Perl that explains the very basics of the language.<br><h4> Comment 77212471 John White: </h4>Now Brian, why would you be recommending that book?  The Monks are a charity after all....<br>------------------------------------------------------------------ <br><h3> Answer 1036294 rlbond: </h3><p>The <code>$number</code> variables contain the parts of the string that matched the <em><a href="https://perldoc.perl.org/perlre.html#Capture-groups" rel="noreferrer">capture groups</a></em> <code>( ... )</code> in the pattern for your last regex match if the match was successful.</p>
+<h4> brian d foy, Id: 850438 Score: 4: </h4>You might do well to check out something like <i>Learning Perl</i> or other introduction to Perl that explains the very basics of the language.<br><h4> John White, Id: 77212471 Score: 1: </h4>Now Brian, why would you be recommending that book?  The Monks are a charity after all....<br>------------------------------------------------------------------ <br><h3> rlbond, Id: 1036294, Score: 80: </h3><p>The <code>$number</code> variables contain the parts of the string that matched the <em><a href="https://perldoc.perl.org/perlre.html#Capture-groups" rel="noreferrer">capture groups</a></em> <code>( ... )</code> in the pattern for your last regex match if the match was successful.</p>
 
 <p>For example, take the following string:</p>
 
@@ -13,7 +13,7 @@ How many $number variables are there?</p>
 </code></pre>
 
 <p><code>$1</code> equals the text "<code>brown</code>".</p>
-<h4> Comment 115523424 DemiImp: </h4>I think it&#39;s also important to mention that all capture variables ($1, $2, etc) are locally scoped.  Once you leave the block, they are undefined.<br><h4> Comment 57584267 user1289: </h4>what if there will be more than one matches? can&#39;s we somehow get all the matches?<br><h4> Comment 96446883 Alecg_O: </h4>@user1289 that&#39;s what the other numbers ($2, $3, ...) are for.<br><h4> Comment 115523338 DemiImp: </h4>@user1289 - Your regex needs multiple parenthesis to capture multiple values.  You can&#39;t just use one capture criteria (ex m/ (b.?) /) to grab all words in a string that start with &quot;b&quot; (the prior example will only capture the first instance).<br>------------------------------------------------------------------ <br><h3> Answer 1036291 Jim Puls: </h3><p>The number variables are the matches from the last <em>successful</em> match or substitution operator you applied:</p>
+<h4> DemiImp, Comment 115523424 Score: 1: </h4>I think it&#39;s also important to mention that all capture variables ($1, $2, etc) are locally scoped.  Once you leave the block, they are undefined.<br><h4> user1289, Comment 57584267 Score: 2: </h4>what if there will be more than one matches? can&#39;s we somehow get all the matches?<br><h4> Alecg_O, Comment 96446883 Score: 0: </h4>@user1289 that&#39;s what the other numbers ($2, $3, ...) are for.<br><h4> DemiImp, Comment 115523338 Score: 0: </h4>@user1289 - Your regex needs multiple parenthesis to capture multiple values.  You can&#39;t just use one capture criteria (ex m/ (b.?) /) to grab all words in a string that start with &quot;b&quot; (the prior example will only capture the first instance).<br>------------------------------------------------------------------ <br><h3> Jim Puls, Id: 1036291, Score: 38: </h3><p>The number variables are the matches from the last <em>successful</em> match or substitution operator you applied:</p>
 
 <pre><code>my $string = 'abcdefghi';
 
@@ -25,7 +25,7 @@ if ($string =~ /(abc)def(ghi)/) {
 <p>Always test that the match or substitution was successful before using <code>$1</code> and so on. Otherwise, you might pick up the leftovers from another operation.</p>
 
 <p>Perl regular expressions are documented in <a href="http://perldoc.perl.org/perlre.html" rel="nofollow noreferrer">perlre</a>.</p>
-<h4> Comment 847082 Chad DeShon: </h4>If $1 through $9 are always there, what is there value if there were less than nine matches?<br><h4> Comment 850419 brian d foy: </h4>I&#39;ve completely replaced the answer with only the truth. Almost everything in the original answer was wrong.<br><h4> Comment 847154 Alan Haggai Alavi: </h4>$1 through $9 are not always there. I think Jim misread the man page. I am quoting the relevant section: &quot;You may have as many parentheses as you wish. If you have more than 9 substrings, the variables $10, $11, ... refer to the corresponding substring. Within the pattern, \10, \11, etc. refer back to substrings if there have been at least that many left parentheses before the backreference. Otherwise (for backward compatibility) \10 is the same as \010, a backspace, and \11 the same as \011, a tab. And so on. (\1 through \9 are always backreferences.)&quot;<br><h4> Comment 849099 Michael Carman: </h4>-1 for too many half-truths. They&#39;re the result of captures, not the match as a whole. They&#39;re only set on successful matches, which means you need to check whether or not the match was successful before using them. As Alan already pointed out, you&#39;ve confused the special case behavior of the alternate backslash notation.<br>------------------------------------------------------------------ <br><h3> Answer 1037117 plusplus: </h3><p>$1, $2, etc will contain the value of captures from the last <strong>successful</strong> match - it's important to check whether the match succeeded before accessing them, i.e.</p>
+<h4> Chad DeShon, Comment 847082 Score: 1: </h4>If $1 through $9 are always there, what is there value if there were less than nine matches?<br><h4> brian d foy, Comment 850419 Score: 6: </h4>I&#39;ve completely replaced the answer with only the truth. Almost everything in the original answer was wrong.<br><h4> Alan Haggai Alavi, Comment 847154 Score: 5: </h4>$1 through $9 are not always there. I think Jim misread the man page. I am quoting the relevant section: &quot;You may have as many parentheses as you wish. If you have more than 9 substrings, the variables $10, $11, ... refer to the corresponding substring. Within the pattern, \10, \11, etc. refer back to substrings if there have been at least that many left parentheses before the backreference. Otherwise (for backward compatibility) \10 is the same as \010, a backspace, and \11 the same as \011, a tab. And so on. (\1 through \9 are always backreferences.)&quot;<br><h4> Michael Carman, Comment 849099 Score: 2: </h4>-1 for too many half-truths. They&#39;re the result of captures, not the match as a whole. They&#39;re only set on successful matches, which means you need to check whether or not the match was successful before using them. As Alan already pointed out, you&#39;ve confused the special case behavior of the alternate backslash notation.<br>------------------------------------------------------------------ <br><h3> plusplus, Id: 1037117, Score: 13: </h3><p>$1, $2, etc will contain the value of captures from the last <strong>successful</strong> match - it's important to check whether the match succeeded before accessing them, i.e.</p>
 
 <pre><code> if ( $var =~ m/( )/ ) { # use $1 etc... }
 </code></pre>
@@ -40,7 +40,7 @@ print "Found: $1\n";
 'Lazy dog' =~ m{ ( quick ) }ix;
 print "Found: $1\n";
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 1036867 Einstein: </h3><p>As others have pointed out, the $x are capture variables for regular expressions, allowing you to reference sections of a matched pattern.</p>
+------------------------------------------------------------------ <br><h3> Einstein, Id: 1036867, Score: 10: </h3><p>As others have pointed out, the $x are capture variables for regular expressions, allowing you to reference sections of a matched pattern.</p>
 
 <p>Perl also supports named captures which might be easier for humans to remember in some cases.</p>
 
@@ -61,10 +61,10 @@ print "Found: $1\n";
 <p>$+{myvara} is 111</p>
 
 <p>$+{myvarb} is 222</p>
------------------------------------------------------------------- <br><h3> Answer 1036306 John T: </h3><p>These are called "match variables". As previously mentioned they contain the text from your last regular expression match.</p>
+------------------------------------------------------------------ <br><h3> John T, Id: 1036306, Score: 6: </h3><p>These are called "match variables". As previously mentioned they contain the text from your last regular expression match.</p>
 
 <p>More information is in <em><a href="http://cslibrary.stanford.edu/108/EssentialPerl.html" rel="nofollow noreferrer">Essential Perl</a></em>. (<kbd>Ctrl</kbd> + <kbd>F</kbd> for 'Match Variables' to find the corresponding section.)</p>
------------------------------------------------------------------- <br><h3> Answer 42293645 Hemanth Gowda: </h3><p>Since you asked about the capture groups, you might want to know about <a href="https://perldoc.perl.org/perlvar.html#%24LAST_PAREN_MATCH" rel="nofollow noreferrer">$+</a> too... 
+------------------------------------------------------------------ <br><h3> Hemanth Gowda, Id: 42293645, Score: 3: </h3><p>Since you asked about the capture groups, you might want to know about <a href="https://perldoc.perl.org/perlvar.html#%24LAST_PAREN_MATCH" rel="nofollow noreferrer">$+</a> too... 
 Pretty useful...</p>
 
 <pre><code>use Data::Dumper;
@@ -82,7 +82,7 @@ while ($text =~ /(hi|ih)abc|(bye|eyb)xx/igs)
   $VAR1 = 'bye';<br>
   $VAR1 = 'eyb';<br></p>
 </blockquote>
------------------------------------------------------------------- <br><h3> Answer 1036785 user118435: </h3><p>The variables $1 .. $9 are also read only variables so you can't implicitly assign a value to them:</p>
+------------------------------------------------------------------ <br><h3> user118435, Id: 1036785, Score: 0: </h3><p>The variables $1 .. $9 are also read only variables so you can't implicitly assign a value to them:</p>
 
 <blockquote>
   <p>$1 = 'foo'; print $1;</p>
@@ -97,5 +97,5 @@ while ($text =~ /(hi|ih)abc|(bye|eyb)xx/igs)
 </blockquote>
 
 <p>The above will also return an error.</p>
-<h4> Comment 103842328 Peter Mortensen: </h4>Re <i>&quot;implicitly&quot;</i>: Don&#39;t you mean <i>&quot;explicitly&quot;</i> (the opposite)?<br>------------------------------------------------------------------ <br><h3> Answer 1039749 Brad Gilbert: </h3><p>I would suspect that there can be as many as <code>2**32 -1</code> numbered match variables, on a 32-bit compiled Perl binary.</p>
-<h4> Comment 103842393 Peter Mortensen: </h4>Yes, this does answer the last of the three questions. But perhaps add something about the practicality?<br>
+<h4> Peter Mortensen, Comment 103842328 Score: 0: </h4>Re <i>&quot;implicitly&quot;</i>: Don&#39;t you mean <i>&quot;explicitly&quot;</i> (the opposite)?<br>------------------------------------------------------------------ <br><h3> Brad Gilbert, Id: 1039749, Score: 0: </h3><p>I would suspect that there can be as many as <code>2**32 -1</code> numbered match variables, on a 32-bit compiled Perl binary.</p>
+<h4> Peter Mortensen, Comment 103842393 Score: 0: </h4>Yes, this does answer the last of the three questions. But perhaps add something about the practicality?<br>

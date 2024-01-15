@@ -1,5 +1,5 @@
- <h2> Title: Get names of all files from a folder with Ruby </h2> <h3> Željko Filipin, question_id: 1755665 </h3>Score: 434, Tags: {ruby,file,directory,filenames} <br><p>I want to get all file names from a folder using Ruby.</p>
------------------------------------------------------------------- <br><h3> Answer 1755713 Ian Eccles: </h3><p>You also have the shortcut option of </p>
+ <h2> Title: Get names of all files from a folder with Ruby </h2> <h4> Željko Filipin, question_id: 1755665 </h4>Score: 434, Tags: {ruby,file,directory,filenames} <br><p>I want to get all file names from a folder using Ruby.</p>
+------------------------------------------------------------------ <br><h3> Ian Eccles, Id: 1755713, Score: 630: </h3><p>You also have the shortcut option of </p>
 
 <pre><code>Dir["/path/to/search/*"]
 </code></pre>
@@ -8,7 +8,7 @@
 
 <pre><code>Dir["/path/to/search/**/*.rb"]
 </code></pre>
-<h4> Comment 50651193 mirichan: </h4>@marflar - <code>.&#47;</code> means the current directory, whereas <code>&#47;</code> is the root mount point, and <code>~&#47;</code> is the user&#39;s home directory. If you move the whole project somewhere else, the first one will work, but the other two probably won&#39;t.<br><h4> Comment 1639272 Yoann Le Touche: </h4>Or you can do the same with Dir::glob()<br><h4> Comment 45071543 BvuRVKyUVlViVIc7: </h4>Why is this prefered?<br><h4> Comment 39116405 Minh Triet: </h4>Also, use <code>.&#47;...</code> rather than <code>~&#47;</code><br><h4> Comment 47207363 stephenmurdoch: </h4>@MinhTriet what does that do? What is it preferable?<br><h4> Comment 71022836 dwkns: </h4>Note that Dir[&quot;/path/to/search/**/*.*&quot;] will also return folders/sub-folders with a &#39;.&#39; in their name. You need to do an extra check with File.file?(file_or_folder_name) to catch them.<br>------------------------------------------------------------------ <br><h3> Answer 1755666 Željko Filipin: </h3><pre><code>Dir.entries(folder)
+<h4> mirichan, Comment 50651193 Score: 9: </h4>@marflar - <code>.&#47;</code> means the current directory, whereas <code>&#47;</code> is the root mount point, and <code>~&#47;</code> is the user&#39;s home directory. If you move the whole project somewhere else, the first one will work, but the other two probably won&#39;t.<br><h4> Yoann Le Touche, Comment 1639272 Score: 6: </h4>Or you can do the same with Dir::glob()<br><h4> BvuRVKyUVlViVIc7, Comment 45071543 Score: 5: </h4>Why is this prefered?<br><h4> Minh Triet, Comment 39116405 Score: 2: </h4>Also, use <code>.&#47;...</code> rather than <code>~&#47;</code><br><h4> stephenmurdoch, Comment 47207363 Score: 1: </h4>@MinhTriet what does that do? What is it preferable?<br><h4> dwkns, Comment 71022836 Score: 0: </h4>Note that Dir[&quot;/path/to/search/**/*.*&quot;] will also return folders/sub-folders with a &#39;.&#39; in their name. You need to do an extra check with File.file?(file_or_folder_name) to catch them.<br>------------------------------------------------------------------ <br><h3> Željko Filipin, Id: 1755666, Score: 207: </h3><pre><code>Dir.entries(folder)
 </code></pre>
 
 <p>example:</p>
@@ -17,10 +17,10 @@
 </code></pre>
 
 <p>Source: <a href="http://ruby-doc.org/core/classes/Dir.html#method-c-entries" rel="noreferrer">http://ruby-doc.org/core/classes/Dir.html#method-c-entries</a></p>
-<h4> Comment 1646191 Željko Filipin: </h4>@Telemachus I use <code>Dir</code> rarely, and every time I need it I have to read documentation. I have posted my question and answer here so I could find it later, and maybe even help someone with the same question. I think I have heard at SO podcast that there is nothing wrong with such behavior. If you have a better answer, please post it. I have posted what I know, I am not a Ruby ninja. I regularly accept answers with the most votes.<br><h4> Comment 1638550 Mike Woodhouse: </h4>Looks like he&#39;s using SO to document the answers to questions he&#39;s just asked. A sort of memo, I suppose. Can&#39;t see much wrong with that - after all, even though this one is a little incomplete (<code>Dir#glob</code> could have perhaps been mentioned, for instance) there&#39;s nothing to prevent someone else from posting a Really Good Answer. &#39;course, I&#39;m mostly a &quot;glass half full&quot; sort of a guy...<br><h4> Comment 1638587 Telemachus: </h4>@Mike: In the grand scheme of things, it&#39;s probably not a big deal. And as you say if the questions and answers were good, it could be a plus overall for the site. But here both question and answer are so minimal that it doesn&#39;t seem especially useful.<br><h4> Comment 120320249 user1142217: </h4>Dir.entries will return a list that includes &quot;.&quot; and &quot;..&quot;. If you don&#39;t want those, you can use Dir.each_child.<br><h4> Comment 23418617 Benjamin Oakes: </h4>This can be a better option than <code>Dir[]</code> or <code>Dir.glob</code> when the argument is a variable.  When <code>path = &#39;&#47;tmp&#39;</code>, compare:  <code>Dir.glob(&quot;#{path}&#47;*&quot;)</code> vs <code>Dir.entries(path)</code>.  The return values are slightly different (&quot;.&quot;, &quot;..&quot;), but the latter is easier to grok on a quick glance.<br><h4> Comment 123816155 Dorian: </h4>This is not recursive, e.g. doesn&#39;t find <code>dir&#47;something&#47;else.txt</code><br><h4> Comment 124495493 Huliax: </h4>This also returns directories (and not just <code>.</code> and <code>..</code>).  While directories technically are files, that isn&#39;t typically what people mean when they say &quot;files&quot;.  There are better answers...<br><h4> Comment 130716833 ggorlen: </h4>Self-answers are encouraged, but that doesn&#39;t exempt the question from the normal requirements. This thread doesn&#39;t pose a question or show any research, just happened to be the first to pick a piece of low-hanging fruit back in 2009.<br>------------------------------------------------------------------ <br><h3> Answer 15511438 Emiliano Poggi: </h3><p>The following snippets exactly shows the name of the files inside a directory, skipping subdirectories and <code>&quot;.&quot;</code>, <code>&quot;..&quot;</code> dotted folders:</p>
+<h4> Željko Filipin, Comment 1646191 Score: 25: </h4>@Telemachus I use <code>Dir</code> rarely, and every time I need it I have to read documentation. I have posted my question and answer here so I could find it later, and maybe even help someone with the same question. I think I have heard at SO podcast that there is nothing wrong with such behavior. If you have a better answer, please post it. I have posted what I know, I am not a Ruby ninja. I regularly accept answers with the most votes.<br><h4> Mike Woodhouse, Comment 1638550 Score: 18: </h4>Looks like he&#39;s using SO to document the answers to questions he&#39;s just asked. A sort of memo, I suppose. Can&#39;t see much wrong with that - after all, even though this one is a little incomplete (<code>Dir#glob</code> could have perhaps been mentioned, for instance) there&#39;s nothing to prevent someone else from posting a Really Good Answer. &#39;course, I&#39;m mostly a &quot;glass half full&quot; sort of a guy...<br><h4> Telemachus, Comment 1638587 Score: 1: </h4>@Mike: In the grand scheme of things, it&#39;s probably not a big deal. And as you say if the questions and answers were good, it could be a plus overall for the site. But here both question and answer are so minimal that it doesn&#39;t seem especially useful.<br><h4> user1142217, Comment 120320249 Score: 1: </h4>Dir.entries will return a list that includes &quot;.&quot; and &quot;..&quot;. If you don&#39;t want those, you can use Dir.each_child.<br><h4> Benjamin Oakes, Comment 23418617 Score: 0: </h4>This can be a better option than <code>Dir[]</code> or <code>Dir.glob</code> when the argument is a variable.  When <code>path = &#39;&#47;tmp&#39;</code>, compare:  <code>Dir.glob(&quot;#{path}&#47;*&quot;)</code> vs <code>Dir.entries(path)</code>.  The return values are slightly different (&quot;.&quot;, &quot;..&quot;), but the latter is easier to grok on a quick glance.<br><h4> Dorian, Comment 123816155 Score: 0: </h4>This is not recursive, e.g. doesn&#39;t find <code>dir&#47;something&#47;else.txt</code><br><h4> Huliax, Comment 124495493 Score: 0: </h4>This also returns directories (and not just <code>.</code> and <code>..</code>).  While directories technically are files, that isn&#39;t typically what people mean when they say &quot;files&quot;.  There are better answers...<br><h4> ggorlen, Comment 130716833 Score: 0: </h4>Self-answers are encouraged, but that doesn&#39;t exempt the question from the normal requirements. This thread doesn&#39;t pose a question or show any research, just happened to be the first to pick a piece of low-hanging fruit back in 2009.<br>------------------------------------------------------------------ <br><h3> Emiliano Poggi, Id: 15511438, Score: 101: </h3><p>The following snippets exactly shows the name of the files inside a directory, skipping subdirectories and <code>&quot;.&quot;</code>, <code>&quot;..&quot;</code> dotted folders:</p>
 <pre><code>Dir.entries(&quot;your/folder&quot;).select { |f| File.file? File.join(&quot;your/folder&quot;, f) }
 </code></pre>
-<h4> Comment 29390546 Automatico: </h4>Can also do <code>...select {|f| File.file? f}</code> for clearer meaning and shorter syntax.<br><h4> Comment 34975018 Kamil Lelonek: </h4>Yep. <code>!File.directory?</code> is working but <code>File.file?</code> not.<br><h4> Comment 49010708 Ian: </h4><code>.reject {|f| File.directory? f}</code> seems cleaner than <code>.select{|f| !File.directory? f}</code>.  Oh, and now I see the first comment... also good.<br><h4> Comment 36005288 TheLukeMcCarthy: </h4>@squixy I had the same problem, in my case I need to provide the full path not just the file name returned by Dir.foreach<br><h4> Comment 33473887 James McMahon: </h4>I&#39;m seeing Dir.entries not give the full path in return filename so this solution didn&#39;t work for me.<br><h4> Comment 34973983 Automatico: </h4>@squixy Did you write it out correctly?: <code>Dir.entries(&quot;your&#47;folder&quot;).select {|f| File.file? f}</code><br><h4> Comment 42730998 Tony: </h4>FYI Dir.glob returns full path and filename, Dir.entries does not.  You have to have the full path and filename for either File.file? or File.directory? to work correctly.<br><h4> Comment 53406868 moeabdol: </h4>The reason File.file? doesn&#39;t work is because you&#39;re passing a file name instead of the absolute path to that file. File.file?(&quot;#{path}/#{file}&quot;) should work.<br><h4> Comment 57646823 s2t2: </h4>adding to the list of options ... <code>.reject!{|file_name| [&quot;.&quot;,&quot;..&quot;,&quot;.gitignore&quot;].include?(file_name)}</code><br>------------------------------------------------------------------ <br><h3> Answer 25582943 konsolebox: </h3><p>To get all files (strictly files only) recursively:</p>
+<h4> Automatico, Comment 29390546 Score: 21: </h4>Can also do <code>...select {|f| File.file? f}</code> for clearer meaning and shorter syntax.<br><h4> Kamil Lelonek, Comment 34975018 Score: 10: </h4>Yep. <code>!File.directory?</code> is working but <code>File.file?</code> not.<br><h4> Ian, Comment 49010708 Score: 6: </h4><code>.reject {|f| File.directory? f}</code> seems cleaner than <code>.select{|f| !File.directory? f}</code>.  Oh, and now I see the first comment... also good.<br><h4> TheLukeMcCarthy, Comment 36005288 Score: 2: </h4>@squixy I had the same problem, in my case I need to provide the full path not just the file name returned by Dir.foreach<br><h4> James McMahon, Comment 33473887 Score: 2: </h4>I&#39;m seeing Dir.entries not give the full path in return filename so this solution didn&#39;t work for me.<br><h4> Automatico, Comment 34973983 Score: 2: </h4>@squixy Did you write it out correctly?: <code>Dir.entries(&quot;your&#47;folder&quot;).select {|f| File.file? f}</code><br><h4> Tony, Comment 42730998 Score: 1: </h4>FYI Dir.glob returns full path and filename, Dir.entries does not.  You have to have the full path and filename for either File.file? or File.directory? to work correctly.<br><h4> moeabdol, Comment 53406868 Score: 1: </h4>The reason File.file? doesn&#39;t work is because you&#39;re passing a file name instead of the absolute path to that file. File.file?(&quot;#{path}/#{file}&quot;) should work.<br><h4> s2t2, Comment 57646823 Score: 0: </h4>adding to the list of options ... <code>.reject!{|file_name| [&quot;.&quot;,&quot;..&quot;,&quot;.gitignore&quot;].include?(file_name)}</code><br>------------------------------------------------------------------ <br><h3> konsolebox, Id: 25582943, Score: 51: </h3><p>To get all files (strictly files only) recursively:</p>
 <pre><code>Dir.glob('path/**/*').select { |e| File.file? e }
 </code></pre>
 <p>Or anything that's not a directory (<code>File.file?</code> would reject non-regular files):</p>
@@ -28,7 +28,7 @@
 </code></pre>
 <h1>Alternative Solution</h1>
 <p>Using <a href="http://www.ruby-doc.org/stdlib-2.1.3/libdoc/find/rdoc/Find.html#method-c-find" rel="noreferrer"><code>Find#find</code></a> over a pattern-based lookup method like <code>Dir.glob</code> is actually better.  See <a href="https://stackoverflow.com/questions/2370702/one-liner-to-recursively-list-directories-in-ruby/13569100#13569100">this answer to &quot;One-liner to Recursively List Directories in Ruby?&quot;</a>.</p>
------------------------------------------------------------------- <br><h3> Answer 49610787 Mario P&#233;rez Alarc&#243;n: </h3><p>In Ruby 2.5 you can now use <code>Dir.children</code>. It gets filenames as an array except for "." and ".." </p>
+------------------------------------------------------------------ <br><h3> Mario P&#233;rez Alarc&#243;n, Id: 49610787, Score: 28: </h3><p>In Ruby 2.5 you can now use <code>Dir.children</code>. It gets filenames as an array except for "." and ".." </p>
 
 <p>Example:</p>
 
@@ -36,7 +36,7 @@
 </code></pre>
 
 <p><a href="http://ruby-doc.org/core-2.5.0/Dir.html#method-c-children" rel="noreferrer">http://ruby-doc.org/core-2.5.0/Dir.html#method-c-children</a></p>
------------------------------------------------------------------- <br><h3> Answer 38160242 user1115652: </h3><p>This works for me:</p>
+------------------------------------------------------------------ <br><h3> user1115652, Id: 38160242, Score: 27: </h3><p>This works for me:</p>
 
 <p>If you don't want hidden files[1], use <strong>Dir[]</strong>:</p>
 
@@ -80,17 +80,17 @@ Dir.entries( home ).select{ |f| File.file? File.join( home, f ) }
 </code></pre>
 
 <p>[1] <code>.dotfile</code> on unix, I don't know about Windows</p>
------------------------------------------------------------------- <br><h3> Answer 57600435 Игорь Хлебников: </h3><p>this code returns only filenames with their extension (without a global path)</p>
+------------------------------------------------------------------ <br><h3> Игорь Хлебников, Id: 57600435, Score: 12: </h3><p>this code returns only filenames with their extension (without a global path)</p>
 <pre><code>Dir.children(&quot;/path/to/search/&quot;)
 </code></pre>
 <p>=&gt; [file_1.rb, file_2.html, file_3.js]</p>
-<h4> Comment 126289111 fguillen: </h4>Nice explanation here: <a href="https://www.bigbinary.com/blog/ruby-2_5-introduces-dir-children-and-dir-each_child" rel="nofollow noreferrer">bigbinary.com/blog/&hellip;</a><br>------------------------------------------------------------------ <br><h3> Answer 30203873 mr.buttons: </h3><p>Personally, I found this the most useful for looping over files in a folder, forward looking safety:</p>
+<h4> fguillen, Comment 126289111 Score: 0: </h4>Nice explanation here: <a href="https://www.bigbinary.com/blog/ruby-2_5-introduces-dir-children-and-dir-each_child" rel="nofollow noreferrer">bigbinary.com/blog/&hellip;</a><br>------------------------------------------------------------------ <br><h3> mr.buttons, Id: 30203873, Score: 10: </h3><p>Personally, I found this the most useful for looping over files in a folder, forward looking safety:</p>
 
 <pre><code>Dir['/etc/path/*'].each do |file_name|
   next if File.directory? file_name 
 end
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 32598243 gilcierweb: </h3><p>This is a solution to find files in a directory:</p>
+------------------------------------------------------------------ <br><h3> gilcierweb, Id: 32598243, Score: 10: </h3><p>This is a solution to find files in a directory:</p>
 
 <pre><code>files = Dir["/work/myfolder/**/*.txt"]
 
@@ -107,19 +107,19 @@ files.each do |file_name|
   end
 end
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 33590960 Lahiru Jayaratne: </h3><p>While getting all the file names in a directory, this snippet can be used to reject both directories [<code>.</code>, <code>..</code>] and hidden files which start with a <code>.</code></p>
+------------------------------------------------------------------ <br><h3> Lahiru Jayaratne, Id: 33590960, Score: 6: </h3><p>While getting all the file names in a directory, this snippet can be used to reject both directories [<code>.</code>, <code>..</code>] and hidden files which start with a <code>.</code></p>
 
 <pre><code>files = Dir.entries("your/folder").reject {|f| File.directory?(f) || f[0].include?('.')}
 </code></pre>
-<h4> Comment 63778403 user1115652: </h4>@Nathan See my answer for an explanation<br><h4> Comment 112637847 Hirurg103: </h4>This answer is a duplicate of <a href="https://stackoverflow.com/a/15511438/3676469">the answer</a> added in 2013<br><h4> Comment 57780901 Nathan: </h4><code>Dir.entries</code> returns local file names, not absolute file paths. On the other hand, <code>File.directory?</code> expects an absolute file path.  This code does not work as expected.<br><h4> Comment 57781241 Lahiru Jayaratne: </h4>It&#39;s weird the code doesn&#39;t work in your case. As this is a code I have used in a live app which works just fine. I&#39;ll recheck my code and post here if there is anything missing from my original working code :)<br>------------------------------------------------------------------ <br><h3> Answer 45923193 yegor256: </h3><p>This is what works for me:</p>
+<h4> user1115652, Comment 63778403 Score: 1: </h4>@Nathan See my answer for an explanation<br><h4> Hirurg103, Comment 112637847 Score: 1: </h4>This answer is a duplicate of <a href="https://stackoverflow.com/a/15511438/3676469">the answer</a> added in 2013<br><h4> Nathan, Comment 57780901 Score: 0: </h4><code>Dir.entries</code> returns local file names, not absolute file paths. On the other hand, <code>File.directory?</code> expects an absolute file path.  This code does not work as expected.<br><h4> Lahiru Jayaratne, Comment 57781241 Score: 0: </h4>It&#39;s weird the code doesn&#39;t work in your case. As this is a code I have used in a live app which works just fine. I&#39;ll recheck my code and post here if there is anything missing from my original working code :)<br>------------------------------------------------------------------ <br><h3> yegor256, Id: 45923193, Score: 6: </h3><p>This is what works for me:</p>
 
 <pre><code>Dir.entries(dir).select { |f| File.file?(File.join(dir, f)) }
 </code></pre>
 
 <p><code>Dir.entries</code> returns an array of strings. Then, we have to provide a full path of the file to <code>File.file?</code>, unless <code>dir</code> is equal to our current working directory. That's why this <code>File.join()</code>.</p>
-<h4> Comment 97664287 Edgar Ortega: </h4>You need to exclude &quot;.&quot; and &quot;..&quot; from entries<br><h4> Comment 112637871 Hirurg103: </h4>This answer is a duplicate of <a href="https://stackoverflow.com/a/15511438/3676469">the answer</a> added in 2013<br>------------------------------------------------------------------ <br><h3> Answer 41501017 Ashwin: </h3><pre><code>Dir.new('/home/user/foldername').each { |file| puts file }
+<h4> Edgar Ortega, Comment 97664287 Score: 1: </h4>You need to exclude &quot;.&quot; and &quot;..&quot; from entries<br><h4> Hirurg103, Comment 112637871 Score: 1: </h4>This answer is a duplicate of <a href="https://stackoverflow.com/a/15511438/3676469">the answer</a> added in 2013<br>------------------------------------------------------------------ <br><h3> Ashwin, Id: 41501017, Score: 3: </h3><pre><code>Dir.new('/home/user/foldername').each { |file| puts file }
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 46908232 Artur INTECH: </h3><p>You may also want to use <code>Rake::FileList</code> (provided you have <code>rake</code> dependency):</p>
+------------------------------------------------------------------ <br><h3> Artur INTECH, Id: 46908232, Score: 3: </h3><p>You may also want to use <code>Rake::FileList</code> (provided you have <code>rake</code> dependency):</p>
 
 <pre><code>FileList.new('lib/*') do |file|
   p file
@@ -136,7 +136,7 @@ end
 </blockquote>
 
 <p><a href="https://docs.ruby-lang.org/en/2.1.0/Rake/FileList.html" rel="nofollow noreferrer">https://docs.ruby-lang.org/en/2.1.0/Rake/FileList.html</a></p>
------------------------------------------------------------------- <br><h3> Answer 57128142 Sebastian Capone: </h3><p>One simple way could be:<br/></p>
+------------------------------------------------------------------ <br><h3> Sebastian Capone, Id: 57128142, Score: 3: </h3><p>One simple way could be:<br/></p>
 
 <pre class="lang-rb prettyprint-override"><code>dir = './' # desired directory
 files = Dir.glob(File.join(dir, '**', '*')).select{|file| File.file?(file)}
@@ -145,7 +145,7 @@ files.each do |f|
     puts f
 end
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 53067304 Ben Pennell: </h3><p>In addition to the suggestions in this thread, I wanted to mention that if you need to return dot files as well (.gitignore, etc), with Dir.glob you would need to include a flag as so: 
+------------------------------------------------------------------ <br><h3> Ben Pennell, Id: 53067304, Score: 2: </h3><p>In addition to the suggestions in this thread, I wanted to mention that if you need to return dot files as well (.gitignore, etc), with Dir.glob you would need to include a flag as so: 
 <code>Dir.glob("/path/to/dir/*", File::FNM_DOTMATCH)</code>
 By default, Dir.entries includes dot files, as well as current a parent directories.</p>
 
@@ -241,11 +241,11 @@ end
 </code></pre>
 
 <p>The differences in file counts are due to <code>Dir.entries</code> including hidden files by default. <code>Dir.entries</code> ended up taking a bit longer in this case due to needing to rebuild the absolute path of the file to determine if a file was a directory, but even without that it was still taking consistently longer than the other options in the recursive case. This was all using ruby 2.5.1 on OSX.</p>
------------------------------------------------------------------- <br><h3> Answer 63697601 Andrew: </h3><p>When loading all names of files in the operating directory you can use</p>
+------------------------------------------------------------------ <br><h3> Andrew, Id: 63697601, Score: 2: </h3><p>When loading all names of files in the operating directory you can use</p>
 <p><code>Dir.glob(&quot;*)</code></p>
 <p>This will return all files within the context that the application is running in (Note for Rails this is the top level directory of the application)</p>
 <p>You can do additional matching and recursive searching found here <a href="https://ruby-doc.org/core-2.7.1/Dir.html#method-c-glob" rel="nofollow noreferrer">https://ruby-doc.org/core-2.7.1/Dir.html#method-c-glob</a></p>
------------------------------------------------------------------- <br><h3> Answer 37939549 punksta: </h3><pre><code>def get_path_content(dir)
+------------------------------------------------------------------ <br><h3> punksta, Id: 37939549, Score: 1: </h3><pre><code>def get_path_content(dir)
   queue = Queue.new
   result = []
   queue &lt;&lt; dir
@@ -265,7 +265,7 @@ end
 </code></pre>
 
 <p>returns file's relative paths from directory and all subdirectories </p>
------------------------------------------------------------------- <br><h3> Answer 41445253 Mikhail Vasin: </h3><p>If you want get an array of filenames <strong>including symlinks</strong>, use</p>
+------------------------------------------------------------------ <br><h3> Mikhail Vasin, Id: 41445253, Score: 1: </h3><p>If you want get an array of filenames <strong>including symlinks</strong>, use</p>
 
 <pre><code>Dir.new('/path/to/dir').entries.reject { |f| File.directory? f }
 </code></pre>
@@ -281,7 +281,7 @@ end
 </code></pre>
 
 <p>As shown in other answers, use <code>Dir.glob('/path/to/dir/**/*')</code> instead of <code>Dir.new('/path/to/dir')</code> if you want to get all the files recursively.</p>
-<h4> Comment 76289735 Richard Peck: </h4>Or just use <code>*.*</code><br>------------------------------------------------------------------ <br><h3> Answer 70042299 Dorian: </h3><p>if you create directories with spaces:</p>
+<h4> Richard Peck, Comment 76289735 Score: 0: </h4>Or just use <code>*.*</code><br>------------------------------------------------------------------ <br><h3> Dorian, Id: 70042299, Score: 0: </h3><p>if you create directories with spaces:</p>
 <pre><code>mkdir &quot;a b&quot;
 touch &quot;a b/c&quot;
 </code></pre>

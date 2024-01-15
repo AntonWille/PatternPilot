@@ -1,4 +1,4 @@
- <h2> Title: Error while installing json gem &#39;mkmf.rb can&#39;t find header files for ruby&#39; </h2> <h3> Navneet, question_id: 20559255 </h3>Score: 516, Tags: {json,ruby,rubygems} <br><p>For context, it on a remote server which has a firewall. I'm setting up my environment through a proxy. I have <code>ruby 1.8.7</code>. When I try to gem install..</p>
+ <h2> Title: Error while installing json gem &#39;mkmf.rb can&#39;t find header files for ruby&#39; </h2> <h4> Navneet, question_id: 20559255 </h4>Score: 516, Tags: {json,ruby,rubygems} <br><p>For context, it on a remote server which has a firewall. I'm setting up my environment through a proxy. I have <code>ruby 1.8.7</code>. When I try to gem install..</p>
 
 <pre><code>sudo gem install --http-proxy &lt;host address&gt;:&lt;port&gt; json
 </code></pre>
@@ -24,7 +24,7 @@ Results logged to /usr/lib64/ruby/gems/1.8/gems/json-1.8.1/ext/json/ext/generato
 </ul>
 
 <p>Any hints? Thanks!</p>
-<h4> Comment 30757126 Малъ Скрылевъ: </h4>check presense of <code>&#47;usr&#47;lib&#47;ruby&#47;ruby.h</code> file, if it is present, show us error message from <code>gem_make.out</code>.<br>------------------------------------------------------------------ <br><h3> Answer 20561594 Aleksei Matiushkin: </h3><p>Modern era update, as <a href="https://stackoverflow.com/questions/20559255/error-while-installing-json-gem-mkmf-rb-cant-find-header-files-for-ruby/26225468#26225468">stated by mimoralea</a>:</p>
+<h4> Малъ Скрылевъ, Id: 30757126 Score: 0: </h4>check presense of <code>&#47;usr&#47;lib&#47;ruby&#47;ruby.h</code> file, if it is present, show us error message from <code>gem_make.out</code>.<br>------------------------------------------------------------------ <br><h3> Aleksei Matiushkin, Id: 20561594, Score: 933: </h3><p>Modern era update, as <a href="https://stackoverflow.com/questions/20559255/error-while-installing-json-gem-mkmf-rb-cant-find-header-files-for-ruby/26225468#26225468">stated by mimoralea</a>:</p>
 
 <blockquote>
   <p>In case that you are using ruby 2.0 or 2.2 (thanks @patrick-davey).</p>
@@ -69,7 +69,7 @@ sudo apt-get install ruby2.3-dev
 
 <pre><code>$ sudo zypper install ruby-devel
 </code></pre>
-<h4> Comment 32786655 Wayne Riesterer: </h4>After installing ruby-devel (on Fedora 20), I got the error *** extconf.rb failed ***. Once installing gcc as you suggested, everything worked fine.<br><h4> Comment 64573378 Lu&#237;s de Sousa: </h4>Nope, this answer did not help solving anything. The right answer is <a href="http://stackoverflow.com/a/26225468/2066215">the one by mimoralea</a>.<br><h4> Comment 30782063 Navneet: </h4>Thanks! I meant the answer in that question seemed module-specific. I think instead of <code>ruby-dev</code> its <code>ruby-devel</code>. Here&#39;s where I found what I exactly needed - <a href="https://www.digitalocean.com/community/articles/how-to-install-ruby-on-rails-on-centos-6" rel="nofollow noreferrer">digitalocean.com/community/articles/&hellip;</a><br><h4> Comment 114878303 random-forest-cat: </h4>i noticed on debian i had to install gcc and make as well<br><h4> Comment 102366049 Ilias Karim: </h4>How about it for Darwin/macOS?<br><h4> Comment 69436419 JalalJaberi: </h4>saved my life, in some application&#39;s docs there is only ruby-dev (and not ruby-devel). That is confusing to linux beginners.<br><h4> Comment 71254922 Matt Hancock: </h4>On Ubuntu / debian: Run <code>ruby -v</code> to determine your ruby version. Run <code>apt-cache search ruby | grep &quot;[0-9].[0-9]-dev&quot;</code> to locate the corresponding version-specific dev package.<br><h4> Comment 76904935 Satys: </h4>or sudo apt-get install ruby2.4-dev (check your ruby version[ruby -v], and install correspondingly)<br><h4> Comment 76905281 Satys: </h4>@mudasobwa Okay, nice :)<br><h4> Comment 90198939 Alex: </h4>@mudasobwa Bless your heart stranger.<br><h4> Comment 58303527 superbob: </h4>You can add <code>sudo zypper install ruby-devel</code> for openSUSE<br><h4> Comment 64573081 Lu&#237;s de Sousa: </h4>This does nothing on Ubuntu. The missing package is <code>ruby2.2-dev</code> (or whichever version you have installed).<br><h4> Comment 64573212 Aleksei Matiushkin: </h4>@Lu&#237;sdeSousa Back in 2013 there was no <code>ruby2.2-dev</code> package in Ubuntu, and I bet this answer helped you to solve the problem.<br><h4> Comment 102366133 Ilias Karim: </h4>No need for you to comment then :P<br><h4> Comment 118654716 rbleattler: </h4><code>sudo apt-get install ruby`ruby -e &#39;puts RUBY_VERSION[&#47;\d+\.\d+&#47;]&#39;`-dev  </code>  This helped me in WSL! Thank you so much<br>------------------------------------------------------------------ <br><h3> Answer 58231417 joki: </h3><p>For <strong>Xcode 11 on macOS 10.14</strong>, this can happen even after installing Xcode and installing command-line tools and accepting the license with</p>
+<h4> Wayne Riesterer, Comment 32786655 Score: 11: </h4>After installing ruby-devel (on Fedora 20), I got the error *** extconf.rb failed ***. Once installing gcc as you suggested, everything worked fine.<br><h4> Lu&#237;s de Sousa, Comment 64573378 Score: 2: </h4>Nope, this answer did not help solving anything. The right answer is <a href="http://stackoverflow.com/a/26225468/2066215">the one by mimoralea</a>.<br><h4> Navneet, Comment 30782063 Score: 2: </h4>Thanks! I meant the answer in that question seemed module-specific. I think instead of <code>ruby-dev</code> its <code>ruby-devel</code>. Here&#39;s where I found what I exactly needed - <a href="https://www.digitalocean.com/community/articles/how-to-install-ruby-on-rails-on-centos-6" rel="nofollow noreferrer">digitalocean.com/community/articles/&hellip;</a><br><h4> random-forest-cat, Comment 114878303 Score: 2: </h4>i noticed on debian i had to install gcc and make as well<br><h4> Ilias Karim, Comment 102366049 Score: 0: </h4>How about it for Darwin/macOS?<br><h4> JalalJaberi, Comment 69436419 Score: 0: </h4>saved my life, in some application&#39;s docs there is only ruby-dev (and not ruby-devel). That is confusing to linux beginners.<br><h4> Matt Hancock, Comment 71254922 Score: 0: </h4>On Ubuntu / debian: Run <code>ruby -v</code> to determine your ruby version. Run <code>apt-cache search ruby | grep &quot;[0-9].[0-9]-dev&quot;</code> to locate the corresponding version-specific dev package.<br><h4> Satys, Comment 76904935 Score: 0: </h4>or sudo apt-get install ruby2.4-dev (check your ruby version[ruby -v], and install correspondingly)<br><h4> Satys, Comment 76905281 Score: 0: </h4>@mudasobwa Okay, nice :)<br><h4> Alex, Comment 90198939 Score: 0: </h4>@mudasobwa Bless your heart stranger.<br><h4> superbob, Comment 58303527 Score: 0: </h4>You can add <code>sudo zypper install ruby-devel</code> for openSUSE<br><h4> Lu&#237;s de Sousa, Comment 64573081 Score: 0: </h4>This does nothing on Ubuntu. The missing package is <code>ruby2.2-dev</code> (or whichever version you have installed).<br><h4> Aleksei Matiushkin, Comment 64573212 Score: 0: </h4>@Lu&#237;sdeSousa Back in 2013 there was no <code>ruby2.2-dev</code> package in Ubuntu, and I bet this answer helped you to solve the problem.<br><h4> Ilias Karim, Comment 102366133 Score: 0: </h4>No need for you to comment then :P<br><h4> rbleattler, Comment 118654716 Score: 0: </h4><code>sudo apt-get install ruby`ruby -e &#39;puts RUBY_VERSION[&#47;\d+\.\d+&#47;]&#39;`-dev  </code>  This helped me in WSL! Thank you so much<br>------------------------------------------------------------------ <br><h3> joki, Id: 58231417, Score: 253: </h3><p>For <strong>Xcode 11 on macOS 10.14</strong>, this can happen even after installing Xcode and installing command-line tools and accepting the license with</p>
 
 
 
@@ -104,7 +104,7 @@ ruby -rrbconfig -e 'puts RbConfig::CONFIG["rubyhdrdir"]'
 
 <pre class="lang-none prettyprint-override"><code>sudo xcode-select --switch /Applications/Xcode.app
 </code></pre>
-<h4> Comment 105971408 M12: </h4>If you need (or want) to switch the chosen Xcode SDK for a single command or script, you can make use of the <code>DEVELOPER_DIR</code> environment variable as documented in <code>xcode-select(1)</code>. For example: <code>DEVELOPER_DIR=&#47;Library&#47;Developer&#47;CommandLineTools&#47; bundle install</code><br><h4> Comment 109461786 h3dkandi: </h4>The solution worked but switching it this way breaks some functionality. <code>xcodebuild</code> for example stops working.<br>------------------------------------------------------------------ <br><h3> Answer 26225468 mimoralea: </h3><p>In case that you are using ruby 2.0 or 2.2 (thanks @patrick-davey) or 2.3 (thanks @juanitofatas).</p>
+<h4> M12, Comment 105971408 Score: 1: </h4>If you need (or want) to switch the chosen Xcode SDK for a single command or script, you can make use of the <code>DEVELOPER_DIR</code> environment variable as documented in <code>xcode-select(1)</code>. For example: <code>DEVELOPER_DIR=&#47;Library&#47;Developer&#47;CommandLineTools&#47; bundle install</code><br><h4> h3dkandi, Comment 109461786 Score: 0: </h4>The solution worked but switching it this way breaks some functionality. <code>xcodebuild</code> for example stops working.<br>------------------------------------------------------------------ <br><h3> mimoralea, Id: 26225468, Score: 81: </h3><p>In case that you are using ruby 2.0 or 2.2 (thanks @patrick-davey) or 2.3 (thanks @juanitofatas).</p>
 
 <pre><code>sudo apt-get install ruby-dev
 sudo apt-get install ruby2.0-dev
@@ -113,11 +113,11 @@ sudo apt-get install ruby2.3-dev
 </code></pre>
 
 <p>And you get the pattern here...</p>
-<h4> Comment 48403025 patrickdavey: </h4>Or, if you&#39;re using 2.2 ... <code>sudo apt-get install ruby2.2-dev</code><br><h4> Comment 58476126 Siddhu: </h4>If you&#39;re using an old version of Ubuntu such as Trusty (14.04), add the brightbox PPA for Ruby: <code>sudo apt-add-repository -y ppa:brightbox&#47;ruby-ng &amp;&amp; sudo apt-get update &amp;&amp; sudo apt-get install -y ruby2.2-dev</code><br><h4> Comment 54483695 Aparichith: </h4>@patrick-davey  <code>E: Unable to locate package ruby2.2-dev</code> <code>E: Couldn&#39;t find any package by regex &#39;ruby2.2-dev&#39;</code><br><h4> Comment 56834011 Pithikos: </h4>@dson probably you use an old Ubuntu version. Try upgrading.<br><h4> Comment 56896314 Andrew Faulkner: </h4>I got the same error as well, and I&#39;m using a fully updated version of Linux Mint. I don&#39;t think the OS verison is the issue.<br>------------------------------------------------------------------ <br><h3> Answer 35895505 Juanito Fatas: </h3><p>I also encountered this problem because I <a href="https://www.brightbox.com/blog/2016/01/06/ruby-2-3-ubuntu-packages/">install Ruby on Ubuntu via brightbox</a>, and I thought ruby-dev is the trunk of ruby. So I did not install. Install ruby2.3-dev fixes it:</p>
+<h4> patrickdavey, Comment 48403025 Score: 6: </h4>Or, if you&#39;re using 2.2 ... <code>sudo apt-get install ruby2.2-dev</code><br><h4> Siddhu, Comment 58476126 Score: 3: </h4>If you&#39;re using an old version of Ubuntu such as Trusty (14.04), add the brightbox PPA for Ruby: <code>sudo apt-add-repository -y ppa:brightbox&#47;ruby-ng &amp;&amp; sudo apt-get update &amp;&amp; sudo apt-get install -y ruby2.2-dev</code><br><h4> Aparichith, Comment 54483695 Score: 1: </h4>@patrick-davey  <code>E: Unable to locate package ruby2.2-dev</code> <code>E: Couldn&#39;t find any package by regex &#39;ruby2.2-dev&#39;</code><br><h4> Pithikos, Comment 56834011 Score: 0: </h4>@dson probably you use an old Ubuntu version. Try upgrading.<br><h4> Andrew Faulkner, Comment 56896314 Score: 0: </h4>I got the same error as well, and I&#39;m using a fully updated version of Linux Mint. I don&#39;t think the OS verison is the issue.<br>------------------------------------------------------------------ <br><h3> Juanito Fatas, Id: 35895505, Score: 24: </h3><p>I also encountered this problem because I <a href="https://www.brightbox.com/blog/2016/01/06/ruby-2-3-ubuntu-packages/">install Ruby on Ubuntu via brightbox</a>, and I thought ruby-dev is the trunk of ruby. So I did not install. Install ruby2.3-dev fixes it:</p>
 
 <pre><code>sudo apt-get install ruby2.3-dev
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 49178186 Juan De Le&#243;n: </h3><p>For those who are getting this on Mac OS X you may need to run the following command to install the XCode command-line tools, even if you already have XCode installed:</p>
+------------------------------------------------------------------ <br><h3> Juan De Le&#243;n, Id: 49178186, Score: 21: </h3><p>For those who are getting this on Mac OS X you may need to run the following command to install the XCode command-line tools, even if you already have XCode installed:</p>
 
 <pre><code>sudo xcode-select --install
 </code></pre>
@@ -126,7 +126,7 @@ sudo apt-get install ruby2.3-dev
 
 <pre><code>sudo xcodebuild -license
 </code></pre>
-<h4> Comment 100155783 Sweet Chilly Philly: </h4>This was the correct answer for me. I had no Ruby Development Headers. Once I installed xCode the original command I tried running worked. Thanks!<br><h4> Comment 103052497 Belden: </h4>On OSX with Mojave I had to run that as: <code>su - $USER -c &#39;xcode-select --install&#39;</code><br>------------------------------------------------------------------ <br><h3> Answer 40553513 Kinifwyne: </h3><p>I had a similar problem using cygwin to run the following command:</p>
+<h4> Sweet Chilly Philly, Comment 100155783 Score: 0: </h4>This was the correct answer for me. I had no Ruby Development Headers. Once I installed xCode the original command I tried running worked. Thanks!<br><h4> Belden, Comment 103052497 Score: 0: </h4>On OSX with Mojave I had to run that as: <code>su - $USER -c &#39;xcode-select --install&#39;</code><br>------------------------------------------------------------------ <br><h3> Kinifwyne, Id: 40553513, Score: 14: </h3><p>I had a similar problem using cygwin to run the following command:</p>
 
 <pre><code>$ gem install rerun
 </code></pre>
@@ -141,18 +141,18 @@ sudo apt-get install ruby2.3-dev
 <li>make</li>
 <li>automake1.15</li>
 </ul>
-<h4> Comment 69963954 rr-: </h4>This segfaults for me: <code>&#47;cygdrive&#47;z&#47;.gem&#47;ruby&#47;extensions&#47;x86-cygwin&#47;json-1.8.3&#47;json&#47;&zwnj;&#8203;ext&#47;parser.so: [BUG] Segmentation fault at 0x0001b8</code><br><h4> Comment 69964011 rr-: </h4>Resolved by doing <code>rm -rf ~&#47;.gem&#47;</code> and reissuing the command.<br><h4> Comment 85250906 Pedro Lobito: </h4><code>ruby-dev</code> on raspberry pi<br>------------------------------------------------------------------ <br><h3> Answer 50223278 Manuel Fedele: </h3><p>Most voted solution didn't work on my machine (linux mint 18.04).
+<h4> rr-, Comment 69963954 Score: 0: </h4>This segfaults for me: <code>&#47;cygdrive&#47;z&#47;.gem&#47;ruby&#47;extensions&#47;x86-cygwin&#47;json-1.8.3&#47;json&#47;&zwnj;&#8203;ext&#47;parser.so: [BUG] Segmentation fault at 0x0001b8</code><br><h4> rr-, Comment 69964011 Score: 0: </h4>Resolved by doing <code>rm -rf ~&#47;.gem&#47;</code> and reissuing the command.<br><h4> Pedro Lobito, Comment 85250906 Score: 0: </h4><code>ruby-dev</code> on raspberry pi<br>------------------------------------------------------------------ <br><h3> Manuel Fedele, Id: 50223278, Score: 13: </h3><p>Most voted solution didn't work on my machine (linux mint 18.04).
 After a careful look, i found that g++ was missing.
 Solved with </p>
 
 <blockquote>
   <p>sudo apt-get install g++</p>
 </blockquote>
-<h4> Comment 88863737 Scott Lindner: </h4>This worked for me on Ubuntu 18.04. I also had to do a sudo apt-get install make prior to the g++ install to work.<br><h4> Comment 95492758 Arda: </h4>Can confirm installing <code>make</code> and <code>g++</code> fixed my issue on Ubuntu 18.04, too!<br>------------------------------------------------------------------ <br><h3> Answer 23112578 Prokur: </h3><p>in case you use SUSE</p>
+<h4> Scott Lindner, Comment 88863737 Score: 3: </h4>This worked for me on Ubuntu 18.04. I also had to do a sudo apt-get install make prior to the g++ install to work.<br><h4> Arda, Comment 95492758 Score: 0: </h4>Can confirm installing <code>make</code> and <code>g++</code> fixed my issue on Ubuntu 18.04, too!<br>------------------------------------------------------------------ <br><h3> Prokur, Id: 23112578, Score: 8: </h3><p>in case you use SUSE</p>
 
 <pre><code>sudo yast2 -i ruby-devel
 </code></pre>
-<h4> Comment 48406914 Lesik2008: </h4>I prefer <code>sudo zypper in ruby-devel</code>.<br>------------------------------------------------------------------ <br><h3> Answer 57949803 Aaron Brager: </h3><h1>Xcode 11 / macOS Catalina</h1>
+<h4> Lesik2008, Comment 48406914 Score: 2: </h4>I prefer <code>sudo zypper in ruby-devel</code>.<br>------------------------------------------------------------------ <br><h3> Aaron Brager, Id: 57949803, Score: 8: </h3><h1>Xcode 11 / macOS Catalina</h1>
 
 <p>On Xcode 11 / macOS Catalina, the header files are no longer in the old location and the old <code>/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg</code> file is no longer available.</p>
 
@@ -178,21 +178,21 @@ Solved with </p>
 <pre><code>CPATH="" xcodebuild --some-args
 </code></pre>
 </blockquote>
-<h4> Comment 102366243 Ilias Karim: </h4>Do you have any documentation on CPATH? Setting it is not solving the issue for me. When I checked it’s value in its first place it appeared undefined.<br><h4> Comment 102390870 Aaron Brager: </h4><a href="https://gcc.gnu.org/onlinedocs/cpp/Environment-Variables.html" rel="nofollow noreferrer">gcc.gnu.org/onlinedocs/cpp/Environment-Variables.html</a> - you may need to find a different environment variable depending on the language/compiler you’re using. It’s normal that it would be unset by default<br><h4> Comment 103180652 Feldur: </h4>And, in case you haven&#39;t seen it elsewhere, there can&#39;t be spaces in the Xcode path/name<br><h4> Comment 106887711 ice_chrysler: </h4>From all the answers here, this the only solution that worked for me. I am on <code>Mojave 10.14.6</code> and <code>XCode 11.3.1</code>. Thank you so much, took me 1 day to resolve this :/<br>------------------------------------------------------------------ <br><h3> Answer 35068377 emmojo: </h3><p>In Fedora 21 and up, you simply open a terminal and install the Ruby Development files as root.</p>
+<h4> Ilias Karim, Comment 102366243 Score: 2: </h4>Do you have any documentation on CPATH? Setting it is not solving the issue for me. When I checked it’s value in its first place it appeared undefined.<br><h4> Aaron Brager, Comment 102390870 Score: 1: </h4><a href="https://gcc.gnu.org/onlinedocs/cpp/Environment-Variables.html" rel="nofollow noreferrer">gcc.gnu.org/onlinedocs/cpp/Environment-Variables.html</a> - you may need to find a different environment variable depending on the language/compiler you’re using. It’s normal that it would be unset by default<br><h4> Feldur, Comment 103180652 Score: 0: </h4>And, in case you haven&#39;t seen it elsewhere, there can&#39;t be spaces in the Xcode path/name<br><h4> ice_chrysler, Comment 106887711 Score: 0: </h4>From all the answers here, this the only solution that worked for me. I am on <code>Mojave 10.14.6</code> and <code>XCode 11.3.1</code>. Thank you so much, took me 1 day to resolve this :/<br>------------------------------------------------------------------ <br><h3> emmojo, Id: 35068377, Score: 5: </h3><p>In Fedora 21 and up, you simply open a terminal and install the Ruby Development files as root.</p>
 
 <pre><code>dnf install ruby-devel
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 60831875 Shawn Lauzon: </h3><p>On Mac 10.14, the header files don't seem to be installed in the correct place. Rather than changing paths like the other fixes, I was able to just run this:</p>
+------------------------------------------------------------------ <br><h3> Shawn Lauzon, Id: 60831875, Score: 5: </h3><p>On Mac 10.14, the header files don't seem to be installed in the correct place. Rather than changing paths like the other fixes, I was able to just run this:</p>
 
 <pre><code>open /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg
 </code></pre>
 
 <p>Follow the instructions and it resolved this problem for me.</p>
------------------------------------------------------------------- <br><h3> Answer 42007786 bott: </h3><p>You may need to install gcc after install ruby-devel</p>
------------------------------------------------------------------- <br><h3> Answer 60520087 Chester Fang: </h3><p>Xcode -> Preferences -> Locations</p>
+------------------------------------------------------------------ <br><h3> bott, Id: 42007786, Score: 3: </h3><p>You may need to install gcc after install ruby-devel</p>
+------------------------------------------------------------------ <br><h3> Chester Fang, Id: 60520087, Score: 1: </h3><p>Xcode -> Preferences -> Locations</p>
 
 <p>change Command Line Tools to Xcode 11.2.1</p>
------------------------------------------------------------------- <br><h3> Answer 58252313 aleksander_si: </h3><p>You need to install the entire ruby and not just the minimum package. The correct command to use is:</p>
+------------------------------------------------------------------ <br><h3> aleksander_si, Id: 58252313, Score: 0: </h3><p>You need to install the entire ruby and not just the minimum package. The correct command to use is:</p>
 
 <pre><code>sudo apt install ruby-full
 </code></pre>
@@ -201,7 +201,7 @@ Solved with </p>
 
 <pre><code>sudo apt-get install ruby2.3-dev
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 60773745 G&#246;k&#231;er G&#246;kdal: </h3><p>For Ubuntu 18, after checking log file mentioned while install</p>
+------------------------------------------------------------------ <br><h3> G&#246;k&#231;er G&#246;kdal, Id: 60773745, Score: 0: </h3><p>For Ubuntu 18, after checking log file mentioned while install</p>
 
 <p>Results logged to /var/canvas/vendor/bundle/ruby/2.5.0/extensions/x86_64-linux/2.5.0/nio4r-2.5.2/gem_make.out</p>
 
@@ -216,8 +216,8 @@ Solved with </p>
 </code></pre>
 
 <p>everything worked.</p>
------------------------------------------------------------------- <br><h3> Answer 64249016 jarr: </h3><p>I faced a similar issue on <strong>Xcode 12</strong> with macOS <strong>10.15</strong> and cocoapods. Just make sure that the xcode-select command points to the SDK you want to build against. It should build without issues afterwards.</p>
------------------------------------------------------------------- <br><h3> Answer 64894716 Carlos Thadeu: </h3><p><strong>BEFORE</strong> you follow the tip from Joki's answer (below) and <strong>IF</strong> :</p>
+------------------------------------------------------------------ <br><h3> jarr, Id: 64249016, Score: 0: </h3><p>I faced a similar issue on <strong>Xcode 12</strong> with macOS <strong>10.15</strong> and cocoapods. Just make sure that the xcode-select command points to the SDK you want to build against. It should build without issues afterwards.</p>
+------------------------------------------------------------------ <br><h3> Carlos Thadeu, Id: 64894716, Score: 0: </h3><p><strong>BEFORE</strong> you follow the tip from Joki's answer (below) and <strong>IF</strong> :</p>
 <ul>
 <li><p>you have MacOS 10.14.6</p>
 </li>
@@ -239,11 +239,11 @@ If you move MacOSX10.15.sdk folder to /Library/Developer/CommandLineTools/SDKs/ 
 <pre><code>ruby -rrbconfig -e 'puts RbConfig::CONFIG[&quot;rubyhdrdir&quot;]'
 </code></pre>
 <p>will show  MacOSX10.15.sdk folder like default again, nowadays I dunno how to fix it! My suggestion, compress the folder and put the original folder until fix will be available.</p>
------------------------------------------------------------------- <br><h3> Answer 74263740 Kent Robin: </h3><p><strong>macOS RubyMine Gem installation failure</strong></p>
+------------------------------------------------------------------ <br><h3> Kent Robin, Id: 74263740, Score: 0: </h3><p><strong>macOS RubyMine Gem installation failure</strong></p>
 <p>My problem with this error message was when trying to install a Gem via RubyMine. It didn't like that I had changed the global Ruby version with <code>rbenv</code>, so I fixed it by changing back to the system default Ruby version with:</p>
 <p><code>rbenv global system</code></p>
 <p>and restarted RubyMine.</p>
------------------------------------------------------------------- <br><h3> Answer 58562649 Ajmal Aamir: </h3><pre><code>sudo apt-get --reinstall install ruby
+------------------------------------------------------------------ <br><h3> Ajmal Aamir, Id: 58562649, Score: -2: </h3><pre><code>sudo apt-get --reinstall install ruby
 </code></pre>
 
 <p>try it for ubuntu 16.04</p>

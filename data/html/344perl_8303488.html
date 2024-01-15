@@ -1,4 +1,4 @@
- <h2> Title: Regex to match any character including new lines </h2> <h3> kurotsuki, question_id: 8303488 </h3>Score: 344, Tags: {regex,perl} <br><p>Is there a regex to match "all characters including newlines"? </p>
+ <h2> Title: Regex to match any character including new lines </h2> <h4> kurotsuki, question_id: 8303488 </h4>Score: 344, Tags: {regex,perl} <br><p>Is there a regex to match "all characters including newlines"? </p>
 
 <p>For example, in the regex below, there is no output from <code>$2</code> because <code>(.+?)</code> doesn't include new lines when matching.</p>
 
@@ -14,7 +14,7 @@ $string =~ /(START)(.+?)(END)/;
 
 print $2;
 </code></pre>
-<h4> Comment 10234536 snoofkin: </h4>You may want to read about regex modifiers / flags such as: m,s (m/regex/ims...)<br>------------------------------------------------------------------ <br><h3> Answer 8303552 ephemient: </h3><p>If you don't want add the <code>/s</code> regex modifier (perhaps you still want <code>.</code> to retain its original meaning elsewhere in the regex), you may also use a character class.  One possibility:</p>
+<h4> snoofkin, Id: 10234536 Score: 1: </h4>You may want to read about regex modifiers / flags such as: m,s (m/regex/ims...)<br>------------------------------------------------------------------ <br><h3> ephemient, Id: 8303552, Score: 463: </h3><p>If you don't want add the <code>/s</code> regex modifier (perhaps you still want <code>.</code> to retain its original meaning elsewhere in the regex), you may also use a character class.  One possibility:</p>
 
 <pre><code>[\S\s]
 </code></pre>
@@ -25,11 +25,11 @@ print $2;
 
 <pre><code>(?s:.)
 </code></pre>
-<h4> Comment 59113471 Vlastimil Ovč&#225;č&#237;k: </h4>Is <code>(?:.|\n)</code> inferior in any way, except being less elegant?<br><h4> Comment 98309263 Resigned June 2023: </h4>@VlastimilOvč&#225;č&#237;k That one can be really bad for runtime if you use it with <code>*</code> or <code>+</code> since there are 2^n different ways it can match any given string of length n.<br><h4> Comment 136805938 Isidro Rodriguez: </h4><code>(?s:.)</code> was exactly what I needed. Thanks!<br>------------------------------------------------------------------ <br><h3> Answer 8303507 BoltClock: </h3><p>Add the <a href="http://perldoc.perl.org/perlre.html#Modifiers" rel="noreferrer"><code>s</code> modifier</a> to your regex to cause <code>.</code> to match newlines:</p>
+<h4> Vlastimil Ovč&#225;č&#237;k, Comment 59113471 Score: 1: </h4>Is <code>(?:.|\n)</code> inferior in any way, except being less elegant?<br><h4> Resigned June 2023, Comment 98309263 Score: 1: </h4>@VlastimilOvč&#225;č&#237;k That one can be really bad for runtime if you use it with <code>*</code> or <code>+</code> since there are 2^n different ways it can match any given string of length n.<br><h4> Isidro Rodriguez, Comment 136805938 Score: 0: </h4><code>(?s:.)</code> was exactly what I needed. Thanks!<br>------------------------------------------------------------------ <br><h3> BoltClock, Id: 8303507, Score: 257: </h3><p>Add the <a href="http://perldoc.perl.org/perlre.html#Modifiers" rel="noreferrer"><code>s</code> modifier</a> to your regex to cause <code>.</code> to match newlines:</p>
 
 <pre><code>$string =~ /(START)(.+?)(END)/s;
 </code></pre>
-<h4> Comment 38421715 Zymotik: </h4>In JavaScript: (START)[\s\S]*(END) - See www.regexpal.com to test<br><h4> Comment 101273342 LukeSolar: </h4>In Java you can use the inline modifier (?s) at the beginning of the regex, for example to replace any character including newlines after &#39;yourPattern&#39; use <code>&quot;(?s)yourPattern.*&quot;</code>- Also see: <a href="https://www.rexegg.com/regex-modifiers.html#dotall" rel="nofollow noreferrer">rexegg.com/regex-modifiers.html#dotall</a><br><h4> Comment 64308226 Jacob van Lingen: </h4>For more info regarding @Zymotik&#39;s comment, see: <a href="http://stackoverflow.com/questions/1068280/javascript-regex-multiline-flag-doesnt-work" title="javascript regex multiline flag doesnt work">stackoverflow.com/questions/1068280/&hellip;</a><br><h4> Comment 113342365 Lyall: </h4>JavaScript now supports this way. ES2018 added the <code>s</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/dotAll" rel="nofollow noreferrer">dotAll</a> flag.<br><h4> Comment 105601363 Jon Schneider: </h4>In Ruby, the modifier is <code>m</code>, not <code>s</code>. See: <a href="https://rubular.com/" rel="nofollow noreferrer">rubular.com</a><br>------------------------------------------------------------------ <br><h3> Answer 75635391 Julesezaar: </h3><p>This is very readable to me and matches &quot;<strong>any character or newline</strong>&quot;</p>
+<h4> Zymotik, Comment 38421715 Score: 42: </h4>In JavaScript: (START)[\s\S]*(END) - See www.regexpal.com to test<br><h4> LukeSolar, Comment 101273342 Score: 3: </h4>In Java you can use the inline modifier (?s) at the beginning of the regex, for example to replace any character including newlines after &#39;yourPattern&#39; use <code>&quot;(?s)yourPattern.*&quot;</code>- Also see: <a href="https://www.rexegg.com/regex-modifiers.html#dotall" rel="nofollow noreferrer">rexegg.com/regex-modifiers.html#dotall</a><br><h4> Jacob van Lingen, Comment 64308226 Score: 1: </h4>For more info regarding @Zymotik&#39;s comment, see: <a href="http://stackoverflow.com/questions/1068280/javascript-regex-multiline-flag-doesnt-work" title="javascript regex multiline flag doesnt work">stackoverflow.com/questions/1068280/&hellip;</a><br><h4> Lyall, Comment 113342365 Score: 1: </h4>JavaScript now supports this way. ES2018 added the <code>s</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/dotAll" rel="nofollow noreferrer">dotAll</a> flag.<br><h4> Jon Schneider, Comment 105601363 Score: 0: </h4>In Ruby, the modifier is <code>m</code>, not <code>s</code>. See: <a href="https://rubular.com/" rel="nofollow noreferrer">rubular.com</a><br>------------------------------------------------------------------ <br><h3> Julesezaar, Id: 75635391, Score: 27: </h3><p>This is very readable to me and matches &quot;<strong>any character or newline</strong>&quot;</p>
 <pre><code>(.|\n)*
 </code></pre>
 <p>It behaves the same as</p>
@@ -47,11 +47,11 @@ start_string(.|\n)*?end_string
 and newlines end_string
 some more text end_string
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 8303515 FailedDev: </h3><p>Yeap, you just need to make <code>.</code> match newline : </p>
+------------------------------------------------------------------ <br><h3> FailedDev, Id: 8303515, Score: 10: </h3><p>Yeap, you just need to make <code>.</code> match newline : </p>
 
 <pre><code>$string =~ /(START)(.+?)(END)/s;
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 76804550 Ayo Reis: </h3><p>I like to use an empty negated set which matches any character not in the group, since it's empty it will match anything including newlines.</p>
+------------------------------------------------------------------ <br><h3> Ayo Reis, Id: 76804550, Score: 0: </h3><p>I like to use an empty negated set which matches any character not in the group, since it's empty it will match anything including newlines.</p>
 <pre><code>[^]
 </code></pre>
 <p>If you want more than zero characters</p>
@@ -61,12 +61,12 @@ some more text end_string
 <pre><code>[^]+
 </code></pre>
 <p>Tested in JavaScript.</p>
-<h4> Comment 135464404 Glenn Slayden: </h4>Not sure about this. What specific regex engine implementation are you using? I don&#39;t think this notation has a conventional or widely-adopted meaning. Notepad++, for example, rejects this expression as malformed. One problem is that, if the engine can&#39;t assume there is at least one character in the (negated) set, then you&#39;d have to establish another escape sequence in order to negate the set of a single <code>&#39;]&#39;</code> character.<br><h4> Comment 135483220 Ayo Reis: </h4>I&#39;m using Chrome (V8), if I paste <code>&#47;[^]*&#47;.test(&#39;whatever&#39;)</code> in the console it return <code>true</code>.<br>------------------------------------------------------------------ <br><h3> Answer 75670741 brian d foy: </h3><p>Go with the other answers that use the <code>/s</code> flag to let the <code>.</code> match every character in</p>
+<h4> Glenn Slayden, Comment 135464404 Score: 0: </h4>Not sure about this. What specific regex engine implementation are you using? I don&#39;t think this notation has a conventional or widely-adopted meaning. Notepad++, for example, rejects this expression as malformed. One problem is that, if the engine can&#39;t assume there is at least one character in the (negated) set, then you&#39;d have to establish another escape sequence in order to negate the set of a single <code>&#39;]&#39;</code> character.<br><h4> Ayo Reis, Comment 135483220 Score: 0: </h4>I&#39;m using Chrome (V8), if I paste <code>&#47;[^]*&#47;.test(&#39;whatever&#39;)</code> in the console it return <code>true</code>.<br>------------------------------------------------------------------ <br><h3> brian d foy, Id: 75670741, Score: -1: </h3><p>Go with the other answers that use the <code>/s</code> flag to let the <code>.</code> match every character in</p>
 <p><a href="https://www.effectiveperlprogramming.com/2011/01/use-the-n-regex-character-class-to-get-not-a-newline/" rel="nofollow noreferrer">Perl v5.12 added the <code>\N</code> as a character class shortcut</a> to always match any character except a newline despite the setting of <code>/s</code>. This allows <code>\n</code> to have a partner like <code>\s</code> has <code>\S</code>.</p>
 <p>With this, you can do like similar answers to use both sides of the complement: <code>[\n\N]</code>, <code>[\s\S]</code>, and so on.</p>
 <p>However, you've also tagged this with javascript, which thinks <code>\N</code> is just capital N.</p>
------------------------------------------------------------------- <br><h3> Answer 8303506 nadime: </h3><p>You want to use "multiline".</p>
+------------------------------------------------------------------ <br><h3> nadime, Id: 8303506, Score: -6: </h3><p>You want to use "multiline".</p>
 
 <pre><code>$string =~ /(START)(.+?)(END)/m;
 </code></pre>
-<h4> Comment 10230837 BoltClock: </h4>No, <code>m</code> affects the <code>^</code> and <code>$</code> anchors but not <code>.</code>.<br><h4> Comment 10230949 nadime: </h4>Interesting, thanks.  Guess I&#39;ve never tried to do exactly what the OP is asking.<br>
+<h4> BoltClock, Comment 10230837 Score: 8: </h4>No, <code>m</code> affects the <code>^</code> and <code>$</code> anchors but not <code>.</code>.<br><h4> nadime, Comment 10230949 Score: 0: </h4>Interesting, thanks.  Guess I&#39;ve never tried to do exactly what the OP is asking.<br>

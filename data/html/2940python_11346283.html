@@ -1,20 +1,20 @@
- <h2> Title: Renaming column names in Pandas </h2> <h3> user1504276, question_id: 11346283 </h3>Score: 2940, Tags: {python,pandas,replace,dataframe,rename} <br><p>I want to change the column labels of a Pandas DataFrame from</p>
+ <h2> Title: Renaming column names in Pandas </h2> <h4> user1504276, question_id: 11346283 </h4>Score: 2940, Tags: {python,pandas,replace,dataframe,rename} <br><p>I want to change the column labels of a Pandas DataFrame from</p>
 <pre><code>['$a', '$b', '$c', '$d', '$e']
 </code></pre>
 <p>to</p>
 <pre><code>['a', 'b', 'c', 'd', 'e']
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 35068123 Anton Protopopov: </h3><p>You could use <a href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.str.slice.html" rel="noreferrer"><code>str.slice</code></a> for that:</p>
+------------------------------------------------------------------ <br><h3> Anton Protopopov, Id: 35068123, Score: 13: </h3><p>You could use <a href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.str.slice.html" rel="noreferrer"><code>str.slice</code></a> for that:</p>
 
 <pre><code>df.columns = df.columns.str.slice(1)
 </code></pre>
-<h4> Comment 99214832 cs95: </h4>PS: This is a more verbose equivalent to <code>df.columns.str[1:]</code>... probably better to use that, it&#39;s shorter and more obvious.<br>------------------------------------------------------------------ <br><h3> Answer 30380922 migloo: </h3><p>Use:</p>
+<h4> cs95, Comment 99214832 Score: 2: </h4>PS: This is a more verbose equivalent to <code>df.columns.str[1:]</code>... probably better to use that, it&#39;s shorter and more obvious.<br>------------------------------------------------------------------ <br><h3> migloo, Id: 30380922, Score: 82: </h3><p>Use:</p>
 <pre><code>old_names = ['$a', '$b', '$c', '$d', '$e'] 
 new_names = ['a', 'b', 'c', 'd', 'e']
 df.rename(columns=dict(zip(old_names, new_names)), inplace=True)
 </code></pre>
 <p>This way you can manually edit the <code>new_names</code> as you wish. It works great when you need to rename only a few columns to correct misspellings, accents, remove special characters, etc.</p>
-<h4> Comment 50010913 Christopher Pearson: </h4>I like this approach, but I think <code>df.columns = [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;, &#39;d&#39;, &#39;e&#39;]</code> is simpler.<br><h4> Comment 50983447 bkowshik: </h4>I like this method of zipping old and new names. We can use <code>df.columns.values</code> to get the old names.<br><h4> Comment 105728178 pauljohn32: </h4>Best to take the old names as @bkowshik suggested, then edit them and re-insert them, ie <code>namez = df.columns.values</code> followed by some edits, then <code>df.columns = namez</code>.<br><h4> Comment 67831472 mythicalcoder: </h4>I display the tabular view and copy the columns to old_names. I copy the requirement array to new_names. Then use dict(zip(old_names, new_names)) Very elegant solution.<br><h4> Comment 77111072 Tim Gottgetreu: </h4>I often use subsets of lists from something like:  <code>myList = list(df)  myList[10:20]</code> , etc - so this is perfect.<br>------------------------------------------------------------------ <br><h3> Answer 11354850 lexual: </h3><h2>Rename Specific Columns</h2>
+<h4> Christopher Pearson, Comment 50010913 Score: 4: </h4>I like this approach, but I think <code>df.columns = [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;, &#39;d&#39;, &#39;e&#39;]</code> is simpler.<br><h4> bkowshik, Comment 50983447 Score: 3: </h4>I like this method of zipping old and new names. We can use <code>df.columns.values</code> to get the old names.<br><h4> pauljohn32, Comment 105728178 Score: 1: </h4>Best to take the old names as @bkowshik suggested, then edit them and re-insert them, ie <code>namez = df.columns.values</code> followed by some edits, then <code>df.columns = namez</code>.<br><h4> mythicalcoder, Comment 67831472 Score: 1: </h4>I display the tabular view and copy the columns to old_names. I copy the requirement array to new_names. Then use dict(zip(old_names, new_names)) Very elegant solution.<br><h4> Tim Gottgetreu, Comment 77111072 Score: 0: </h4>I often use subsets of lists from something like:  <code>myList = list(df)  myList[10:20]</code> , etc - so this is perfect.<br>------------------------------------------------------------------ <br><h3> lexual, Id: 11354850, Score: 4504: </h3><h2>Rename Specific Columns</h2>
 <p>Use the <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.rename.html" rel="noreferrer"><code>df.rename()</code></a> function and refer the columns to be renamed. Not all the columns have to be renamed:</p>
 <pre><code>df = df.rename(columns={'oldName1': 'newName1', 'oldName2': 'newName2'})
 
@@ -73,7 +73,7 @@ df
 1  x  x  x  x  x
 2  x  x  x  x  x
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 11346337 eumiro: </h3><p>Just assign it to the <code>.columns</code> attribute:</p>
+------------------------------------------------------------------ <br><h3> eumiro, Id: 11346337, Score: 2529: </h3><p>Just assign it to the <code>.columns</code> attribute:</p>
 <pre><code>&gt;&gt;&gt; df = pd.DataFrame({'$a':[1,2], '$b': [10,20]})
 &gt;&gt;&gt; df
    $a  $b
@@ -86,7 +86,7 @@ df
 0  1  10
 1  2  20
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 16667215 Andy Hayden: </h3><p>The <a href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.rename.html" rel="noreferrer"><code>rename</code></a> method can take a <strong><em>function</em></strong>, for example:</p>
+------------------------------------------------------------------ <br><h3> Andy Hayden, Id: 16667215, Score: 516: </h3><p>The <a href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.rename.html" rel="noreferrer"><code>rename</code></a> method can take a <strong><em>function</em></strong>, for example:</p>
 
 <pre><code>In [11]: df.columns
 Out[11]: Index([u'$a', u'$b', u'$c', u'$d', u'$e'], dtype=object)
@@ -96,10 +96,10 @@ In [12]: df.rename(columns=lambda x: x[1:], inplace=True)
 In [13]: df.columns
 Out[13]: Index([u'a', u'b', u'c', u'd', u'e'], dtype=object)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 30546734 kadee: </h3><p>As documented in <em><a href="http://pandas.pydata.org/pandas-docs/stable/text.html" rel="noreferrer">Working with text data</a></em>:</p>
+------------------------------------------------------------------ <br><h3> kadee, Id: 30546734, Score: 273: </h3><p>As documented in <em><a href="http://pandas.pydata.org/pandas-docs/stable/text.html" rel="noreferrer">Working with text data</a></em>:</p>
 <pre><code>df.columns = df.columns.str.replace('$', '')
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 46912050 Ted Petrou: </h3><h1>Pandas 0.21+ Answer</h1>
+------------------------------------------------------------------ <br><h3> Ted Petrou, Id: 46912050, Score: 199: </h3><h1>Pandas 0.21+ Answer</h1>
 
 <p>There have been some significant updates to column renaming in version 0.21. </p>
 
@@ -187,7 +187,7 @@ df1 = df.some_method1()
 df1.columns = columns
 df1.some_method3()
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 22657894 paulo.filip3: </h3><p>Since you only want to remove the $ sign in all column names, you could just do:</p>
+------------------------------------------------------------------ <br><h3> paulo.filip3, Id: 22657894, Score: 160: </h3><p>Since you only want to remove the $ sign in all column names, you could just do:</p>
 
 <pre><code>df = df.rename(columns=lambda x: x.replace('$', ''))
 </code></pre>
@@ -196,14 +196,14 @@ df1.some_method3()
 
 <pre><code>df.rename(columns=lambda x: x.replace('$', ''), inplace=True)
 </code></pre>
-<h4> Comment 93655064 Deepak: </h4>This one not only helps in OP&#39;s case but also in generic requirements.  E.g.: to split a column name by a separator and use one part of it.<br>------------------------------------------------------------------ <br><h3> Answer 61679284 Nirali Khoda: </h3><p>Renaming columns in Pandas is an easy task.</p>
+<h4> Deepak, Comment 93655064 Score: 3: </h4>This one not only helps in OP&#39;s case but also in generic requirements.  E.g.: to split a column name by a separator and use one part of it.<br>------------------------------------------------------------------ <br><h3> Nirali Khoda, Id: 61679284, Score: 141: </h3><p>Renaming columns in Pandas is an easy task.</p>
 <pre><code>df.rename(columns={'$a': 'a', '$b': 'b', '$c': 'c', '$d': 'd', '$e': 'e'}, inplace=True)
 </code></pre>
-<h4> Comment 122088565 aschmied: </h4>The <code>columns</code> arg here can also be a function. So if you want to remove the first char from each name you can do <code>df.rename(columns=lambda name: name[1:], inplace=True)</code> (<a href="https://pandas.pydata.org/docs/user_guide/basics.html#basics-rename" rel="nofollow noreferrer">ref</a>)<br><h4> Comment 116934313 lkahtz: </h4>I will up this since It is naturally supported.<br><h4> Comment 119610485 slisnychyi: </h4>much better than approved solution<br><h4> Comment 123443622 Shaida Muhammad: </h4>It&#39;s very natural. You can do it for arbitrary columns. It should be an accepted answer.<br><h4> Comment 125597969 ZakS: </h4>also give a label to an unlabelled column using this method: df.rename(columns={0: &quot;x&quot;, 1: &quot;y&quot;, 2: &quot;z&quot;})<br>------------------------------------------------------------------ <br><h3> Answer 36149967 M PAUL: </h3><pre><code>df.columns = ['a', 'b', 'c', 'd', 'e']
+<h4> aschmied, Comment 122088565 Score: 2: </h4>The <code>columns</code> arg here can also be a function. So if you want to remove the first char from each name you can do <code>df.rename(columns=lambda name: name[1:], inplace=True)</code> (<a href="https://pandas.pydata.org/docs/user_guide/basics.html#basics-rename" rel="nofollow noreferrer">ref</a>)<br><h4> lkahtz, Comment 116934313 Score: 2: </h4>I will up this since It is naturally supported.<br><h4> slisnychyi, Comment 119610485 Score: 1: </h4>much better than approved solution<br><h4> Shaida Muhammad, Comment 123443622 Score: 1: </h4>It&#39;s very natural. You can do it for arbitrary columns. It should be an accepted answer.<br><h4> ZakS, Comment 125597969 Score: 0: </h4>also give a label to an unlabelled column using this method: df.rename(columns={0: &quot;x&quot;, 1: &quot;y&quot;, 2: &quot;z&quot;})<br>------------------------------------------------------------------ <br><h3> M PAUL, Id: 36149967, Score: 95: </h3><pre><code>df.columns = ['a', 'b', 'c', 'd', 'e']
 </code></pre>
 
 <p>It will replace the existing names with the names you provide, in the order you provide.</p>
------------------------------------------------------------------- <br><h3> Answer 46192213 piRSquared: </h3><h1>One line or Pipeline solutions</h1>
+------------------------------------------------------------------ <br><h3> piRSquared, Id: 46192213, Score: 44: </h3><h1>One line or Pipeline solutions</h1>
 <p>I'll focus on two things:</p>
 <ol>
 <li><p>OP clearly states</p>
@@ -330,7 +330,7 @@ In this solution, we pass a lambda that takes <code>x</code> but then ignores it
 0     1     3     5
 1     2     4     6
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 39770407 firelynx: </h3><h1>Column names vs Names of Series</h1>
+------------------------------------------------------------------ <br><h3> firelynx, Id: 39770407, Score: 42: </h3><h1>Column names vs Names of Series</h1>
 <p>I would like to explain a bit what happens behind the scenes.</p>
 <p>Dataframes are a set of Series.</p>
 <p>Series in turn are an extension of a <code>numpy.array</code>.</p>
@@ -372,7 +372,7 @@ name of the index
 <p>This is easily achievable by setting columns to lists, like this:</p>
 <pre><code>df.columns = [['one', 'one'], ['one', 'two']]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 67978608 Aaron Diamond-Reivich: </h3><p>Many of pandas functions have an inplace parameter. When setting it True, the transformation applies directly to the dataframe that you are calling it on. For example:</p>
+------------------------------------------------------------------ <br><h3> Aaron Diamond-Reivich, Id: 67978608, Score: 42: </h3><p>Many of pandas functions have an inplace parameter. When setting it True, the transformation applies directly to the dataframe that you are calling it on. For example:</p>
 <pre><code>df = pd.DataFrame({'$a':[1,2], '$b': [3,4]})
 df.rename(columns={'$a': 'a'}, inplace=True)
 df.columns
@@ -391,7 +391,7 @@ df2.columns
 &gt;&gt;&gt; Index(['a', '$b'], dtype='object')
 </code></pre>
 <p>If these types of transformations are something that you do often, you could also look into a number of different pandas GUI tools. I'm the creator of one called <a href="https://trymito.io/soo" rel="noreferrer">Mito</a>. It’s a spreadsheet that automatically converts your edits to python code.</p>
------------------------------------------------------------------- <br><h3> Answer 60584778 Amar Kumar: </h3><p>Let's <em>understand</em> renaming by a small example...</p>
+------------------------------------------------------------------ <br><h3> Amar Kumar, Id: 60584778, Score: 32: </h3><p>Let's <em>understand</em> renaming by a small example...</p>
 <ol>
 <li><p>Renaming columns using mapping:</p>
 <pre><code> df = pd.DataFrame({&quot;A&quot;: [1, 2, 3], &quot;B&quot;: [4, 5, 6]}) # Creating a df with column name A and B
@@ -417,13 +417,13 @@ df2.columns
 </code></pre>
 </li>
 </ol>
------------------------------------------------------------------- <br><h3> Answer 67467042 Sushan Bastola: </h3><p>Suppose your dataset name is df, and df has.</p>
+------------------------------------------------------------------ <br><h3> Sushan Bastola, Id: 67467042, Score: 32: </h3><p>Suppose your dataset name is df, and df has.</p>
 <pre><code>df = ['$a', '$b', '$c', '$d', '$e']`
 </code></pre>
 <p>So, to rename these, we would simply do.</p>
 <pre><code>df.columns = ['a','b','c','d','e']
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 57670616 vibhu_singh: </h3><p>Let's say this is your dataframe.</p>
+------------------------------------------------------------------ <br><h3> vibhu_singh, Id: 57670616, Score: 26: </h3><p>Let's say this is your dataframe.</p>
 
 <p><a href="https://i.stack.imgur.com/vazEj.png" rel="noreferrer"><img src="https://i.stack.imgur.com/vazEj.png" alt="enter image description here"></a></p>
 
@@ -453,7 +453,7 @@ For example, if you passed this:</p>
 </ol>
 
 <p>Similarly, you can change any rows or columns.</p>
------------------------------------------------------------------- <br><h3> Answer 32322596 unique_beast: </h3><p>If you've got the dataframe, df.columns dumps everything into a list you can manipulate and then reassign into your dataframe as the names of columns...</p>
+------------------------------------------------------------------ <br><h3> unique_beast, Id: 32322596, Score: 22: </h3><p>If you've got the dataframe, df.columns dumps everything into a list you can manipulate and then reassign into your dataframe as the names of columns...</p>
 <pre><code>columns = df.columns
 columns = [row.replace(&quot;$&quot;, &quot;&quot;) for row in columns]
 df.rename(columns=dict(zip(columns, things)), inplace=True)
@@ -528,13 +528,13 @@ cProfile.run('awo(df)')
 print 'kaitlyn'
 cProfile.run('kaitlyn(df)')
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 67914447 Crystal L: </h3><p>If you already have a list for the new column names, you can try this:</p>
+------------------------------------------------------------------ <br><h3> Crystal L, Id: 67914447, Score: 22: </h3><p>If you already have a list for the new column names, you can try this:</p>
 <pre><code>new_cols = ['a', 'b', 'c', 'd', 'e']
 new_names_map = {df.columns[i]:new_cols[i] for i in range(len(new_cols))}
 
 df.rename(new_names_map, axis=1, inplace=True)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 35387028 Alexander: </h3><pre><code>df = pd.DataFrame({'$a': [1], '$b': [1], '$c': [1], '$d': [1], '$e': [1]})
+------------------------------------------------------------------ <br><h3> Alexander, Id: 35387028, Score: 21: </h3><pre><code>df = pd.DataFrame({'$a': [1], '$b': [1], '$c': [1], '$d': [1], '$e': [1]})
 </code></pre>
 
 <p>If your new list of columns is in the same order as the existing columns, the assignment is simple:</p>
@@ -559,20 +559,20 @@ df.columns = df.columns.map(lambda col: d[col])  # Or `.map(d.get)` as pointed o
 
 <pre><code>df.columns = [col[1:] if col[0] == '$' else col for col in df]
 </code></pre>
-<h4> Comment 79347992 piRSquared: </h4>Instead of <code>lambda col: d[col]</code> you could pass <code>d.get</code>... so it would look like <code>df.columns.map(d.get)</code><br>------------------------------------------------------------------ <br><h3> Answer 51414545 Yog: </h3><pre><code>df.rename(index=str, columns={'A':'a', 'B':'b'})
+<h4> piRSquared, Comment 79347992 Score: 2: </h4>Instead of <code>lambda col: d[col]</code> you could pass <code>d.get</code>... so it would look like <code>df.columns.map(d.get)</code><br>------------------------------------------------------------------ <br><h3> Yog, Id: 51414545, Score: 21: </h3><pre><code>df.rename(index=str, columns={'A':'a', 'B':'b'})
 </code></pre>
 <p><em><a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.rename.html" rel="nofollow noreferrer">pandas.DataFrame.rename</a></em></p>
-<h4> Comment 117006841 Peter Mortensen: </h4>An explanation would be in order.<br>------------------------------------------------------------------ <br><h3> Answer 33872824 kait: </h3><p>Another way we could replace the original column labels is by stripping the unwanted characters (here '$') from the original column labels.</p>
+<h4> Peter Mortensen, Comment 117006841 Score: 0: </h4>An explanation would be in order.<br>------------------------------------------------------------------ <br><h3> kait, Id: 33872824, Score: 20: </h3><p>Another way we could replace the original column labels is by stripping the unwanted characters (here '$') from the original column labels.</p>
 <p>This could have been done by running a <em>for</em> loop over df.columns and appending the stripped columns to df.columns.</p>
 <p>Instead, we can do this neatly in a single statement by using list comprehension like below:</p>
 <pre><code>df.columns = [col.strip('$') for col in df.columns]
 </code></pre>
 <p>(<code>strip</code> method in Python strips the given character from beginning and end of the string.)</p>
-<h4> Comment 55510968 Dan Lowe: </h4>Can you explain how/why this works? That will make the answer more valuable for future readers.<br>------------------------------------------------------------------ <br><h3> Answer 33986975 Thodoris P: </h3><p>It is real simple. Just use:</p>
+<h4> Dan Lowe, Comment 55510968 Score: 2: </h4>Can you explain how/why this works? That will make the answer more valuable for future readers.<br>------------------------------------------------------------------ <br><h3> Thodoris P, Id: 33986975, Score: 18: </h3><p>It is real simple. Just use:</p>
 <pre><code>df.columns = ['Name1', 'Name2', 'Name3'...]
 </code></pre>
 <p>And it will assign the column names by the order you put them in.</p>
------------------------------------------------------------------- <br><h3> Answer 68371189 Ankit Rai: </h3><pre><code># This way it will work
+------------------------------------------------------------------ <br><h3> Ankit Rai, Id: 68371189, Score: 15: </h3><pre><code># This way it will work
 import pandas as pd
 
 # Define a dictionary 
@@ -588,7 +588,7 @@ print(rankings_pd)
 
 rankings_pd.rename(columns = {'test':'TEST'}, inplace = True)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 51219353 sbha: </h3><p>Another option is to rename using a regular expression:</p>
+------------------------------------------------------------------ <br><h3> sbha, Id: 51219353, Score: 12: </h3><p>Another option is to rename using a regular expression:</p>
 
 <pre><code>import pandas as pd
 import re
@@ -601,7 +601,7 @@ df = df.rename(columns=lambda x: re.sub('\$','',x))
 0  1  3  5
 1  2  4  6
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 38776854 Anil_M: </h3><p>My method is generic wherein you can add additional delimiters by comma separating <code>delimiters=</code> variable and future-proof it.</p>
+------------------------------------------------------------------ <br><h3> Anil_M, Id: 38776854, Score: 11: </h3><p>My method is generic wherein you can add additional delimiters by comma separating <code>delimiters=</code> variable and future-proof it.</p>
 <p><strong>Working Code:</strong></p>
 <pre><code>import pandas as pd
 import re
@@ -624,7 +624,7 @@ df.columns = [re.split(matchPattern, i)[1] for i in df.columns ]
 0  1  3  5  7   9
 1  2  4  6  8  10
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 39215492 oxer: </h3><p>Note that the approaches in previous answers do not work for a <em>MultiIndex</em>. For a <em>MultiIndex</em>, you need to do something like the following:</p>
+------------------------------------------------------------------ <br><h3> oxer, Id: 39215492, Score: 10: </h3><p>Note that the approaches in previous answers do not work for a <em>MultiIndex</em>. For a <em>MultiIndex</em>, you need to do something like the following:</p>
 <pre><code>&gt;&gt;&gt; df = pd.DataFrame({('$a','$x'):[1,2], ('$b','$y'): [3,4], ('e','f'):[5,6]})
 &gt;&gt;&gt; df
    $a $b  e
@@ -640,7 +640,7 @@ df.columns = [re.split(matchPattern, i)[1] for i in df.columns ]
 0  1  3  5
 1  2  4  6
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 44584447 matthhias: </h3><p>If you have to deal with loads of columns named by the providing system out of your control, I came up with the following approach that is a combination of a general approach and specific replacements in one go.</p>
+------------------------------------------------------------------ <br><h3> matthhias, Id: 44584447, Score: 9: </h3><p>If you have to deal with loads of columns named by the providing system out of your control, I came up with the following approach that is a combination of a general approach and specific replacements in one go.</p>
 <p>First create a dictionary from the dataframe column names using regular expressions in order to throw away certain appendixes of column names and then add specific replacements to the dictionary to name core columns as expected later in the receiving database.</p>
 <p>This is then applied to the dataframe in one go.</p>
 <pre><code>dict = dict(zip(df.columns, df.columns.str.replace('(:S$|:C1$|:L$|:D$|\.Serial:L$)', '')))
@@ -650,10 +650,10 @@ dict['country:C1'] = 'CountryID'
 dict['pim1:D'] = 'pim_actual'
 df.rename(columns=dict, inplace=True)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 66706456 Omkar Darves: </h3><p>If you just want to remove the '$' sign then use the below code</p>
+------------------------------------------------------------------ <br><h3> Omkar Darves, Id: 66706456, Score: 9: </h3><p>If you just want to remove the '$' sign then use the below code</p>
 <pre><code>df.columns = pd.Series(df.columns.str.replace(&quot;$&quot;, &quot;&quot;))
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 60589137 Stryker: </h3><p>In addition to the solution already provided, you can replace all the columns while you are reading the file. We can use <code>names</code> and <code>header=0</code> to do that.</p>
+------------------------------------------------------------------ <br><h3> Stryker, Id: 60589137, Score: 8: </h3><p>In addition to the solution already provided, you can replace all the columns while you are reading the file. We can use <code>names</code> and <code>header=0</code> to do that.</p>
 
 <p>First, we create a list of the names that we like to use as our column names:</p>
 
@@ -666,7 +666,7 @@ ufo = pd.read_csv('link to the file you are using', names = ufo_cols, header = 0
 </code></pre>
 
 <p>In this case, all the column names will be replaced with the names you have in your list.</p>
------------------------------------------------------------------- <br><h3> Answer 73623532 Mainland: </h3><p>My one line answer is</p>
+------------------------------------------------------------------ <br><h3> Mainland, Id: 73623532, Score: 8: </h3><p>My one line answer is</p>
 <p><code>df.columns = df_new_cols</code></p>
 <p>It is the best one with 1/3rd the processing time.</p>
 <p><code>timeit</code> comparison:</p>
@@ -680,7 +680,7 @@ ufo = pd.read_csv('link to the file you are using', names = ufo_cols, header = 0
 %timeit df.columns = df_new_cols
 72.9 µs ± 17.2 µs per loop (mean ± std. dev. of 7 runs, 10000 loops each)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 74245040 Omri: </h3><p><strong>A simple and 'fun' (and pythonic?) solution:</strong></p>
+------------------------------------------------------------------ <br><h3> Omri, Id: 74245040, Score: 8: </h3><p><strong>A simple and 'fun' (and pythonic?) solution:</strong></p>
 <pre><code>df.rename(columns={x: x.replace('$', '') for x in df.columns})
 </code></pre>
 <p>Where:</p>
@@ -702,7 +702,7 @@ ufo = pd.read_csv('link to the file you are using', names = ufo_cols, header = 0
 <p>Since your changes follow a pattern, to remove the $ character in each column, we can use a dictionary comprehension:</p>
 <pre><code>{x: x.replace('$', '') for x in df.columns}
 </code></pre>
-<h4> Comment 134816222 Trenton McKinney: </h4>The correct way is <code>df.columns = df.columns.str.replace(&#39;$&#39;, &#39;&#39;)</code> or <code>df.columns = df.columns.str.lstrip(&#39;$&#39;)</code>. As shown in <a href="https://stackoverflow.com/a/30546734/7758804">this answer</a> and <a href="https://stackoverflow.com/a/73010626/7758804">this answer</a><br>------------------------------------------------------------------ <br><h3> Answer 55635790 Kaustubh J: </h3><p>Assuming you can use a regular expression, this solution <em>removes</em> the need of manual encoding using a regular expression:</p>
+<h4> Trenton McKinney, Comment 134816222 Score: 1: </h4>The correct way is <code>df.columns = df.columns.str.replace(&#39;$&#39;, &#39;&#39;)</code> or <code>df.columns = df.columns.str.lstrip(&#39;$&#39;)</code>. As shown in <a href="https://stackoverflow.com/a/30546734/7758804">this answer</a> and <a href="https://stackoverflow.com/a/73010626/7758804">this answer</a><br>------------------------------------------------------------------ <br><h3> Kaustubh J, Id: 55635790, Score: 7: </h3><p>Assuming you can use a regular expression, this solution <em>removes</em> the need of manual encoding using a regular expression:</p>
 <pre><code>import pandas as pd
 import re
 
@@ -713,7 +713,7 @@ cols = data.columns
 new_cols = list(map(lambda v:v.group(), (list(map(srch.search, cols)))))
 data.columns = new_cols
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 49915518 seeiespi: </h3><p>Here's a nifty little function I like to use to cut down on typing:</p>
+------------------------------------------------------------------ <br><h3> seeiespi, Id: 49915518, Score: 6: </h3><p>Here's a nifty little function I like to use to cut down on typing:</p>
 <pre><code>def rename(data, oldnames, newname):
     if type(oldnames) == str: # Input can be a string or list of strings
         oldnames = [oldnames] # When renaming multiple columns
@@ -749,13 +749,13 @@ Please enter the index of the column you would like to rename: 0
 In [4]: df.columns
 Out[5]: Index(['first', 'col2', 'ohmy', 'idk'], dtype='object')
 </code></pre>
-<h4> Comment 99215505 cs95: </h4>The use case for a function like this is extremely rare. In most cases, I know what I&#39;m looking for and what I want to rename it to, I&#39;d just assign/modify it myself.<br><h4> Comment 99337933 seeiespi: </h4>@cs95 I tend to work with large national or international surveys where variables will have coded variable names that begin with prefixes depending on answer options, likert scales, and branching (such as EDU_2913.443, EDU_2913.421,...). This function has been very useful for me in working with those types of sets, I understand if its not for you though :)<br>------------------------------------------------------------------ <br><h3> Answer 62546763 Igor Ostaptchenko: </h3><p>I needed to rename features for XGBoost, and it didn't like any of these:</p>
+<h4> cs95, Comment 99215505 Score: 2: </h4>The use case for a function like this is extremely rare. In most cases, I know what I&#39;m looking for and what I want to rename it to, I&#39;d just assign/modify it myself.<br><h4> seeiespi, Comment 99337933 Score: 1: </h4>@cs95 I tend to work with large national or international surveys where variables will have coded variable names that begin with prefixes depending on answer options, likert scales, and branching (such as EDU_2913.443, EDU_2913.421,...). This function has been very useful for me in working with those types of sets, I understand if its not for you though :)<br>------------------------------------------------------------------ <br><h3> Igor Ostaptchenko, Id: 62546763, Score: 6: </h3><p>I needed to rename features for XGBoost, and it didn't like any of these:</p>
 <pre class="lang-py prettyprint-override"><code>import re
 regex = r&quot;[!\&quot;#$%&amp;'()*+,\-.\/:;&lt;=&gt;?@[\\\]^_`{|}~ ]+&quot;
 X_trn.columns = X_trn.columns.str.replace(regex, '_', regex=True)
 X_tst.columns = X_tst.columns.str.replace(regex, '_', regex=True)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 76995303 cottontail: </h3><h3>Rename column at a specific position</h3>
+------------------------------------------------------------------ <br><h3> cottontail, Id: 76995303, Score: 3: </h3><h3>Rename column at a specific position</h3>
 <p>One use-case not mentioned on this page is how to rename a column by index, i.e. rename a column name at a specific position. If the column names are unique, then <code>rename()</code> would work. For example, if we want to rename the second column, the following would work.</p>
 <pre class="lang-py prettyprint-override"><code>df = pd.DataFrame({'$A': [1, 2], '$B': ['a', 'b']})
 df.rename(columns={df.columns[1]: 'new'}, inplace=True)
@@ -780,7 +780,7 @@ df = df.set_axis([*df.columns[:1], 'new', *df.columns[2:]], axis=1)
 df.columns = df.columns.str.removeprefix('$')
 </code></pre>
 <p><a href="https://i.stack.imgur.com/HwLwe.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/HwLwe.png" alt="result3" /></a></p>
------------------------------------------------------------------- <br><h3> Answer 73010626 Mykola Zotko: </h3><p>You can use the <a href="http://pandas.pydata.org/docs/reference/api/pandas.Series.str.lstrip.html#pandas.Series.str.lstrip" rel="nofollow noreferrer"><code>lstrip</code></a> or <a href="http://pandas.pydata.org/docs/reference/api/pandas.Series.str.strip.html#pandas.Series.str.strip" rel="nofollow noreferrer"><code>strip</code></a> methods with an index:</p>
+------------------------------------------------------------------ <br><h3> Mykola Zotko, Id: 73010626, Score: 2: </h3><p>You can use the <a href="http://pandas.pydata.org/docs/reference/api/pandas.Series.str.lstrip.html#pandas.Series.str.lstrip" rel="nofollow noreferrer"><code>lstrip</code></a> or <a href="http://pandas.pydata.org/docs/reference/api/pandas.Series.str.strip.html#pandas.Series.str.strip" rel="nofollow noreferrer"><code>strip</code></a> methods with an index:</p>
 <pre><code>df.columns = df.columns.str.lstrip('$')
 </code></pre>
 <p>or</p>

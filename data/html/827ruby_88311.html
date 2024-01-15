@@ -1,4 +1,4 @@
- <h2> Title: How to generate a random string in Ruby </h2> <h3> Jeff, question_id: 88311 </h3>Score: 827, Tags: {ruby,random,passwords} <br><p>I'm currently generating an 8-character pseudo-random uppercase string for "A" .. "Z":</p>
+ <h2> Title: How to generate a random string in Ruby </h2> <h4> Jeff, question_id: 88311 </h4>Score: 827, Tags: {ruby,random,passwords} <br><p>I'm currently generating an 8-character pseudo-random uppercase string for "A" .. "Z":</p>
 
 <pre><code>value = ""; 8.times{value  &lt;&lt; (65 + rand(25)).chr}
 </code></pre>
@@ -11,13 +11,13 @@
 <p>but it looks like trash.</p>
 
 <p>Does anyone have a better method?</p>
-<h4> Comment 14720680 Jeff: </h4>Suppose there is a method to reset a user&#39;s password and it has an argument for the new password. I would like to pass in a random string, in the above code I need a tmp variable, whereas in the single statement examples bellow I can do the whole thing as a one liner. Sure a utility method could be nice in the long run, esp if I&#39;m needing similar here and there, but sometimes you just want it in place, one time, done.<br><h4> Comment 14720848 David J.: </h4>No, you don&#39;t have to use a temporary variable. Try this: <code>reset_user_password!(random_string)</code> where <code>def random_string; SecureRandom.urlsafe_base64(20) end</code><br><h4> Comment 17429539 Colonel Panic: </h4>8 letters is a shamefully weak password. Given the md5sum a modern PC could recover the password in <a href="http://www.codinghorror.com/blog/2012/04/speed-hashing.html" rel="nofollow noreferrer">30 seconds</a>. How about something longer <a href="http://rubydoc.info/stdlib/securerandom/1.9.2/SecureRandom#urlsafe_base64-class_method" rel="nofollow noreferrer"><code>securerandom.urlsafe_base64</code></a><br><h4> Comment 61150850 Shiva: </h4>well, put a webdesigner infront of VIM and ask him to save and exit; Jokes apart. <code>require &#39;securerandom&#39;; SecureRandom.hex(15)</code> should work fine<br><h4> Comment 14437666 David J.: </h4>I don&#39;t understand why you care that &quot;since it isn&#39;t a single statement it can&#39;t be passed as an argument&quot;. Why not just make it a utility or helper method?<br>------------------------------------------------------------------ <br><h3> Answer 32656602 Alex Antonov: </h3><p>This solution needs external dependency, but seems prettier than another.</p>
+<h4> Jeff, Id: 14720680 Score: 1: </h4>Suppose there is a method to reset a user&#39;s password and it has an argument for the new password. I would like to pass in a random string, in the above code I need a tmp variable, whereas in the single statement examples bellow I can do the whole thing as a one liner. Sure a utility method could be nice in the long run, esp if I&#39;m needing similar here and there, but sometimes you just want it in place, one time, done.<br><h4> David J., Id: 14720848 Score: 0: </h4>No, you don&#39;t have to use a temporary variable. Try this: <code>reset_user_password!(random_string)</code> where <code>def random_string; SecureRandom.urlsafe_base64(20) end</code><br><h4> Colonel Panic, Id: 17429539 Score: 0: </h4>8 letters is a shamefully weak password. Given the md5sum a modern PC could recover the password in <a href="http://www.codinghorror.com/blog/2012/04/speed-hashing.html" rel="nofollow noreferrer">30 seconds</a>. How about something longer <a href="http://rubydoc.info/stdlib/securerandom/1.9.2/SecureRandom#urlsafe_base64-class_method" rel="nofollow noreferrer"><code>securerandom.urlsafe_base64</code></a><br><h4> Shiva, Id: 61150850 Score: 0: </h4>well, put a webdesigner infront of VIM and ask him to save and exit; Jokes apart. <code>require &#39;securerandom&#39;; SecureRandom.hex(15)</code> should work fine<br><h4> David J., Id: 14437666 Score: 0: </h4>I don&#39;t understand why you care that &quot;since it isn&#39;t a single statement it can&#39;t be passed as an argument&quot;. Why not just make it a utility or helper method?<br>------------------------------------------------------------------ <br><h3> Alex Antonov, Id: 32656602, Score: 4: </h3><p>This solution needs external dependency, but seems prettier than another.</p>
 
 <ol>
 <li>Install gem <a href="https://github.com/stympy/faker" rel="nofollow noreferrer">faker</a></li>
 <li><code>Faker::Lorem.characters(10) # =&gt; "ang9cbhoa8"</code></li>
 </ol>
-<h4> Comment 116978217 Mr. Rene: </h4>Passing number with the 1st argument of characters is deprecated. Use keyword argument like <code>characters(number: ...)</code> instead.    <code>Faker::Lorem.characters(number: 10) # =&gt; &quot;ang9cbhoa8&quot;</code><br>------------------------------------------------------------------ <br><h3> Answer 88341 Kent Fredric: </h3><pre><code>(0...8).map { (65 + rand(26)).chr }.join
+<h4> Mr. Rene, Comment 116978217 Score: 0: </h4>Passing number with the 1st argument of characters is deprecated. Use keyword argument like <code>characters(number: ...)</code> instead.    <code>Faker::Lorem.characters(number: 10) # =&gt; &quot;ang9cbhoa8&quot;</code><br>------------------------------------------------------------------ <br><h3> Kent Fredric, Id: 88341, Score: 1040: </h3><pre><code>(0...8).map { (65 + rand(26)).chr }.join
 </code></pre>
 <p>I spend too much time golfing.</p>
 <pre><code>(0...50).map { ('a'..'z').to_a[rand(26)] }.join
@@ -30,7 +30,7 @@ string = (0...50).map { o[rand(o.length)] }.join
 <pre><code>50.times.map { (0...(rand(10))).map { ('a'..'z').to_a[rand(26)] }.join }.join(&quot; &quot;)
 </code></pre>
 <p>this code generates 50 random word string with words length less than 10 characters and then join with space</p>
-<h4> Comment 14435768 fny: </h4>34 characters and blazing fast: <code>(&#39;a&#39;..&#39;z&#39;).to_a.shuffle[0,8].join</code>. Note you&#39;ll need Ruby &gt;=1.9 to <code>shuffle</code>.<br><h4> Comment 21462228 Robin: </h4><code>[*(&#39;a&#39;..&#39;z&#39;),*(&#39;0&#39;..&#39;9&#39;)].shuffle[0,8].join</code> to generate a random string with both letters and numbers.<br><h4> Comment 22328719 pencil: </h4><code>rand</code> is deterministic and predictable. Don&#39;t use this for generating passwords! Use one of the <code>SecureRandom</code> solutions instead.<br><h4> Comment 14959978 michaeltwofish: </h4>@faraz your method isn&#39;t functionally the same, it&#39;s not random with replacement.<br><h4> Comment 14720891 David J.: </h4>Leveraging existing libraries is preferable unless you have a driver to roll your own. See <code>SecureRandom</code> as one example, in the other answers.<br><h4> Comment 50115248 PL J: </h4>The solutions with <code>shuffle</code> wouldn&#39;t be that awesome, as they&#39;d generate strings with one occurrence of a character ( so string such as &quot;gbalgqut&quot; would be impossible - double &quot;g&quot; )<br><h4> Comment 37778142 Tanel Suurhans: </h4>Always use existing solutions like SecureRandom in favor of homegrown &quot;random&quot; solutions. Seriously, they are there for a reason.<br><h4> Comment 37792728 Kent Fredric: </h4>@TanelSuurhans As the OP of this answer I agree with all the sentiments regarding &quot;use proven tested tools&quot;. Just at the time of this answer, such tools were not core yet, and author appeared to have golfing as an objective.  Understanding how your language works is just as important as using tools written in the language.<br><h4> Comment 26805259 Dennis Krupenik: </h4>the last example should read  <code>(0...50).map { [(&#39;a&#39;..&#39;z&#39;),(&#39;A&#39;..&#39;Z&#39;)].flat_map(&amp;:to_a).sample }.join</code>  you definitely <i>have not</i> spent <i>too</i> much time golfing xD<br><h4> Comment 28551867 Vizjerai: </h4>further reduced from Dennis&#39;s answer <code>(0..50).map { [*&#39;a&#39;..&#39;z&#39;,*&#39;A&#39;..&#39;Z&#39;].sample }.join</code><br><h4> Comment 91704878 aidan: </h4>If golf is the objective, <code>(&#39;a&#39;..&#39;z&#39;)</code> is identical to <code>(?a..?z)</code>; two characters saved.<br><h4> Comment 14987101 fny: </h4>Touche @michaeltwofish. Here&#39;s the shortest and most performant one-liner I could muster: <code>[].fill(0,l){rand(65..90).chr}.join</code> (35 chars). <code>fill</code> is faster than <code>map</code>, but for real performance, drop the golf and prebuild the array with a <i>proper</i> use of <code>sample</code>: <code>chars=[&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;, &quot;E&quot;, &quot;F&quot;, &quot;G&quot;, &quot;H&quot;, &quot;J&quot;, &quot;K&quot;, &quot;L&quot;, &quot;M&quot;, &quot;N&quot;, &quot;P&quot;, &quot;Q&quot;, &quot;R&quot;, &quot;S&quot;, &quot;T&quot;, &quot;U&quot;, &quot;V&quot;, &quot;W&quot;, &quot;X&quot;, &quot;Y&quot;, &quot;Z&quot;];[].fill(0,l){chars.sample}.join</code> That not even significantly faster for 8 characters. With 8 characters, no worries. Anything flies. ;)  See my <a href="http://goo.gl/cOu9G" rel="nofollow noreferrer">full benchmarks</a> for details.<br><h4> Comment 14524267 Alex Gaudio: </h4>first example should be rand(26) otherwise you never get the letter &#39;Z&#39;<br>------------------------------------------------------------------ <br><h3> Answer 1619602 christopherstyles: </h3><p>Why not use SecureRandom?</p>
+<h4> fny, Comment 14435768 Score: 222: </h4>34 characters and blazing fast: <code>(&#39;a&#39;..&#39;z&#39;).to_a.shuffle[0,8].join</code>. Note you&#39;ll need Ruby &gt;=1.9 to <code>shuffle</code>.<br><h4> Robin, Comment 21462228 Score: 43: </h4><code>[*(&#39;a&#39;..&#39;z&#39;),*(&#39;0&#39;..&#39;9&#39;)].shuffle[0,8].join</code> to generate a random string with both letters and numbers.<br><h4> pencil, Comment 22328719 Score: 34: </h4><code>rand</code> is deterministic and predictable. Don&#39;t use this for generating passwords! Use one of the <code>SecureRandom</code> solutions instead.<br><h4> michaeltwofish, Comment 14959978 Score: 28: </h4>@faraz your method isn&#39;t functionally the same, it&#39;s not random with replacement.<br><h4> David J., Comment 14720891 Score: 25: </h4>Leveraging existing libraries is preferable unless you have a driver to roll your own. See <code>SecureRandom</code> as one example, in the other answers.<br><h4> PL J, Comment 50115248 Score: 6: </h4>The solutions with <code>shuffle</code> wouldn&#39;t be that awesome, as they&#39;d generate strings with one occurrence of a character ( so string such as &quot;gbalgqut&quot; would be impossible - double &quot;g&quot; )<br><h4> Tanel Suurhans, Comment 37778142 Score: 4: </h4>Always use existing solutions like SecureRandom in favor of homegrown &quot;random&quot; solutions. Seriously, they are there for a reason.<br><h4> Kent Fredric, Comment 37792728 Score: 2: </h4>@TanelSuurhans As the OP of this answer I agree with all the sentiments regarding &quot;use proven tested tools&quot;. Just at the time of this answer, such tools were not core yet, and author appeared to have golfing as an objective.  Understanding how your language works is just as important as using tools written in the language.<br><h4> Dennis Krupenik, Comment 26805259 Score: 2: </h4>the last example should read  <code>(0...50).map { [(&#39;a&#39;..&#39;z&#39;),(&#39;A&#39;..&#39;Z&#39;)].flat_map(&amp;:to_a).sample }.join</code>  you definitely <i>have not</i> spent <i>too</i> much time golfing xD<br><h4> Vizjerai, Comment 28551867 Score: 1: </h4>further reduced from Dennis&#39;s answer <code>(0..50).map { [*&#39;a&#39;..&#39;z&#39;,*&#39;A&#39;..&#39;Z&#39;].sample }.join</code><br><h4> aidan, Comment 91704878 Score: 0: </h4>If golf is the objective, <code>(&#39;a&#39;..&#39;z&#39;)</code> is identical to <code>(?a..?z)</code>; two characters saved.<br><h4> fny, Comment 14987101 Score: 0: </h4>Touche @michaeltwofish. Here&#39;s the shortest and most performant one-liner I could muster: <code>[].fill(0,l){rand(65..90).chr}.join</code> (35 chars). <code>fill</code> is faster than <code>map</code>, but for real performance, drop the golf and prebuild the array with a <i>proper</i> use of <code>sample</code>: <code>chars=[&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;, &quot;E&quot;, &quot;F&quot;, &quot;G&quot;, &quot;H&quot;, &quot;J&quot;, &quot;K&quot;, &quot;L&quot;, &quot;M&quot;, &quot;N&quot;, &quot;P&quot;, &quot;Q&quot;, &quot;R&quot;, &quot;S&quot;, &quot;T&quot;, &quot;U&quot;, &quot;V&quot;, &quot;W&quot;, &quot;X&quot;, &quot;Y&quot;, &quot;Z&quot;];[].fill(0,l){chars.sample}.join</code> That not even significantly faster for 8 characters. With 8 characters, no worries. Anything flies. ;)  See my <a href="http://goo.gl/cOu9G" rel="nofollow noreferrer">full benchmarks</a> for details.<br><h4> Alex Gaudio, Comment 14524267 Score: 0: </h4>first example should be rand(26) otherwise you never get the letter &#39;Z&#39;<br>------------------------------------------------------------------ <br><h3> christopherstyles, Id: 1619602, Score: 864: </h3><p>Why not use SecureRandom?</p>
 
 <pre><code>require 'securerandom'
 random_string = SecureRandom.hex
@@ -47,12 +47,12 @@ random_string = SecureRandom.hex
 </ul>
 
 <p>see: <a href="http://ruby-doc.org/stdlib-1.9.2/libdoc/securerandom/rdoc/SecureRandom.html" rel="noreferrer">http://ruby-doc.org/stdlib-1.9.2/libdoc/securerandom/rdoc/SecureRandom.html</a></p>
-<h4> Comment 6982662 J-_-L: </h4>By the way, it&#39;s part of the stdlib in 1.9 and recent 1.8 versions, so one can just <code>require &#39;securerandom&#39;</code> to get this neat <code>SecureRandom</code> helper :)<br><h4> Comment 11202086 Marc: </h4>BTW SecureRandom was removed from ActiveSupport in version 3.2. From the changelog: &quot;Removed ActiveSupport::SecureRandom in favor of SecureRandom from the standard library&quot;.<br><h4> Comment 35392122 Gerry Shaw: </h4><code>SecureRandom.random_number(36**12).to_s(36).rjust(12, &quot;0&quot;)</code> will generate a string with 0-9a-z (36 characters) that is ALWAYS 12 characters long.  Change 12 to whatever length you want.  Unfortunately no way to just get A-Z using <code>Integer#to_s</code>.<br><h4> Comment 5109943 Jeff Dickey: </h4>base64 would, but not hex like in his example<br><h4> Comment 46937290 nzifnab: </h4>@stringo0 that is wrong.  If you wanted to pass <code>+fGH1</code> through a URL, you just need to URL-encode it like you would ANY value that&#39;s going through a URL:  <code>%2BfGH1</code><br><h4> Comment 75088615 gogofan: </h4>I tried &#39;SecureRandom.random_number(9**6)&#39; but it sometimes returns 5 numbers but it sometimes returns 6 numbers.<br><h4> Comment 131752053 JakeRobb: </h4>@dcangulo hello from the future! 👋🏻 The chances are low enough that you generally don&#39;t need to worry about it with something like <code>SecureRandom.hex</code>, but it&#39;s not impossible. If you&#39;re using this to generate unique IDs, use <code>SecureRandom.uuid</code>.<br><h4> Comment 136081903 user229044: </h4>@JakeRobb Err, <code>SecureRandom.uuid</code> is exactly as likely to generate duplicates as <code>SecureRandom.hex</code>. They are two different encodings for 128 random bits.<br><h4> Comment 136119954 JakeRobb: </h4>Right you are, thanks for the callout! I was thinking of Type 1 UUIDs, but this method generates a Type 4.<br><h4> Comment 3638968 stringo0: </h4>This generates strings that aren&#39;t safe for passing as get variables for websites - for example, you can get string=+fGH1 (+ is read as a space), and string=fyhi/ (the slash is used for navigation)<br><h4> Comment 11006649 Thomas: </h4>@JeffDickey no, thats wrong. <code>SecureRandom.base64 =&gt; &quot;7p0lfNClJwolM9BJcgG5lQ==&quot;</code> as you see, there are <code>=</code> in it. Method hex only returns <code>0-9a-f</code><br><h4> Comment 93262450 dcangulo: </h4>What are the chances of getting a duplicate?<br><h4> Comment 57990264 user1491929: </h4>To generate a string containing only 5 alpha characters you could do this <code>SecureRandom.hex.gsub(&#47;\d&#47;, &quot;&quot;)[0..4]</code><br><h4> Comment 75088541 gogofan: </h4>Hi, I like SecureRandom, but how do I get a string of 6 numbers, each digit with range 0-9. And I would like it in a way that it&#39;s easy to stub in my Rails controller spec.<br>------------------------------------------------------------------ <br><h3> Answer 3572953 Christoffer M&#246;ller: </h3><p>I use this for generating random URL friendly strings with a length between 1 and  <code>string_length</code> characters:</p>
+<h4> J-_-L, Comment 6982662 Score: 68: </h4>By the way, it&#39;s part of the stdlib in 1.9 and recent 1.8 versions, so one can just <code>require &#39;securerandom&#39;</code> to get this neat <code>SecureRandom</code> helper :)<br><h4> Marc, Comment 11202086 Score: 21: </h4>BTW SecureRandom was removed from ActiveSupport in version 3.2. From the changelog: &quot;Removed ActiveSupport::SecureRandom in favor of SecureRandom from the standard library&quot;.<br><h4> Gerry Shaw, Comment 35392122 Score: 16: </h4><code>SecureRandom.random_number(36**12).to_s(36).rjust(12, &quot;0&quot;)</code> will generate a string with 0-9a-z (36 characters) that is ALWAYS 12 characters long.  Change 12 to whatever length you want.  Unfortunately no way to just get A-Z using <code>Integer#to_s</code>.<br><h4> Jeff Dickey, Comment 5109943 Score: 11: </h4>base64 would, but not hex like in his example<br><h4> nzifnab, Comment 46937290 Score: 1: </h4>@stringo0 that is wrong.  If you wanted to pass <code>+fGH1</code> through a URL, you just need to URL-encode it like you would ANY value that&#39;s going through a URL:  <code>%2BfGH1</code><br><h4> gogofan, Comment 75088615 Score: 1: </h4>I tried &#39;SecureRandom.random_number(9**6)&#39; but it sometimes returns 5 numbers but it sometimes returns 6 numbers.<br><h4> JakeRobb, Comment 131752053 Score: 0: </h4>@dcangulo hello from the future! 👋🏻 The chances are low enough that you generally don&#39;t need to worry about it with something like <code>SecureRandom.hex</code>, but it&#39;s not impossible. If you&#39;re using this to generate unique IDs, use <code>SecureRandom.uuid</code>.<br><h4> user229044, Comment 136081903 Score: 0: </h4>@JakeRobb Err, <code>SecureRandom.uuid</code> is exactly as likely to generate duplicates as <code>SecureRandom.hex</code>. They are two different encodings for 128 random bits.<br><h4> JakeRobb, Comment 136119954 Score: 0: </h4>Right you are, thanks for the callout! I was thinking of Type 1 UUIDs, but this method generates a Type 4.<br><h4> stringo0, Comment 3638968 Score: 0: </h4>This generates strings that aren&#39;t safe for passing as get variables for websites - for example, you can get string=+fGH1 (+ is read as a space), and string=fyhi/ (the slash is used for navigation)<br><h4> Thomas, Comment 11006649 Score: 0: </h4>@JeffDickey no, thats wrong. <code>SecureRandom.base64 =&gt; &quot;7p0lfNClJwolM9BJcgG5lQ==&quot;</code> as you see, there are <code>=</code> in it. Method hex only returns <code>0-9a-f</code><br><h4> dcangulo, Comment 93262450 Score: 0: </h4>What are the chances of getting a duplicate?<br><h4> user1491929, Comment 57990264 Score: 0: </h4>To generate a string containing only 5 alpha characters you could do this <code>SecureRandom.hex.gsub(&#47;\d&#47;, &quot;&quot;)[0..4]</code><br><h4> gogofan, Comment 75088541 Score: 0: </h4>Hi, I like SecureRandom, but how do I get a string of 6 numbers, each digit with range 0-9. And I would like it in a way that it&#39;s easy to stub in my Rails controller spec.<br>------------------------------------------------------------------ <br><h3> Christoffer M&#246;ller, Id: 3572953, Score: 271: </h3><p>I use this for generating random URL friendly strings with a length between 1 and  <code>string_length</code> characters:</p>
 <pre><code>string_length = 8
 rand(36**string_length).to_s(36)
 </code></pre>
 <p>It generates random strings of lowercase a-z and 0-9. It's not very customizable but it's short and clean.</p>
-<h4> Comment 8897422 Brian E: </h4>This is a great solution (and fast, too), but it will occasionally produce a string <i>under</i> <code>length</code> length, roughly once in ~40<br><h4> Comment 19804815 Adrien Rey-Jarthon: </h4>Here is the version always producing tokens of the desired length: <code>(36**(length-1) + rand(36**length - 36**(length-1))).to_s(36)</code><br><h4> Comment 9353579 Eric Hu: </h4>@Brian E this would guarantee the digits you want: <code>(36**(length-1) + rand(36**length)).to_s(36)</code>.  36**(length-1) converted to base 36 is 10**(length-1), which is the smallest value that has the digit length you want.<br><h4> Comment 5435141 Jo Liss: </h4>+1 for the shortest version (that doesn&#39;t call external binaries ^^).  If the random string isn&#39;t public facing, I sometimes even just use <code>rand.to_s</code>; ugly, but works.<br><h4> Comment 42410087 kakubei: </h4>This spits out an error for me in Rails 4 and Ruby 2.1.1: <code>NameError: undefined local variable or method </code>length&#39; for main:Object`<br><h4> Comment 63890141 user1115652: </h4>This will give you an exact length: <code>Random.new.rand( 36**(length-1) ... 36**length ).to_s( 36 )</code><br><h4> Comment 19804791 Adrien Rey-Jarthon: </h4>@EricHu You&#39;re solution also produce tokens longer than <code>length</code>.<br><h4> Comment 37611661 justcode: </h4>@BigBourin Your solution doesnt always produce tokens of desired length<br><h4> Comment 34027797 Max Williams: </h4>Yep, +1 for brevity and lack of dependencies.<br><h4> Comment 63891739 user1115652: </h4>If you need speed and exact length, you can also use this, which runs about 20x faster than the one in my last comment: <code>( rand * (36**length - 36**(length-1) ) + 36**(length-1) ).floor.to_s( 36 )</code>. It&#39;s not as readable though, so I would put it in a function. Probably the simplest would be to generate something that is guaranteed to be to long, and then truncate it.<br><h4> Comment 71087093 Jan Klimo: </h4>I&#39;m using this to generate 6 char tokens in a very simple way: <code>rand(36**11).to_s(36).upcase[0,6]</code> i.e. just make the original string safely long enough and then take any N chars from it<br><h4> Comment 136078469 user229044: </h4>@JanKlimo That&#39;s just wrong though. <code>rand(36**11).to_s(36)</code> may return a string with only 1 character.  There are ways of doing this that are provably correct and will work 100% of the time, and there is your way, which may randomly produce fewer digits than is required. Don&#39;t do that. Don&#39;t write code that is probabilistically correct, when <i>guaranteed</i> correct is so trivial.<br>------------------------------------------------------------------ <br><h3> Answer 493230 ImNotQuiteJack: </h3><p>This solution generates a string of easily readable characters for activation codes; I didn't want people confusing 8 with B, 1 with I, 0 with O, L with 1, etc.</p>
+<h4> Brian E, Comment 8897422 Score: 14: </h4>This is a great solution (and fast, too), but it will occasionally produce a string <i>under</i> <code>length</code> length, roughly once in ~40<br><h4> Adrien Rey-Jarthon, Comment 19804815 Score: 11: </h4>Here is the version always producing tokens of the desired length: <code>(36**(length-1) + rand(36**length - 36**(length-1))).to_s(36)</code><br><h4> Eric Hu, Comment 9353579 Score: 7: </h4>@Brian E this would guarantee the digits you want: <code>(36**(length-1) + rand(36**length)).to_s(36)</code>.  36**(length-1) converted to base 36 is 10**(length-1), which is the smallest value that has the digit length you want.<br><h4> Jo Liss, Comment 5435141 Score: 6: </h4>+1 for the shortest version (that doesn&#39;t call external binaries ^^).  If the random string isn&#39;t public facing, I sometimes even just use <code>rand.to_s</code>; ugly, but works.<br><h4> kakubei, Comment 42410087 Score: 3: </h4>This spits out an error for me in Rails 4 and Ruby 2.1.1: <code>NameError: undefined local variable or method </code>length&#39; for main:Object`<br><h4> user1115652, Comment 63890141 Score: 1: </h4>This will give you an exact length: <code>Random.new.rand( 36**(length-1) ... 36**length ).to_s( 36 )</code><br><h4> Adrien Rey-Jarthon, Comment 19804791 Score: 1: </h4>@EricHu You&#39;re solution also produce tokens longer than <code>length</code>.<br><h4> justcode, Comment 37611661 Score: 1: </h4>@BigBourin Your solution doesnt always produce tokens of desired length<br><h4> Max Williams, Comment 34027797 Score: 0: </h4>Yep, +1 for brevity and lack of dependencies.<br><h4> user1115652, Comment 63891739 Score: 0: </h4>If you need speed and exact length, you can also use this, which runs about 20x faster than the one in my last comment: <code>( rand * (36**length - 36**(length-1) ) + 36**(length-1) ).floor.to_s( 36 )</code>. It&#39;s not as readable though, so I would put it in a function. Probably the simplest would be to generate something that is guaranteed to be to long, and then truncate it.<br><h4> Jan Klimo, Comment 71087093 Score: 0: </h4>I&#39;m using this to generate 6 char tokens in a very simple way: <code>rand(36**11).to_s(36).upcase[0,6]</code> i.e. just make the original string safely long enough and then take any N chars from it<br><h4> user229044, Comment 136078469 Score: 0: </h4>@JanKlimo That&#39;s just wrong though. <code>rand(36**11).to_s(36)</code> may return a string with only 1 character.  There are ways of doing this that are provably correct and will work 100% of the time, and there is your way, which may randomly produce fewer digits than is required. Don&#39;t do that. Don&#39;t write code that is probabilistically correct, when <i>guaranteed</i> correct is so trivial.<br>------------------------------------------------------------------ <br><h3> ImNotQuiteJack, Id: 493230, Score: 177: </h3><p>This solution generates a string of easily readable characters for activation codes; I didn't want people confusing 8 with B, 1 with I, 0 with O, L with 1, etc.</p>
 
 <pre><code># Generates a random string from a set of easily readable characters
 def generate_activation_code(size = 6)
@@ -60,7 +60,7 @@ def generate_activation_code(size = 6)
   (0...size).map{ charset.to_a[rand(charset.size)] }.join
 end
 </code></pre>
-<h4> Comment 26442659 colinm: </h4>@gtd - Yep. U and V are ambigvovs.<br><h4> Comment 28575021 gtd: </h4>To be secure you would also want to use <code>SecureRandom.random_number(charset.size)</code> instead of <code>rand(charset.size)</code><br><h4> Comment 12030608 gtd: </h4>Is &#39;U&#39; ambiguous or is that a typo?<br><h4> Comment 41430580 dkniffin: </h4>I was just trying to improve on this, by adding lower case and/or some special characters (shift+num), and got the following lists: <code>%w{ A C D E F G H J K L M N P Q R T W X Y Z 2 3 4 6 7 9 ! @ # $ % ^ &amp; * +}</code> and <code>%w{ A D E F G H J L N Q R T Y a d e f h n r y 2 3 4 7 ! @ # $ % ^ &amp; * }</code> (first list doesn&#39;t include lower case, but it&#39;s longer) Kinda interesting how that worked out.<br><h4> Comment 26442971 gtd: </h4>@colinm V&#39;s in there though.<br><h4> Comment 9828096 Tom Corelis: </h4>Couldn&#39;t you just use <code>charset.sample</code> instead of <code>charset.to_a[rand(charset.size)</code>?<br><h4> Comment 12030524 gtd: </h4>@Tom, if you are using Ruby 1.9 or Rails then yes.  Plain 1.8.7 then no.<br>------------------------------------------------------------------ <br><h3> Answer 48521297 Markus: </h3><p>Since Ruby 2.5, it's really easy with <code>SecureRandom.alphanumeric</code>:</p>
+<h4> colinm, Comment 26442659 Score: 12: </h4>@gtd - Yep. U and V are ambigvovs.<br><h4> gtd, Comment 28575021 Score: 9: </h4>To be secure you would also want to use <code>SecureRandom.random_number(charset.size)</code> instead of <code>rand(charset.size)</code><br><h4> gtd, Comment 12030608 Score: 3: </h4>Is &#39;U&#39; ambiguous or is that a typo?<br><h4> dkniffin, Comment 41430580 Score: 2: </h4>I was just trying to improve on this, by adding lower case and/or some special characters (shift+num), and got the following lists: <code>%w{ A C D E F G H J K L M N P Q R T W X Y Z 2 3 4 6 7 9 ! @ # $ % ^ &amp; * +}</code> and <code>%w{ A D E F G H J L N Q R T Y a d e f h n r y 2 3 4 7 ! @ # $ % ^ &amp; * }</code> (first list doesn&#39;t include lower case, but it&#39;s longer) Kinda interesting how that worked out.<br><h4> gtd, Comment 26442971 Score: 1: </h4>@colinm V&#39;s in there though.<br><h4> Tom Corelis, Comment 9828096 Score: 0: </h4>Couldn&#39;t you just use <code>charset.sample</code> instead of <code>charset.to_a[rand(charset.size)</code>?<br><h4> gtd, Comment 12030524 Score: 0: </h4>@Tom, if you are using Ruby 1.9 or Rails then yes.  Plain 1.8.7 then no.<br>------------------------------------------------------------------ <br><h3> Markus, Id: 48521297, Score: 137: </h3><p>Since Ruby 2.5, it's really easy with <code>SecureRandom.alphanumeric</code>:</p>
 
 <pre><code>len = 8
 SecureRandom.alphanumeric(len)
@@ -96,7 +96,7 @@ rand           0.306650   0.000716   0.307366 (  0.307745)
 </code></pre>
 
 <p>So the <code>rand</code> solution only takes about 3/4 of the time of <code>SecureRandom</code>. That might matter if you generate a lot of strings, but if you just create some random string from time to time I'd always go with the more secure implementation since it is also easier to call and more explicit.</p>
-<h4> Comment 122420730 cozyconemotel: </h4>Now we need a similar solution for 0-z (without the uppercase characters). SecureRandom doesn&#39;t seem to provide that out of the box.<br>------------------------------------------------------------------ <br><h3> Answer 7222962 Travis Reeder: </h3><p>Others have mentioned something similar, but this uses the  URL safe function.</p>
+<h4> cozyconemotel, Comment 122420730 Score: 0: </h4>Now we need a similar solution for 0-z (without the uppercase characters). SecureRandom doesn&#39;t seem to provide that out of the box.<br>------------------------------------------------------------------ <br><h3> Travis Reeder, Id: 7222962, Score: 135: </h3><p>Others have mentioned something similar, but this uses the  URL safe function.</p>
 
 <pre><code>require 'securerandom'
 p SecureRandom.urlsafe_base64(5) #=&gt; "UtM7aa8"
@@ -105,7 +105,7 @@ p SecureRandom.urlsafe_base64(nil, true) #=&gt; "i0XQ-7gglIsHGV2_BNPrdQ=="
 </code></pre>
 
 <p>The result may contain A-Z, a-z, 0-9, “-” and “_”. “=” is also used if padding is true.</p>
------------------------------------------------------------------- <br><h3> Answer 8730431 Shai Coleman: </h3><pre><code>[*('A'..'Z')].sample(8).join
+------------------------------------------------------------------ <br><h3> Shai Coleman, Id: 8730431, Score: 55: </h3><pre><code>[*('A'..'Z')].sample(8).join
 </code></pre>
 
 <p>Generate a random 8 letter string (e.g. NVAYXHGR)</p>
@@ -114,7 +114,7 @@ p SecureRandom.urlsafe_base64(nil, true) #=&gt; "i0XQ-7gglIsHGV2_BNPrdQ=="
 </code></pre>
 
 <p>Generate a random 8 character string (e.g. 3PH4SWF2), excludes 0/1/I/O. Ruby 1.9</p>
-<h4> Comment 13467465 tybro0103: </h4>Only problem is each character in the result is unique. Limits the possible values.<br><h4> Comment 14721028 David J.: </h4>If this <a href="http://www.ruby-forum.com/topic/822646" rel="nofollow noreferrer">feature request</a> goes through, Ruby 1.9.x may end up with #sample for sampling without replacment and #choice for sampling with replacement.<br><h4> Comment 57761766 jayunit100: </h4>This is an error, i think you need ... <code>[*(&quot;A&quot;..&quot;Z&quot;)]&#39;</code> ; ((not single qoutes))<br><h4> Comment 64527100 Sinscary: </h4>can you tell me how i can <code>stub</code> this for <code>rspec</code> to pass.<br>------------------------------------------------------------------ <br><h3> Answer 1117003 Travis Reeder: </h3><p>I can't remember where I found this, but it seems like the best and the least process intensive to me:</p>
+<h4> tybro0103, Comment 13467465 Score: 5: </h4>Only problem is each character in the result is unique. Limits the possible values.<br><h4> David J., Comment 14721028 Score: 1: </h4>If this <a href="http://www.ruby-forum.com/topic/822646" rel="nofollow noreferrer">feature request</a> goes through, Ruby 1.9.x may end up with #sample for sampling without replacment and #choice for sampling with replacement.<br><h4> jayunit100, Comment 57761766 Score: 0: </h4>This is an error, i think you need ... <code>[*(&quot;A&quot;..&quot;Z&quot;)]&#39;</code> ; ((not single qoutes))<br><h4> Sinscary, Comment 64527100 Score: 0: </h4>can you tell me how i can <code>stub</code> this for <code>rspec</code> to pass.<br>------------------------------------------------------------------ <br><h3> Travis Reeder, Id: 1117003, Score: 31: </h3><p>I can't remember where I found this, but it seems like the best and the least process intensive to me:</p>
 
 <pre><code>def random_string(length=10)
   chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ0123456789'
@@ -123,23 +123,23 @@ p SecureRandom.urlsafe_base64(nil, true) #=&gt; "i0XQ-7gglIsHGV2_BNPrdQ=="
   password
 end
 </code></pre>
-<h4> Comment 5335330 deadwards: </h4>Perhaps you found it here? <a href="http://travisonrails.com/2007/06/07/generate-random-text-with-ruby" rel="nofollow noreferrer">travisonrails.com/2007/06/07/generate-random-text-with-ruby</a><br><h4> Comment 32266641 Andrew: </h4>The <code>0</code> and <code>1</code> and <code>O</code> and <code>I</code> were intentionally missing because those characters are ambiguous. If this sort of code is being used to generate a set of characters that a user needs to copy, it&#39;s best to exclude characters that may be difficult to distinguish out of context.<br><h4> Comment 21863398 sunnyrjuneja: </h4>Isn&#39;t there a 0 and 1 missing from this?<br><h4> Comment 21887654 Travis Reeder: </h4>Looks like that could be where I found it.<br><h4> Comment 21887664 Travis Reeder: </h4>And ya, it does look like 0 and 1 are missing.<br>------------------------------------------------------------------ <br><h3> Answer 11462624 LENZCOM: </h3><pre><code>require 'securerandom'
+<h4> deadwards, Comment 5335330 Score: 7: </h4>Perhaps you found it here? <a href="http://travisonrails.com/2007/06/07/generate-random-text-with-ruby" rel="nofollow noreferrer">travisonrails.com/2007/06/07/generate-random-text-with-ruby</a><br><h4> Andrew, Comment 32266641 Score: 4: </h4>The <code>0</code> and <code>1</code> and <code>O</code> and <code>I</code> were intentionally missing because those characters are ambiguous. If this sort of code is being used to generate a set of characters that a user needs to copy, it&#39;s best to exclude characters that may be difficult to distinguish out of context.<br><h4> sunnyrjuneja, Comment 21863398 Score: 0: </h4>Isn&#39;t there a 0 and 1 missing from this?<br><h4> Travis Reeder, Comment 21887654 Score: 0: </h4>Looks like that could be where I found it.<br><h4> Travis Reeder, Comment 21887664 Score: 0: </h4>And ya, it does look like 0 and 1 are missing.<br>------------------------------------------------------------------ <br><h3> LENZCOM, Id: 11462624, Score: 29: </h3><pre><code>require 'securerandom'
 SecureRandom.urlsafe_base64(9)
 </code></pre>
-<h4> Comment 16839985 tardate: </h4>btw, urlsafe_base64 returns a string about 4/3 the length indicated. To get a string exactly n chars long, try <code>n=9 ; SecureRandom.urlsafe_base64(n)[0..n-1]</code><br><h4> Comment 16839514 tardate: </h4>old skool (and uglier) alternative: <code>Random.new.bytes(9)</code><br>------------------------------------------------------------------ <br><h3> Answer 17596273 Srikanta Mahapatro: </h3><p>If you want a string of specified length, use:</p>
+<h4> tardate, Comment 16839985 Score: 4: </h4>btw, urlsafe_base64 returns a string about 4/3 the length indicated. To get a string exactly n chars long, try <code>n=9 ; SecureRandom.urlsafe_base64(n)[0..n-1]</code><br><h4> tardate, Comment 16839514 Score: 0: </h4>old skool (and uglier) alternative: <code>Random.new.bytes(9)</code><br>------------------------------------------------------------------ <br><h3> Srikanta Mahapatro, Id: 17596273, Score: 26: </h3><p>If you want a string of specified length, use:</p>
 
 <pre><code>require 'securerandom'
 randomstring = SecureRandom.hex(n)
 </code></pre>
 
 <p>It will generate a random string of length <code>2n</code> containing <code>0-9</code> and <code>a-f</code></p>
-<h4> Comment 60131690 Omar Ali: </h4>It doesn&#39;t generate a string of length <code>n</code>, it actually generates a string that&#39;s 4/3 of <code>n</code>.<br><h4> Comment 106385206 Rihards: </h4>@OmarAli you&#39;re wrong. As per Ruby documentation in case of <code>.hex</code> it&#39;s 2n. Documentation: SecureRandom.hex generates a random hexadecimal string. The argument <i>n</i> specifies the length, in bytes, of the random number to be generated. The length of the resulting hexadecimal string is twice of <i>n</i>.<br>------------------------------------------------------------------ <br><h3> Answer 26107751 gr8scott06: </h3><p><code>Array.new(n){[*"0".."9"].sample}.join</code>,
+<h4> Omar Ali, Comment 60131690 Score: 0: </h4>It doesn&#39;t generate a string of length <code>n</code>, it actually generates a string that&#39;s 4/3 of <code>n</code>.<br><h4> Rihards, Comment 106385206 Score: 0: </h4>@OmarAli you&#39;re wrong. As per Ruby documentation in case of <code>.hex</code> it&#39;s 2n. Documentation: SecureRandom.hex generates a random hexadecimal string. The argument <i>n</i> specifies the length, in bytes, of the random number to be generated. The length of the resulting hexadecimal string is twice of <i>n</i>.<br>------------------------------------------------------------------ <br><h3> gr8scott06, Id: 26107751, Score: 15: </h3><p><code>Array.new(n){[*"0".."9"].sample}.join</code>,
 where <code>n=8</code> in your case.</p>
 
 <p>Generalized: <code>Array.new(n){[*"A".."Z", *"0".."9"].sample}.join</code>, etc. </p>
 
 <p>From: "<a href="https://stackoverflow.com/questions/26076011/rails-generate-pseudo-random-string-a-z-0-9/26076063#26076063">Generate pseudo random string A-Z, 0-9</a>".</p>
------------------------------------------------------------------- <br><h3> Answer 6412228 Nathan Long: </h3><p>I think this is a nice balance of conciseness, clarity and ease of modification.</p>
+------------------------------------------------------------------ <br><h3> Nathan Long, Id: 6412228, Score: 6: </h3><p>I think this is a nice balance of conciseness, clarity and ease of modification.</p>
 <pre><code>characters = ('a'..'z').to_a + ('A'..'Z').to_a
 # Prior to 1.9, use .choice, not .sample
 (0..8).map{characters.sample}.join
@@ -154,12 +154,12 @@ where <code>n=8</code> in your case.</p>
 <p>For a truly impressive array of characters:</p>
 <pre><code>characters = (32..126).to_a.pack('U*').chars.to_a
 </code></pre>
-<h4> Comment 37732737 luster: </h4>i would recommend this to just use capital letters + numbers, also remove the &quot;confusing&quot; ones         charset = (1..9).to_a.concat((&#39;A&#39;..&#39;Z&#39;).to_a).reject{ |a| [0, 1, &#39;O&#39;, &#39;I&#39;].include?(a) }         (0...size).map{ charset[rand(charset.size)] }.join<br>------------------------------------------------------------------ <br><h3> Answer 88422 Coren: </h3><pre><code>require 'sha1'
+<h4> luster, Comment 37732737 Score: 1: </h4>i would recommend this to just use capital letters + numbers, also remove the &quot;confusing&quot; ones         charset = (1..9).to_a.concat((&#39;A&#39;..&#39;Z&#39;).to_a).reject{ |a| [0, 1, &#39;O&#39;, &#39;I&#39;].include?(a) }         (0...size).map{ charset[rand(charset.size)] }.join<br>------------------------------------------------------------------ <br><h3> Coren, Id: 88422, Score: 11: </h3><pre><code>require 'sha1'
 srand
 seed = "--#{rand(10000)}--#{Time.now}--"
 Digest::SHA1.hexdigest(seed)[0,8]
 </code></pre>
-<h4> Comment 12617 webmat: </h4>Keep in mind that a hex digest returns only 0-9 and a-f characters.<br><h4> Comment 12249 Jeff: </h4>Interesting, but quite a bit more computationally expensive<br><h4> Comment 12262 Kent Fredric: </h4>Also no capacity for limited scope of characters.<br>------------------------------------------------------------------ <br><h3> Answer 3326909 Ragmaanir: </h3><p>Ruby 1.9+:</p>
+<h4> webmat, Comment 12617 Score: 3: </h4>Keep in mind that a hex digest returns only 0-9 and a-f characters.<br><h4> Jeff, Comment 12249 Score: 0: </h4>Interesting, but quite a bit more computationally expensive<br><h4> Kent Fredric, Comment 12262 Score: 0: </h4>Also no capacity for limited scope of characters.<br>------------------------------------------------------------------ <br><h3> Ragmaanir, Id: 3326909, Score: 11: </h3><p>Ruby 1.9+:</p>
 
 <pre><code>ALPHABET = ('a'..'z').to_a
 #=&gt; ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
@@ -172,7 +172,7 @@ Digest::SHA1.hexdigest(seed)[0,8]
 10.times.inject('') { |s| s + ALPHABET.sample }
 #=&gt; "fdgvacnxhc"
 </code></pre>
-<h4> Comment 4792498 Misha Moroshko: </h4>The <code>map</code> solution is really nice!<br><h4> Comment 81777104 odlp: </h4>You can ask <code>#sample</code> for how many elements you want. E.g. <code>ALPHABET.sample(10).join</code>... <a href="https://ruby-doc.org/core-2.4.0/Array.html#method-i-sample" rel="nofollow noreferrer">ruby-doc.org/core-2.4.0/Array.html#method-i-sample</a><br><h4> Comment 84342299 Saša Zejnilović: </h4>That is actually wrong. <code>sample(10)</code> gives you 10 unique samples. But you want to allow them to repeat.   But I would use <code>Array.new(10).map</code> for performance<br><h4> Comment 86627244 taylorthurlow: </h4>I wanted alphanumeric with both lower and upper cases. I&#39;ve also switched to use <code>Array.new</code> and its block syntax.  <code>Array.new(20) { [*&#39;0&#39;..&#39;9&#39;, *&#39;a&#39;..&#39;z&#39;, *&#39;A&#39;..&#39;Z&#39;].sample }.join</code><br>------------------------------------------------------------------ <br><h3> Answer 27010181 Awais: </h3><p>Here is one line simple code for random string with length 8:</p>
+<h4> Misha Moroshko, Comment 4792498 Score: 1: </h4>The <code>map</code> solution is really nice!<br><h4> odlp, Comment 81777104 Score: 0: </h4>You can ask <code>#sample</code> for how many elements you want. E.g. <code>ALPHABET.sample(10).join</code>... <a href="https://ruby-doc.org/core-2.4.0/Array.html#method-i-sample" rel="nofollow noreferrer">ruby-doc.org/core-2.4.0/Array.html#method-i-sample</a><br><h4> Saša Zejnilović, Comment 84342299 Score: 0: </h4>That is actually wrong. <code>sample(10)</code> gives you 10 unique samples. But you want to allow them to repeat.   But I would use <code>Array.new(10).map</code> for performance<br><h4> taylorthurlow, Comment 86627244 Score: 0: </h4>I wanted alphanumeric with both lower and upper cases. I&#39;ve also switched to use <code>Array.new</code> and its block syntax.  <code>Array.new(20) { [*&#39;0&#39;..&#39;9&#39;, *&#39;a&#39;..&#39;z&#39;, *&#39;A&#39;..&#39;Z&#39;].sample }.join</code><br>------------------------------------------------------------------ <br><h3> Awais, Id: 27010181, Score: 11: </h3><p>Here is one line simple code for random string with length 8:</p>
 
 <pre><code> random_string = ('0'..'z').to_a.shuffle.first(8).join
 </code></pre>
@@ -181,7 +181,7 @@ Digest::SHA1.hexdigest(seed)[0,8]
 
 <pre><code>random_password = ('0'..'z').to_a.shuffle.first(8).join
 </code></pre>
-<h4> Comment 76931824 Benjamin Carlsson: </h4>You should not use this to generate yourself a password, as this method will never repeat a character. Therefore you&#39;re only using <code>P(36, 8) &#47; 36^8 = 0.4</code> of the possible character space for 8 characters (~2x easier to brute force) or <code>P(36, 25) &#47; 36^25 = 0.00001</code> of the possible character space for 25 characters (~100,000x easier to brute force).<br>------------------------------------------------------------------ <br><h3> Answer 2031464 user163365: </h3><p>Another method I like to use:</p>
+<h4> Benjamin Carlsson, Comment 76931824 Score: 4: </h4>You should not use this to generate yourself a password, as this method will never repeat a character. Therefore you&#39;re only using <code>P(36, 8) &#47; 36^8 = 0.4</code> of the possible character space for 8 characters (~2x easier to brute force) or <code>P(36, 25) &#47; 36^25 = 0.00001</code> of the possible character space for 25 characters (~100,000x easier to brute force).<br>------------------------------------------------------------------ <br><h3> user163365, Id: 2031464, Score: 8: </h3><p>Another method I like to use:</p>
 
 <pre><code> rand(2**256).to_s(36)[0..7]
 </code></pre>
@@ -190,7 +190,7 @@ Digest::SHA1.hexdigest(seed)[0,8]
 
 <pre><code> rand(2**256).to_s(36).ljust(8,'a')[0..7]
 </code></pre>
-<h4> Comment 11019097 Jeff: </h4>Even better to grab the least significant part of the random number by using the right hand side of the string: rand(2**64).to_s(36)[-10,10]<br>------------------------------------------------------------------ <br><h3> Answer 15719632 pencil: </h3><p>Be aware: <code>rand</code> is predictable for an attacker and therefore probably insecure. You should definitely use SecureRandom if this is for generating passwords. I use something like this:</p>
+<h4> Jeff, Comment 11019097 Score: 0: </h4>Even better to grab the least significant part of the random number by using the right hand side of the string: rand(2**64).to_s(36)[-10,10]<br>------------------------------------------------------------------ <br><h3> pencil, Id: 15719632, Score: 8: </h3><p>Be aware: <code>rand</code> is predictable for an attacker and therefore probably insecure. You should definitely use SecureRandom if this is for generating passwords. I use something like this:</p>
 
 <pre><code>length = 10
 characters = ('A'..'Z').to_a + ('a'..'z').to_a + ('0'..'9').to_a
@@ -199,21 +199,21 @@ password = SecureRandom.random_bytes(length).each_char.map do |char|
   characters[(char.ord % characters.length)]
 end.join
 </code></pre>
-<h4> Comment 71715486 Breedly: </h4>This is probably the &quot;most&quot; secure solution. SecureRandom attempts to use underlying security APIs provided by the operating system. If you have OpenSSL it will use that, if you&#39;re on Windows it will go the best option there.  I especially like this solution because it allows you to specify a set of characters for use. Though it won&#39;t work if your character set is longer than the maximum value of a byte: 255.  I recommend viewing the source code for SecureRandom in the doc:  <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/securerandom/rdoc/SecureRandom.html#method-c-random_bytes" rel="nofollow noreferrer">ruby-doc.org/stdlib-1.9.3/libdoc/securerandom/rdoc/&hellip;</a><br>------------------------------------------------------------------ <br><h3> Answer 10220012 Teej: </h3><pre><code>SecureRandom.base64(15).tr('+/=lIO0', 'pqrsxyz')
+<h4> Breedly, Comment 71715486 Score: 0: </h4>This is probably the &quot;most&quot; secure solution. SecureRandom attempts to use underlying security APIs provided by the operating system. If you have OpenSSL it will use that, if you&#39;re on Windows it will go the best option there.  I especially like this solution because it allows you to specify a set of characters for use. Though it won&#39;t work if your character set is longer than the maximum value of a byte: 255.  I recommend viewing the source code for SecureRandom in the doc:  <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/securerandom/rdoc/SecureRandom.html#method-c-random_bytes" rel="nofollow noreferrer">ruby-doc.org/stdlib-1.9.3/libdoc/securerandom/rdoc/&hellip;</a><br>------------------------------------------------------------------ <br><h3> Teej, Id: 10220012, Score: 7: </h3><pre><code>SecureRandom.base64(15).tr('+/=lIO0', 'pqrsxyz')
 </code></pre>
 
 <p>Something from Devise</p>
-<h4> Comment 27543060 miguelcobain: </h4>Why is it replacing string characters using <code>.tr(&#39;+&#47;=lIO0&#39;, &#39;pqrsxyz&#39;)</code>?<br><h4> Comment 29417885 RobDil: </h4>The special characters because they are not URL safe. And l/I or O/0 because they are very easy confused if you use the technique to generate readable user passwords.<br><h4> Comment 42640030 Shai Coleman: </h4>That function has a bit of bias towards certain characters. Also for other lengths (e.g. 16), the last character will not be random. Here&#39;s a way to avoid that.      SecureRandom.base64(64).tr(&#39;+/=lIO01&#39;, &#39;&#39;)[0,16]<br>------------------------------------------------------------------ <br><h3> Answer 12890596 Thaha kp: </h3><p>Here is one simple code for random password with length 8:</p>
+<h4> miguelcobain, Comment 27543060 Score: 0: </h4>Why is it replacing string characters using <code>.tr(&#39;+&#47;=lIO0&#39;, &#39;pqrsxyz&#39;)</code>?<br><h4> RobDil, Comment 29417885 Score: 0: </h4>The special characters because they are not URL safe. And l/I or O/0 because they are very easy confused if you use the technique to generate readable user passwords.<br><h4> Shai Coleman, Comment 42640030 Score: 0: </h4>That function has a bit of bias towards certain characters. Also for other lengths (e.g. 16), the last character will not be random. Here&#39;s a way to avoid that.      SecureRandom.base64(64).tr(&#39;+/=lIO01&#39;, &#39;&#39;)[0,16]<br>------------------------------------------------------------------ <br><h3> Thaha kp, Id: 12890596, Score: 7: </h3><p>Here is one simple code for random password with length 8:</p>
 
 <pre><code>rand_password=('0'..'z').to_a.shuffle.first(8).join
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 10773250 pdu: </h3><p>Just adding my cents here...</p>
+------------------------------------------------------------------ <br><h3> pdu, Id: 10773250, Score: 5: </h3><p>Just adding my cents here...</p>
 
 <pre><code>def random_string(length = 8)
   rand(32**length).to_s(32)
 end
 </code></pre>
-<h4> Comment 16839462 tardate: </h4>NB: this doesn&#39;t always return a string exactly +length+ long - it may be shorter. It depends on the the number returned by <code>rand</code><br>------------------------------------------------------------------ <br><h3> Answer 25456667 Tilo: </h3><p>You can use <a href="https://github.com/rubyworks/facets/blob/126a619fd766bc45588cac18d09c4f1927538e33/lib/core/facets/string/random.rb" rel="nofollow noreferrer"><code>String#random</code></a> from the Facets of Ruby Gem <code>facets</code>.</p>
+<h4> tardate, Comment 16839462 Score: 4: </h4>NB: this doesn&#39;t always return a string exactly +length+ long - it may be shorter. It depends on the the number returned by <code>rand</code><br>------------------------------------------------------------------ <br><h3> Tilo, Id: 25456667, Score: 5: </h3><p>You can use <a href="https://github.com/rubyworks/facets/blob/126a619fd766bc45588cac18d09c4f1927538e33/lib/core/facets/string/random.rb" rel="nofollow noreferrer"><code>String#random</code></a> from the Facets of Ruby Gem <code>facets</code>.</p>
 
 <p>It basically does this:</p>
 
@@ -225,7 +225,7 @@ end
   end
 end
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 3431889 erik: </h3><p>I was doing something like this recently to generate an 8 byte random string from 62 characters.  The characters were 0-9,a-z,A-Z.  I had an array of them as was looping 8 times and picking a random value out of the array.  This was inside a Rails app.</p>
+------------------------------------------------------------------ <br><h3> erik, Id: 3431889, Score: 4: </h3><p>I was doing something like this recently to generate an 8 byte random string from 62 characters.  The characters were 0-9,a-z,A-Z.  I had an array of them as was looping 8 times and picking a random value out of the array.  This was inside a Rails app.</p>
 
 <pre><code>str = ''
 8.times {|i| str &lt;&lt; ARRAY_OF_POSSIBLE_VALUES[rand(SIZE_OF_ARRAY_OF_POSSIBLE_VALUES)] }
@@ -236,7 +236,7 @@ end
 <p>This code was in the before create of an ActiveRecord object.   Before the record was created this code would run and generate the 'unique' code.  Entries in the DB were always produced reliably, but the code (<code>str</code> in the above line) was being duplicated much too often.</p>
 
 <p>I created a script to run through 100000 iterations of this above line with small delay so it would take 3-4 hours hoping to see some kind of repeat pattern on an hourly basis, but saw nothing.  I have no idea why this was happening in my Rails app.</p>
------------------------------------------------------------------- <br><h3> Answer 5735905 Tim James: </h3><p>Given:</p>
+------------------------------------------------------------------ <br><h3> Tim James, Id: 5735905, Score: 4: </h3><p>Given:</p>
 
 <pre><code>chars = [*('a'..'z'),*('0'..'9')].flatten
 </code></pre>
@@ -245,7 +245,7 @@ end
 
 <pre><code>Array.new(len) { chars.sample }.join
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 89042 Ryan Bigg: </h3><p>With this method you can pass in an abitrary length. It's set as a default as 6.</p>
+------------------------------------------------------------------ <br><h3> Ryan Bigg, Id: 89042, Score: 3: </h3><p>With this method you can pass in an abitrary length. It's set as a default as 6.</p>
 
 <pre><code>def generate_random_string(length=6)
   string = ""
@@ -256,7 +256,7 @@ end
   string
 end
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 89514 webmat: </h3><p>I like Radar's answer best, so far, I think. I'd tweak a bit like this:</p>
+------------------------------------------------------------------ <br><h3> webmat, Id: 89514, Score: 3: </h3><p>I like Radar's answer best, so far, I think. I'd tweak a bit like this:</p>
 
 <pre><code>CHARS = ('a'..'z').to_a + ('A'..'Z').to_a
 def rand_string(length=8)
@@ -265,7 +265,7 @@ def rand_string(length=8)
   s
 end
 </code></pre>
-<h4> Comment 24950109 niels: </h4>Why not use <code>(CHARS*length).sample(length).join</code>?<br><h4> Comment 82609985 Tom Lord: </h4>@niels This suggestion would generate a <i>weighted</i> string, in favour of non-repeated characters. For example, if <code>CHARS=[&#39;a&#39;,&#39;b&#39;]</code> then your method would generate <code>&quot;aa&quot;</code> or <code>&quot;bb&quot;</code> only 33% of the time, but <code>&quot;ab&quot;</code> or <code>&quot;ba&quot;</code> 67% of the time. Maybe that&#39;s not a problem, but it&#39;s worth bearing in mind!<br><h4> Comment 82756926 niels: </h4>good point, @TomLord, I think I didn&#39;t actually realise that when I posted that suggestion (although I must admit I don&#39;t remember posting that at all :D)<br>------------------------------------------------------------------ <br><h3> Answer 9234645 peter: </h3><p>2 solutions for a random string consisting of 3 ranges:</p>
+<h4> niels, Comment 24950109 Score: 0: </h4>Why not use <code>(CHARS*length).sample(length).join</code>?<br><h4> Tom Lord, Comment 82609985 Score: 0: </h4>@niels This suggestion would generate a <i>weighted</i> string, in favour of non-repeated characters. For example, if <code>CHARS=[&#39;a&#39;,&#39;b&#39;]</code> then your method would generate <code>&quot;aa&quot;</code> or <code>&quot;bb&quot;</code> only 33% of the time, but <code>&quot;ab&quot;</code> or <code>&quot;ba&quot;</code> 67% of the time. Maybe that&#39;s not a problem, but it&#39;s worth bearing in mind!<br><h4> niels, Comment 82756926 Score: 0: </h4>good point, @TomLord, I think I didn&#39;t actually realise that when I posted that suggestion (although I must admit I don&#39;t remember posting that at all :D)<br>------------------------------------------------------------------ <br><h3> peter, Id: 9234645, Score: 3: </h3><p>2 solutions for a random string consisting of 3 ranges:</p>
 
 <pre><code>(('a'..'z').to_a + ('A'..'Z').to_a + (0..9).to_a).sample(8).join
 
@@ -279,15 +279,15 @@ end
 <pre><code>( ('a'..'z').to_a.sample(8) + ('A'..'Z').to_a.sample(8) + (0..9).to_a.sample(8) ).shuffle.join 
 #=&gt; "Kc5zOGtM0H796QgPp8u2Sxo1"
 </code></pre>
-<h4> Comment 101660261 Joshua Pinter: </h4>And if you want to enforce a certain number of each range, you could do something like this: <code>( (&#39;a&#39;..&#39;z&#39;).to_a.sample(8) + (&#39;A&#39;..&#39;Z&#39;).to_a.sample(8) + (0..9).to_a.sample(8) + [ &quot;%&quot;, &quot;!&quot;, &quot;*&quot; ].sample(8) ).shuffle.join #=&gt; &quot;Kc5zOGtM0*H796QgPp%!8u2Sxo1&quot;</code><br>------------------------------------------------------------------ <br><h3> Answer 10434882 tybro0103: </h3><p>My 2 cents:</p>
+<h4> Joshua Pinter, Comment 101660261 Score: 0: </h4>And if you want to enforce a certain number of each range, you could do something like this: <code>( (&#39;a&#39;..&#39;z&#39;).to_a.sample(8) + (&#39;A&#39;..&#39;Z&#39;).to_a.sample(8) + (0..9).to_a.sample(8) + [ &quot;%&quot;, &quot;!&quot;, &quot;*&quot; ].sample(8) ).shuffle.join #=&gt; &quot;Kc5zOGtM0*H796QgPp%!8u2Sxo1&quot;</code><br>------------------------------------------------------------------ <br><h3> tybro0103, Id: 10434882, Score: 3: </h3><p>My 2 cents:</p>
 
 <pre><code>  def token(length=16)
     chars = [*('A'..'Z'), *('a'..'z'), *(0..9)]
     (0..length).map {chars.sample}.join
   end
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 20272585 Josh: </h3><p>My favorite is <code>(:A..:Z).to_a.shuffle[0,8].join</code>.  Note that shuffle requires Ruby > 1.9.</p>
------------------------------------------------------------------- <br><h3> Answer 25358706 lzap: </h3><p>Another trick that works with Ruby 1.8+ and is fast is:</p>
+------------------------------------------------------------------ <br><h3> Josh, Id: 20272585, Score: 3: </h3><p>My favorite is <code>(:A..:Z).to_a.shuffle[0,8].join</code>.  Note that shuffle requires Ruby > 1.9.</p>
+------------------------------------------------------------------ <br><h3> lzap, Id: 25358706, Score: 3: </h3><p>Another trick that works with Ruby 1.8+ and is fast is:</p>
 
 <pre><code>&gt;&gt; require "openssl"
 &gt;&gt; OpenSSL::Random.random_bytes(20).unpack('H*').join
@@ -295,7 +295,7 @@ end
 </code></pre>
 
 <p>It get's you random hex string. Similar way you should be able to generate base64 string ('M*').</p>
------------------------------------------------------------------- <br><h3> Answer 88470 Carlos Villela: </h3><p>We've been using this on our code:</p>
+------------------------------------------------------------------ <br><h3> Carlos Villela, Id: 88470, Score: 2: </h3><p>We've been using this on our code:</p>
 
 <pre><code>class String
 
@@ -309,7 +309,7 @@ end
 <p>The maximum length supported is 25 (we're only using it with the default anyway, so hasn't been a problem).</p>
 
 <p>Someone mentioned that 'a'..'z' is suboptimal if you want to completely avoid generating offensive words. One of the ideas we had was removing vowels, but you still end up with WTFBBQ etc.</p>
-<h4> Comment 21148 Jeff: </h4>Yes, I suppose that technically isn&#39;t really a random string anymore, good find webmat.<br><h4> Comment 12646 webmat: </h4>Your approach can&#39;t return repeating characters (e.g, uuunMoBldj)... Is this what&#39;s wanted?<br>------------------------------------------------------------------ <br><h3> Answer 7173336 Evgenii: </h3><p>Here is another method:</p>
+<h4> Jeff, Comment 21148 Score: 2: </h4>Yes, I suppose that technically isn&#39;t really a random string anymore, good find webmat.<br><h4> webmat, Comment 12646 Score: 1: </h4>Your approach can&#39;t return repeating characters (e.g, uuunMoBldj)... Is this what&#39;s wanted?<br>------------------------------------------------------------------ <br><h3> Evgenii, Id: 7173336, Score: 2: </h3><p>Here is another method:</p>
 
 <ul>
 <li>It uses the secure random number generator instead of rand()</li>
@@ -332,9 +332,9 @@ end
   }.join
 end
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 7653318 eric: </h3><pre><code>''.tap {|v| 4.times { v &lt;&lt; ('a'..'z').to_a.sample} }
+------------------------------------------------------------------ <br><h3> eric, Id: 7653318, Score: 2: </h3><pre><code>''.tap {|v| 4.times { v &lt;&lt; ('a'..'z').to_a.sample} }
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 51750404 Lucas Andrade: </h3><p>Here is a improve of @Travis R answer:</p>
+------------------------------------------------------------------ <br><h3> Lucas Andrade, Id: 51750404, Score: 1: </h3><p>Here is a improve of @Travis R answer:</p>
 
 <pre><code> def random_string(length=5)
     chars = 'abdefghjkmnpqrstuvwxyzABDEFGHJKLMNPQRSTUVWXYZ'
@@ -347,7 +347,7 @@ end
 </code></pre>
 
 <p>At @Travis R answer chars and numbers were together, so sometimes <code>random_string</code> could return only numbers or only characters. With this improve at least half of <code>random_string</code> will be characters and the rest are numbers. Just in case if you need a random string with numbers and characters</p>
------------------------------------------------------------------- <br><h3> Answer 5073878 Manuel A. Guilamo: </h3><p>try this out</p>
+------------------------------------------------------------------ <br><h3> Manuel A. Guilamo, Id: 5073878, Score: 1: </h3><p>try this out</p>
 
 <pre><code>def rand_name(len=9)
   ary = [('0'..'9').to_a, ('a'..'z').to_a, ('A'..'Z').to_a]
@@ -361,7 +361,7 @@ end
 </code></pre>
 
 <p>I love the answers of the thread, have been very helpful, indeed!, but if I may say, none of them satisfies my ayes, maybe is the rand() method. it's just doesn't seems right to me, since we've got the Array#choice method for that matter.</p>
-<h4> Comment 136078635 user229044: </h4><code>ar = [(&#39;0&#39;..&#39;9&#39;).to_a, (&#39;a&#39;..&#39;z&#39;).to_a, (&#39;A&#39;..&#39;Z&#39;).to_a].flatten; 10.times.map { ar.choice }.join</code><br>------------------------------------------------------------------ <br><h3> Answer 10292347 Chris Bloom: </h3><p>This is based on a few other answers, but it adds a bit more complexity:</p>
+<h4> user229044, Comment 136078635 Score: 0: </h4><code>ar = [(&#39;0&#39;..&#39;9&#39;).to_a, (&#39;a&#39;..&#39;z&#39;).to_a, (&#39;A&#39;..&#39;Z&#39;).to_a].flatten; 10.times.map { ar.choice }.join</code><br>------------------------------------------------------------------ <br><h3> Chris Bloom, Id: 10292347, Score: 1: </h3><p>This is based on a few other answers, but it adds a bit more complexity:</p>
 
 <pre><code>def random_password
   specials = ((32..47).to_a + (58..64).to_a + (91..96).to_a + (123..126).to_a).pack('U*').chars.to_a
@@ -379,20 +379,20 @@ end
 </code></pre>
 
 <p>Essentially it ensures a password that is 8 - 20 characters in length, and which contains at least one number and one special character.</p>
------------------------------------------------------------------- <br><h3> Answer 11313001 lzap: </h3><p>If you are on a UNIX and you still must use Ruby 1.8 (no SecureRandom) without Rails, you can also use this:</p>
+------------------------------------------------------------------ <br><h3> lzap, Id: 11313001, Score: 1: </h3><p>If you are on a UNIX and you still must use Ruby 1.8 (no SecureRandom) without Rails, you can also use this:</p>
 
 <pre><code>random_string = `openssl rand -base64 24`
 </code></pre>
 
 <p>Note this spawns new shell, this is very slow and it can only be recommended for scripts.</p>
------------------------------------------------------------------- <br><h3> Answer 37333123 shiva kumar: </h3><p>For devise secure_validatable you can use this</p>
+------------------------------------------------------------------ <br><h3> shiva kumar, Id: 37333123, Score: 1: </h3><p>For devise secure_validatable you can use this</p>
 <pre class="lang-rb prettyprint-override"><code>(0...8).map { ([65, 97].sample + rand(26)).chr }.push(rand(99)).join
 </code></pre>
-<h4> Comment 64545467 Kyle Tolle: </h4>To generate a random password using uppercase, lowercase, numbers, and special characters, I used something like:  <code>random_ascii_character = -&gt; { (33..126).to_a.sample.chr }; 8.times.map { random_ascii_character.call }.shuffle.join</code><br>------------------------------------------------------------------ <br><h3> Answer 88338 easeout: </h3><p>To make your first into one statement:</p>
+<h4> Kyle Tolle, Comment 64545467 Score: 0: </h4>To generate a random password using uppercase, lowercase, numbers, and special characters, I used something like:  <code>random_ascii_character = -&gt; { (33..126).to_a.sample.chr }; 8.times.map { random_ascii_character.call }.shuffle.join</code><br>------------------------------------------------------------------ <br><h3> easeout, Id: 88338, Score: 0: </h3><p>To make your first into one statement:</p>
 
 <pre><code>(0...8).collect { |n| value  &lt;&lt; (65 + rand(25)).chr }.join()
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 15789933 Simptive: </h3><p>Create an empty string or a pre-fix if require:</p>
+------------------------------------------------------------------ <br><h3> Simptive, Id: 15789933, Score: 0: </h3><p>Create an empty string or a pre-fix if require:</p>
 
 <pre><code>myStr = "OID-"
 </code></pre>
@@ -423,7 +423,7 @@ end
 
 <pre><code>"OID-XZ2J32XM"
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 17949884 Abdo: </h3><p>Here's a solution that is flexible and allows dups:</p>
+------------------------------------------------------------------ <br><h3> Abdo, Id: 17949884, Score: 0: </h3><p>Here's a solution that is flexible and allows dups:</p>
 
 <pre><code>class String
   # generate a random string of length n using current string as the source of characters
@@ -446,27 +446,27 @@ end
 
 <p>Explanation:
 The method above takes the chars of a given string and generates a big enough array. It then shuffles it, takes the first n items, then joins them.</p>
------------------------------------------------------------------- <br><h3> Answer 23310810 Automatico: </h3><pre><code>Array.new(8).inject(""){|r|r&lt;&lt;('0'..'z').to_a.shuffle[0]}  # 57
+------------------------------------------------------------------ <br><h3> Automatico, Id: 23310810, Score: 0: </h3><pre><code>Array.new(8).inject(""){|r|r&lt;&lt;('0'..'z').to_a.shuffle[0]}  # 57
 (1..8).inject(""){|r|r&lt;&lt;('0'..'z').to_a.shuffle[0]}        # 51
 e="";8.times{e&lt;&lt;('0'..'z').to_a.shuffle[0]};e              # 45
 (1..8).map{('0'..'z').to_a.shuffle[0]}.join                # 43
 (1..8).map{rand(49..122).chr}.join                         # 34
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 35601419 DDD: </h3><pre><code>10.times do 
+------------------------------------------------------------------ <br><h3> DDD, Id: 35601419, Score: 0: </h3><pre><code>10.times do 
   alphabet = ('a'..'z').to_a
   string += alpha[rand(alpha.length)]
 end
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 39246466 Minski: </h3><pre><code>a='';8.times{a&lt;&lt;[*'a'..'z'].sample};p a
+------------------------------------------------------------------ <br><h3> Minski, Id: 39246466, Score: 0: </h3><pre><code>a='';8.times{a&lt;&lt;[*'a'..'z'].sample};p a
 </code></pre>
 
 <p>or</p>
 
 <pre><code>8.times.collect{[*'a'..'z'].sample}.join
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 88371 Purfideas: </h3><p>This is almost as ugly but perhaps as step in right direction?</p>
+------------------------------------------------------------------ <br><h3> Purfideas, Id: 88371, Score: -1: </h3><p>This is almost as ugly but perhaps as step in right direction?</p>
 
 <pre><code> (1..8).map{|i| ('a'..'z').to_a[rand(26)]}.join
 </code></pre>
-<h4> Comment 12224 Purfideas: </h4>:) I actually love the fastest gun in a perverse way<br>------------------------------------------------------------------ <br><h3> Answer 1157293 maykeye: </h3><p>In ruby 1.9 one can use Array's choice method which returns random element from array</p>
-<h4> Comment 1192735 Andrew Grimm: </h4>Thanks for the heads up - however, <a href="http://svn.ruby-lang.org/repos/ruby/tags/v1_9_1_0/NEWS" rel="nofollow noreferrer">svn.ruby-lang.org/repos/ruby/tags/v1_9_1_0/NEWS</a> seems to indicate that Array#sample is to be used in 1.9.1, not Array#choose / choice<br>
+<h4> Purfideas, Comment 12224 Score: 0: </h4>:) I actually love the fastest gun in a perverse way<br>------------------------------------------------------------------ <br><h3> maykeye, Id: 1157293, Score: -1: </h3><p>In ruby 1.9 one can use Array's choice method which returns random element from array</p>
+<h4> Andrew Grimm, Comment 1192735 Score: 1: </h4>Thanks for the heads up - however, <a href="http://svn.ruby-lang.org/repos/ruby/tags/v1_9_1_0/NEWS" rel="nofollow noreferrer">svn.ruby-lang.org/repos/ruby/tags/v1_9_1_0/NEWS</a> seems to indicate that Array#sample is to be used in 1.9.1, not Array#choose / choice<br>

@@ -1,8 +1,8 @@
- <h2> Title: Convert string &quot;Jun 1 2005 1:33PM&quot; into datetime </h2> <h3> Oli, question_id: 466345 </h3>Score: 2946, Tags: {python,datetime} <br><p>I have a huge list of datetime strings like the following</p>
+ <h2> Title: Convert string &quot;Jun 1 2005 1:33PM&quot; into datetime </h2> <h4> Oli, question_id: 466345 </h4>Score: 2946, Tags: {python,datetime} <br><p>I have a huge list of datetime strings like the following</p>
 <pre class="lang-py prettyprint-override"><code>[&quot;Jun 1 2005 1:33PM&quot;, &quot;Aug 28 1999 12:00AM&quot;]
 </code></pre>
 <p>How do I convert them into <a href="https://docs.python.org/3/library/datetime.html#datetime-objects" rel="noreferrer"><code>datetime</code></a> objects?</p>
-<h4> Comment 82612834 smci: </h4>Unless you&#39;re sure one format handles every single date-time (no &#39;&#39;, no NaNs, no incompletes, no format mismatches, no trailing characters, timezones, microsecond timestamps, or other text...), the exception-happiness of <code>strptime()</code> will drive you nuts, unless you wrap it. See my answer, based on <a href="https://stackoverflow.com/a/24547627/202229">Or Weis answer to this</a><br><h4> Comment 116729277 Ben: </h4><code>datetime.strptime</code> as others have mentioned. For those who prefer a video explanation, <a href="https://youtu.be/2VyOsBTWLOI?t=419" rel="nofollow noreferrer">see here</a>.<br><h4> Comment 103629882 Way Too Simple: </h4>The laziest, most widely usable approach I know is dateparser (check <a href="https://blog.scrapinghub.com/2015/11/09/parse-natural-language-dates-with-dateparser" rel="nofollow noreferrer">blog.scrapinghub.com/2015/11/09/&hellip;</a>). It works even with natural language time expressions in several languages out of the box. I guess it can be slow though.<br><h4> Comment 105348517 GoingMyWay: </h4>There is a helpful link here: <a href="https://stackabuse.com/converting-strings-to-datetime-in-python/" rel="nofollow noreferrer">stackabuse.com/converting-strings-to-datetime-in-python</a><br>------------------------------------------------------------------ <br><h3> Answer 466376 Patrick Harrington: </h3><p><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime.strptime" rel="noreferrer"><code>datetime.strptime</code></a> parses an input string in the user-specified format into a <em>timezone-naive</em> <a href="https://docs.python.org/3/library/datetime.html#datetime-objects" rel="noreferrer"><code>datetime</code></a> object:</p>
+<h4> smci, Id: 82612834 Score: 10: </h4>Unless you&#39;re sure one format handles every single date-time (no &#39;&#39;, no NaNs, no incompletes, no format mismatches, no trailing characters, timezones, microsecond timestamps, or other text...), the exception-happiness of <code>strptime()</code> will drive you nuts, unless you wrap it. See my answer, based on <a href="https://stackoverflow.com/a/24547627/202229">Or Weis answer to this</a><br><h4> Ben, Id: 116729277 Score: 1: </h4><code>datetime.strptime</code> as others have mentioned. For those who prefer a video explanation, <a href="https://youtu.be/2VyOsBTWLOI?t=419" rel="nofollow noreferrer">see here</a>.<br><h4> Way Too Simple, Id: 103629882 Score: 0: </h4>The laziest, most widely usable approach I know is dateparser (check <a href="https://blog.scrapinghub.com/2015/11/09/parse-natural-language-dates-with-dateparser" rel="nofollow noreferrer">blog.scrapinghub.com/2015/11/09/&hellip;</a>). It works even with natural language time expressions in several languages out of the box. I guess it can be slow though.<br><h4> GoingMyWay, Id: 105348517 Score: 0: </h4>There is a helpful link here: <a href="https://stackabuse.com/converting-strings-to-datetime-in-python/" rel="nofollow noreferrer">stackabuse.com/converting-strings-to-datetime-in-python</a><br>------------------------------------------------------------------ <br><h3> Patrick Harrington, Id: 466376, Score: 4423: </h3><p><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime.strptime" rel="noreferrer"><code>datetime.strptime</code></a> parses an input string in the user-specified format into a <em>timezone-naive</em> <a href="https://docs.python.org/3/library/datetime.html#datetime-objects" rel="noreferrer"><code>datetime</code></a> object:</p>
 <pre><code>&gt;&gt;&gt; from datetime import datetime
 &gt;&gt;&gt; datetime.strptime('Jun 1 2005  1:33PM', '%b %d %Y %I:%M%p')
 datetime.datetime(2005, 6, 1, 13, 33)
@@ -26,7 +26,7 @@ date(2005, 6, 1)
 <li><code>strptime</code> = &quot;string parse time&quot;</li>
 <li><code>strftime</code> = &quot;string format time&quot;</li>
 </ul>
-<h4> Comment 42304946 Izkata: </h4>@User You&#39;ll have to know ahead of time to exclude that part of the format string, but if you want a <code>date</code> instead of a <code>datetime</code>, going through <code>datetime</code> handles it nicely:  <code>datetime.strptime(&#39;Jun 1 2005&#39;, &#39;%b %d %Y&#39;).date() == date(2005, 6, 1)</code><br><h4> Comment 69281629 Flimm: </h4>If you know the string represents a datetime in UTC, you can get a timezone aware <code>datetime</code> object by adding this line in Python 3: <code>from datetime import timezone; datetime_object = datetime_object.replace(tzinfo=timezone.utc)</code><br><h4> Comment 35782427 jfs: </h4>&#39;%b&#39;, &#39;%p&#39; may fail in non-English locale.<br><h4> Comment 35812420 User: </h4>What is the string doesn&#39;t have the time, just &quot;April 25, 2014&quot;<br><h4> Comment 125500802 hm6: </h4>In my case, &quot;<a href="https://stackoverflow.com/a/54830426/6784445">stackoverflow.com/a/54830426/6784445</a>&quot; answer was a better match and I was hoping if we could include it to this solution as a complement.<br>------------------------------------------------------------------ <br><h3> Answer 470303 Simon Willison: </h3><p>Use the third-party <a href="https://dateutil.readthedocs.io" rel="noreferrer"><code>dateutil</code></a> library:</p>
+<h4> Izkata, Comment 42304946 Score: 33: </h4>@User You&#39;ll have to know ahead of time to exclude that part of the format string, but if you want a <code>date</code> instead of a <code>datetime</code>, going through <code>datetime</code> handles it nicely:  <code>datetime.strptime(&#39;Jun 1 2005&#39;, &#39;%b %d %Y&#39;).date() == date(2005, 6, 1)</code><br><h4> Flimm, Comment 69281629 Score: 23: </h4>If you know the string represents a datetime in UTC, you can get a timezone aware <code>datetime</code> object by adding this line in Python 3: <code>from datetime import timezone; datetime_object = datetime_object.replace(tzinfo=timezone.utc)</code><br><h4> jfs, Comment 35782427 Score: 11: </h4>&#39;%b&#39;, &#39;%p&#39; may fail in non-English locale.<br><h4> User, Comment 35812420 Score: 1: </h4>What is the string doesn&#39;t have the time, just &quot;April 25, 2014&quot;<br><h4> hm6, Comment 125500802 Score: 1: </h4>In my case, &quot;<a href="https://stackoverflow.com/a/54830426/6784445">stackoverflow.com/a/54830426/6784445</a>&quot; answer was a better match and I was hoping if we could include it to this solution as a complement.<br>------------------------------------------------------------------ <br><h3> Simon Willison, Id: 470303, Score: 1068: </h3><p>Use the third-party <a href="https://dateutil.readthedocs.io" rel="noreferrer"><code>dateutil</code></a> library:</p>
 <pre><code>from dateutil import parser
 parser.parse(&quot;Aug 28 1999 12:00AM&quot;)  # datetime.datetime(1999, 8, 28, 0, 0)
 </code></pre>
@@ -34,7 +34,7 @@ parser.parse(&quot;Aug 28 1999 12:00AM&quot;)  # datetime.datetime(1999, 8, 28, 
 <p>Install it with:</p>
 <pre><code>pip install python-dateutil
 </code></pre>
-<h4> Comment 7732028 Paweł Polewicz: </h4>Be aware that for large data amounts this might not be the most optimal way to approach the problem. Guessing the format every single time may be horribly slow.<br><h4> Comment 9427690 brian buck: </h4>This is nice but it would be nice to have a solution that is built-in rather than having to go to a third party.<br><h4> Comment 123669626 wisbucky: </h4>This is great for situations where you cannot guarantee the date format.<br><h4> Comment 133867889 java-addict301: </h4>oh cmon.  Python always brags about great standard library.  it can&#39;t do THIS?<br><h4> Comment 126066246 theProcrastinator: </h4>If you have uncertain formats and some of those are incomplete, like <code>June 2009</code> instead of <code>12 June 2009</code>, it would assume any arbitrary day. Same goes for dates without month.<br>------------------------------------------------------------------ <br><h3> Answer 466366 florin: </h3><p>Check out <a href="http://docs.python.org/3/library/time.html#time.strptime" rel="noreferrer">strptime</a> in the <a href="http://docs.python.org/3/library/time.html" rel="noreferrer">time</a> module.  It is the inverse of <a href="http://docs.python.org/3/library/time.html#time.strftime" rel="noreferrer">strftime</a>.</p>
+<h4> Paweł Polewicz, Comment 7732028 Score: 125: </h4>Be aware that for large data amounts this might not be the most optimal way to approach the problem. Guessing the format every single time may be horribly slow.<br><h4> brian buck, Comment 9427690 Score: 29: </h4>This is nice but it would be nice to have a solution that is built-in rather than having to go to a third party.<br><h4> wisbucky, Comment 123669626 Score: 2: </h4>This is great for situations where you cannot guarantee the date format.<br><h4> java-addict301, Comment 133867889 Score: 1: </h4>oh cmon.  Python always brags about great standard library.  it can&#39;t do THIS?<br><h4> theProcrastinator, Comment 126066246 Score: 0: </h4>If you have uncertain formats and some of those are incomplete, like <code>June 2009</code> instead of <code>12 June 2009</code>, it would assume any arbitrary day. Same goes for dates without month.<br>------------------------------------------------------------------ <br><h3> florin, Id: 466366, Score: 515: </h3><p>Check out <a href="http://docs.python.org/3/library/time.html#time.strptime" rel="noreferrer">strptime</a> in the <a href="http://docs.python.org/3/library/time.html" rel="noreferrer">time</a> module.  It is the inverse of <a href="http://docs.python.org/3/library/time.html#time.strftime" rel="noreferrer">strftime</a>.</p>
 
 <pre><code>$ python
 &gt;&gt;&gt; import time
@@ -51,7 +51,7 @@ my_datetime = datetime.fromtimestamp(timestamp)
 from datetime import date
 my_date = date.fromtimestamp(timestamp)
 </code></pre>
-<h4> Comment 3848927 Alexander Bird: </h4>From what I understand, this answer only outputs time objects, not datetime objects -- which is why the answer would be buried compared to Patrick&#39;s answer.<br>------------------------------------------------------------------ <br><h3> Answer 54830426 SuperNova: </h3><h2>Python &gt;= 3.7</h2>
+<h4> Alexander Bird, Comment 3848927 Score: 18: </h4>From what I understand, this answer only outputs time objects, not datetime objects -- which is why the answer would be buried compared to Patrick&#39;s answer.<br>------------------------------------------------------------------ <br><h3> SuperNova, Id: 54830426, Score: 274: </h3><h2>Python &gt;= 3.7</h2>
 <p>To convert a <strong>YYYY-MM-DD</strong> string to a datetime object, <a href="https://docs.python.org/3/library/datetime.html#datetime.datetime.fromisoformat" rel="noreferrer">datetime.fromisoformat</a> could be used.</p>
 <pre class="lang-py prettyprint-override"><code>from datetime import datetime
 
@@ -63,7 +63,7 @@ print (datetime.fromisoformat(date_string))
 <blockquote>
 <p>This does <em>not</em> support parsing arbitrary ISO 8601 strings - it is only intended as the inverse operation of <a href="https://docs.python.org/3/library/datetime.html#datetime.datetime.isoformat" rel="noreferrer"><code>datetime.isoformat()</code></a>. A more full-featured ISO 8601 parser, <code>dateutil.parser.isoparse</code> is available in the third-party package <a href="https://dateutil.readthedocs.io/en/stable/parser.html#dateutil.parser.isoparse" rel="noreferrer"><code>dateutil</code></a>.</p>
 </blockquote>
-<h4> Comment 126188056 Zincfan: </h4>This <code>fromisoformat()</code> seems to return timezone unaware datetime format in my case. So subtracting from <code>datetime.datetime.now()</code> gives you error. See this,<a href="https://stackoverflow.com/questions/4530069/how-do-i-get-a-value-of-datetime-today-in-python-that-is-timezone-aware/4530166#4530166" title="how do i get a value of datetime today in python that is timezone aware">stackoverflow.com/questions/4530069/&hellip;</a><br><h4> Comment 127835265 Walter Tross: </h4>This answer is extremely useful to most people landing here, even though it&#39;s not appropriate for the original question.<br><h4> Comment 128995275 Flimm: </h4>@Zincfan <code>fromisoformat</code> does return <code>datetime</code> objects with timezone offsets in the right cases. See Python&#39;s documentation: <a href="https://docs.python.org/3/library/datetime.html#datetime.datetime.fromisoformat" rel="nofollow noreferrer">docs.python.org/3/library/&hellip;</a><br><h4> Comment 133867901 java-addict301: </h4>can hardly believe they would add a method so misleading.  If can&#39;t parse iso, why name iso?<br><h4> Comment 125500758 hm6: </h4>Is there a way to include this answer in the top answer?<br>------------------------------------------------------------------ <br><h3> Answer 22128786 Steve Peak: </h3><p>I have put together a project that can convert some really neat expressions. Check out <strong><a href="http://github.com/stevepeak/timestring" rel="noreferrer">timestring</a></strong>.</p>
+<h4> Zincfan, Comment 126188056 Score: 1: </h4>This <code>fromisoformat()</code> seems to return timezone unaware datetime format in my case. So subtracting from <code>datetime.datetime.now()</code> gives you error. See this,<a href="https://stackoverflow.com/questions/4530069/how-do-i-get-a-value-of-datetime-today-in-python-that-is-timezone-aware/4530166#4530166" title="how do i get a value of datetime today in python that is timezone aware">stackoverflow.com/questions/4530069/&hellip;</a><br><h4> Walter Tross, Comment 127835265 Score: 0: </h4>This answer is extremely useful to most people landing here, even though it&#39;s not appropriate for the original question.<br><h4> Flimm, Comment 128995275 Score: 0: </h4>@Zincfan <code>fromisoformat</code> does return <code>datetime</code> objects with timezone offsets in the right cases. See Python&#39;s documentation: <a href="https://docs.python.org/3/library/datetime.html#datetime.datetime.fromisoformat" rel="nofollow noreferrer">docs.python.org/3/library/&hellip;</a><br><h4> java-addict301, Comment 133867901 Score: 0: </h4>can hardly believe they would add a method so misleading.  If can&#39;t parse iso, why name iso?<br><h4> hm6, Comment 125500758 Score: 0: </h4>Is there a way to include this answer in the top answer?<br>------------------------------------------------------------------ <br><h3> Steve Peak, Id: 22128786, Score: 133: </h3><p>I have put together a project that can convert some really neat expressions. Check out <strong><a href="http://github.com/stevepeak/timestring" rel="noreferrer">timestring</a></strong>.</p>
 <h2>Here are some examples below:</h2>
 <code>pip install timestring</code>
 <pre><code>&gt;&gt;&gt; import timestring
@@ -76,7 +76,7 @@ datetime.datetime(2015, 8, 15, 20, 40)
 &gt;&gt;&gt; (timestring.Range('next week').start.date, timestring.Range('next week').end.date)
 (datetime.datetime(2014, 3, 10, 0, 0), datetime.datetime(2014, 3, 14, 0, 0))
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 27401685 Rizwan Mumtaz: </h3><p>Remember this and you didn't need to get confused in datetime conversion again.</p>
+------------------------------------------------------------------ <br><h3> Rizwan Mumtaz, Id: 27401685, Score: 70: </h3><p>Remember this and you didn't need to get confused in datetime conversion again.</p>
 
 <p>String to datetime object = <code>strptime</code></p>
 
@@ -138,7 +138,7 @@ datetime.datetime(2015, 8, 15, 20, 40)
 
 <pre><code>[datetime.datetime(2017, 12, 1, 0, 0), datetime.datetime(2017, 1, 1, 0, 0), datetime.datetime(2017, 1, 12, 0, 0), datetime.datetime(2017, 6, 1, 1, 30)]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 22223725 Janus Troelsen: </h3><p>Many timestamps have an implied timezone. To ensure that your code will work in every timezone, you should use UTC internally and attach a timezone each time a foreign object enters the system.</p>
+------------------------------------------------------------------ <br><h3> Janus Troelsen, Id: 22223725, Score: 51: </h3><p>Many timestamps have an implied timezone. To ensure that your code will work in every timezone, you should use UTC internally and attach a timezone each time a foreign object enters the system.</p>
 <p>Python 3.2+:</p>
 <pre><code>&gt;&gt;&gt; datetime.datetime.strptime(
 ...     &quot;March 5, 2014, 20:13:50&quot;, &quot;%B %d, %Y, %H:%M:%S&quot;
@@ -168,7 +168,7 @@ datetime.datetime(2014, 3, 5, 16, 43, 50, tzinfo=&lt;UTC&gt;)
 datetime.datetime(1883, 11, 18, 7, 34, tzinfo=&lt;UTC&gt;)
 </code></pre>
 <p>The weird &quot;7 hours and 34 minutes&quot; are derived from the longitude of Chicago. I used this timestamp because it is right before <a href="https://www.loc.gov/item/today-in-history/november-18/#time" rel="noreferrer">standardized time was adopted in Chicago</a>.</p>
------------------------------------------------------------------- <br><h3> Answer 64199825 jjm: </h3><p>If your string is in <a href="https://en.wikipedia.org/wiki/ISO_8601" rel="nofollow noreferrer">ISO 8601</a> format and you have Python 3.7+, you can use the following simple code:</p>
+------------------------------------------------------------------ <br><h3> jjm, Id: 64199825, Score: 39: </h3><p>If your string is in <a href="https://en.wikipedia.org/wiki/ISO_8601" rel="nofollow noreferrer">ISO 8601</a> format and you have Python 3.7+, you can use the following simple code:</p>
 <pre><code>import datetime
 
 aDate = datetime.date.fromisoformat('2020-10-04')
@@ -182,7 +182,7 @@ aDateTime = datetime.datetime.fromisoformat('2020-10-04 22:47:00')
 <pre><code>YYYY-MM-DD[*HH[:MM[:SS[.fff[fff]]]][+HH:MM[:SS[.ffffff]]]]
 </code></pre>
 <p>Where <code>*</code> matches any single character. See also <a href="https://docs.python.org/3/library/datetime.html#datetime.date.fromisoformat" rel="nofollow noreferrer">here</a> and <a href="https://docs.python.org/3/library/datetime.html#datetime.datetime.fromisoformat" rel="nofollow noreferrer">here</a>.</p>
------------------------------------------------------------------- <br><h3> Answer 34377575 Alexander: </h3><p>Here are two solutions using Pandas to convert dates formatted as strings into datetime.date objects.</p>
+------------------------------------------------------------------ <br><h3> Alexander, Id: 34377575, Score: 34: </h3><p>Here are two solutions using Pandas to convert dates formatted as strings into datetime.date objects.</p>
 
 <pre><code>import pandas as pd
 
@@ -220,7 +220,7 @@ dates = ['2015-12-25', '2015-12-26']
 <p>There are many options for converting from the strings to Pandas Timestamps using <code>to_datetime</code>, so check the <a href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.to_datetime.html" rel="noreferrer">docs</a> if you need anything special.</p>
 
 <p>Likewise, Timestamps have many <a href="http://pandas.pydata.org/pandas-docs/stable/api.html#datetimelike-properties" rel="noreferrer">properties and methods</a> that can be accessed in addition to <code>.date</code></p>
-<h4> Comment 122772525 FObersteiner: </h4>I think timings have changed by now (Python 3.9, pandas 1.3.3); <code>pd.DatetimeIndex(dates).date.tolist()</code> runs about 3x faster than <code>[d.date() for d in pd.to_datetime(dates)]</code> on my machine.<br>------------------------------------------------------------------ <br><h3> Answer 48054268 user1767754: </h3><p>I personally like the solution using the <code>parser</code> module, which is the second answer to this question and is beautiful, as you don't have to construct any string literals to get it working. <strong>But</strong>, one downside is that it is <strong>90% slower</strong> than the accepted answer with <code>strptime</code>.</p>
+<h4> FObersteiner, Comment 122772525 Score: 0: </h4>I think timings have changed by now (Python 3.9, pandas 1.3.3); <code>pd.DatetimeIndex(dates).date.tolist()</code> runs about 3x faster than <code>[d.date() for d in pd.to_datetime(dates)]</code> on my machine.<br>------------------------------------------------------------------ <br><h3> user1767754, Id: 48054268, Score: 33: </h3><p>I personally like the solution using the <code>parser</code> module, which is the second answer to this question and is beautiful, as you don't have to construct any string literals to get it working. <strong>But</strong>, one downside is that it is <strong>90% slower</strong> than the accepted answer with <code>strptime</code>.</p>
 <pre><code>from dateutil import parser
 from datetime import datetime
 import timeit
@@ -239,7 +239,7 @@ print(timeit.timeit(stmt=strptime, number=10**5))
 1.3627995655316933</p>
 </blockquote>
 <p>As long as you are not doing this <em>a million</em> times over and over again, I still think the <code>parser</code> method is more convenient and will handle most of the time formats automatically.</p>
------------------------------------------------------------------- <br><h3> Answer 34871180 guneysus: </h3><pre><code>In [34]: import datetime
+------------------------------------------------------------------ <br><h3> guneysus, Id: 34871180, Score: 19: </h3><pre><code>In [34]: import datetime
 
 In [35]: _now = datetime.datetime.now()
 
@@ -256,7 +256,7 @@ Out[39]: datetime.datetime(2016, 1, 19, 9, 47, 0, 432000)
 
 In [40]: assert _now == _parsed
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 7761860 Aram Kocharyan: </h3><p>Something that isn't mentioned here and is useful: adding a suffix to the day. I decoupled the suffix logic so you can use it for any number you like, not just dates.</p>
+------------------------------------------------------------------ <br><h3> Aram Kocharyan, Id: 7761860, Score: 25: </h3><p>Something that isn't mentioned here and is useful: adding a suffix to the day. I decoupled the suffix logic so you can use it for any number you like, not just dates.</p>
 
 <pre><code>import time
 
@@ -293,7 +293,7 @@ print day_suffix(time.strptime("4 Sep 03", "%d %b %y"))
 print day_suffix(time.strptime("13 Nov 90", "%d %b %y"))
 print day_suffix(time.strptime("14 Oct 10", "%d %b %y"))​​​​​​​
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 27046382 Ryu_hayabusa: </h3><p>Django Timezone aware datetime object example.</p>
+------------------------------------------------------------------ <br><h3> Ryu_hayabusa, Id: 27046382, Score: 17: </h3><p>Django Timezone aware datetime object example.</p>
 
 <pre><code>import datetime
 from django.utils.timezone import get_current_timezone
@@ -308,7 +308,7 @@ date_obj = tz.localize(date_object)
 
 <pre><code>RuntimeWarning: DateTimeField MyModel.created received a naive datetime (2016-03-04 00:00:00) while time zone support is active.
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 35202640 Mackraken: </h3><p>Create a small utility function like:</p>
+------------------------------------------------------------------ <br><h3> Mackraken, Id: 35202640, Score: 16: </h3><p>Create a small utility function like:</p>
 
 <pre><code>def date(datestr="", format="%Y-%m-%d"):
     from datetime import datetime
@@ -324,7 +324,7 @@ date_obj = tz.localize(date_object)
 <li>There's a date format as default that you can override.</li>
 <li>You can easily modify it to return a datetime.</li>
 </ul>
------------------------------------------------------------------- <br><h3> Answer 51869533 Kanish Mathew: </h3><p>This would be helpful for converting a string to datetime and also with a time zone:</p>
+------------------------------------------------------------------ <br><h3> Kanish Mathew, Id: 51869533, Score: 16: </h3><p>This would be helpful for converting a string to datetime and also with a time zone:</p>
 <pre><code>def convert_string_to_time(date_string, timezone):
 
     from datetime import datetime
@@ -339,7 +339,7 @@ date = '2018-08-14 13:09:24.543953+00:00'
 TIME_ZONE = 'UTC'
 date_time_obj_timezone = convert_string_to_time(date, TIME_ZONE)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 42515333 Bill Bell: </h3><p><strong>arrow</strong> offers many useful functions for dates and times. This bit of code provides an answer to the question and shows that arrow is also capable of formatting dates easily and displaying information for other locales.</p>
+------------------------------------------------------------------ <br><h3> Bill Bell, Id: 42515333, Score: 11: </h3><p><strong>arrow</strong> offers many useful functions for dates and times. This bit of code provides an answer to the question and shows that arrow is also capable of formatting dates easily and displaying information for other locales.</p>
 
 <pre><code>&gt;&gt;&gt; import arrow
 &gt;&gt;&gt; dateStrings = [ 'Jun 1  2005 1:33PM', 'Aug 28 1999 12:00AM' ]
@@ -360,7 +360,7 @@ datetime.datetime(1999, 8, 28, 0, 0, tzinfo=tzutc())
 </code></pre>
 
 <p>See <a href="http://arrow.readthedocs.io/en/latest/" rel="nofollow noreferrer">http://arrow.readthedocs.io/en/latest/</a> for more.</p>
------------------------------------------------------------------- <br><h3> Answer 59706589 Bilesh Ganguly: </h3><p>You can also check out <a href="https://dateparser.readthedocs.io/en/latest/" rel="nofollow noreferrer"><code>dateparser</code></a>:</p>
+------------------------------------------------------------------ <br><h3> Bilesh Ganguly, Id: 59706589, Score: 10: </h3><p>You can also check out <a href="https://dateparser.readthedocs.io/en/latest/" rel="nofollow noreferrer"><code>dateparser</code></a>:</p>
 <blockquote>
 <p><a href="https://pypi.org/project/dateparser/" rel="nofollow noreferrer"><code>dateparser</code></a> provides modules to easily parse localized dates in almost
 any string formats commonly found on web pages.</p>
@@ -389,12 +389,12 @@ print(dt2)
 <pre class="lang-none prettyprint-override"><code>2005-06-01 13:33:00
 1999-08-28 00:00:00
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 30577110 Raphael Amoedo: </h3><p>You can use <a href="https://github.com/ralphavalon/easy_date" rel="noreferrer">easy_date</a> to make it easy:</p>
+------------------------------------------------------------------ <br><h3> Raphael Amoedo, Id: 30577110, Score: 7: </h3><p>You can use <a href="https://github.com/ralphavalon/easy_date" rel="noreferrer">easy_date</a> to make it easy:</p>
 
 <pre><code>import date_converter
 converted_date = date_converter.string_to_datetime('Jun 1 2005  1:33PM', '%b %d %Y %I:%M%p')
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 47925290 Javed: </h3><p>If you want only date format then you can manually convert it by passing your individual fields like:</p>
+------------------------------------------------------------------ <br><h3> Javed, Id: 47925290, Score: 5: </h3><p>If you want only date format then you can manually convert it by passing your individual fields like:</p>
 
 <pre><code>&gt;&gt;&gt; import datetime
 &gt;&gt;&gt; date = datetime.date(int('2017'),int('12'),int('21'))
@@ -411,7 +411,7 @@ date_formate = datetime.date(int(selected_month_rec.split('-')[0]),int(selected_
 </code></pre>
 
 <p>You will get the resulting value in date format.</p>
------------------------------------------------------------------- <br><h3> Answer 69917740 Grant Shannon: </h3><p>Similar to <a href="https://stackoverflow.com/questions/466345/convert-string-jun-1-2005-133pm-into-datetime/47925290#47925290">Javed's answer</a>, I just wanted date from string - so combining <a href="https://stackoverflow.com/questions/466345/convert-string-jun-1-2005-133pm-into-datetime/470303#470303">Simon's</a> and Javed's logic, we get:</p>
+------------------------------------------------------------------ <br><h3> Grant Shannon, Id: 69917740, Score: 5: </h3><p>Similar to <a href="https://stackoverflow.com/questions/466345/convert-string-jun-1-2005-133pm-into-datetime/47925290#47925290">Javed's answer</a>, I just wanted date from string - so combining <a href="https://stackoverflow.com/questions/466345/convert-string-jun-1-2005-133pm-into-datetime/470303#470303">Simon's</a> and Javed's logic, we get:</p>
 <pre><code>from dateutil import parser
 import datetime
 
@@ -423,7 +423,7 @@ parser.parse(s).date()
 <blockquote>
 <p><code>datetime.date(2021, 3, 4)</code></p>
 </blockquote>
------------------------------------------------------------------- <br><h3> Answer 64114476 Grzegorz: </h3><p>It seems using <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html" rel="nofollow noreferrer">pandas Timestamp</a> is the fastest:</p>
+------------------------------------------------------------------ <br><h3> Grzegorz, Id: 64114476, Score: 4: </h3><p>It seems using <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html" rel="nofollow noreferrer">pandas Timestamp</a> is the fastest:</p>
 <pre class="lang-none prettyprint-override"><code>import pandas as pd
 
 N = 1000
@@ -452,7 +452,7 @@ l = ['2014-01-09'] * N
 %timeit _ = list(map(lambda x: ciso8601.parse_datetime(x), l))
 186 µs ± 4.13 µs per loop (mean ± std. dev. of 7 runs, 10000 loops each)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 68889318 officialrahulmandal: </h3><p>If you <em>don't</em> want to explicitly specify which format your string is in with respect to the date time format, you can use this hack to by pass that step:</p>
+------------------------------------------------------------------ <br><h3> officialrahulmandal, Id: 68889318, Score: 3: </h3><p>If you <em>don't</em> want to explicitly specify which format your string is in with respect to the date time format, you can use this hack to by pass that step:</p>
 <pre><code>from dateutil.parser import parse
 
 # Function that'll guess the format and convert it into the python datetime format
@@ -497,7 +497,7 @@ for date in new:
     #   2021/06/07 00:00:00.000000
 </code></pre>
 <p>Try running the above snippet to have a better clarity.</p>
------------------------------------------------------------------- <br><h3> Answer 47876476 smci: </h3><p>See <a href="https://stackoverflow.com/questions/6615533/is-there-a-python-equivalent-to-cs-datetime-tryparse/47876446#47876446">my answer</a>.</p>
+------------------------------------------------------------------ <br><h3> smci, Id: 47876476, Score: 2: </h3><p>See <a href="https://stackoverflow.com/questions/6615533/is-there-a-python-equivalent-to-cs-datetime-tryparse/47876446#47876446">my answer</a>.</p>
 
 <p>In real-world data this is a real problem: multiple, mismatched, incomplete, inconsistent and multilanguage/region date formats, often mixed freely in one dataset. It's not ok for production code to fail, let alone go exception-happy like a fox.</p>
 
@@ -512,7 +512,7 @@ for date in new:
 
     return None # or reraise the ValueError if no format matched, if you prefer
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 53995363 Riz.Khan: </h3><p>Use:</p>
+------------------------------------------------------------------ <br><h3> Riz.Khan, Id: 53995363, Score: 2: </h3><p>Use:</p>
 <pre><code>emp = pd.read_csv(&quot;C:\\py\\programs\\pandas_2\\pandas\\employees.csv&quot;)
 emp.info()
 </code></pre>
@@ -555,12 +555,12 @@ Team                 957 non-null object
 dtypes: datetime64[ns](2), float64(1), int64(1), object(4)
 memory usage: 62.6+ KB
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 66809743 John Forbes: </h3><p>A short sample mapping a yyyy-mm-dd date string to a datetime.date object:</p>
+------------------------------------------------------------------ <br><h3> John Forbes, Id: 66809743, Score: 2: </h3><p>A short sample mapping a yyyy-mm-dd date string to a datetime.date object:</p>
 <pre><code>from datetime import date
 date_from_yyyy_mm_dd = lambda δ : date(*[int(_) for _ in δ.split('-')])
 date_object = date_from_yyyy_mm_dd('2021-02-15')
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 76371233 cottontail: </h3><p>You can take a look at all possible datetime formats at <a href="https://strftime.org/" rel="nofollow noreferrer">https://strftime.org/</a>.</p>
+------------------------------------------------------------------ <br><h3> cottontail, Id: 76371233, Score: 2: </h3><p>You can take a look at all possible datetime formats at <a href="https://strftime.org/" rel="nofollow noreferrer">https://strftime.org/</a>.</p>
 <p>If you have multiple strings to convert into datetime objects, you can either use a list comprehension or map <code>datetime.strptime</code>.</p>
 <pre class="lang-py prettyprint-override"><code>from datetime import datetime
 from itertools import repeat
@@ -595,7 +595,7 @@ dates = pd.date_range('2000-1-1', '2000-1-2', 1000000).strftime('%b %d %Y %I:%M%
 %timeit _ = pd.to_datetime(dates, format='%b %d %Y %I:%M%p').tolist()
 # 1.16 s ± 8.11 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 74103496 Niyaz: </h3><pre><code>#Convert String to datetime
+------------------------------------------------------------------ <br><h3> Niyaz, Id: 74103496, Score: 0: </h3><pre><code>#Convert String to datetime
 &gt;&gt;&gt; x=datetime.strptime('Jun 1 2005', '%b %d %Y').date()
 &gt;&gt;&gt; print(x,type(x))
 2005-06-01 00:00:00 &lt;class 'datetime.datetime'&gt;

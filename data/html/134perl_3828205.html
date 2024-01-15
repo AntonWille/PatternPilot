@@ -1,4 +1,4 @@
- <h2> Title: How do I enter a multi-line comment in Perl? </h2> <h3> vrbilgi, question_id: 3828205 </h3>Score: 134, Tags: {perl,comments,multiline,perl-data-structures} <br><blockquote>
+ <h2> Title: How do I enter a multi-line comment in Perl? </h2> <h4> vrbilgi, question_id: 3828205 </h4>Score: 134, Tags: {perl,comments,multiline,perl-data-structures} <br><blockquote>
   <p><strong>Possible Duplicate:</strong><br>
   <a href="https://stackoverflow.com/questions/3608957">What are the common workarounds for multi-line comments in Perl?</a>  </p>
 </blockquote>
@@ -6,7 +6,7 @@
 
 
 <p>How do I add a multi-line comment to Perl source code?</p>
-<h4> Comment 18921193 TheBlackCorsair: </h4>simply do       =head     ##your code to comment     =cut<br>------------------------------------------------------------------ <br><h3> Answer 3828297 Nikhil Jain: </h3><p>POD is the official way to do multi line comments in Perl. See:</p>
+<h4> TheBlackCorsair, Id: 18921193 Score: 1: </h4>simply do       =head     ##your code to comment     =cut<br>------------------------------------------------------------------ <br><h3> Nikhil Jain, Id: 3828297, Score: 165: </h3><p>POD is the official way to do multi line comments in Perl. See:</p>
 <ul>
 <li><strong><a href="http://www.perlmonks.org/?node_id=560985" rel="nofollow noreferrer">Multi-line comments in perl
 code</a></strong> and</li>
@@ -54,7 +54,7 @@ $wont_be_assigned = 37;
 
 =cut
 </code></pre>
-<h4> Comment 37357802 Bharat Pahalwani: </h4>It isn&#39;t necessary to start the comment with =POD, you can use any thing to start Multi-line comment ( say =xyz etc ) But yes end must always be with =cut not even =CUT<br>------------------------------------------------------------------ <br><h3> Answer 3828292 vrbilgi: </h3><p>I found it. Perl has multi-line comments:</p>
+<h4> Bharat Pahalwani, Comment 37357802 Score: 7: </h4>It isn&#39;t necessary to start the comment with =POD, you can use any thing to start Multi-line comment ( say =xyz etc ) But yes end must always be with =cut not even =CUT<br>------------------------------------------------------------------ <br><h3> vrbilgi, Id: 3828292, Score: 31: </h3><p>I found it. Perl has multi-line comments:</p>
 
 <pre><code>#!/usr/bin/perl
 
@@ -72,4 +72,4 @@ Example of multiline comment.
 
 print "Multi Line Comment Example \n";
 </code></pre>
-<h4> Comment 17453890 Andrew_1510: </h4>Between <code>=for comment</code> and <code>=cut</code>, from the second paragraph, it will be shown in <i>perldoc</i>.  So only the first paragraph would be fully commented from both codes and <i>perldoc</i>.  If this should be avoided, use <code>=begin comment</code> ...multi-lines/paragraph comments... <code>=end comment (*new-line*) =cut</code>.<br>
+<h4> Andrew_1510, Comment 17453890 Score: 7: </h4>Between <code>=for comment</code> and <code>=cut</code>, from the second paragraph, it will be shown in <i>perldoc</i>.  So only the first paragraph would be fully commented from both codes and <i>perldoc</i>.  If this should be avoided, use <code>=begin comment</code> ...multi-lines/paragraph comments... <code>=end comment (*new-line*) =cut</code>.<br>

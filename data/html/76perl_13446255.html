@@ -1,9 +1,9 @@
- <h2> Title: how to remove the first two columns in a file using shell (awk, sed, whatever) </h2> <h3> wenzi, question_id: 13446255 </h3>Score: 76, Tags: {perl,shell,awk,sed,cut} <br><p>I have a file with many lines
+ <h2> Title: how to remove the first two columns in a file using shell (awk, sed, whatever) </h2> <h4> wenzi, question_id: 13446255 </h4>Score: 76, Tags: {perl,shell,awk,sed,cut} <br><p>I have a file with many lines
 in each line there are many columns(fields) separated by blank " "
 the numbers of columns in each line are different
 I want to remove the first two columns
 how to?</p>
-<h4> Comment 95156920 Ciro Santilli OurBigBook.com: </h4>Possible duplicate of <a href="https://stackoverflow.com/questions/2961635/using-awk-to-print-all-columns-from-the-nth-to-the-last">Using awk to print all columns from the nth to the last</a><br>------------------------------------------------------------------ <br><h3> Answer 13446273 sampson-chen: </h3><p>You can do it with <code>cut</code>:</p>
+<h4> Ciro Santilli OurBigBook.com, Id: 95156920 Score: 0: </h4>Possible duplicate of <a href="https://stackoverflow.com/questions/2961635/using-awk-to-print-all-columns-from-the-nth-to-the-last">Using awk to print all columns from the nth to the last</a><br>------------------------------------------------------------------ <br><h3> sampson-chen, Id: 13446273, Score: 164: </h3><p>You can do it with <code>cut</code>:</p>
 
 <pre><code>cut -d " " -f 3- input_filename &gt; output_filename
 </code></pre>
@@ -33,7 +33,7 @@ how to?</p>
 <li><code>print</code>: print the modified line</li>
 <li><code>input_filename &gt; output_filename</code>: same as above.</li>
 </ul>
-<h4> Comment 18385651 sampson-chen: </h4>@wenzi oops, forgot that <code>cut</code> uses tab as delimiter by default. See updated answer - just tested and it works. all else being equal, I would recommend using <code>cut</code> over <code>awk</code>.<br><h4> Comment 18400673 Ed Morton: </h4>You could do it in awk with just <code>awk &#39;{sub(&#47;([^ ]+ ){2}&#47;, &quot;&quot;)}1&#39;</code>. I agree cut is the better choice anyway if you have a single-char field separator though.<br><h4> Comment 83313830 jirislav: </h4>there are still some whitespaces left, use <code>awk &#39;{$1=&quot;&quot;; $2=&quot;&quot;; sub(&#47;^ +&#47;, &quot;&quot;); print}&#39;</code> instead or shorter <code>awk &#39;{$1=$2=&quot;&quot;; sub(&#47;^ +&#47;, &quot;&quot;)}1&#39;</code><br><h4> Comment 130838716 Brian Peterson: </h4>Thanks for explaining the individual flags, didn&#39;t realize you could specify &quot;3-&quot; to mean &quot;3 onwards&quot;.<br>------------------------------------------------------------------ <br><h3> Answer 14715189 raychi: </h3><p>Here's one way to do it with Awk that's relatively easy to understand:</p>
+<h4> sampson-chen, Comment 18385651 Score: 0: </h4>@wenzi oops, forgot that <code>cut</code> uses tab as delimiter by default. See updated answer - just tested and it works. all else being equal, I would recommend using <code>cut</code> over <code>awk</code>.<br><h4> Ed Morton, Comment 18400673 Score: 0: </h4>You could do it in awk with just <code>awk &#39;{sub(&#47;([^ ]+ ){2}&#47;, &quot;&quot;)}1&#39;</code>. I agree cut is the better choice anyway if you have a single-char field separator though.<br><h4> jirislav, Comment 83313830 Score: 0: </h4>there are still some whitespaces left, use <code>awk &#39;{$1=&quot;&quot;; $2=&quot;&quot;; sub(&#47;^ +&#47;, &quot;&quot;); print}&#39;</code> instead or shorter <code>awk &#39;{$1=$2=&quot;&quot;; sub(&#47;^ +&#47;, &quot;&quot;)}1&#39;</code><br><h4> Brian Peterson, Comment 130838716 Score: 0: </h4>Thanks for explaining the individual flags, didn&#39;t realize you could specify &quot;3-&quot; to mean &quot;3 onwards&quot;.<br>------------------------------------------------------------------ <br><h3> raychi, Id: 14715189, Score: 33: </h3><p>Here's one way to do it with Awk that's relatively easy to understand:</p>
 
 <pre><code>awk '{print substr($0, index($0, $3))}'
 </code></pre>
@@ -68,11 +68,11 @@ how to?</p>
 <li><code>NR &gt; 1</code>: use record/line number</li>
 <li><code>NF &gt; 0</code>: use field/column number</li>
 </ul>
-<h4> Comment 37750467 CMCDragonkai: </h4>How about removing the last 2 column, counting from the reverse?<br><h4> Comment 53179673 PHP Learner: </h4>This will not work correctly if field #2 and field #3 has same contents.<br>------------------------------------------------------------------ <br><h3> Answer 24601841 Felipe Alvarez: </h3><p>Thanks for posting the question. I'd also like to add the script that helped me.</p>
+<h4> CMCDragonkai, Comment 37750467 Score: 0: </h4>How about removing the last 2 column, counting from the reverse?<br><h4> PHP Learner, Comment 53179673 Score: 10: </h4>This will not work correctly if field #2 and field #3 has same contents.<br>------------------------------------------------------------------ <br><h3> Felipe Alvarez, Id: 24601841, Score: 13: </h3><p>Thanks for posting the question. I'd also like to add the script that helped me.</p>
 
 <pre><code>awk '{ $1=""; print $0 }' file
 </code></pre>
-<h4> Comment 43239651 timurb: </h4>Awk doesn&#39;t keep field delimiters in this case.<br><h4> Comment 113742887 MichaelChirico: </h4>You can add <code>OFS=FS</code> to keep the delimiters:<a href="https://unix.stackexchange.com/a/252748/112834">unix.stackexchange.com/a/252748/112834</a><br>------------------------------------------------------------------ <br><h3> Answer 13446583 Jonathan Leffler: </h3><p>You can use <code>sed</code>:</p>
+<h4> timurb, Comment 43239651 Score: 1: </h4>Awk doesn&#39;t keep field delimiters in this case.<br><h4> MichaelChirico, Comment 113742887 Score: 0: </h4>You can add <code>OFS=FS</code> to keep the delimiters:<a href="https://unix.stackexchange.com/a/252748/112834">unix.stackexchange.com/a/252748/112834</a><br>------------------------------------------------------------------ <br><h3> Jonathan Leffler, Id: 13446583, Score: 6: </h3><p>You can use <code>sed</code>:</p>
 
 <pre><code>sed 's/^[^ ][^ ]* [^ ][^ ]* //'
 </code></pre>
@@ -87,13 +87,13 @@ how to?</p>
 do echo "$residue"
 done &lt; in-file &gt; out-file
 </code></pre>
-<h4> Comment 18387778 Ed Morton: </h4>If <code>residue</code> can contain a backslash, the above read will interpret it and not reproduce it in the output. Always use <code>while IFS= read -r ...</code>.<br><h4> Comment 18387811 Jonathan Leffler: </h4>If <code>bash</code> interprets the contents with a plain <code>read</code>, then <code>bash</code> is broken (again).  The read command in original shells didn&#39;t do such nonsense; I don&#39;t believe it is required by POSIX shell.  It would irritate the blazes out of me to find that <code>bash</code> does what you say it does — I already have a love/hate relation with the program since it does a lot of things well, but there are some things that it does badly, and changing legacy behaviour is one of the worst, and requiring an option to enable the old standard behaviour is ... very irritating.  It seems you&#39;re right; <code>bash</code> is borked!<br><h4> Comment 18400298 Ed Morton: </h4>That behavior is POSIX, see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/utilities/read.html" rel="nofollow noreferrer">pubs.opengroup.org/onlinepubs/9699919799/utilities/read.html</a>&zwnj;&#8203;.<br><h4> Comment 18400763 Ed Morton: </h4>I see I didn&#39;t say it explicitly but the reason you need IFS= is that if the first field in the input was empty, then default field splitting would strip leading blanks so <code>residue</code> would start at field 4 (or later) instead of field 3.<br><h4> Comment 18402548 Jonathan Leffler: </h4>Damn...OK; POSIX is borked, but <code>bash</code> is following POSIX 2008.  I&#39;ve never wanted that functionality in more than a quarter century of shell programming, but I guess I must be in a minority.<br>------------------------------------------------------------------ <br><h3> Answer 24602199 technosaurus: </h3><p>Its pretty straight forward to do it with only shell</p>
+<h4> Ed Morton, Comment 18387778 Score: 0: </h4>If <code>residue</code> can contain a backslash, the above read will interpret it and not reproduce it in the output. Always use <code>while IFS= read -r ...</code>.<br><h4> Jonathan Leffler, Comment 18387811 Score: 0: </h4>If <code>bash</code> interprets the contents with a plain <code>read</code>, then <code>bash</code> is broken (again).  The read command in original shells didn&#39;t do such nonsense; I don&#39;t believe it is required by POSIX shell.  It would irritate the blazes out of me to find that <code>bash</code> does what you say it does — I already have a love/hate relation with the program since it does a lot of things well, but there are some things that it does badly, and changing legacy behaviour is one of the worst, and requiring an option to enable the old standard behaviour is ... very irritating.  It seems you&#39;re right; <code>bash</code> is borked!<br><h4> Ed Morton, Comment 18400298 Score: 0: </h4>That behavior is POSIX, see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/utilities/read.html" rel="nofollow noreferrer">pubs.opengroup.org/onlinepubs/9699919799/utilities/read.html</a>&zwnj;&#8203;.<br><h4> Ed Morton, Comment 18400763 Score: 0: </h4>I see I didn&#39;t say it explicitly but the reason you need IFS= is that if the first field in the input was empty, then default field splitting would strip leading blanks so <code>residue</code> would start at field 4 (or later) instead of field 3.<br><h4> Jonathan Leffler, Comment 18402548 Score: 0: </h4>Damn...OK; POSIX is borked, but <code>bash</code> is following POSIX 2008.  I&#39;ve never wanted that functionality in more than a quarter century of shell programming, but I guess I must be in a minority.<br>------------------------------------------------------------------ <br><h3> technosaurus, Id: 24602199, Score: 6: </h3><p>Its pretty straight forward to do it with only shell</p>
 
 <pre><code>while read A B C; do
 echo "$C"
 done &lt; oldfile &gt;newfile
 </code></pre>
-<h4> Comment 82565600 robert: </h4>This is a great answer, however you will want to use <code>read -r</code> instead of <code>read</code>.<br><h4> Comment 82565636 robert: </h4><code>read -r</code> will preserve backslashes. <code>read</code> will not. For example: <code>echo &quot;foo ba\r&quot;</code> will produce an output of <code>foo ba\r</code>. However, <code>echo &quot;foo ba\r&quot; |  (while read first_column second_column; do echo &quot;$second_column&quot;; done)</code> will produce just <code>bar</code> as the output (with the backslash removed. Adding the <code>-r</code> flag produces the correct output of <code>ba\r</code><br>------------------------------------------------------------------ <br><h3> Answer 27397206 Vijay: </h3><p>perl:</p>
+<h4> robert, Comment 82565600 Score: 0: </h4>This is a great answer, however you will want to use <code>read -r</code> instead of <code>read</code>.<br><h4> robert, Comment 82565636 Score: 0: </h4><code>read -r</code> will preserve backslashes. <code>read</code> will not. For example: <code>echo &quot;foo ba\r&quot;</code> will produce an output of <code>foo ba\r</code>. However, <code>echo &quot;foo ba\r&quot; |  (while read first_column second_column; do echo &quot;$second_column&quot;; done)</code> will produce just <code>bar</code> as the output (with the backslash removed. Adding the <code>-r</code> flag produces the correct output of <code>ba\r</code><br>------------------------------------------------------------------ <br><h3> Vijay, Id: 27397206, Score: 5: </h3><p>perl:</p>
 
 <pre><code>perl -lane 'print join(' ',@F[2..$#F])' File
 </code></pre>
@@ -102,10 +102,10 @@ done &lt; oldfile &gt;newfile
 
 <pre><code>awk '{$1=$2=""}1' File
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 47912906 Carlos: </h3><p>Using awk, and based in some of the options below, using a for loop makes a bit more flexible; sometimes I may want to delete the first 9 columns ( if I do an "ls -lrt" for example), so I change the 2 for a 9 and that's it:</p>
+------------------------------------------------------------------ <br><h3> Carlos, Id: 47912906, Score: 2: </h3><p>Using awk, and based in some of the options below, using a for loop makes a bit more flexible; sometimes I may want to delete the first 9 columns ( if I do an "ls -lrt" for example), so I change the 2 for a 9 and that's it:</p>
 
 <p><code>awk '{ for(i=0;i++&lt;2;){$i=""}; print $0 }' your_file.txt</code></p>
------------------------------------------------------------------- <br><h3> Answer 13449192 potong: </h3><p>This might work for you (GNU sed):</p>
+------------------------------------------------------------------ <br><h3> potong, Id: 13449192, Score: 1: </h3><p>This might work for you (GNU sed):</p>
 
 <pre><code>sed -r 's/^([^ ]+ ){2}//' file
 </code></pre>
@@ -114,7 +114,7 @@ done &lt; oldfile &gt;newfile
 
 <pre><code>sed -r 's/^(\S+\s+){2}//' file
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 43933171 Holger Brandl: </h3><p>Use <a href="https://github.com/holgerbrandl/kscript" rel="nofollow noreferrer">kscript</a></p>
+------------------------------------------------------------------ <br><h3> Holger Brandl, Id: 43933171, Score: 0: </h3><p>Use <a href="https://github.com/holgerbrandl/kscript" rel="nofollow noreferrer">kscript</a></p>
 
 <pre><code>kscript 'lines.split().select(-1,-2).print()' file
 </code></pre>

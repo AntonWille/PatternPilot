@@ -1,10 +1,10 @@
- <h2> Title: How can I install a local gem? </h2> <h3> hectorsq, question_id: 220176 </h3>Score: 363, Tags: {ruby,rubygems} <br><p>If I download a .gem file to a folder in my computer, can I install it later using <code>gem install</code>?</p>
-<h4> Comment 38431692 Jaider: </h4>This post is related to <a href="http://stackoverflow.com/questions/1864618/install-gem-locally">stackoverflow.com/questions/1864618/install-gem-locally</a><br>------------------------------------------------------------------ <br><h3> Answer 286347 JasonTrue: </h3><p>Also, you can use <code>gem install --local path_to_gem/filename.gem</code></p>
+ <h2> Title: How can I install a local gem? </h2> <h4> hectorsq, question_id: 220176 </h4>Score: 363, Tags: {ruby,rubygems} <br><p>If I download a .gem file to a folder in my computer, can I install it later using <code>gem install</code>?</p>
+<h4> Jaider, Id: 38431692 Score: 0: </h4>This post is related to <a href="http://stackoverflow.com/questions/1864618/install-gem-locally">stackoverflow.com/questions/1864618/install-gem-locally</a><br>------------------------------------------------------------------ <br><h3> JasonTrue, Id: 286347, Score: 350: </h3><p>Also, you can use <code>gem install --local path_to_gem/filename.gem</code></p>
 
 <p>This will skip the usual gem repository scan that happens when you leave off <code>--local</code>.</p>
 
 <p>You can find other magic with <code>gem install --help</code>.</p>
-<h4> Comment 44147629 JasonTrue: </h4>@BoratSagdiyev, a zip file is not a gem. Like most zip files, you need to unzip it before you can do much with it. If it contains a gem, then you can use gem install on the extracted .gem file. I don&#39;t remember the internals of the gem format; it&#39;s possible it may just be a zip file with a special header, but rubygems doesn&#39;t recognize zip files as such.<br><h4> Comment 44145185 Erran Morad: </h4>I download a gem such as rubygems in zip format. So there is no .gem file here. How do I install this from local ? Thank you.<br>------------------------------------------------------------------ <br><h3> Answer 220181 Chris Bunch: </h3><p>Yup, when you do <code>gem install</code>, it will search the current directory first, so if your .gem file is there, it will pick it up. I found it on the <a href="https://guides.rubygems.org/command-reference/#gem-install" rel="noreferrer">gem reference</a>, which you may find handy as well:</p>
+<h4> JasonTrue, Comment 44147629 Score: 4: </h4>@BoratSagdiyev, a zip file is not a gem. Like most zip files, you need to unzip it before you can do much with it. If it contains a gem, then you can use gem install on the extracted .gem file. I don&#39;t remember the internals of the gem format; it&#39;s possible it may just be a zip file with a special header, but rubygems doesn&#39;t recognize zip files as such.<br><h4> Erran Morad, Comment 44145185 Score: 0: </h4>I download a gem such as rubygems in zip format. So there is no .gem file here. How do I install this from local ? Thank you.<br>------------------------------------------------------------------ <br><h3> Chris Bunch, Id: 220181, Score: 300: </h3><p>Yup, when you do <code>gem install</code>, it will search the current directory first, so if your .gem file is there, it will pick it up. I found it on the <a href="https://guides.rubygems.org/command-reference/#gem-install" rel="noreferrer">gem reference</a>, which you may find handy as well:</p>
 
 <blockquote>
   <p>gem install will install the named
@@ -15,13 +15,13 @@
   install the most recent version of the
   gem you want.</p>
 </blockquote>
-<h4> Comment 107565528 Martin: </h4>I have a <code>Gemfile</code> but not a <code>.gem</code> file. So what is this <code>.gem</code> file? What should it contain? — Wait – I see. You mean an <code>gem-name.gem</code> file. Remember that on unix it&#39;s pretty normal to have file starting with a &#39;.&#39; so it&#39;s better to spell it out.<br><h4> Comment 100352657 Charles Wood: </h4>Checking in to say that this is working for me in 2019.<br><h4> Comment 42749712 Ain Tohvri: </h4>Link ends in infinite redirects :(<br><h4> Comment 122093305 ptim: </h4>&quot;I have a Gemfile but not a .gem file&quot; - Run <code>gem build</code> to generate a *.gem file from Gemfile (I&#39;m a ruby noob, this worked for me!)<br><h4> Comment 109834449 Jed Burke: </h4>I can confirm from the future of 2020, the link works for me. In case it doesn&#39;t work in the distant future, here&#39;s the Archive.org <a href="https://web.archive.org/web/20200419034615/https://guides.rubygems.org/command-reference/#gem-install" rel="nofollow noreferrer">April 19th, 2020 snapshot</a><br>------------------------------------------------------------------ <br><h3> Answer 7956096 user979912: </h3><p>you can also <strong>use the full filename to your gem file:</strong></p>
+<h4> Martin, Comment 107565528 Score: 4: </h4>I have a <code>Gemfile</code> but not a <code>.gem</code> file. So what is this <code>.gem</code> file? What should it contain? — Wait – I see. You mean an <code>gem-name.gem</code> file. Remember that on unix it&#39;s pretty normal to have file starting with a &#39;.&#39; so it&#39;s better to spell it out.<br><h4> Charles Wood, Comment 100352657 Score: 3: </h4>Checking in to say that this is working for me in 2019.<br><h4> Ain Tohvri, Comment 42749712 Score: 2: </h4>Link ends in infinite redirects :(<br><h4> ptim, Comment 122093305 Score: 1: </h4>&quot;I have a Gemfile but not a .gem file&quot; - Run <code>gem build</code> to generate a *.gem file from Gemfile (I&#39;m a ruby noob, this worked for me!)<br><h4> Jed Burke, Comment 109834449 Score: 0: </h4>I can confirm from the future of 2020, the link works for me. In case it doesn&#39;t work in the distant future, here&#39;s the Archive.org <a href="https://web.archive.org/web/20200419034615/https://guides.rubygems.org/command-reference/#gem-install" rel="nofollow noreferrer">April 19th, 2020 snapshot</a><br>------------------------------------------------------------------ <br><h3> user979912, Id: 7956096, Score: 68: </h3><p>you can also <strong>use the full filename to your gem file:</strong></p>
 
 <pre><code>gem install /full/path/to/your.gem
 </code></pre>
 
 <p>this works as well -- it's probably the easiest way</p>
------------------------------------------------------------------- <br><h3> Answer 17057296 Boris Stitnicky: </h3><p>If you create your gems with bundler:</p>
+------------------------------------------------------------------ <br><h3> Boris Stitnicky, Id: 17057296, Score: 44: </h3><p>If you create your gems with bundler:</p>
 
 <pre><code># do this in the proper directory
 bundle gem foobar
@@ -34,16 +34,16 @@ rake install
 </code></pre>
 
 <p>Chances are, that your downloaded gem will know <code>rake install</code>, too.</p>
-<h4> Comment 62728523 sixty4bit: </h4>this seems like the best modern answer. accepted answer is from 8 years ago<br><h4> Comment 113956536 Igor Skochinsky: </h4>this is useful for those who create gems but not so much for those who simply want to install a prebuilt one<br>------------------------------------------------------------------ <br><h3> Answer 42891981 Matthias Winkelmann: </h3><p>If you want to work on a locally modified fork of a gem, the best way to do so is</p>
+<h4> sixty4bit, Comment 62728523 Score: 3: </h4>this seems like the best modern answer. accepted answer is from 8 years ago<br><h4> Igor Skochinsky, Comment 113956536 Score: 0: </h4>this is useful for those who create gems but not so much for those who simply want to install a prebuilt one<br>------------------------------------------------------------------ <br><h3> Matthias Winkelmann, Id: 42891981, Score: 17: </h3><p>If you want to work on a locally modified fork of a gem, the best way to do so is</p>
 
 <p><code>gem 'pry', path: './pry'</code></p>
 
 <p>in a Gemfile.</p>
 
 <p>... where <code>./pry</code> would be the clone of your repository. Simply run <code>bundle install</code> once, and any changes in the gem sources you make are immediately reflected. With <code>gem install pry/pry.gem</code>, the sources are still moved into <code>GEM_PATH</code> and you'll always have to run both <code>bundle gem pry</code> and <code>gem update</code> to test.</p>
------------------------------------------------------------------- <br><h3> Answer 27778762 hechen0: </h3><p>if you download the project file from github or other scm host site, use gem build to build the project first, so you can get a whatever.gem file in current directory. Then gem install it!</p>
------------------------------------------------------------------- <br><h3> Answer 35004163 leobelizquierdo: </h3><p>Go to the path in where the gem is and call <code>gem install -l gemname.gem</code></p>
------------------------------------------------------------------- <br><h3> Answer 58331390 Daniel Antonio Nu&#241;ez Carhuayo: </h3><p>Well, it's this my DRY installation:</p>
+------------------------------------------------------------------ <br><h3> hechen0, Id: 27778762, Score: 15: </h3><p>if you download the project file from github or other scm host site, use gem build to build the project first, so you can get a whatever.gem file in current directory. Then gem install it!</p>
+------------------------------------------------------------------ <br><h3> leobelizquierdo, Id: 35004163, Score: 6: </h3><p>Go to the path in where the gem is and call <code>gem install -l gemname.gem</code></p>
+------------------------------------------------------------------ <br><h3> Daniel Antonio Nu&#241;ez Carhuayo, Id: 58331390, Score: 1: </h3><p>Well, it's this my DRY installation:</p>
 
 <ol>
 <li>Look into a computer with already installed gems needed in the cache directory (by default: <code>[Ruby Installation version]/lib/ruby/gems/[Ruby version]/cache</code>)</li>
@@ -60,7 +60,7 @@ rake install
   add the localhost url in gem sources, more information in:
   <a href="https://guides.rubygems.org/run-your-own-gem-server/" rel="nofollow noreferrer">https://guides.rubygems.org/run-your-own-gem-server/</a></p>
 </blockquote>
------------------------------------------------------------------- <br><h3> Answer 58619276 Vinayak Mishra: </h3><p>You can download gems from <a href="https://rubygems.org/gems/" rel="nofollow noreferrer">https://rubygems.org/gems/</a> or build you local gem via bundle and rack.</p>
+------------------------------------------------------------------ <br><h3> Vinayak Mishra, Id: 58619276, Score: 1: </h3><p>You can download gems from <a href="https://rubygems.org/gems/" rel="nofollow noreferrer">https://rubygems.org/gems/</a> or build you local gem via bundle and rack.</p>
 
 <p>eg: </p>
 

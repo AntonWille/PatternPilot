@@ -1,4 +1,4 @@
- <h2> Title: How do I break out of a loop in Perl? </h2> <h3> Zain Rizvi, question_id: 303216 </h3>Score: 324, Tags: {perl,loops,break,strict} <br><p>I'm trying to use a <code>break</code> statement in a <code>for</code> loop, but since I'm also using strict subs in my Perl code, I'm getting an error saying:</p>
+ <h2> Title: How do I break out of a loop in Perl? </h2> <h4> Zain Rizvi, question_id: 303216 </h4>Score: 324, Tags: {perl,loops,break,strict} <br><p>I'm trying to use a <code>break</code> statement in a <code>for</code> loop, but since I'm also using strict subs in my Perl code, I'm getting an error saying:</p>
 
 <blockquote>
   <p>Bareword "break" not allowed while
@@ -16,7 +16,7 @@
     }
 }
 </code></pre>
-<h4> Comment 148042 Paul Tomblin: </h4>And if you didn&#39;t have &quot;strict subs&quot; on, you would have gotten a run-time error instead when it couldn&#39;t find a sub named &quot;break&quot;.<br>------------------------------------------------------------------ <br><h3> Answer 303231 Zain Rizvi: </h3><p>Oh, I found it.  You use <a href="http://perldoc.perl.org/functions/last.html" rel="nofollow noreferrer">last</a> instead of <a href="https://perldoc.perl.org/functions/break.html" rel="nofollow noreferrer">break</a></p>
+<h4> Paul Tomblin, Id: 148042 Score: 25: </h4>And if you didn&#39;t have &quot;strict subs&quot; on, you would have gotten a run-time error instead when it couldn&#39;t find a sub named &quot;break&quot;.<br>------------------------------------------------------------------ <br><h3> Zain Rizvi, Id: 303231, Score: 475: </h3><p>Oh, I found it.  You use <a href="http://perldoc.perl.org/functions/last.html" rel="nofollow noreferrer">last</a> instead of <a href="https://perldoc.perl.org/functions/break.html" rel="nofollow noreferrer">break</a></p>
 <pre><code>for my $entry (@array){
     if ($string eq &quot;text&quot;){
          last;
@@ -24,7 +24,7 @@
 }
 </code></pre>
 <p>It's also described under <strong>Loop Control</strong> in &quot;perlsyn(1)&quot; (<code>man perlsyn</code> on UNIX-like).</p>
-<h4> Comment 52761712 Thupten: </h4>for some reason, i am completely unable to remember this keyword &#39;last&#39;. always end up googling &#39;perl break loop&#39; :(<br><h4> Comment 89749124 HoldOffHunger: </h4>Also, works the same for <code>while</code>() loops.  <code>my @array = (&quot;_&quot;, &quot;apple&quot;, &quot;orange&quot;); my $thing; while ($thing = shift @array){ 	last if $thing =~ &#47;[A-Za-z]&#47;; } print($thing);	# &quot;apple&quot;</code><br><h4> Comment 40005591 osirisgothra: </h4>not to mention that &#39;break&#39; is an experimental keyword in &gt;5.010 right? so you might get an illegal outside given block error, not that you should use it. The only way that would even work is if you used a while loop inside a given block, and then break, which in theory would work the way you wanted IF (and only if) the given block only had the while loop in it, and assuming you were just feeding given some scalar variable... but why do all that work just to use a break, it is (very) bad form, not to mention (blah!)just saying, its &quot;possible&quot; just not a good idea &amp; not what you may think it is<br><h4> Comment 3306681 Razor Storm: </h4>Though this is merely a semantic difference and doesn&#39;t amount to much else other than textual consistency with the &quot;next&quot; command.<br>------------------------------------------------------------------ <br><h3> Answer 303261 Kent Fredric: </h3><p>Additional data (in case you have more questions):</p>
+<h4> Thupten, Comment 52761712 Score: 34: </h4>for some reason, i am completely unable to remember this keyword &#39;last&#39;. always end up googling &#39;perl break loop&#39; :(<br><h4> HoldOffHunger, Comment 89749124 Score: 1: </h4>Also, works the same for <code>while</code>() loops.  <code>my @array = (&quot;_&quot;, &quot;apple&quot;, &quot;orange&quot;); my $thing; while ($thing = shift @array){ 	last if $thing =~ &#47;[A-Za-z]&#47;; } print($thing);	# &quot;apple&quot;</code><br><h4> osirisgothra, Comment 40005591 Score: 1: </h4>not to mention that &#39;break&#39; is an experimental keyword in &gt;5.010 right? so you might get an illegal outside given block error, not that you should use it. The only way that would even work is if you used a while loop inside a given block, and then break, which in theory would work the way you wanted IF (and only if) the given block only had the while loop in it, and assuming you were just feeding given some scalar variable... but why do all that work just to use a break, it is (very) bad form, not to mention (blah!)just saying, its &quot;possible&quot; just not a good idea &amp; not what you may think it is<br><h4> Razor Storm, Comment 3306681 Score: 0: </h4>Though this is merely a semantic difference and doesn&#39;t amount to much else other than textual consistency with the &quot;next&quot; command.<br>------------------------------------------------------------------ <br><h3> Kent Fredric, Id: 303261, Score: 178: </h3><p>Additional data (in case you have more questions):</p>
 
 <pre><code>FOO: {
        for my $i ( @listone ){
@@ -38,7 +38,7 @@
        }                           # |
  } # &lt;-------------------------------
 </code></pre>
-<h4> Comment 148776 ysth: </h4>You do if you have other code just after the for my $i loop that you also want to skip.  The outer {} is a bare block, which is itself a funny kind of loop that can be last/redo/next&#39;d.<br><h4> Comment 148670 cjm: </h4>You don&#39;t actually need the braces after FOO:<br>------------------------------------------------------------------ <br><h3> Answer 43872666 Kamal Nayan: </h3><p>Simply <code>last</code> would work here:</p>
+<h4> ysth, Comment 148776 Score: 15: </h4>You do if you have other code just after the for my $i loop that you also want to skip.  The outer {} is a bare block, which is itself a funny kind of loop that can be last/redo/next&#39;d.<br><h4> cjm, Comment 148670 Score: 2: </h4>You don&#39;t actually need the braces after FOO:<br>------------------------------------------------------------------ <br><h3> Kamal Nayan, Id: 43872666, Score: 25: </h3><p>Simply <code>last</code> would work here:</p>
 
 <pre><code>for my $entry (@array){
     if ($string eq "text"){
@@ -61,7 +61,7 @@
 </code></pre>
 
 <p>Given a <code>last</code> statement will make the compiler to come out from both the loops. The same can be done in any number of loops, and labels can be fixed anywhere.</p>
------------------------------------------------------------------- <br><h3> Answer 32575568 MortenB: </h3><p>On a large iteration I like using interrupts. Just press <kbd>Ctrl</kbd> + <kbd>C</kbd> to quit:</p>
+------------------------------------------------------------------ <br><h3> MortenB, Id: 32575568, Score: 5: </h3><p>On a large iteration I like using interrupts. Just press <kbd>Ctrl</kbd> + <kbd>C</kbd> to quit:</p>
 
 <pre><code>my $exitflag = 0;
 $SIG{INT} = sub { $exitflag=1 };
@@ -70,7 +70,7 @@ while(!$exitflag) {
     # Do your stuff
 }
 </code></pre>
-<h4> Comment 110029602 MortenB: </h4>@PeterMortensen - this works fine in windows, the only thing to keep in mind for windows may be to turn on autoflush if you print to STDOUT &#39;$|=1;`<br>------------------------------------------------------------------ <br><h3> Answer 63580584 Timur Shtatland: </h3><p>For Perl one-liners with <em>implicit loops</em> (using <code>-n</code> or <code>-p</code> command line options), use <code>last</code> or <code>last LINE</code> to break out of the loop that iterates over input records. For example, these simple examples all print the first 2 lines of the input:</p>
+<h4> MortenB, Comment 110029602 Score: 0: </h4>@PeterMortensen - this works fine in windows, the only thing to keep in mind for windows may be to turn on autoflush if you print to STDOUT &#39;$|=1;`<br>------------------------------------------------------------------ <br><h3> Timur Shtatland, Id: 63580584, Score: 3: </h3><p>For Perl one-liners with <em>implicit loops</em> (using <code>-n</code> or <code>-p</code> command line options), use <code>last</code> or <code>last LINE</code> to break out of the loop that iterates over input records. For example, these simple examples all print the first 2 lines of the input:</p>
 <pre><code>echo 1 2 3 4 | xargs -n1 | perl -ne 'last if $. == 3; print;'
 echo 1 2 3 4 | xargs -n1 | perl -ne 'last LINE if $. == 3; print;'
 echo 1 2 3 4 | xargs -n1 | perl -pe 'last if $. == 3;'

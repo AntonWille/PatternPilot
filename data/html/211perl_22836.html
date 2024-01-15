@@ -1,11 +1,11 @@
- <h2> Title: How do I perform a Perl substitution on a string while keeping the original? </h2> <h3> kaybenleroll, question_id: 22836 </h3>Score: 211, Tags: {regex,perl,replace} <br><p>In Perl, what is a good way to perform a replacement on a string using a regular expression and store the value in a different variable, without changing the original?</p>
+ <h2> Title: How do I perform a Perl substitution on a string while keeping the original? </h2> <h4> kaybenleroll, question_id: 22836 </h4>Score: 211, Tags: {regex,perl,replace} <br><p>In Perl, what is a good way to perform a replacement on a string using a regular expression and store the value in a different variable, without changing the original?</p>
 
 <p>I usually just copy the string to a new variable then bind it to the <code>s///</code> regex that does the replacement on the new string, but I was wondering if there is a better way to do this?</p>
 
 <pre><code>$newstring = $oldstring;
 $newstring =~ s/foo/bar/g;
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 22896 John Siracusa: </h3><p>This is the idiom I've always used to get a modified copy of a string without changing the original:</p>
+------------------------------------------------------------------ <br><h3> John Siracusa, Id: 22896, Score: 300: </h3><p>This is the idiom I've always used to get a modified copy of a string without changing the original:</p>
 <pre><code>(my $newstring = $oldstring) =~ s/foo/bar/g;
 </code></pre>
 <p>In perl 5.14.0 or later, you can use the new <code>/r</code> <a href="https://metacpan.org/pod/release/FLORA/perl-5.14.2/pod/perl5140delta.pod#Non-destructive-substitution" rel="noreferrer">non-destructive substitution modifier</a>:</p>
@@ -16,7 +16,7 @@ $newstring =~ s/foo/bar/g;
 The above solutions work without <code>g</code> too. They also work with any other modifiers.</p>
 <p><strong>SEE ALSO:</strong><br />
 <a href="https://perldoc.perl.org/perlrequick" rel="noreferrer"><code>perldoc perlrequick</code>: Perl regular expressions quick start</a></p>
-<h4> Comment 16669 ysth: </h4>Whether or not under use strict.  Minimal scoping of variables++<br><h4> Comment 71941754 ikegami: </h4>@Benoit, I believe you mean <code>s&#47;foo&#47;bar&#47; for my $newstring = $oldstring;</code> It works, but it&#39;s far weirder.<br><h4> Comment 35841021 Benny: </h4>I was wondering if something like <code>my $new = $_ for $old =~ s&#47;foo&#47;bar;</code> would work?<br>------------------------------------------------------------------ <br><h3> Answer 24090 Pat: </h3><p>The statement:</p>
+<h4> ysth, Comment 16669 Score: 6: </h4>Whether or not under use strict.  Minimal scoping of variables++<br><h4> ikegami, Comment 71941754 Score: 2: </h4>@Benoit, I believe you mean <code>s&#47;foo&#47;bar&#47; for my $newstring = $oldstring;</code> It works, but it&#39;s far weirder.<br><h4> Benny, Comment 35841021 Score: 0: </h4>I was wondering if something like <code>my $new = $_ for $old =~ s&#47;foo&#47;bar;</code> would work?<br>------------------------------------------------------------------ <br><h3> Pat, Id: 24090, Score: 51: </h3><p>The statement:</p>
 
 <pre><code>(my $newstring = $oldstring) =~ s/foo/bar/g;
 </code></pre>
@@ -33,16 +33,16 @@ $newstring =~ s/foo/bar/g;
 #...
 my $newstring = $oldstring =~ s/foo/bar/gr;
 </code></pre>
-<h4> Comment 40310517 mareoraft: </h4>Did you forget the <code>g</code> in your top regex?<br>------------------------------------------------------------------ <br><h3> Answer 62500 Sam Kington: </h3><p>Under <code>use strict</code>, say:</p>
+<h4> mareoraft, Comment 40310517 Score: 3: </h4>Did you forget the <code>g</code> in your top regex?<br>------------------------------------------------------------------ <br><h3> Sam Kington, Id: 62500, Score: 26: </h3><p>Under <code>use strict</code>, say:</p>
 
 <pre><code>(my $new = $original) =~ s/foo/bar/;
 </code></pre>
 
 <p>instead.</p>
------------------------------------------------------------------- <br><h3> Answer 94557 Josh Millard: </h3><p>The one-liner solution is more useful as a shibboleth than good code; good Perl coders will know it and understand it, but it's much less transparent and readable than the two-line copy-and-modify couplet you're starting with.</p>
+------------------------------------------------------------------ <br><h3> Josh Millard, Id: 94557, Score: 14: </h3><p>The one-liner solution is more useful as a shibboleth than good code; good Perl coders will know it and understand it, but it's much less transparent and readable than the two-line copy-and-modify couplet you're starting with.</p>
 
 <p>In other words, a good way to do this is the way you're <i>already</i> doing it.  Unnecessary concision at the cost of readability isn't a win.</p>
-<h4> Comment 20969 brian d foy: </h4>You might think it&#39;s unnecessary concision, but having to type a variable name twice to use it once is twice the number of points of failure. It&#39;s perfectly readable to people who know the language, and it&#39;s even in our &lt;i&gt;Learning Perl&lt;/i&gt; course.<br><h4> Comment 17100 Josh Millard: </h4>The one line version, &lt;i&gt;if correctly executed&lt;/i&gt;, isn&#39;t subject, true.  But that&#39;s a separate issue.<br><h4> Comment 16671 ysth: </h4>Ah, but the one line version isn&#39;t subject to the error in the question of unintentionally modifying the wrong string.<br>------------------------------------------------------------------ <br><h3> Answer 44172761 textral: </h3><p>Another pre-5.14 solution: <a href="http://www.perlmonks.org/?node_id=346719" rel="nofollow noreferrer">http://www.perlmonks.org/?node_id=346719</a> (see japhy's post)</p>
+<h4> brian d foy, Comment 20969 Score: 13: </h4>You might think it&#39;s unnecessary concision, but having to type a variable name twice to use it once is twice the number of points of failure. It&#39;s perfectly readable to people who know the language, and it&#39;s even in our &lt;i&gt;Learning Perl&lt;/i&gt; course.<br><h4> Josh Millard, Comment 17100 Score: 1: </h4>The one line version, &lt;i&gt;if correctly executed&lt;/i&gt;, isn&#39;t subject, true.  But that&#39;s a separate issue.<br><h4> ysth, Comment 16671 Score: 0: </h4>Ah, but the one line version isn&#39;t subject to the error in the question of unintentionally modifying the wrong string.<br>------------------------------------------------------------------ <br><h3> textral, Id: 44172761, Score: 2: </h3><p>Another pre-5.14 solution: <a href="http://www.perlmonks.org/?node_id=346719" rel="nofollow noreferrer">http://www.perlmonks.org/?node_id=346719</a> (see japhy's post)</p>
 
 <p>As his approach uses <code>map</code>, it also works well for arrays, but requires cascading <code>map</code> to produce a temporary array (otherwise the original would be modified):</p>
 
@@ -50,7 +50,7 @@ my $newstring = $oldstring =~ s/foo/bar/gr;
 my @list = map { s/this/that/; $_ } map { $_ } @orig;
 # @orig unmodified
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 55786 Tim Kennedy: </h3><p>If you write Perl with <code>use strict;</code>, then you'll find that the one line syntax isn't valid, even when declared.</p>
+------------------------------------------------------------------ <br><h3> Tim Kennedy, Id: 55786, Score: 1: </h3><p>If you write Perl with <code>use strict;</code>, then you'll find that the one line syntax isn't valid, even when declared.</p>
 
 <p>With:</p>
 
@@ -76,7 +76,7 @@ $newstring =~ s/foo/bar/g;
 print "$oldstring","\n";
 print "$newstring","\n";
 </code></pre>
-<h4> Comment 1466011 glenn jackman: </h4>If you <code>use warnings;</code> instead of <code>-w</code>, you gain greater control: for instance, if you want to temporarily turn off warnings in a block of code.<br>------------------------------------------------------------------ <br><h3> Answer 35829163 JoGotta: </h3><p>I hate foo and bar .. who dreamed up these non descriptive terms in programming anyway?</p>
+<h4> glenn jackman, Comment 1466011 Score: 3: </h4>If you <code>use warnings;</code> instead of <code>-w</code>, you gain greater control: for instance, if you want to temporarily turn off warnings in a block of code.<br>------------------------------------------------------------------ <br><h3> JoGotta, Id: 35829163, Score: 1: </h3><p>I hate foo and bar .. who dreamed up these non descriptive terms in programming anyway?</p>
 
 <pre><code>my $oldstring = "replace donotreplace replace donotreplace replace donotreplace";
 
@@ -86,4 +86,4 @@ $newstring =~ s/replace/newword/g; # inplace replacement
 print $newstring;
 %: newword donotreplace newword donotreplace newword donotreplace
 </code></pre>
-<h4> Comment 91809732 Jon: </h4>See... if JoGotta had used the traditional and familiar <code>foo</code> and <code>bar</code>, his answer would have been accurate. Proving, once again, customs exist for a reason and lessons are only learned the hard way.  ;)<br><h4> Comment 61182432 Teepeemm: </h4>How is this different from the original?  (And I think you want <code>=~ s</code>.)<br><h4> Comment 79577577 Pascal: </h4>Clbuttic mistake.  The actual output of that code is <code>newword donotnewword newword donotnewword newword donotnewword</code><br><h4> Comment 118964180 Peter Mortensen: </h4><a href="https://en.wikipedia.org/wiki/Scunthorpe_problem" rel="nofollow noreferrer">Clbuttic reference</a><br><h4> Comment 118964611 Peter Mortensen: </h4>Who? Wikipedia has <a href="https://en.wikipedia.org/wiki/Foobar#History_and_etymology" rel="nofollow noreferrer">part of the answer</a>. Incl.: <i>&quot;The etymology of foobar could be derived from the military slang from the World War II era FUBAR, which was bowdlerised to foobar. The word foo on its own was used earlier. ... The first known use of the terms in print in a programming context appears in a 1965 edition of MIT&#39;s Tech Engineering News.&quot;</i><br>------------------------------------------------------------------ <br><h3> Answer 67513243 ngn999: </h3><p>if I just use this in oneliner, how about, <code>sprintf(&quot;%s&quot;, $oldstring)</code></p>
+<h4> Jon, Comment 91809732 Score: 3: </h4>See... if JoGotta had used the traditional and familiar <code>foo</code> and <code>bar</code>, his answer would have been accurate. Proving, once again, customs exist for a reason and lessons are only learned the hard way.  ;)<br><h4> Teepeemm, Comment 61182432 Score: 2: </h4>How is this different from the original?  (And I think you want <code>=~ s</code>.)<br><h4> Pascal, Comment 79577577 Score: 2: </h4>Clbuttic mistake.  The actual output of that code is <code>newword donotnewword newword donotnewword newword donotnewword</code><br><h4> Peter Mortensen, Comment 118964180 Score: 0: </h4><a href="https://en.wikipedia.org/wiki/Scunthorpe_problem" rel="nofollow noreferrer">Clbuttic reference</a><br><h4> Peter Mortensen, Comment 118964611 Score: 0: </h4>Who? Wikipedia has <a href="https://en.wikipedia.org/wiki/Foobar#History_and_etymology" rel="nofollow noreferrer">part of the answer</a>. Incl.: <i>&quot;The etymology of foobar could be derived from the military slang from the World War II era FUBAR, which was bowdlerised to foobar. The word foo on its own was used earlier. ... The first known use of the terms in print in a programming context appears in a 1965 edition of MIT&#39;s Tech Engineering News.&quot;</i><br>------------------------------------------------------------------ <br><h3> ngn999, Id: 67513243, Score: 1: </h3><p>if I just use this in oneliner, how about, <code>sprintf(&quot;%s&quot;, $oldstring)</code></p>

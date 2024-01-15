@@ -1,12 +1,12 @@
- <h2> Title: How do I pad a string with zeroes? </h2> <h3> Faisal, question_id: 339007 </h3>Score: 2150, Tags: {python,string,zero-padding} <br><p>How do I pad a numeric string with zeroes to the left, so that the string has a specific length?</p>
------------------------------------------------------------------- <br><h3> Answer 63089932 NBStephens: </h3><p>I am adding how to use a int from a length of a string within an f-string because it didn't appear to be covered:</p>
+ <h2> Title: How do I pad a string with zeroes? </h2> <h4> Faisal, question_id: 339007 </h4>Score: 2150, Tags: {python,string,zero-padding} <br><p>How do I pad a numeric string with zeroes to the left, so that the string has a specific length?</p>
+------------------------------------------------------------------ <br><h3> NBStephens, Id: 63089932, Score: 18: </h3><p>I am adding how to use a int from a length of a string within an f-string because it didn't appear to be covered:</p>
 <pre><code>&gt;&gt;&gt; pad_number = len(&quot;this_string&quot;)
 11
 &gt;&gt;&gt; s = f&quot;{1:0{pad_number}}&quot; }
 &gt;&gt;&gt; s
 '00000000001'
 </code></pre>
-<h4> Comment 112968904 runDOSrun: </h4>it&#39;s covered in this answer: <a href="https://stackoverflow.com/a/57360675/860196">stackoverflow.com/a/57360675/860196</a><br>------------------------------------------------------------------ <br><h3> Answer 339013 Harley Holcombe: </h3><p>To pad strings:</p>
+<h4> runDOSrun, Comment 112968904 Score: 0: </h4>it&#39;s covered in this answer: <a href="https://stackoverflow.com/a/57360675/860196">stackoverflow.com/a/57360675/860196</a><br>------------------------------------------------------------------ <br><h3> Harley Holcombe, Id: 339013, Score: 3355: </h3><p>To pad strings:</p>
 <pre><code>&gt;&gt;&gt; n = '4'
 &gt;&gt;&gt; print(n.zfill(3))
 004
@@ -27,13 +27,13 @@
 004
 </code></pre>
 <p><a href="https://docs.python.org/3/library/string.html#format-string-syntax" rel="noreferrer">String formatting documentation</a>.</p>
-<h4> Comment 101420604 Motti: </h4>How could you have not used the number 7 for your example?!? 😲<br><h4> Comment 53483220 Jason R. Coombs: </h4>Comments <code>python &gt;= 2.6</code> are incorrect. That syntax doesn&#39;t work on <code>python &gt;= 3</code>. You could change it to <code>python &lt; 3</code>, but may I suggest instead always using parenthesis and omitting the comments altogether (encouraging recommended usage)?<br><h4> Comment 63950557 Dragon: </h4>Note that you don&#39;t need to number your format strings: <code>&#39;{:03d} {:03d}&#39;.format(1, 2)</code> implicitly assigns the values in order.<br><h4> Comment 99112245 Anders Rabo Thorbeck: </h4>Can any of these approaches be adapted to work with a variable number of zeroes?<br><h4> Comment 95530895 ShadowRanger: </h4>@JasonR.Coombs: I assume you meant the <code>print</code> statement, when it should be a <code>print</code> function on Python 3? I edited in the parens; since only one thing is being printed, it works identically now on Py2 and Py3.<br><h4> Comment 124160896 Jasper: </h4>@PhaniRithvij: Use another set of curly brackets: print(f&#39;{i:0{n}d}&#39;) where i is your value and n is the amount of characters you want. Or when using format: &#39;{i:0{n}d}&#39;.format(i=4, n=6)  or the less readable version without labels: &#39;{:0{}d}&#39;.format(4, 6)<br><h4> Comment 127730137 PM 2Ring: </h4>@Motti It&#39;s probably just a random number <a href="https://xkcd.com/221/" rel="nofollow noreferrer">xkcd.com/221</a><br><h4> Comment 135870622 Roger Keays: </h4>also: <code>str(4).zfill(3)</code><br>------------------------------------------------------------------ <br><h3> Answer 339024 Paul D. Eden: </h3><p>Just use the <a href="https://docs.python.org/3/library/stdtypes.html#str.rjust" rel="noreferrer"><code>rjust</code></a> method of the string object.</p>
+<h4> Motti, Comment 101420604 Score: 11: </h4>How could you have not used the number 7 for your example?!? 😲<br><h4> Jason R. Coombs, Comment 53483220 Score: 9: </h4>Comments <code>python &gt;= 2.6</code> are incorrect. That syntax doesn&#39;t work on <code>python &gt;= 3</code>. You could change it to <code>python &lt; 3</code>, but may I suggest instead always using parenthesis and omitting the comments altogether (encouraging recommended usage)?<br><h4> Dragon, Comment 63950557 Score: 5: </h4>Note that you don&#39;t need to number your format strings: <code>&#39;{:03d} {:03d}&#39;.format(1, 2)</code> implicitly assigns the values in order.<br><h4> Anders Rabo Thorbeck, Comment 99112245 Score: 4: </h4>Can any of these approaches be adapted to work with a variable number of zeroes?<br><h4> ShadowRanger, Comment 95530895 Score: 1: </h4>@JasonR.Coombs: I assume you meant the <code>print</code> statement, when it should be a <code>print</code> function on Python 3? I edited in the parens; since only one thing is being printed, it works identically now on Py2 and Py3.<br><h4> Jasper, Comment 124160896 Score: 1: </h4>@PhaniRithvij: Use another set of curly brackets: print(f&#39;{i:0{n}d}&#39;) where i is your value and n is the amount of characters you want. Or when using format: &#39;{i:0{n}d}&#39;.format(i=4, n=6)  or the less readable version without labels: &#39;{:0{}d}&#39;.format(4, 6)<br><h4> PM 2Ring, Comment 127730137 Score: 1: </h4>@Motti It&#39;s probably just a random number <a href="https://xkcd.com/221/" rel="nofollow noreferrer">xkcd.com/221</a><br><h4> Roger Keays, Comment 135870622 Score: 0: </h4>also: <code>str(4).zfill(3)</code><br>------------------------------------------------------------------ <br><h3> Paul D. Eden, Id: 339024, Score: 484: </h3><p>Just use the <a href="https://docs.python.org/3/library/stdtypes.html#str.rjust" rel="noreferrer"><code>rjust</code></a> method of the string object.</p>
 <p>This example creates a 10-character length string, padding as necessary:</p>
 <pre><code>&gt;&gt;&gt; s = 'test'
 &gt;&gt;&gt; s.rjust(10, '0')
 &gt;&gt;&gt; '000000test'
 </code></pre>
-<h4> Comment 126976665 Neil: </h4>@StanislavKoncebovski strings are immutable in Python. The value of a string will always remain unchanged no matter what you do to it and you always have to reassign if you want to update the variable to reference the new string. This has nothing to do with rjust.<br><h4> Comment 127177142 Stanislav Koncebovski: </h4>@Paul D.Eden You may be right theoretically, but I checked it again, and yes, if you do not assign like t = t.rjust(10, &#39;0&#39;) you will not obtain &#39;000000test&#39; in t. My assertion is based on a test. I am using Python 3.7.<br><h4> Comment 126239674 Stanislav Koncebovski: </h4>In my opinion, it should be &#39;t = t.rjust(10, &#39;0&#39;), otherwise the value of t remains unchanged (at least for me)<br>------------------------------------------------------------------ <br><h3> Answer 339012 Konrad Rudolph: </h3><p>Besides <code>zfill</code>, you can use general string formatting:</p>
+<h4> Neil, Comment 126976665 Score: 3: </h4>@StanislavKoncebovski strings are immutable in Python. The value of a string will always remain unchanged no matter what you do to it and you always have to reassign if you want to update the variable to reference the new string. This has nothing to do with rjust.<br><h4> Stanislav Koncebovski, Comment 127177142 Score: 0: </h4>@Paul D.Eden You may be right theoretically, but I checked it again, and yes, if you do not assign like t = t.rjust(10, &#39;0&#39;) you will not obtain &#39;000000test&#39; in t. My assertion is based on a test. I am using Python 3.7.<br><h4> Stanislav Koncebovski, Comment 126239674 Score: 0: </h4>In my opinion, it should be &#39;t = t.rjust(10, &#39;0&#39;), otherwise the value of t remains unchanged (at least for me)<br>------------------------------------------------------------------ <br><h3> Konrad Rudolph, Id: 339012, Score: 217: </h3><p>Besides <code>zfill</code>, you can use general string formatting:</p>
 
 <pre class="lang-py prettyprint-override"><code>print(f'{number:05d}') # (since Python 3.6), or
 print('{:05d}'.format(number)) # or
@@ -43,7 +43,7 @@ print(format(number, '05d'))
 </code></pre>
 
 <p>Documentation for <a href="https://docs.python.org/3/library/string.html#string-formatting" rel="noreferrer">string formatting</a> and <a href="https://docs.python.org/3/reference/lexical_analysis.html#f-strings" rel="noreferrer">f-strings</a>.</p>
-<h4> Comment 99687165 Konrad Rudolph: </h4>@LarsH Well it’s notable that the link in my answer originally pointed to <code>%</code> formatting. It now points to <code>str.format</code> formatting. <i>I did not change the link!</i> Rather, the Python documentation website behind that link was rewritten. Apart from that, the <a href="https://docs.python.org/2.7/library/stdtypes.html?highlight=str%20format#str.format" rel="nofollow noreferrer">documentation used to have stronger wording</a>, and literally states that <code>str.format</code> “should be preferred to the <code>%</code> formatting”, just as I wrote in the comment you quoted.<br><h4> Comment 99686467 LarsH: </h4>@Konrad: &quot;The documentation, however, says to use format instead.&quot; I know I&#39;m late to the party, but I&#39;d like to see what you mean by this. The documentation I see (<a href="https://docs.python.org/3/library/stdtypes.html#old-string-formatting" rel="nofollow noreferrer">docs.python.org/3/library/stdtypes.html#old-string-formatti&zwnj;&#8203;ng</a>) says using <code>format</code> or other alternatives &quot;may help avoid [aforementioned] errors&quot; associated with <code>%</code> interpolation. That&#39;s not very robust &quot;deprecation.&quot;<br>------------------------------------------------------------------ <br><h3> Answer 24386708 Cees Timmerman: </h3><p>For Python 3.6+ using <a href="https://docs.python.org/3/reference/lexical_analysis.html#f-strings" rel="noreferrer">f-strings</a>:</p>
+<h4> Konrad Rudolph, Comment 99687165 Score: 1: </h4>@LarsH Well it’s notable that the link in my answer originally pointed to <code>%</code> formatting. It now points to <code>str.format</code> formatting. <i>I did not change the link!</i> Rather, the Python documentation website behind that link was rewritten. Apart from that, the <a href="https://docs.python.org/2.7/library/stdtypes.html?highlight=str%20format#str.format" rel="nofollow noreferrer">documentation used to have stronger wording</a>, and literally states that <code>str.format</code> “should be preferred to the <code>%</code> formatting”, just as I wrote in the comment you quoted.<br><h4> LarsH, Comment 99686467 Score: 0: </h4>@Konrad: &quot;The documentation, however, says to use format instead.&quot; I know I&#39;m late to the party, but I&#39;d like to see what you mean by this. The documentation I see (<a href="https://docs.python.org/3/library/stdtypes.html#old-string-formatting" rel="nofollow noreferrer">docs.python.org/3/library/stdtypes.html#old-string-formatti&zwnj;&#8203;ng</a>) says using <code>format</code> or other alternatives &quot;may help avoid [aforementioned] errors&quot; associated with <code>%</code> interpolation. That&#39;s not very robust &quot;deprecation.&quot;<br>------------------------------------------------------------------ <br><h3> Cees Timmerman, Id: 24386708, Score: 207: </h3><p>For Python 3.6+ using <a href="https://docs.python.org/3/reference/lexical_analysis.html#f-strings" rel="noreferrer">f-strings</a>:</p>
 <pre><code>&gt;&gt;&gt; i = 1
 &gt;&gt;&gt; f&quot;{i:0&gt;2}&quot;  # Works for both numbers and strings.
 '01'
@@ -57,7 +57,7 @@ print(format(number, '05d'))
 '01'
 </code></pre>
 <p>Those <a href="https://docs.python.org/3/library/string.html#format-specification-mini-language" rel="noreferrer">standard format specifiers</a> are <code>[[fill]align][minimumwidth]</code> and <code>[0][minimumwidth]</code>.</p>
-<h4> Comment 131814641 Good Pen: </h4>Thx. Where can we find the official doc of things like <code>f&quot;{i:0&gt;2}&quot;</code> ? The only official doc about f-string I can find is <a href="https://peps.python.org/pep-0498/#format-specifiers" rel="nofollow noreferrer">peps.python.org/pep-0498/#format-specifiers</a>, but I get no result when I type <code>ctrl-f</code> then type in <code>pad</code> or <code>fill</code>.<br><h4> Comment 131836433 Cees Timmerman: </h4>@GoodPen Unfortunately, Python docs never caught up to PHP docs ease, but i found it at <a href="https://peps.python.org/pep-3101/#standard-format-specifiers" rel="nofollow noreferrer">peps.python.org/pep-3101/#standard-format-specifiers</a><br><h4> Comment 131866961 Good Pen: </h4>Now I find it by  <code>pydoc FORMATING</code><br>------------------------------------------------------------------ <br><h3> Answer 14269071 Victor Barrantes: </h3><pre><code>&gt;&gt;&gt; '99'.zfill(5)
+<h4> Good Pen, Comment 131814641 Score: 0: </h4>Thx. Where can we find the official doc of things like <code>f&quot;{i:0&gt;2}&quot;</code> ? The only official doc about f-string I can find is <a href="https://peps.python.org/pep-0498/#format-specifiers" rel="nofollow noreferrer">peps.python.org/pep-0498/#format-specifiers</a>, but I get no result when I type <code>ctrl-f</code> then type in <code>pad</code> or <code>fill</code>.<br><h4> Cees Timmerman, Comment 131836433 Score: 0: </h4>@GoodPen Unfortunately, Python docs never caught up to PHP docs ease, but i found it at <a href="https://peps.python.org/pep-3101/#standard-format-specifiers" rel="nofollow noreferrer">peps.python.org/pep-3101/#standard-format-specifiers</a><br><h4> Good Pen, Comment 131866961 Score: 0: </h4>Now I find it by  <code>pydoc FORMATING</code><br>------------------------------------------------------------------ <br><h3> Victor Barrantes, Id: 14269071, Score: 75: </h3><pre><code>&gt;&gt;&gt; '99'.zfill(5)
 '00099'
 &gt;&gt;&gt; '99'.rjust(5,'0')
 '00099'
@@ -68,7 +68,7 @@ print(format(number, '05d'))
 <pre><code>&gt;&gt;&gt; '99'.ljust(5,'0')
 '99000'
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 6196350 johnsyweb: </h3><p><code>str(n).zfill(width)</code> will work with <code>string</code>s, <code>int</code>s, <code>float</code>s... and is Python 2.<em>x</em> and 3.<em>x</em> compatible:</p>
+------------------------------------------------------------------ <br><h3> johnsyweb, Id: 6196350, Score: 45: </h3><p><code>str(n).zfill(width)</code> will work with <code>string</code>s, <code>int</code>s, <code>float</code>s... and is Python 2.<em>x</em> and 3.<em>x</em> compatible:</p>
 
 <pre><code>&gt;&gt;&gt; n = 3
 &gt;&gt;&gt; str(n).zfill(5)
@@ -80,7 +80,7 @@ print(format(number, '05d'))
 &gt;&gt;&gt; str(n).zfill(5)
 '003.0'
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 51128565 Russia Must Remove Putin: </h3><blockquote>
+------------------------------------------------------------------ <br><h3> Russia Must Remove Putin, Id: 51128565, Score: 34: </h3><blockquote>
   <h2>What is the most pythonic way to pad a numeric string with zeroes to the left, i.e., so the numeric string has a specific length?</h2>
 </blockquote>
 
@@ -226,7 +226,7 @@ pad(PyObject *self, Py_ssize_t left, Py_ssize_t right, char fill)
 &gt;&gt;&gt; '-foo'.zfill(10)
 '-000000foo'
 </code></pre>
-<h4> Comment 99201587 Russia Must Remove Putin: </h4>@eladsilver depends on your intent, keeping in mind the behavior with <code>+</code> and <code>-</code>, and I added a link to the docs!<br><h4> Comment 99199497 elad silver: </h4>for the performance, are there cases where f strings are better including  use cases for python2 vs python3? also, I think as zfill is not common it would help your answer to have a link to the docs<br>------------------------------------------------------------------ <br><h3> Answer 38353814 elad silver: </h3><p>For the ones who came here to understand and not just a quick answer.
+<h4> Russia Must Remove Putin, Comment 99201587 Score: 1: </h4>@eladsilver depends on your intent, keeping in mind the behavior with <code>+</code> and <code>-</code>, and I added a link to the docs!<br><h4> elad silver, Comment 99199497 Score: 0: </h4>for the performance, are there cases where f strings are better including  use cases for python2 vs python3? also, I think as zfill is not common it would help your answer to have a link to the docs<br>------------------------------------------------------------------ <br><h3> elad silver, Id: 38353814, Score: 32: </h3><p>For the ones who came here to understand and not just a quick answer.
 I do these especially for time strings:</p>
 
 <pre><code>hour = 4
@@ -251,7 +251,7 @@ minute = 3
   
   <p>":" symbols the format_spec</p>
 </blockquote>
------------------------------------------------------------------- <br><h3> Answer 57360675 ruohola: </h3><p>When using Python <code>&gt;= 3.6</code>, the cleanest way is to use <a href="https://docs.python.org/3/reference/lexical_analysis.html#f-strings" rel="noreferrer">f-strings</a> with <a href="https://docs.python.org/3/library/string.html#formatspec" rel="noreferrer">string formatting</a>:</p>
+------------------------------------------------------------------ <br><h3> ruohola, Id: 57360675, Score: 30: </h3><p>When using Python <code>&gt;= 3.6</code>, the cleanest way is to use <a href="https://docs.python.org/3/reference/lexical_analysis.html#f-strings" rel="noreferrer">f-strings</a> with <a href="https://docs.python.org/3/library/string.html#formatspec" rel="noreferrer">string formatting</a>:</p>
 
 <pre><code>&gt;&gt;&gt; s = f"{1:08}"  # inline with int
 &gt;&gt;&gt; s
@@ -292,14 +292,14 @@ minute = 3
 &gt;&gt;&gt; f"{'-1':0&gt;8}"
 '000000-1'
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 68730826 user1315621: </h3><p>For numbers:</p>
+------------------------------------------------------------------ <br><h3> user1315621, Id: 68730826, Score: 23: </h3><p>For numbers:</p>
 <pre><code>i = 12
 print(f&quot;{i:05d}&quot;)
 </code></pre>
 <p>Output</p>
 <pre><code>00012
 </code></pre>
-<h4> Comment 122400061 Andr&#233; Aichert: </h4>I&#39;d rather hope you&#39;ll get &#39;00002&#39;. Also an example with i&gt;10 might have been a good idea. Nonetheless, this helped me.<br><h4> Comment 132397982 user1315621: </h4>I updated my answer based on your suggestions. Thanks!<br>------------------------------------------------------------------ <br><h3> Answer 339019 Peter Rowell: </h3><pre><code>width = 10
+<h4> Andr&#233; Aichert, Comment 122400061 Score: 1: </h4>I&#39;d rather hope you&#39;ll get &#39;00002&#39;. Also an example with i&gt;10 might have been a good idea. Nonetheless, this helped me.<br><h4> user1315621, Comment 132397982 Score: 0: </h4>I updated my answer based on your suggestions. Thanks!<br>------------------------------------------------------------------ <br><h3> Peter Rowell, Id: 339019, Score: 19: </h3><pre><code>width = 10
 x = 5
 print "%0*d" % (width, x)
 &gt; 0000000005
@@ -315,7 +315,7 @@ print "%0*d" % (width, x)
 </code></pre>
 
 <p>I.e. <code>print()</code> is now a function, not a statement. Note that I still prefer the Old School <code>printf()</code> style because, IMNSHO, it reads better, and because, um, I've been using that notation since January, 1980. Something ... old dogs .. something something ... new tricks.</p>
------------------------------------------------------------------- <br><h3> Answer 6196270 user221014: </h3><p>For zip codes saved as integers:</p>
+------------------------------------------------------------------ <br><h3> user221014, Id: 6196270, Score: 7: </h3><p>For zip codes saved as integers:</p>
 
 <pre><code>&gt;&gt;&gt; a = 6340
 &gt;&gt;&gt; b = 90210
@@ -324,7 +324,7 @@ print "%0*d" % (width, x)
 &gt;&gt;&gt; print '%05d' % b
 90210
 </code></pre>
-<h4> Comment 7379179 user221014: </h4>You are correct, and I like your suggestion with zfill better anyhow<br>------------------------------------------------------------------ <br><h3> Answer 44800566 Simon Steinberger: </h3><p>Quick timing comparison:</p>
+<h4> user221014, Comment 7379179 Score: 1: </h4>You are correct, and I like your suggestion with zfill better anyhow<br>------------------------------------------------------------------ <br><h3> Simon Steinberger, Id: 44800566, Score: 5: </h3><p>Quick timing comparison:</p>
 
 <pre><code>setup = '''
 from random import randint
@@ -370,14 +370,14 @@ print timeit.Timer("test_7()", setup=setup).repeat(3, 900000)
 </code></pre>
 
 <p>I've made different tests of different repetitions. The differences are not huge, but in all tests, the <code>zfill</code> solution was fastest.</p>
------------------------------------------------------------------- <br><h3> Answer 70949336 Lafftar: </h3><p>If you're looking to pad an integer, and limit the significant figures at the same time (with f strings):</p>
+------------------------------------------------------------------ <br><h3> Lafftar, Id: 70949336, Score: 5: </h3><p>If you're looking to pad an integer, and limit the significant figures at the same time (with f strings):</p>
 <pre class="lang-py prettyprint-override"><code>a = 4.432
 &gt;&gt; 4.432
 a = f'{a:04.1f}'
 &gt;&gt; '04.4'
 </code></pre>
 <p><code>f'{a:04.1f}'</code> this translates to 1 decimal/(float) point, left pad the digit until 4 characters total.</p>
------------------------------------------------------------------- <br><h3> Answer 55988138 kmario23: </h3><p>Another approach would be to use a list comprehension with a condition checking for lengths. Below is a demonstration:</p>
+------------------------------------------------------------------ <br><h3> kmario23, Id: 55988138, Score: 1: </h3><p>Another approach would be to use a list comprehension with a condition checking for lengths. Below is a demonstration:</p>
 
 <pre><code># input list of strings that we want to prepend zeros
 In [71]: list_of_str = ["101010", "10101010", "11110", "0000"]
@@ -386,7 +386,7 @@ In [71]: list_of_str = ["101010", "10101010", "11110", "0000"]
 In [83]: ["0"*(8-len(s)) + s if len(s) &lt; desired_len else s for s in list_of_str]
 Out[83]: ['00101010', '10101010', '00011110', '00000000']
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 61518229 zzfima: </h3><p>Its ok too:</p>
+------------------------------------------------------------------ <br><h3> zzfima, Id: 61518229, Score: 2: </h3><p>Its ok too:</p>
 
 <pre><code> h = 2
  m = 7
@@ -395,12 +395,12 @@ Out[83]: ['00101010', '10101010', '00011110', '00000000']
 </code></pre>
 
 <p>so output will be: "02:07:03"</p>
------------------------------------------------------------------- <br><h3> Answer 16408018 J Lacar: </h3><p>You could also repeat "0", prepend it to <code>str(n)</code> and get the rightmost width slice. Quick and dirty little expression.</p>
+------------------------------------------------------------------ <br><h3> J Lacar, Id: 16408018, Score: 1: </h3><p>You could also repeat "0", prepend it to <code>str(n)</code> and get the rightmost width slice. Quick and dirty little expression.</p>
 
 <pre><code>def pad_left(n, width, pad="0"):
     return ((pad * width) + str(n))[-width:]
 </code></pre>
-<h4> Comment 23523988 J Lacar: </h4>This only works for positive numbers though. It gets a little more complicated if you want negatives too. But this expression is good for quick and dirty work, if you don&#39;t mind that kind of thing.<br><h4> Comment 102507330 TastySlowCooker: </h4>I have absolutely no idea why this is downvoted. If it&#39;s cause it doesn&#39;t work on negative numbers fair enough, but the overwhelming reason one would left pad with zeros is for id numbers. If you have negative id numbers I think you have bigger problems... are you expecting your pad to be of the form &#39;00000-1234&#39;? or &#39;-000001234&#39;? Honestly given the question this answer works, it&#39;s simple, it&#39;s clean, it&#39;s extensible. It may not be zfill but if it answers the question it should be upvoted.<br>------------------------------------------------------------------ <br><h3> Answer 62827644 Julien Faujanet: </h3><p>I made a function :</p>
+<h4> J Lacar, Comment 23523988 Score: 1: </h4>This only works for positive numbers though. It gets a little more complicated if you want negatives too. But this expression is good for quick and dirty work, if you don&#39;t mind that kind of thing.<br><h4> TastySlowCooker, Comment 102507330 Score: 1: </h4>I have absolutely no idea why this is downvoted. If it&#39;s cause it doesn&#39;t work on negative numbers fair enough, but the overwhelming reason one would left pad with zeros is for id numbers. If you have negative id numbers I think you have bigger problems... are you expecting your pad to be of the form &#39;00000-1234&#39;? or &#39;-000001234&#39;? Honestly given the question this answer works, it&#39;s simple, it&#39;s clean, it&#39;s extensible. It may not be zfill but if it answers the question it should be upvoted.<br>------------------------------------------------------------------ <br><h3> Julien Faujanet, Id: 62827644, Score: 0: </h3><p>I made a function :</p>
 <pre><code>def PadNumber(number, n_pad, add_prefix=None):
     number_str = str(number)
     paded_number = number_str.zfill(n_pad)

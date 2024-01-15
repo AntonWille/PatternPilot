@@ -1,4 +1,4 @@
- <h2> Title: What does ** (double star/asterisk) and * (star/asterisk) do for parameters? </h2> <h3> Todd, question_id: 36901 </h3>Score: 3360, Tags: {python,syntax,parameter-passing,variadic-functions,argument-unpacking} <br><p>What do <code>*args</code> and <code>**kwargs</code> mean in these function definitions?</p>
+ <h2> Title: What does ** (double star/asterisk) and * (star/asterisk) do for parameters? </h2> <h4> Todd, question_id: 36901 </h4>Score: 3360, Tags: {python,syntax,parameter-passing,variadic-functions,argument-unpacking} <br><p>What do <code>*args</code> and <code>**kwargs</code> mean in these function definitions?</p>
 <pre><code>def foo(x, y, *args):
     pass
 
@@ -7,7 +7,7 @@ def bar(x, y, **kwargs):
 </code></pre>
 <hr />
 <p><sub>See <a href="https://stackoverflow.com/questions/2921847">What do ** (double star/asterisk) and * (star/asterisk) mean in a function call?</a> for the complementary question about arguments.</sub></p>
-<h4> Comment 97343204 Aran-Fey: </h4>This question is a very popular duplicate target, but unfortunately it&#39;s often used incorrectly. Keep in mind that this question asks about <b>defining functions with varargs</b> (<code>def func(*args)</code>). For a question asking what it means in function <i>calls</i> (<code>func(*[1,2])</code>) see <a href="https://stackoverflow.com/questions/5239856/1222951">here</a>. For a question asking <i>how</i> to unpack argument lists see <a href="https://stackoverflow.com/q/3480184/1222951">here</a>. For a question asking what the <code>*</code> means in <i>literals</i> (<code>[*[1, 2]]</code>) see <a href="https://stackoverflow.com/q/36980992/1222951">here</a>.<br><h4> Comment 85121837 Russia Must Remove Putin: </h4>see also <a href="https://stackoverflow.com/questions/6967632/unpacking-extended-unpacking-and-nested-extended-unpacking" title="unpacking extended unpacking and nested extended unpacking">stackoverflow.com/questions/6967632/&hellip;</a><br><h4> Comment 115318596 ShadowRanger: </h4>@Aran-Fey: I think a better target for &quot;what does it mean in function calls&quot; is <a href="https://stackoverflow.com/q/2921847/364696">What does the star operator mean, in a function call?</a>. <a href="https://stackoverflow.com/questions/5239856/1222951">Your link</a> doesn&#39;t really address the use of <code>**</code>, and it a much narrower question.<br><h4> Comment 127051533 Karl Knechtel: </h4>This question is - like many very old questions - sort of backwards; usually a question should be about how to solve a problem in new code, rather than how to understand existing code. For the latter, if you are closing something else as a duplicate, consider <a href="https://stackoverflow.com/questions/1993727/expanding-tuples-into-arguments" title="expanding tuples into arguments">stackoverflow.com/questions/1993727/&hellip;</a> (although this only covers <code>*</code> and not <code>**</code>).<br><h4> Comment 128406992 Karl Knechtel: </h4><a href="https://stackoverflow.com/questions/3394835/use-of-args-and-kwargs" title="use of args and kwargs">stackoverflow.com/questions/3394835/use-of-args-and-kwargs</a> was also closed as a duplicate of this, but you might find it better than this one.<br><h4> Comment 128407014 Karl Knechtel: </h4>There&#39;s also <a href="https://stackoverflow.com/questions/23744017/how-to-pass-through-python-args-and-kwargs" title="how to pass through python args and kwargs">stackoverflow.com/questions/23744017/&hellip;</a>, covering both parameters and arguments, with both <code>*</code> and <code>**</code>, in practical situations - but not in very much detail. (Some answers here talk about arguments, but the question is not really up to par.)<br>------------------------------------------------------------------ <br><h3> Answer 36908 Peter Hoffmann: </h3><p>The <code>*args</code> and <code>**kwargs</code> are common idioms to allow an arbitrary number of arguments to functions, as described in the section <a href="http://docs.python.org/3/tutorial/controlflow.html#more-on-defining-functions" rel="noreferrer">more on defining functions</a> in the Python tutorial.</p>
+<h4> Aran-Fey, Id: 97343204 Score: 159: </h4>This question is a very popular duplicate target, but unfortunately it&#39;s often used incorrectly. Keep in mind that this question asks about <b>defining functions with varargs</b> (<code>def func(*args)</code>). For a question asking what it means in function <i>calls</i> (<code>func(*[1,2])</code>) see <a href="https://stackoverflow.com/questions/5239856/1222951">here</a>. For a question asking <i>how</i> to unpack argument lists see <a href="https://stackoverflow.com/q/3480184/1222951">here</a>. For a question asking what the <code>*</code> means in <i>literals</i> (<code>[*[1, 2]]</code>) see <a href="https://stackoverflow.com/q/36980992/1222951">here</a>.<br><h4> Russia Must Remove Putin, Id: 85121837 Score: 14: </h4>see also <a href="https://stackoverflow.com/questions/6967632/unpacking-extended-unpacking-and-nested-extended-unpacking" title="unpacking extended unpacking and nested extended unpacking">stackoverflow.com/questions/6967632/&hellip;</a><br><h4> ShadowRanger, Id: 115318596 Score: 4: </h4>@Aran-Fey: I think a better target for &quot;what does it mean in function calls&quot; is <a href="https://stackoverflow.com/q/2921847/364696">What does the star operator mean, in a function call?</a>. <a href="https://stackoverflow.com/questions/5239856/1222951">Your link</a> doesn&#39;t really address the use of <code>**</code>, and it a much narrower question.<br><h4> Karl Knechtel, Id: 127051533 Score: 1: </h4>This question is - like many very old questions - sort of backwards; usually a question should be about how to solve a problem in new code, rather than how to understand existing code. For the latter, if you are closing something else as a duplicate, consider <a href="https://stackoverflow.com/questions/1993727/expanding-tuples-into-arguments" title="expanding tuples into arguments">stackoverflow.com/questions/1993727/&hellip;</a> (although this only covers <code>*</code> and not <code>**</code>).<br><h4> Karl Knechtel, Id: 128406992 Score: 0: </h4><a href="https://stackoverflow.com/questions/3394835/use-of-args-and-kwargs" title="use of args and kwargs">stackoverflow.com/questions/3394835/use-of-args-and-kwargs</a> was also closed as a duplicate of this, but you might find it better than this one.<br><h4> Karl Knechtel, Id: 128407014 Score: 0: </h4>There&#39;s also <a href="https://stackoverflow.com/questions/23744017/how-to-pass-through-python-args-and-kwargs" title="how to pass through python args and kwargs">stackoverflow.com/questions/23744017/&hellip;</a>, covering both parameters and arguments, with both <code>*</code> and <code>**</code>, in practical situations - but not in very much detail. (Some answers here talk about arguments, but the question is not really up to par.)<br>------------------------------------------------------------------ <br><h3> Peter Hoffmann, Id: 36908, Score: 3194: </h3><p>The <code>*args</code> and <code>**kwargs</code> are common idioms to allow an arbitrary number of arguments to functions, as described in the section <a href="http://docs.python.org/3/tutorial/controlflow.html#more-on-defining-functions" rel="noreferrer">more on defining functions</a> in the Python tutorial.</p>
 <p>The <code>*args</code> will give you all positional arguments <a href="https://docs.python.org/3/tutorial/controlflow.html#arbitrary-argument-lists" rel="noreferrer">as a tuple</a>:</p>
 <pre><code>def foo(*args):
     for a in args:
@@ -70,7 +70,7 @@ foo(*baz)
 <p>A Python <code>dict</code>, semantically used for keyword argument passing, is arbitrarily ordered. However, in Python 3.6+, keyword arguments are guaranteed to remember insertion order.
 &quot;The order of elements in <code>**kwargs</code> now corresponds to the order in which keyword arguments were passed to the function.&quot; - <a href="https://docs.python.org/3/whatsnew/3.6.html" rel="noreferrer">What’s New In Python 3.6</a>.
 In fact, all dicts in CPython 3.6 will remember insertion order as an implementation detail, and this becomes standard in Python 3.7.</p>
------------------------------------------------------------------- <br><h3> Answer 36926 Lorin Hochstein: </h3><p>It's also worth noting that you can use <code>*</code> and <code>**</code> when calling functions as well. This is a shortcut that allows you to pass multiple arguments to a function directly using either a list/tuple or a dictionary. For example, if you have the following function:</p>
+------------------------------------------------------------------ <br><h3> Lorin Hochstein, Id: 36926, Score: 823: </h3><p>It's also worth noting that you can use <code>*</code> and <code>**</code> when calling functions as well. This is a shortcut that allows you to pass multiple arguments to a function directly using either a list/tuple or a dictionary. For example, if you have the following function:</p>
 
 <pre><code>def foo(x,y,z):
     print("x=" + str(x))
@@ -107,7 +107,7 @@ Traceback (most recent call last):
   File "&lt;stdin&gt;", line 1, in &lt;module&gt;
 TypeError: foo() got an unexpected keyword argument 'badnews'
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 36911 nickd: </h3><p>The single * means that there can be any number of extra positional arguments. <code>foo()</code> can be invoked like <code>foo(1,2,3,4,5)</code>. In the body of foo() param2 is a sequence containing 2-5.</p>
+------------------------------------------------------------------ <br><h3> nickd, Id: 36911, Score: 219: </h3><p>The single * means that there can be any number of extra positional arguments. <code>foo()</code> can be invoked like <code>foo(1,2,3,4,5)</code>. In the body of foo() param2 is a sequence containing 2-5.</p>
 
 <p>The double ** means there can be any number of extra named parameters. <code>bar()</code> can be invoked like <code>bar(1, a=2, b=3)</code>. In the body of bar() param2 is a dictionary containing {'a':2, 'b':3 }</p>
 
@@ -132,7 +132,7 @@ bar(1,a=2,b=3)
 1
 {'a': 2, 'b': 3}
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 26365795 Russia Must Remove Putin: </h3><blockquote>
+------------------------------------------------------------------ <br><h3> Russia Must Remove Putin, Id: 26365795, Score: 212: </h3><blockquote>
 <h1>What does <code>**</code> (double star) and <code>*</code> (star) do for parameters?</h1>
 </blockquote>
 <p>They allow for <strong>functions to be defined to accept</strong> and for <strong>users to pass</strong> any number of arguments, positional (<code>*</code>) and keyword (<code>**</code>).</p>
@@ -315,7 +315,7 @@ def quux(a, b, c=None, d=0, e=100, f=None, g=None, h=None):
     differentiating_process_quux(a,b,c,d,e,f,g,h)
 </code></pre>
 <p>And by factoring out our code, which <code>*args</code> and <code>**kwargs</code> allows us to do, we reduce lines of code, improve readability and maintainability, and have sole canonical locations for the logic in our program. If we need to change any part of this structure, we have one place in which to make each change.</p>
------------------------------------------------------------------- <br><h3> Answer 34899056 mrtechmaker: </h3><p>Let us first understand what are positional arguments and keyword arguments.
+------------------------------------------------------------------ <br><h3> mrtechmaker, Id: 34899056, Score: 66: </h3><p>Let us first understand what are positional arguments and keyword arguments.
 Below is an example of function definition with <strong>Positional arguments.</strong></p>
 
 <pre><code>def test(a,b,c):
@@ -452,7 +452,7 @@ sum(a=1,b=2,c=3,d=4) #positional args sent to function sum
 <p>In a <strong>function definition</strong> the '*' <strong>packs</strong> positional arguments into a tuple.</p>
 
 <p>In a <strong>function definition</strong> the '**' <strong>packs</strong> keyword arguments into a dictionary.</p>
-<h4> Comment 136400751 vadasambar: </h4>This is very easy to understand. Thank you. For someone coming from Golang, list/tuple packing/unpacking sounds similar to variadic parameters in Golang: <a href="https://stackoverflow.com/a/23669857/6874596">stackoverflow.com/a/23669857/6874596</a><br><h4> Comment 136404108 mrtechmaker: </h4>sure boss  always at your service :)  I love medu vadaa too :) cheers<br>------------------------------------------------------------------ <br><h3> Answer 47580283 Brad Solomon: </h3><p>This table is handy for using <code>*</code> and <code>**</code> in function <em>construction</em> and function <em>call</em>:</p>
+<h4> vadasambar, Comment 136400751 Score: 1: </h4>This is very easy to understand. Thank you. For someone coming from Golang, list/tuple packing/unpacking sounds similar to variadic parameters in Golang: <a href="https://stackoverflow.com/a/23669857/6874596">stackoverflow.com/a/23669857/6874596</a><br><h4> mrtechmaker, Comment 136404108 Score: 1: </h4>sure boss  always at your service :)  I love medu vadaa too :) cheers<br>------------------------------------------------------------------ <br><h3> Brad Solomon, Id: 47580283, Score: 47: </h3><p>This table is handy for using <code>*</code> and <code>**</code> in function <em>construction</em> and function <em>call</em>:</p>
 
 <pre><code>            In function construction         In function call
 =======================================================================
@@ -472,7 +472,7 @@ sum(a=1,b=2,c=3,d=4) #positional args sent to function sum
 <p>This really just serves to summarize Lorin Hochstein's <a href="https://stackoverflow.com/a/36926/7954504">answer</a> but I find it helpful.</p>
 
 <p>Relatedly: uses for the star/splat operators have been <a href="https://docs.python.org/3/whatsnew/3.5.html#pep-448-additional-unpacking-generalizations" rel="noreferrer">expanded</a> in Python 3</p>
-<h4> Comment 124788773 Moberg: </h4>Apparently &quot;splat&quot; is jargon for asterisk <code>*</code>. <a href="http://www.catb.org/jargon/html/S/splat.html" rel="nofollow noreferrer">catb.org/jargon/html/S/splat.html</a> &quot;Name used in many places (DEC, IBM, and others) for the asterisk (*) character (ASCII 0101010). This may derive from the ‘squashed-bug’ appearance of the asterisk on many early line printers.&quot;<br>------------------------------------------------------------------ <br><h3> Answer 59630576 Meysam Sadeghi: </h3><p><strong>TL;DR</strong></p>
+<h4> Moberg, Comment 124788773 Score: 1: </h4>Apparently &quot;splat&quot; is jargon for asterisk <code>*</code>. <a href="http://www.catb.org/jargon/html/S/splat.html" rel="nofollow noreferrer">catb.org/jargon/html/S/splat.html</a> &quot;Name used in many places (DEC, IBM, and others) for the asterisk (*) character (ASCII 0101010). This may derive from the ‘squashed-bug’ appearance of the asterisk on many early line printers.&quot;<br>------------------------------------------------------------------ <br><h3> Meysam Sadeghi, Id: 59630576, Score: 37: </h3><p><strong>TL;DR</strong></p>
 <p>Below are 6 different use cases for <code>*</code> and <code>**</code> in python programming:</p>
 <ol>
 <li><strong>To accept any number of positional arguments using <code>*args</code>:</strong> <code>def foo(*args): pass</code>, here <code>foo</code> accepts any number of positional arguments, i. e., the following calls are valid <code>foo(1)</code>, <code>foo(1, 'bar')</code></li>
@@ -487,18 +487,18 @@ sum(a=1,b=2,c=3,d=4) #positional args sent to function sum
     pass
 </code></pre>
 <p><strong>BONUS 2</strong>: <a href="https://stackoverflow.com/a/21809162/3484477">THIS ANSWER</a> to the same question also brings a new perspective, where it shares what does <code>*</code> and <code>**</code> means in a <code>function call</code>, <code>functions signature</code>, <code>for loops</code>, etc.</p>
-<h4> Comment 124788659 Moberg: </h4>One reason to use <code>&#47;</code> is that it allows you to change the names of the parameters in the function and not have to update at any place where the function is called (you can be sure that no caller of the function has used the names of the parameters to supply arguments since it isn&#39;t used).<br>------------------------------------------------------------------ <br><h3> Answer 12362812 ronak: </h3><p><code>*</code> and <code>**</code> have special usage in the function argument list. <code>*</code>
+<h4> Moberg, Comment 124788659 Score: 1: </h4>One reason to use <code>&#47;</code> is that it allows you to change the names of the parameters in the function and not have to update at any place where the function is called (you can be sure that no caller of the function has used the names of the parameters to supply arguments since it isn&#39;t used).<br>------------------------------------------------------------------ <br><h3> ronak, Id: 12362812, Score: 31: </h3><p><code>*</code> and <code>**</code> have special usage in the function argument list. <code>*</code>
 implies that the argument is a list and <code>**</code> implies that the argument
 is a dictionary. This allows functions to take arbitrary number of
 arguments</p>
------------------------------------------------------------------- <br><h3> Answer 36902 Chris Upchurch: </h3><p>From the Python documentation:</p>
+------------------------------------------------------------------ <br><h3> Chris Upchurch, Id: 36902, Score: 22: </h3><p>From the Python documentation:</p>
 
 <blockquote>
   <p>If there are more positional arguments than there are formal parameter slots, a TypeError exception is raised, unless a formal parameter using the syntax "*identifier" is present; in this case, that formal parameter receives a tuple containing the excess positional arguments (or an empty tuple if there were no excess positional arguments). </p>
   
   <p>If any keyword argument does not correspond to a formal parameter name, a TypeError exception is raised, unless a formal parameter using the syntax "**identifier" is present; in this case, that formal parameter receives a dictionary containing the excess keyword arguments (using the keywords as keys and the argument values as corresponding values), or a (new) empty dictionary if there were no excess keyword arguments. </p>
 </blockquote>
------------------------------------------------------------------- <br><h3> Answer 50461663 Miladiouss: </h3><h2>For those of you who learn by examples!</h2>
+------------------------------------------------------------------ <br><h3> Miladiouss, Id: 50461663, Score: 26: </h3><h2>For those of you who learn by examples!</h2>
 
 <ol>
 <li>The purpose of <code>*</code>  is to give you the ability to define a function that can take an arbitrary number of arguments provided as a list (e.g. <code>f(*myList)</code> ).</li>
@@ -571,7 +571,7 @@ f(myList, myDict)
 <li>You cannot use a non-optional argument twice.</li>
 <li>If applicable, <code>**</code> must come after <code>*</code>, always.</li>
 </ol>
------------------------------------------------------------------- <br><h3> Answer 51733267 ishandutta2007: </h3><p><code>*</code> means receive variable arguments as tuple</p>
+------------------------------------------------------------------ <br><h3> ishandutta2007, Id: 51733267, Score: 19: </h3><p><code>*</code> means receive variable arguments as tuple</p>
 
 <p><code>**</code> means receive variable arguments as dictionary</p>
 
@@ -606,7 +606,7 @@ bar(dic1="two", dic2=3)
 <pre><code>dic1 two
 dic2 3
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 34166505 leewz: </h3><p>In Python 3.5, you can also use this syntax in <code>list</code>, <code>dict</code>, <code>tuple</code>, and <code>set</code> displays (also sometimes called literals). See <a href="http://legacy.python.org/dev/peps/pep-0448/" rel="noreferrer">PEP 488: Additional Unpacking Generalizations</a>.</p>
+------------------------------------------------------------------ <br><h3> leewz, Id: 34166505, Score: 14: </h3><p>In Python 3.5, you can also use this syntax in <code>list</code>, <code>dict</code>, <code>tuple</code>, and <code>set</code> displays (also sometimes called literals). See <a href="http://legacy.python.org/dev/peps/pep-0448/" rel="noreferrer">PEP 488: Additional Unpacking Generalizations</a>.</p>
 
 <pre><code>&gt;&gt;&gt; (0, *range(1, 4), 5, *range(6, 8))
 (0, 1, 2, 3, 5, 6, 7)
@@ -627,7 +627,7 @@ range(1, 10, 2)
 </code></pre>
 
 <p>(Thanks to mgilson for the PEP link.)</p>
-<h4> Comment 56080415 mgilson: </h4>I&#39;m not sure that this is a violation of &quot;there&#39;s only one way to do it&quot;.  There&#39;s no other way to initialize a list/tuple from multiple iterables -- You currently need to chain them into a single iterable which isn&#39;t always convenient.  You can read about the rational in <a href="http://legacy.python.org/dev/peps/pep-0448/" rel="nofollow noreferrer">PEP-0448</a>.  Also, this isn&#39;t a python3.x feature, it&#39;s a python3.5+ feature :-).<br>------------------------------------------------------------------ <br><h3> Answer 40492308 Lochu&#39;an Chang: </h3><p>I want to give an example which others haven't  mentioned</p>
+<h4> mgilson, Comment 56080415 Score: 1: </h4>I&#39;m not sure that this is a violation of &quot;there&#39;s only one way to do it&quot;.  There&#39;s no other way to initialize a list/tuple from multiple iterables -- You currently need to chain them into a single iterable which isn&#39;t always convenient.  You can read about the rational in <a href="http://legacy.python.org/dev/peps/pep-0448/" rel="nofollow noreferrer">PEP-0448</a>.  Also, this isn&#39;t a python3.x feature, it&#39;s a python3.5+ feature :-).<br>------------------------------------------------------------------ <br><h3> Lochu&#39;an Chang, Id: 40492308, Score: 11: </h3><p>I want to give an example which others haven't  mentioned</p>
 <p>* can also unpack a <strong>generator</strong></p>
 <p>An example from Python3 Document</p>
 <pre><code>x = [1, 2, 3]
@@ -639,7 +639,7 @@ unzip_x, unzip_y = zip(*zip(x, y))
 <p>The zip() receives multiple iretable args, and return a generator.</p>
 <pre><code>zip(*zip(x,y)) -&gt; zip((1, 4), (2, 5), (3, 6))
 </code></pre>
-<h4> Comment 114888001 EduardoSaverin: </h4>unzip_x will be <code>(1, 2, 3)</code> not <code>[1, 2, 3]</code>. Same goes for unzip_y<br>------------------------------------------------------------------ <br><h3> Answer 55475113 RBF06: </h3><h2>TL;DR</h2>
+<h4> EduardoSaverin, Comment 114888001 Score: 1: </h4>unzip_x will be <code>(1, 2, 3)</code> not <code>[1, 2, 3]</code>. Same goes for unzip_y<br>------------------------------------------------------------------ <br><h3> RBF06, Id: 55475113, Score: 11: </h3><h2>TL;DR</h2>
 <p>It packs arguments passed to the function into <code>list</code> and <code>dict</code> respectively inside the function body. When you define a function signature like this:</p>
 <pre class="lang-py prettyprint-override"><code>def func(*args, **kwds):
     # do stuff
@@ -660,7 +660,7 @@ f(*iterable, **mapping)
 # That call is equivalent to
 f(1, 20, 500, d=100, e=3)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 56962836 Raj: </h3><p>Building on nickd's <a href="https://stackoverflow.com/a/36911/8588359">answer</a>...</p>
+------------------------------------------------------------------ <br><h3> Raj, Id: 56962836, Score: 10: </h3><p>Building on nickd's <a href="https://stackoverflow.com/a/36911/8588359">answer</a>...</p>
 
 <pre><code>def foo(param1, *param2):
     print(param1)
@@ -699,7 +699,7 @@ three_params(1, 2, 3, 4, s=5)
 </code></pre>
 
 <p>Basically, any number of <strong>positional arguments</strong> can use *args and any <strong>named arguments</strong> (or kwargs aka keyword arguments) can use **kwargs.</p>
------------------------------------------------------------------- <br><h3> Answer 32031804 quiet_penguin: </h3><p>In addition to function calls, *args and **kwargs are useful in class hierarchies and also avoid having to write <code>__init__</code> method in Python. Similar usage can seen in frameworks like Django code.</p>
+------------------------------------------------------------------ <br><h3> quiet_penguin, Id: 32031804, Score: 8: </h3><p>In addition to function calls, *args and **kwargs are useful in class hierarchies and also avoid having to write <code>__init__</code> method in Python. Similar usage can seen in frameworks like Django code.</p>
 
 <p>For example,</p>
 
@@ -752,7 +752,7 @@ This is done through *args and **kwargs. kwargs mainly used so that code is read
 </code></pre>
 
 <p>The complete code is <a href="http://harisankar-krishnaswamy.blogspot.sg/2015/08/using-args-and-kwargs-python-code-post.html" rel="noreferrer">here</a></p>
------------------------------------------------------------------- <br><h3> Answer 62442187 etoricky: </h3><p>Given a function that has 3 items as argument</p>
+------------------------------------------------------------------ <br><h3> etoricky, Id: 62442187, Score: 5: </h3><p>Given a function that has 3 items as argument</p>
 
 <pre><code>sum = lambda x, y, z: x + y + z
 sum(1,2,3) # sum 3 items
@@ -770,7 +770,7 @@ sum(*[1,2,3]) # ok, 1 list becomes 3 items
 <p>Imagine this toy with a bag of a triangle, a circle and a rectangle item. That bag does not directly fit. You need to unpack the bag to take those 3 items and now they fit. The Python * operator does this unpack process.</p>
 
 <p><a href="https://i.stack.imgur.com/9gf2j.jpg" rel="noreferrer"><img src="https://i.stack.imgur.com/9gf2j.jpg" alt="enter image description here"></a></p>
------------------------------------------------------------------- <br><h3> Answer 50116852 Hrvoje: </h3><p><code>*args</code> and <code>**kwargs</code>: allow you to pass a variable number of arguments to a function. </p>
+------------------------------------------------------------------ <br><h3> Hrvoje, Id: 50116852, Score: 4: </h3><p><code>*args</code> and <code>**kwargs</code>: allow you to pass a variable number of arguments to a function. </p>
 
 <p><code>*args</code>: is used to send a non-keyworded variable length argument list to the function:</p>
 
@@ -810,7 +810,7 @@ Your last_name is Tesla.
 Your birthday is 7.10.1856.
 Your birthplace is Croatia.
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 40262722 amir jj: </h3><p>A good example of using both in a function is:</p>
+------------------------------------------------------------------ <br><h3> amir jj, Id: 40262722, Score: 3: </h3><p>A good example of using both in a function is:</p>
 
 <pre><code>&gt;&gt;&gt; def foo(*arg,**kwargs):
 ...     print arg
@@ -839,7 +839,7 @@ Your birthplace is Croatia.
 ((1, 2, 3), 'aa', 'bb')
 {}
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 40823181 TNg: </h3><p>This example would help you remember <code>*args</code>, <code>**kwargs</code> and even <code>super</code> and inheritance in Python at once.</p>
+------------------------------------------------------------------ <br><h3> TNg, Id: 40823181, Score: 3: </h3><p>This example would help you remember <code>*args</code>, <code>**kwargs</code> and even <code>super</code> and inheritance in Python at once.</p>
 
 <pre><code>class base(object):
     def __init__(self, base_param):
@@ -863,7 +863,7 @@ print c1.child_param # 1
 print c2.base_param # 0
 print c2.child_param # 1
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 59217020 dreftymac: </h3><h2>Context</h2>
+------------------------------------------------------------------ <br><h3> dreftymac, Id: 59217020, Score: 2: </h3><h2>Context</h2>
 
 <ul>
 <li>python 3.x</li>
@@ -919,7 +919,7 @@ print c2.child_param # 1
   print(vdemo[-1])
 
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 66705594 user15049586: </h3><p>*args ( or *any ) means every parameters</p>
+------------------------------------------------------------------ <br><h3> user15049586, Id: 66705594, Score: 2: </h3><p>*args ( or *any ) means every parameters</p>
 <pre class="lang-py prettyprint-override"><code>def any_param(*param):
     pass
 
@@ -961,7 +961,7 @@ func(width=&quot;10&quot;,height=&quot;20&quot;) # {width=&quot;10&quot;,height=
 
 
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 74406075 Super Kai - Kazuya Ito: </h3><ul>
+------------------------------------------------------------------ <br><h3> Super Kai - Kazuya Ito, Id: 74406075, Score: 1: </h3><ul>
 <li><p><strong><code>*args</code></strong> is the special parameter which can take 0 or more (positional) arguments as a tuple.</p>
 </li>
 <li><p><strong><code>**kwargs</code></strong> is the special parameter which can take 0 or more (keyword) arguments as a dictionary.</p>
@@ -1161,7 +1161,7 @@ test(1, 2, num1=3, num2=4)
 <p>Output:</p>
 <pre class="lang-none prettyprint-override"><code>(1, 2) {'num1': 3, 'num2': 4}
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 75920670 Vinod Srivastav: </h3><pre class="lang-py prettyprint-override"><code>def foo(x, y, *args):
+------------------------------------------------------------------ <br><h3> Vinod Srivastav, Id: 75920670, Score: 1: </h3><pre class="lang-py prettyprint-override"><code>def foo(x, y, *args):
     pass
 
 def bar(x, y, **kwargs):
@@ -1192,7 +1192,7 @@ Address = kwargs['address']
 <blockquote>
 <p>Reading <code>kwargs</code> doesn't required to enumerate over a loop and order of arguments don't matter.</p>
 </blockquote>
------------------------------------------------------------------- <br><h3> Answer 77047783 cowlinator: </h3><p>The asterisk '*' in a function <strong>definition</strong> <em>combines</em> multiple positional arguments into a single <em>tuple</em> argument.</p>
+------------------------------------------------------------------ <br><h3> cowlinator, Id: 77047783, Score: 1: </h3><p>The asterisk '*' in a function <strong>definition</strong> <em>combines</em> multiple positional arguments into a single <em>tuple</em> argument.</p>
 <pre><code>&gt;&gt;&gt; def A(*tpl):
 ...     print(tpl)
 ...
@@ -1224,7 +1224,7 @@ Address = kwargs['address']
 &gt;&gt;&gt; D(**dct)
 5 4 3 2 1
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 52134172 Premraj: </h3><ul>
+------------------------------------------------------------------ <br><h3> Premraj, Id: 52134172, Score: 0: </h3><ul>
 <li><code>def foo(param1, *param2):</code> is a method can accept arbitrary number of values for <code>*param2</code>,</li>
 <li><code>def bar(param1, **param2):</code> is a method can accept arbitrary number of values with keys for <code>*param2</code></li>
 <li><code>param1</code> is a simple parameter.</li>
@@ -1236,7 +1236,7 @@ Address = kwargs['address']
     // method body
 }
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 73178373 Isaac Vin&#237;cius: </h3><h3>&quot;Infinite&quot; Args with *args and **kwargs</h3>
+------------------------------------------------------------------ <br><h3> Isaac Vin&#237;cius, Id: 73178373, Score: 0: </h3><h3>&quot;Infinite&quot; Args with *args and **kwargs</h3>
 <p><code>*args</code> and <code>**kwargs</code> are just some way to input unlimited characters to functions, like:</p>
 <pre class="lang-py prettyprint-override"><code>
 def print_all(*args, **kwargs):
@@ -1252,5 +1252,5 @@ print_all(&quot;Hello&quot;, &quot;World&quot;, to_print=&quot;!&quot;)
 !
 &quot;&quot;&quot;
 </code></pre>
-<h4> Comment 129241254 Isaac Vin&#237;cius: </h4><code>*args</code> can be anything, like <code>*something</code>, the same for <code>**kwargs</code>, example: <code>*keyworded_args</code><br>------------------------------------------------------------------ <br><h3> Answer 75871130 happymancer: </h3><p>The most simple explanation is just that * is *args, which passes a tuple, and ** is **kwargs, which passes a dictionary. Those are just general names that are default.</p>
-<h4> Comment 133875190 bfontaine: </h4>There are already 25 answers to this question; why add a new one that duplicates the others?<br><h4> Comment 133893366 happymancer: </h4>All of the previous answers are more complicated, just simplified it....<br>
+<h4> Isaac Vin&#237;cius, Comment 129241254 Score: 0: </h4><code>*args</code> can be anything, like <code>*something</code>, the same for <code>**kwargs</code>, example: <code>*keyworded_args</code><br>------------------------------------------------------------------ <br><h3> happymancer, Id: 75871130, Score: 0: </h3><p>The most simple explanation is just that * is *args, which passes a tuple, and ** is **kwargs, which passes a dictionary. Those are just general names that are default.</p>
+<h4> bfontaine, Comment 133875190 Score: 0: </h4>There are already 25 answers to this question; why add a new one that duplicates the others?<br><h4> happymancer, Comment 133893366 Score: 0: </h4>All of the previous answers are more complicated, just simplified it....<br>

@@ -1,4 +1,4 @@
- <h2> Title: How can I check if a file exists in Perl? </h2> <h3> superstar, question_id: 2601027 </h3>Score: 125, Tags: {perl} <br><p>I have a relative path </p>
+ <h2> Title: How can I check if a file exists in Perl? </h2> <h4> superstar, question_id: 2601027 </h4>Score: 125, Tags: {perl} <br><p>I have a relative path </p>
 
 <pre><code>   $base_path = "input/myMock.TGZ";
 </code></pre>
@@ -7,7 +7,7 @@
 The filename can change. But the path is always stored in <code>$base_path</code>.</p>
 
 <p>I need to check if the file exists in <code>$base_path</code>.</p>
------------------------------------------------------------------- <br><h3> Answer 2601042 Greg Bacon: </h3><p>Test whether <em>something</em> exists at given path using the <code>-e</code> file-test operator.</p>
+------------------------------------------------------------------ <br><h3> Greg Bacon, Id: 2601042, Score: 199: </h3><p>Test whether <em>something</em> exists at given path using the <code>-e</code> file-test operator.</p>
 
 <pre><code>print "$base_path exists!\n" if -e $base_path;
 </code></pre>
@@ -79,7 +79,7 @@ The filename can change. But the path is always stored in <code>$base_path</code
   Same for inode change time (Unix, may differ for other platforms)</li>
   </ul>
 </blockquote>
-<h4> Comment 2610223 Greg Bacon: </h4>@superstar Hello again! Yes, <code>-e</code> works with relative paths, but I think I may have misunderstood your question. Do you have a <i>directory</i> named <code>myMock.TGZ</code>, and you want to know whether that directory contains a file with a particular name? Help us give you better answers by editing your question to include examples!<br><h4> Comment 2610202 superstar: </h4>hey bacon, nice to see you. so -e even works for a relative path? i thought it only worked for particular file...cool thanks<br>------------------------------------------------------------------ <br><h3> Answer 2601284 hpavc: </h3><p>You might want a variant of exists ...    perldoc -f "-f"</p>
+<h4> Greg Bacon, Comment 2610223 Score: 3: </h4>@superstar Hello again! Yes, <code>-e</code> works with relative paths, but I think I may have misunderstood your question. Do you have a <i>directory</i> named <code>myMock.TGZ</code>, and you want to know whether that directory contains a file with a particular name? Help us give you better answers by editing your question to include examples!<br><h4> superstar, Comment 2610202 Score: 0: </h4>hey bacon, nice to see you. so -e even works for a relative path? i thought it only worked for particular file...cool thanks<br>------------------------------------------------------------------ <br><h3> hpavc, Id: 2601284, Score: 30: </h3><p>You might want a variant of exists ...    perldoc -f "-f"</p>
 
 <pre><code>      -X FILEHANDLE
        -X EXPR
@@ -123,7 +123,7 @@ The filename can change. But the path is always stored in <code>$base_path</code
 
                    -M  Script start time minus file modification time, in days.
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 2601041 mdm: </h3><pre><code>if (-e $base_path)
+------------------------------------------------------------------ <br><h3> mdm, Id: 2601041, Score: 22: </h3><pre><code>if (-e $base_path)
 { 
  # code
 }
@@ -132,7 +132,7 @@ The filename can change. But the path is always stored in <code>$base_path</code
 <p><code>-e</code> is the 'existence' operator in Perl.</p>
 
 <p>You can check permissions and other attributes using the code on <a href="http://www.pageresource.com/cgirec/ptut17.htm" rel="noreferrer">this page</a>.</p>
-<h4> Comment 2610296 Ether: </h4>Why not link to the official documentation for these operators instead?<br><h4> Comment 2610416 mdm: </h4>@Ether, just because I was searching for the existence operator and its the first page I found. PerlDoc was probably a better option in retrospect.<br>------------------------------------------------------------------ <br><h3> Answer 23483795 Zain Rizvi: </h3><p>Use:</p>
+<h4> Ether, Comment 2610296 Score: 3: </h4>Why not link to the official documentation for these operators instead?<br><h4> mdm, Comment 2610416 Score: 0: </h4>@Ether, just because I was searching for the existence operator and its the first page I found. PerlDoc was probably a better option in retrospect.<br>------------------------------------------------------------------ <br><h3> Zain Rizvi, Id: 23483795, Score: 16: </h3><p>Use:</p>
 
 <pre><code>if (-f $filePath)
 {
@@ -141,20 +141,20 @@ The filename can change. But the path is always stored in <code>$base_path</code
 </code></pre>
 
 <p><code>-e</code> returns true even if the file is a directory. <code>-f</code> will only return true if it's an actual file</p>
------------------------------------------------------------------- <br><h3> Answer 2601051 Klaus Byskov Pedersen: </h3><p>You can use: <code>if(-e $base_path)</code></p>
-<h4> Comment 2610224 justintime: </h4>You might also use <code>-f</code> to test for a normal file (as opposed to a directory or various other special types of file)<br>------------------------------------------------------------------ <br><h3> Answer 37951440 user5240420: </h3><pre><code>if(-e $base_path)
+------------------------------------------------------------------ <br><h3> Klaus Byskov Pedersen, Id: 2601051, Score: 14: </h3><p>You can use: <code>if(-e $base_path)</code></p>
+<h4> justintime, Comment 2610224 Score: 8: </h4>You might also use <code>-f</code> to test for a normal file (as opposed to a directory or various other special types of file)<br>------------------------------------------------------------------ <br><h3> user5240420, Id: 37951440, Score: 6: </h3><pre><code>if(-e $base_path)
 {
     print &quot;Something&quot;;
 }
 </code></pre>
 <p>would do the trick.</p>
-<h4> Comment 130540999 jat: </h4>Without quotes I get compile errors.  if(-e &quot;$base_path&quot;) {     print &quot;Something&quot;; }<br>------------------------------------------------------------------ <br><h3> Answer 27025029 Balaji Boggaram Ramanarayan: </h3><pre><code>#!/usr/bin/perl -w
+<h4> jat, Comment 130540999 Score: 0: </h4>Without quotes I get compile errors.  if(-e &quot;$base_path&quot;) {     print &quot;Something&quot;; }<br>------------------------------------------------------------------ <br><h3> Balaji Boggaram Ramanarayan, Id: 27025029, Score: 5: </h3><pre><code>#!/usr/bin/perl -w
 
 $fileToLocate = '/whatever/path/for/file/you/are/searching/MyFile.txt';
 if (-e $fileToLocate) {
     print "File is present";
 }
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 31097674 Nikhil Ranjan: </h3><p>Use the below code. Here <code>-f</code> checks if it's a file or not:</p>
+------------------------------------------------------------------ <br><h3> Nikhil Ranjan, Id: 31097674, Score: 2: </h3><p>Use the below code. Here <code>-f</code> checks if it's a file or not:</p>
 <pre><code>print &quot;File $base_path is exists!\n&quot; if -f $base_path;
 </code></pre>

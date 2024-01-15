@@ -1,11 +1,11 @@
- <h2> Title: How do I measure elapsed time in Python? </h2> <h3> gilbert8, question_id: 7370801 </h3>Score: 2061, Tags: {python,performance,measure,timeit} <br><p>I want to measure the time it took to execute a function. I couldn't get <code>timeit</code> to work:</p>
+ <h2> Title: How do I measure elapsed time in Python? </h2> <h4> gilbert8, question_id: 7370801 </h4>Score: 2061, Tags: {python,performance,measure,timeit} <br><p>I want to measure the time it took to execute a function. I couldn't get <code>timeit</code> to work:</p>
 <pre><code>import timeit
 start = timeit.timeit()
 print(&quot;hello&quot;)
 end = timeit.timeit()
 print(end - start)
 </code></pre>
-<h4> Comment 118233992 Llopeth: </h4>timeit.timeit()  prints the time that it takes to execute its argument, which is &quot;pass&quot; by default.  you have to instead use start= time.time()    end = time.time()<br><h4> Comment 131410240 daniel blanco: </h4>I wrote this module that does the same as the accepted answer but with a decorator <a href="https://pypi.org/project/time-it/" rel="nofollow noreferrer">pypi.org/project/time-it</a><br><h4> Comment 132346054 Thomas: </h4>your example would be something like: <code>timeit.timeit(&#39;print(&quot;hello&quot;)&#39;,number=10)</code><br>------------------------------------------------------------------ <br><h3> Answer 7370824 NPE: </h3><p>Use <a href="http://docs.python.org/library/time.html#time.time" rel="noreferrer"><code>time.time()</code></a> to measure the elapsed wall-clock time between two points:</p>
+<h4> Llopeth, Id: 118233992 Score: 11: </h4>timeit.timeit()  prints the time that it takes to execute its argument, which is &quot;pass&quot; by default.  you have to instead use start= time.time()    end = time.time()<br><h4> daniel blanco, Id: 131410240 Score: 0: </h4>I wrote this module that does the same as the accepted answer but with a decorator <a href="https://pypi.org/project/time-it/" rel="nofollow noreferrer">pypi.org/project/time-it</a><br><h4> Thomas, Id: 132346054 Score: 0: </h4>your example would be something like: <code>timeit.timeit(&#39;print(&quot;hello&quot;)&#39;,number=10)</code><br>------------------------------------------------------------------ <br><h3> NPE, Id: 7370824, Score: 2468: </h3><p>Use <a href="http://docs.python.org/library/time.html#time.time" rel="noreferrer"><code>time.time()</code></a> to measure the elapsed wall-clock time between two points:</p>
 <pre><code>import time
 
 start = time.time()
@@ -29,7 +29,7 @@ better than one microsecond.</p>
 on the platform: <strong>use <code>perf_counter()</code> or <code>process_time()</code> instead</strong>,
 depending on your requirements, to have a well defined behaviour.</p>
 </blockquote>
-<h4> Comment 136660478 Martin C. Martin: </h4>time.time() is affected by NTP errors, someone accidentally setting the year to 3023 by mistake then correcting it, leap seconds, etc.  So this is something that works most of the time, but occasionally gets it wrong, in ways that can be hard to understand and impossible to reproduce.<br><h4> Comment 136660488 Martin C. Martin: </h4>cloc(), perf_counter() and process_time() don&#39;t include sleep().  Sometimes, that&#39;s what you want, other times, it isn&#39;t.  For example, in finding out why a request is slow, &quot;my process was swapped out&quot; is something you&#39;d like to show up in your timing data.<br><h4> Comment 136660577 Martin C. Martin: </h4>time.monotonic() is designed for this use case.<br>------------------------------------------------------------------ <br><h3> Answer 25823885 jfs: </h3><p>Use <code>timeit.default_timer</code> instead of <code>timeit.timeit</code>. The former provides the best clock available on your platform and version of Python automatically:</p>
+<h4> Martin C. Martin, Comment 136660478 Score: 0: </h4>time.time() is affected by NTP errors, someone accidentally setting the year to 3023 by mistake then correcting it, leap seconds, etc.  So this is something that works most of the time, but occasionally gets it wrong, in ways that can be hard to understand and impossible to reproduce.<br><h4> Martin C. Martin, Comment 136660488 Score: 0: </h4>cloc(), perf_counter() and process_time() don&#39;t include sleep().  Sometimes, that&#39;s what you want, other times, it isn&#39;t.  For example, in finding out why a request is slow, &quot;my process was swapped out&quot; is something you&#39;d like to show up in your timing data.<br><h4> Martin C. Martin, Comment 136660577 Score: 0: </h4>time.monotonic() is designed for this use case.<br>------------------------------------------------------------------ <br><h3> jfs, Id: 25823885, Score: 1150: </h3><p>Use <code>timeit.default_timer</code> instead of <code>timeit.timeit</code>. The former provides the best clock available on your platform and version of Python automatically:</p>
 <pre><code>from timeit import default_timer as timer
 
 start = timer()
@@ -43,7 +43,7 @@ print(end - start) # Time in seconds, e.g. 5.38091952400282
 <li><a href="http://scipy-lectures.github.io/advanced/optimizing/" rel="noreferrer">Optimizing code</a></li>
 <li><a href="http://scikit-learn.org/stable/developers/performance.html" rel="noreferrer">How to optimize for speed</a></li>
 </ul>
-<h4> Comment 69371159 lkgarrison: </h4>Excellent answer - using <b>timeit</b> will produce far more accurate results since it will automatically account for things like garbage collection and OS differences<br><h4> Comment 135073498 Robin_hood_963: </h4>I use this in a script and it gives 62 secs and in another EXACTLY the same commands and i get this values for start , end and elapsed time  8357.5812534 8360.9289703 Elapsed time: 8340.9289703 seconds  what is going on??<br>------------------------------------------------------------------ <br><h3> Answer 21455138 Pierre Prinetti: </h3><h1>Python 3 only:</h1>
+<h4> lkgarrison, Comment 69371159 Score: 76: </h4>Excellent answer - using <b>timeit</b> will produce far more accurate results since it will automatically account for things like garbage collection and OS differences<br><h4> Robin_hood_963, Comment 135073498 Score: 0: </h4>I use this in a script and it gives 62 secs and in another EXACTLY the same commands and i get this values for start , end and elapsed time  8357.5812534 8360.9289703 Elapsed time: 8340.9289703 seconds  what is going on??<br>------------------------------------------------------------------ <br><h3> Pierre Prinetti, Id: 21455138, Score: 243: </h3><h1>Python 3 only:</h1>
 <p>Since <code>time.clock()</code> <a href="https://docs.python.org/3.3/library/time.html#time.clock" rel="noreferrer">is deprecated as of Python 3.3</a>, you will want to use <a href="https://docs.python.org/3/library/time.html#time.perf_counter" rel="noreferrer"><code>time.perf_counter()</code></a> for system-wide timing, or <a href="https://docs.python.org/3/library/time.html#time.process_time" rel="noreferrer"><code>time.process_time()</code></a> for process-wide timing, just the way you used to use <code>time.clock()</code>:</p>
 <pre><code>import time
 
@@ -52,7 +52,7 @@ t = time.process_time()
 elapsed_time = time.process_time() - t
 </code></pre>
 <p>The new function <code>process_time</code> will not include time elapsed during sleep.</p>
-<h4> Comment 133375496 MikeB: </h4>The docs say that <code>process_time()</code> returns the sum of CPU and user time. Doesn&#39;t that mean this only returns the time that <code># do some stuff</code> was running (and not blocking -- like on IO) and not the actual elapsed time?<br>------------------------------------------------------------------ <br><h3> Answer 55239060 Gal Bracha: </h3><p>Measuring time <strong>in seconds:</strong></p>
+<h4> MikeB, Comment 133375496 Score: 1: </h4>The docs say that <code>process_time()</code> returns the sum of CPU and user time. Doesn&#39;t that mean this only returns the time that <code># do some stuff</code> was running (and not blocking -- like on IO) and not the actual elapsed time?<br>------------------------------------------------------------------ <br><h3> Gal Bracha, Id: 55239060, Score: 233: </h3><p>Measuring time <strong>in seconds:</strong></p>
 <pre class="lang-py prettyprint-override"><code>from timeit import default_timer as timer
 from datetime import timedelta
 
@@ -68,7 +68,7 @@ print(timedelta(seconds=end-start))
 <p><strong>Output</strong>:</p>
 <pre><code>0:00:01.946339
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 7370980 unutbu: </h3><p>Given a function you'd like to time,</p>
+------------------------------------------------------------------ <br><h3> unutbu, Id: 7370980, Score: 108: </h3><p>Given a function you'd like to time,</p>
 
 <p>test.py:</p>
 
@@ -86,7 +86,7 @@ print(timedelta(seconds=end-start))
 <p>Do not try to use <code>time.time</code> or <code>time.clock</code> (naively) to compare the speed of functions. <a href="https://stackoverflow.com/questions/1622943/timeit-versus-timing-decorator">They can give misleading results</a>.</p>
 
 <p>PS. Do not put print statements in a function you wish to time; otherwise the time measured will depend on the <a href="https://stackoverflow.com/questions/3857052/why-is-printing-to-stdout-so-slow-can-it-be-sped-up/3860319#3860319">speed of the terminal</a>.</p>
------------------------------------------------------------------- <br><h3> Answer 30024601 gojomo: </h3><p>It's fun to do this with a context-manager that automatically remembers the start time upon entry to a <code>with</code> block, then freezes the end time on block exit. With a little trickery, you can even get a running elapsed-time tally inside the block from the same context-manager function. </p>
+------------------------------------------------------------------ <br><h3> gojomo, Id: 30024601, Score: 99: </h3><p>It's fun to do this with a context-manager that automatically remembers the start time upon entry to a <code>with</code> block, then freezes the end time on block exit. With a little trickery, you can even get a running elapsed-time tally inside the block from the same context-manager function. </p>
 
 <p>The core library doesn't have this (but probably ought to). Once in place, you can do things like:</p>
 
@@ -125,7 +125,7 @@ with elapsed_timer() as elapsed:
 </code></pre>
 
 <p>Note that by design of this function, the return value of <code>elapsed()</code> is frozen on block exit, and further calls return the same duration (of about 6 seconds in this toy example). </p>
-<h4> Comment 61565152 J&#233;r&#244;me: </h4>Other context manager example: <a href="http://dabeaz.blogspot.fr/2010/02/context-manager-for-timing-benchmarks.html" rel="nofollow noreferrer">dabeaz.blogspot.fr/2010/02/&hellip;</a><br><h4> Comment 70019895 Brian Burns: </h4>@J&#233;r&#244;me nice example - I adapted it as another answer - <a href="http://stackoverflow.com/a/41408510/243392">stackoverflow.com/a/41408510/243392</a><br><h4> Comment 136690772 Gergely M: </h4>My very similar indie solution:  <a href="https://stackoverflow.com/questions/77533604/python-execution-timing-with-context-manager" title="python execution timing with context manager">stackoverflow.com/questions/77533604/&hellip;</a><br>------------------------------------------------------------------ <br><h3> Answer 45668747 Reddspark: </h3><p>I prefer this. <code>timeit</code> doc is far too confusing. </p>
+<h4> J&#233;r&#244;me, Comment 61565152 Score: 2: </h4>Other context manager example: <a href="http://dabeaz.blogspot.fr/2010/02/context-manager-for-timing-benchmarks.html" rel="nofollow noreferrer">dabeaz.blogspot.fr/2010/02/&hellip;</a><br><h4> Brian Burns, Comment 70019895 Score: 1: </h4>@J&#233;r&#244;me nice example - I adapted it as another answer - <a href="http://stackoverflow.com/a/41408510/243392">stackoverflow.com/a/41408510/243392</a><br><h4> Gergely M, Comment 136690772 Score: 0: </h4>My very similar indie solution:  <a href="https://stackoverflow.com/questions/77533604/python-execution-timing-with-context-manager" title="python execution timing with context manager">stackoverflow.com/questions/77533604/&hellip;</a><br>------------------------------------------------------------------ <br><h3> Reddspark, Id: 45668747, Score: 79: </h3><p>I prefer this. <code>timeit</code> doc is far too confusing. </p>
 
 <pre><code>from datetime import datetime 
 
@@ -139,7 +139,7 @@ print('Time elapsed (hh:mm:ss.ms) {}'.format(time_elapsed))
 </code></pre>
 
 <p>Note, that there isn't any formatting going on here, I just wrote <code>hh:mm:ss</code> into the printout so one can interpret <code>time_elapsed</code></p>
-<h4> Comment 100792604 user1318499: </h4>It&#39;s risky to measure elapsed time this way because datetime.now() can change between the two calls for reasons like network time syncing, daylight savings switchover or the user twiddling the clock.<br><h4> Comment 83006908 Sreehari R: </h4>I was told that timeit calculates the CPU time, does datetime also take into account CPU time used? Are these the same thing?<br><h4> Comment 111761232 mic: </h4>From Shital Shah&#39;s answer: &quot;First, if you are debating between timeit and time.time, the timeit has two advantages:      timeit selects the best timer available on your OS and Python version.     timeit disables garbage collection, however, this is not something you may or may not want.&quot;<br>------------------------------------------------------------------ <br><h3> Answer 56928886 Mingwei He: </h3><p>Here's another way to do this:</p>
+<h4> user1318499, Comment 100792604 Score: 12: </h4>It&#39;s risky to measure elapsed time this way because datetime.now() can change between the two calls for reasons like network time syncing, daylight savings switchover or the user twiddling the clock.<br><h4> Sreehari R, Comment 83006908 Score: 0: </h4>I was told that timeit calculates the CPU time, does datetime also take into account CPU time used? Are these the same thing?<br><h4> mic, Comment 111761232 Score: 0: </h4>From Shital Shah&#39;s answer: &quot;First, if you are debating between timeit and time.time, the timeit has two advantages:      timeit selects the best timer available on your OS and Python version.     timeit disables garbage collection, however, this is not something you may or may not want.&quot;<br>------------------------------------------------------------------ <br><h3> Mingwei He, Id: 56928886, Score: 69: </h3><p>Here's another way to do this:</p>
 
 <pre><code>&gt;&gt; from pytictoc import TicToc
 &gt;&gt; t = TicToc() # create TicToc instance
@@ -166,7 +166,7 @@ Elapsed time is 2.612231 seconds.
 </code></pre>
 
 <p>Refer to the <a href="https://pypi.org/project/pytictoc/" rel="noreferrer">PyPi page</a> for more details.</p>
-<h4> Comment 100399019 hlg: </h4>It would be good to explain the advantage of using this library over other approaches.<br><h4> Comment 108007190 H. S&#225;nchez: </h4>@PetarMI : FYI, I just fixed the issue with <code>ttictoc</code>. Quite a mess I had, but it should be good now.<br><h4> Comment 103211214 ScottieB: </h4>I find the nesting a little confusing.  If I were to come across <code>t.tic()</code> buried in the code, it&#39;s up to me the developer to keep a mental list of where in the series I should expect this to be.  Do you find yourself setting up nests or just multiple tictocs?<br><h4> Comment 100481226 PetarMI: </h4>The nested functionality is actually broken. I opened an issue describing where the problem in the code is but the repo hasn&#39;t been maintained in a year so I wouldn&#39;t expect a change.<br><h4> Comment 114760688 Henri: </h4>@hlg If I remember correctly, MATLAB uses functions with similar names to time stuff. So I guess the advantage is the resemblance, for people who liked this in MATLAB but switched to Python.<br>------------------------------------------------------------------ <br><h3> Answer 62106731 Wojciech Moszczyński: </h3><p>The easiest way to calculate the duration of an operation:</p>
+<h4> hlg, Comment 100399019 Score: 21: </h4>It would be good to explain the advantage of using this library over other approaches.<br><h4> H. S&#225;nchez, Comment 108007190 Score: 1: </h4>@PetarMI : FYI, I just fixed the issue with <code>ttictoc</code>. Quite a mess I had, but it should be good now.<br><h4> ScottieB, Comment 103211214 Score: 0: </h4>I find the nesting a little confusing.  If I were to come across <code>t.tic()</code> buried in the code, it&#39;s up to me the developer to keep a mental list of where in the series I should expect this to be.  Do you find yourself setting up nests or just multiple tictocs?<br><h4> PetarMI, Comment 100481226 Score: 0: </h4>The nested functionality is actually broken. I opened an issue describing where the problem in the code is but the repo hasn&#39;t been maintained in a year so I wouldn&#39;t expect a change.<br><h4> Henri, Comment 114760688 Score: 0: </h4>@hlg If I remember correctly, MATLAB uses functions with similar names to time stuff. So I guess the advantage is the resemblance, for people who liked this in MATLAB but switched to Python.<br>------------------------------------------------------------------ <br><h3> Wojciech Moszczyński, Id: 62106731, Score: 63: </h3><p>The easiest way to calculate the duration of an operation:</p>
 <pre><code>import time
 
 start_time = time.monotonic()
@@ -176,7 +176,7 @@ start_time = time.monotonic()
 print('seconds: ', time.monotonic() - start_time)
 </code></pre>
 <p>Official docs <a href="https://docs.python.org/3/library/time.html#time.monotonic" rel="noreferrer">here</a>.</p>
-<h4> Comment 123249831 alexsmail: </h4>It is better to use <code>time.monotonic_ns()</code>, see <a href="https://docs.python.org/3/library/time.html#time.monotonic_ns" rel="nofollow noreferrer">docs.python.org/3/library/time.html#time.monotonic_ns</a><br><h4> Comment 118574134 Paolo: </h4>@user1318499 it&#39;s not that it returns negative values, it can return a lower value than a previous call. <a href="https://docs.python.org/3/library/time.html#time.time" rel="nofollow noreferrer">docs.python.org/3/library/time.html#time.time</a><br>------------------------------------------------------------------ <br><h3> Answer 52288622 Shital Shah: </h3><p>Here are my findings after going through many good answers here as well as a few other articles.</p>
+<h4> alexsmail, Comment 123249831 Score: 2: </h4>It is better to use <code>time.monotonic_ns()</code>, see <a href="https://docs.python.org/3/library/time.html#time.monotonic_ns" rel="nofollow noreferrer">docs.python.org/3/library/time.html#time.monotonic_ns</a><br><h4> Paolo, Comment 118574134 Score: 0: </h4>@user1318499 it&#39;s not that it returns negative values, it can return a lower value than a previous call. <a href="https://docs.python.org/3/library/time.html#time.time" rel="nofollow noreferrer">docs.python.org/3/library/time.html#time.time</a><br>------------------------------------------------------------------ <br><h3> Shital Shah, Id: 52288622, Score: 49: </h3><p>Here are my findings after going through many good answers here as well as a few other articles.</p>
 <p>First, if you are debating between <code>timeit</code> and <code>time.time</code>, the <code>timeit</code> has two advantages:</p>
 <ol>
 <li><code>timeit</code> selects the best timer available on your OS and Python version.</li>
@@ -225,7 +225,7 @@ timing.print_all_timings()
 <li>Ability to disable printing in block timing (use <code>with timing.MeasureBlockTime() as t</code> and then <code>t.elapsed</code>).</li>
 <li>Ability to keep gc enabled for block timing.</li>
 </ol>
-<h4> Comment 111761731 mic: </h4>Regarding &quot;Ability to disable printing in block timing (use <code>with utils.MeasureBlockTime() as t</code> and then <code>t.elapsed</code>).&quot;: this doesn&#39;t work as is, as <code>t</code> is <code>None</code>. I think <code>__enter__</code> needs to return <code>self</code>, and to disable printing, we have to construct it as <code>utils.MeasureBlockTime(no_print=True)</code>.<br><h4> Comment 111778987 Shital Shah: </h4>@mic - thanks for pointing this out. I&#39;ve updated the answer with this and several other enhancements.<br>------------------------------------------------------------------ <br><h3> Answer 7370883 rocksportrocker: </h3><p>Using <code>time.time</code> to measure execution gives you the overall execution time of your commands including running time spent by other processes on your computer. It is the time the user notices, but is not good if you want to compare different code snippets / algorithms / functions / ...</p>
+<h4> mic, Comment 111761731 Score: 0: </h4>Regarding &quot;Ability to disable printing in block timing (use <code>with utils.MeasureBlockTime() as t</code> and then <code>t.elapsed</code>).&quot;: this doesn&#39;t work as is, as <code>t</code> is <code>None</code>. I think <code>__enter__</code> needs to return <code>self</code>, and to disable printing, we have to construct it as <code>utils.MeasureBlockTime(no_print=True)</code>.<br><h4> Shital Shah, Comment 111778987 Score: 0: </h4>@mic - thanks for pointing this out. I&#39;ve updated the answer with this and several other enhancements.<br>------------------------------------------------------------------ <br><h3> rocksportrocker, Id: 7370883, Score: 31: </h3><p>Using <code>time.time</code> to measure execution gives you the overall execution time of your commands including running time spent by other processes on your computer. It is the time the user notices, but is not good if you want to compare different code snippets / algorithms / functions / ...</p>
 
 <p>More information on <code>timeit</code>:</p>
 
@@ -242,7 +242,7 @@ timing.print_all_timings()
 </ul>
 
 <p><strong>Update</strong>: I used <a href="http://pythonhosted.org/line_profiler/" rel="noreferrer">http://pythonhosted.org/line_profiler/</a> a lot during the last year and find it very helpfull and recommend to use it instead of Pythons profile module.</p>
------------------------------------------------------------------- <br><h3> Answer 34806005 DmitrySemenov: </h3><p><strong>on python3:</strong></p>
+------------------------------------------------------------------ <br><h3> DmitrySemenov, Id: 34806005, Score: 24: </h3><p><strong>on python3:</strong></p>
 <pre><code>from time import sleep, perf_counter as pc
 t0 = pc()
 sleep(1)
@@ -252,7 +252,7 @@ print(pc()-t0)
 <p><strong>output:</strong></p>
 <pre><code>1.001345009999568
 </code></pre>
-<h4> Comment 110085293 Guimoute: </h4>@KIC It&#39;s in seconds.<br><h4> Comment 133923667 Markus Dutschke: </h4>I can&#39;t believe this is the first answer mentioning performance counter <code>perf_counter</code>! Thank you :)<br><h4> Comment 136294848 Joneron: </h4>Note there is a <code>time.perf_counter</code> and <code>time.perf_counter_ns</code> function :)<br><h4> Comment 102208566 KIC: </h4>what is this? ms?<br>------------------------------------------------------------------ <br><h3> Answer 41408510 Brian Burns: </h3><p>Here's another context manager for timing code -</p>
+<h4> Guimoute, Comment 110085293 Score: 1: </h4>@KIC It&#39;s in seconds.<br><h4> Markus Dutschke, Comment 133923667 Score: 1: </h4>I can&#39;t believe this is the first answer mentioning performance counter <code>perf_counter</code>! Thank you :)<br><h4> Joneron, Comment 136294848 Score: 0: </h4>Note there is a <code>time.perf_counter</code> and <code>time.perf_counter_ns</code> function :)<br><h4> KIC, Comment 102208566 Score: 0: </h4>what is this? ms?<br>------------------------------------------------------------------ <br><h3> Brian Burns, Id: 41408510, Score: 22: </h3><p>Here's another context manager for timing code -</p>
 
 <p>Usage: </p>
 
@@ -295,7 +295,7 @@ class benchmark(object):
 </code></pre>
 
 <p>Adapted from <a href="http://dabeaz.blogspot.fr/2010/02/context-manager-for-timing-benchmarks.html" rel="noreferrer">http://dabeaz.blogspot.fr/2010/02/context-manager-for-timing-benchmarks.html</a></p>
------------------------------------------------------------------- <br><h3> Answer 45178581 Leonid Ganeline: </h3><p>Use profiler module. It gives a very detailed profile.</p>
+------------------------------------------------------------------ <br><h3> Leonid Ganeline, Id: 45178581, Score: 22: </h3><p>Use profiler module. It gives a very detailed profile.</p>
 
 <pre><code>import profile
 profile.run('main()')
@@ -317,7 +317,7 @@ profile.run('main()')
 </code></pre>
 
 <p>I've found it very informative.</p>
-<h4> Comment 91970312 not2qubit: </h4>What is <code>main()</code>? Would be more useful if you could provide a simple code example.<br>------------------------------------------------------------------ <br><h3> Answer 20791871 sanchitarora: </h3><p>The python cProfile and pstats modules offer great support for measuring time elapsed in certain functions without having to add any code around the existing functions.</p>
+<h4> not2qubit, Comment 91970312 Score: 1: </h4>What is <code>main()</code>? Would be more useful if you could provide a simple code example.<br>------------------------------------------------------------------ <br><h3> sanchitarora, Id: 20791871, Score: 21: </h3><p>The python cProfile and pstats modules offer great support for measuring time elapsed in certain functions without having to add any code around the existing functions.</p>
 
 <p>For example if you have a python script timeFunctions.py:</p>
 
@@ -377,7 +377,7 @@ timeStats.profile% stats thankyou
 </code></pre>
 
 <p>The dummy example does not do much but give you an idea of what can be done. The best part about this approach is that I dont have to edit any of my existing code to get these numbers and obviously help with profiling.</p>
-<h4> Comment 35112217 ShreevatsaR: </h4>Actually there is some confusion; it appears cProfile does look at wall-clock time by default. I&#39;ve upvoted your answer.<br><h4> Comment 92908549 JayRizzo: </h4>FYI: If you get <code>python -m pstats timeStats.profile ValueError: bad marshal data (unknown type code)</code> check your python version you are running.  I got this when i ran <code>python3 -m cProfile...</code> and <code>python -m pstats</code>. My mistake but got me for a second, so, I wanted to share <code>don&#39;t forget consistency</code>. =)<br><h4> Comment 35111826 ShreevatsaR: </h4>All this is fine, but AFAICT this still measures CPU time, not wall clock time.<br>------------------------------------------------------------------ <br><h3> Answer 27107047 Eyal Ch: </h3><p>(With Ipython only) you can use <a href="https://ipython.org/ipython-doc/3/interactive/magics.html#magic-timeit" rel="noreferrer">%timeit</a> to measure average processing time:</p>
+<h4> ShreevatsaR, Comment 35112217 Score: 2: </h4>Actually there is some confusion; it appears cProfile does look at wall-clock time by default. I&#39;ve upvoted your answer.<br><h4> JayRizzo, Comment 92908549 Score: 0: </h4>FYI: If you get <code>python -m pstats timeStats.profile ValueError: bad marshal data (unknown type code)</code> check your python version you are running.  I got this when i ran <code>python3 -m cProfile...</code> and <code>python -m pstats</code>. My mistake but got me for a second, so, I wanted to share <code>don&#39;t forget consistency</code>. =)<br><h4> ShreevatsaR, Comment 35111826 Score: 0: </h4>All this is fine, but AFAICT this still measures CPU time, not wall clock time.<br>------------------------------------------------------------------ <br><h3> Eyal Ch, Id: 27107047, Score: 21: </h3><p>(With Ipython only) you can use <a href="https://ipython.org/ipython-doc/3/interactive/magics.html#magic-timeit" rel="noreferrer">%timeit</a> to measure average processing time:</p>
 
 <pre><code>def foo():
     print "hello"
@@ -392,7 +392,7 @@ timeStats.profile% stats thankyou
 
 <pre><code>10000 loops, best of 3: 27 µs per loop
 </code></pre>
-<h4> Comment 69529575 raacer: </h4>It worth to mention it is possible to pass flags to %timeit, for example -n specifies how many times the code should be repeated.<br><h4> Comment 135134343 Memming: </h4><code>%%timeit</code> for jupyter notebook cell!<br>------------------------------------------------------------------ <br><h3> Answer 35199035 Danijel: </h3><p>Here is a tiny timer class that returns "hh:mm:ss" string: </p>
+<h4> raacer, Comment 69529575 Score: 5: </h4>It worth to mention it is possible to pass flags to %timeit, for example -n specifies how many times the code should be repeated.<br><h4> Memming, Comment 135134343 Score: 1: </h4><code>%%timeit</code> for jupyter notebook cell!<br>------------------------------------------------------------------ <br><h3> Danijel, Id: 35199035, Score: 21: </h3><p>Here is a tiny timer class that returns "hh:mm:ss" string: </p>
 
 <pre><code>class Timer:
   def __init__(self):
@@ -430,7 +430,7 @@ time_hhmmss = my_timer.get_time_hhmmss()
 
 # ... etc
 </code></pre>
-<h4> Comment 116453214 howdoicode: </h4>And now with f-strings and <a href="https://docs.python.org/3/library/string.html#format-specification-mini-language" rel="nofollow noreferrer"><code>format specifications</code></a> included: <code>time_str = f&quot;{h:02d}:{m:02d}:{s:02d}&quot;</code><br>------------------------------------------------------------------ <br><h3> Answer 56655327 David: </h3><p>I like it <strong>simple</strong> (python 3):</p>
+<h4> howdoicode, Comment 116453214 Score: 0: </h4>And now with f-strings and <a href="https://docs.python.org/3/library/string.html#format-specification-mini-language" rel="nofollow noreferrer"><code>format specifications</code></a> included: <code>time_str = f&quot;{h:02d}:{m:02d}:{s:02d}&quot;</code><br>------------------------------------------------------------------ <br><h3> David, Id: 56655327, Score: 18: </h3><p>I like it <strong>simple</strong> (python 3):</p>
 
 <pre><code>from timeit import timeit
 
@@ -458,7 +458,7 @@ timeit(lambda: time.sleep(1.5), number=1)
 
 <pre><code>1.5015795179999714
 </code></pre>
-<h4> Comment 113491182 Harry Moreno: </h4>what do you mean by output? does timeit write to stdout?<br><h4> Comment 113538809 David: </h4>Nop. I mean the returned value.<br>------------------------------------------------------------------ <br><h3> Answer 56591404 Guillaume Chevalier: </h3><h1>To get insight on every function calls recursively, do:</h1>
+<h4> Harry Moreno, Comment 113491182 Score: 0: </h4>what do you mean by output? does timeit write to stdout?<br><h4> David, Comment 113538809 Score: 0: </h4>Nop. I mean the returned value.<br>------------------------------------------------------------------ <br><h3> Guillaume Chevalier, Id: 56591404, Score: 15: </h3><h1>To get insight on every function calls recursively, do:</h1>
 
 <pre><code>%load_ext snakeviz
 %%snakeviz
@@ -486,7 +486,7 @@ print_files_hashed(files)
 </code></pre>
 
 <p>It also seems possible to run snakeviz outside notebooks. More info on the <a href="https://jiffyclub.github.io/snakeviz/" rel="noreferrer">snakeviz website</a>.</p>
------------------------------------------------------------------- <br><h3> Answer 61536335 Daniel Giger: </h3><p>If you want to be able to time functions conveniently, you can use a simple decorator:</p>
+------------------------------------------------------------------ <br><h3> Daniel Giger, Id: 61536335, Score: 15: </h3><p>If you want to be able to time functions conveniently, you can use a simple decorator:</p>
 <pre class="lang-py prettyprint-override"><code>import time
 
 def timing_decorator(func):
@@ -507,7 +507,7 @@ def function_to_time():
 function_to_time()
 </code></pre>
 <p>Any time you call <code>function_to_time</code>, it will print how long it took and the name of the function being timed.</p>
-<h4> Comment 111953220 Frak: </h4>Is there a Python2.x way of doing this without having to import <code>print_function</code> from <code>__future__</code>? I tried to use <code>join</code> but I don&#39;t understand it well enough to get it to work.<br><h4> Comment 111953323 Frak: </h4>UPDATE. I figured it out and used this: <code>print(&#39;&#39;.join([&quot;time elapsed in &quot;,(func.__name__),&quot;: &quot;,str(end - start)]))</code><br><h4> Comment 130997076 haneulkim: </h4>Hi, is there way to measure time of function run conditionally? For example whenever I pass parameter <code>True</code> in it?<br>------------------------------------------------------------------ <br><h3> Answer 41164411 raacer: </h3><p>One more way to use <a href="https://docs.python.org/2/library/timeit.html" rel="noreferrer">timeit</a>:</p>
+<h4> Frak, Comment 111953220 Score: 0: </h4>Is there a Python2.x way of doing this without having to import <code>print_function</code> from <code>__future__</code>? I tried to use <code>join</code> but I don&#39;t understand it well enough to get it to work.<br><h4> Frak, Comment 111953323 Score: 0: </h4>UPDATE. I figured it out and used this: <code>print(&#39;&#39;.join([&quot;time elapsed in &quot;,(func.__name__),&quot;: &quot;,str(end - start)]))</code><br><h4> haneulkim, Comment 130997076 Score: 0: </h4>Hi, is there way to measure time of function run conditionally? For example whenever I pass parameter <code>True</code> in it?<br>------------------------------------------------------------------ <br><h3> raacer, Id: 41164411, Score: 13: </h3><p>One more way to use <a href="https://docs.python.org/2/library/timeit.html" rel="noreferrer">timeit</a>:</p>
 
 <pre class="lang-py prettyprint-override"><code>from timeit import timeit
 
@@ -517,7 +517,7 @@ def func():
 time = timeit(func, number=1)
 print(time)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 63934234 Wojciech Moszczyński: </h3><p>How to measure the time between two operations. Compare the time of two operations.</p>
+------------------------------------------------------------------ <br><h3> Wojciech Moszczyński, Id: 63934234, Score: 13: </h3><p>How to measure the time between two operations. Compare the time of two operations.</p>
 <pre><code>import time
 
 b = (123*321)*123
@@ -529,7 +529,7 @@ t2 = time.time()
 print(t2-t1)
 </code></pre>
 <p>7.987022399902344e-05</p>
-<h4> Comment 124229700 Will Croxford: </h4>easy to read, easy to use, accurate enough for approx tests or comparisons. But, as I cannot seem to edit at time of writing, to, &#39;compare  the time of two operations&#39;, this should have <code>t0 = time.time()</code> I feel after import line. Then <code>print(t1 -t0)</code> is first operation time. 2 times are needed to compare 2 operations.<br>------------------------------------------------------------------ <br><h3> Answer 74502089 x0s: </h3><p>Here is an answer using:</p>
+<h4> Will Croxford, Comment 124229700 Score: 0: </h4>easy to read, easy to use, accurate enough for approx tests or comparisons. But, as I cannot seem to edit at time of writing, to, &#39;compare  the time of two operations&#39;, this should have <code>t0 = time.time()</code> I feel after import line. Then <code>print(t1 -t0)</code> is first operation time. 2 times are needed to compare 2 operations.<br>------------------------------------------------------------------ <br><h3> x0s, Id: 74502089, Score: 11: </h3><p>Here is an answer using:</p>
 <ul>
 <li>a concise context manager to time code snippets</li>
 <li><code>time.perf_counter()</code> to compute time delta. It should be preferred as it is not adjustable (neither a sysadmin nor a daemon can change its value) contrary to <code>time.time()</code> (see <a href="https://docs.python.org/3/library/time.html#time.get_clock_info" rel="noreferrer">doc</a>)</li>
@@ -561,7 +561,7 @@ with time_it():
 assert time.get_clock_info('time').adjustable
 assert time.get_clock_info('perf_counter').adjustable is False
 </code></pre>
-<h4> Comment 133621899 andres: </h4>You probably want to subscript <code>collections.abc.Iterator</code> directly instead; see <a href="https://docs.python.org/3/library/typing.html#typing.Iterator" rel="nofollow noreferrer">docs.python.org/3/library/typing.html#typing.Iterator</a>. By the way, the minimum needed version to run this isn&#39;t <code>3.10</code> due to typing.<br><h4> Comment 133623171 x0s: </h4>Thanks for your review.  I was confused by the <a href="https://peps.python.org/pep-0604/" rel="nofollow noreferrer">PEP 604</a> enabling <code>Type | None</code> in place of <code>Optional[Type]</code> But this does not apply here. So, you&#39;re right python 3.10 is not required. <a href="https://peps.python.org/pep-0585/" rel="nofollow noreferrer">PEP 585</a> confirms your suggestion, so I&#39;ve updated my answer.<br>------------------------------------------------------------------ <br><h3> Answer 62141170 ruohola: </h3><p>Here's a pretty well documented and fully type hinted decorator I use as a general utility:</p>
+<h4> andres, Comment 133621899 Score: 0: </h4>You probably want to subscript <code>collections.abc.Iterator</code> directly instead; see <a href="https://docs.python.org/3/library/typing.html#typing.Iterator" rel="nofollow noreferrer">docs.python.org/3/library/typing.html#typing.Iterator</a>. By the way, the minimum needed version to run this isn&#39;t <code>3.10</code> due to typing.<br><h4> x0s, Comment 133623171 Score: 0: </h4>Thanks for your review.  I was confused by the <a href="https://peps.python.org/pep-0604/" rel="nofollow noreferrer">PEP 604</a> enabling <code>Type | None</code> in place of <code>Optional[Type]</code> But this does not apply here. So, you&#39;re right python 3.10 is not required. <a href="https://peps.python.org/pep-0585/" rel="nofollow noreferrer">PEP 585</a> confirms your suggestion, so I&#39;ve updated my answer.<br>------------------------------------------------------------------ <br><h3> ruohola, Id: 62141170, Score: 10: </h3><p>Here's a pretty well documented and fully type hinted decorator I use as a general utility:</p>
 <pre><code>from functools import wraps
 from time import perf_counter
 from typing import Any, Callable, Optional, TypeVar, cast
@@ -629,7 +629,7 @@ True
 <p>And the type hints with:</p>
 <pre><code>$ mypy timer.py
 </code></pre>
-<h4> Comment 109956614 Danny: </h4>This is super cool, thank you for sharing. I have not encountered the typing library or the nonlocal keyword -- fun to find new things to learn about. I&#39;m having trouble wrapping my head around this: <code>Callable[[AnyF], AnyF]</code>. What does it mean?<br><h4> Comment 109959564 ruohola: </h4>@Danny On the top I&#39;ve defined the type alias <code>AnyF</code> to mean <code>Callable[..., Any]</code>, so <code>AnyF</code> is a function that can take any amount of any type arguments and return anything. So <code>Callable[[AnyF], AnyF]</code> would expand to <code>Callable[[Callable[..., Any]], Callable[..., Any]]</code>. This is the type of the return value of <code>timer</code> aka the full type of <code>decorator</code>. It is a function that takes any kind of function as its only argument and returns any kind of function.<br><h4> Comment 109962600 Danny: </h4>Thanks for the explanation! I&#39;m still trying to fully wrap my head around the internals of decorators. This helped a lot!<br>------------------------------------------------------------------ <br><h3> Answer 45675005 Andreas Herman: </h3><p>Kind of a super later response, but maybe it serves a purpose for someone. This is a way to do it which I think is super clean.</p>
+<h4> Danny, Comment 109956614 Score: 1: </h4>This is super cool, thank you for sharing. I have not encountered the typing library or the nonlocal keyword -- fun to find new things to learn about. I&#39;m having trouble wrapping my head around this: <code>Callable[[AnyF], AnyF]</code>. What does it mean?<br><h4> ruohola, Comment 109959564 Score: 1: </h4>@Danny On the top I&#39;ve defined the type alias <code>AnyF</code> to mean <code>Callable[..., Any]</code>, so <code>AnyF</code> is a function that can take any amount of any type arguments and return anything. So <code>Callable[[AnyF], AnyF]</code> would expand to <code>Callable[[Callable[..., Any]], Callable[..., Any]]</code>. This is the type of the return value of <code>timer</code> aka the full type of <code>decorator</code>. It is a function that takes any kind of function as its only argument and returns any kind of function.<br><h4> Danny, Comment 109962600 Score: 1: </h4>Thanks for the explanation! I&#39;m still trying to fully wrap my head around the internals of decorators. This helped a lot!<br>------------------------------------------------------------------ <br><h3> Andreas Herman, Id: 45675005, Score: 9: </h3><p>Kind of a super later response, but maybe it serves a purpose for someone. This is a way to do it which I think is super clean.</p>
 
 <pre><code>import time
 
@@ -643,7 +643,7 @@ timed(print, "Hello")
 </code></pre>
 
 <p>Keep in mind that "print" is a function in Python 3 and not Python 2.7. However, it works with any other function. Cheers!</p>
-<h4> Comment 92395603 Daniel Moskovich: </h4>You can turn this into a decorator; this looks even better to me.<br><h4> Comment 81970748 Otieno Rowland: </h4>How can I print very small times? I kind of am getting 0.0sec always<br>------------------------------------------------------------------ <br><h3> Answer 44636960 Vlad Bezden: </h3><p>You can use timeit.</p>
+<h4> Daniel Moskovich, Comment 92395603 Score: 0: </h4>You can turn this into a decorator; this looks even better to me.<br><h4> Otieno Rowland, Comment 81970748 Score: 0: </h4>How can I print very small times? I kind of am getting 0.0sec always<br>------------------------------------------------------------------ <br><h3> Vlad Bezden, Id: 44636960, Score: 8: </h3><p>You can use timeit.</p>
 
 <p>Here is an example on how to test naive_func that takes parameter using Python REPL:</p>
 
@@ -667,7 +667,7 @@ timed(print, "Hello")
 </code></pre>
 
 <p>You don't need wrapper function if function doesn't have any parameters.                                                                                      </p>
-<h4> Comment 91272233 Ciro Santilli OurBigBook.com: </h4>A <code>lambda</code> would be more succinct: <code>print(timeit.timeit(lambda: naive_func(1_000), number=1_000_000))</code><br>------------------------------------------------------------------ <br><h3> Answer 64440741 Myeongsik Joo: </h3><p>print_elapsed_time function is below</p>
+<h4> Ciro Santilli OurBigBook.com, Comment 91272233 Score: 1: </h4>A <code>lambda</code> would be more succinct: <code>print(timeit.timeit(lambda: naive_func(1_000), number=1_000_000))</code><br>------------------------------------------------------------------ <br><h3> Myeongsik Joo, Id: 64440741, Score: 8: </h3><p>print_elapsed_time function is below</p>
 <pre><code>def print_elapsed_time(prefix=''):
     e_time = time.time()
     if not hasattr(print_elapsed_time, 's_time'):
@@ -688,7 +688,7 @@ print_elapsed_time('after tons of jobs')
 after tons of jobs elapsed time: 0.60 sec  
 </code></pre>
 <p>the pros and cons of this function is that you don't need to pass start time</p>
------------------------------------------------------------------- <br><h3> Answer 39549755 Kamlesh Verma: </h3><p>We can also convert time into human-readable time.</p>
+------------------------------------------------------------------ <br><h3> Kamlesh Verma, Id: 39549755, Score: 7: </h3><p>We can also convert time into human-readable time.</p>
 
 <pre><code>import time, datetime
 
@@ -709,7 +709,7 @@ value = end - start
 timestamp = datetime.datetime.fromtimestamp(value)
 print timestamp.strftime('%Y-%m-%d %H:%M:%S')
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 66152141 Lee Netherton: </h3><p>Although it's not strictly asked in the question, it is quite often the case that you want a simple, uniform way to incrementally measure the elapsed time between several lines of code.</p>
+------------------------------------------------------------------ <br><h3> Lee Netherton, Id: 66152141, Score: 7: </h3><p>Although it's not strictly asked in the question, it is quite often the case that you want a simple, uniform way to incrementally measure the elapsed time between several lines of code.</p>
 <p>If you are using Python 3.8 or above, you can make use of <a href="https://www.python.org/dev/peps/pep-0572/" rel="noreferrer">assignment expressions</a> (a.k.a. the walrus operator) to achieve this in a fairly elegant way:</p>
 <pre><code>import time
 
@@ -729,7 +729,7 @@ print(times)
 <p>=&gt;</p>
 <pre><code>{'print': 2.193450927734375e-05, 'sleep': 1.4210970401763916, 'power': 0.005671024322509766}
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 30035725 Karl: </h3><p>I made a library for this, if you want to measure a function you can just do it like this </p>
+------------------------------------------------------------------ <br><h3> Karl, Id: 30035725, Score: 6: </h3><p>I made a library for this, if you want to measure a function you can just do it like this </p>
 
 <pre><code>
 from pythonbenchmark import compare, measure
@@ -751,7 +751,7 @@ myOptimizedFunction(input)
 </code></pre>
 
 <p><a href="https://github.com/Karlheinzniebuhr/pythonbenchmark" rel="noreferrer">https://github.com/Karlheinzniebuhr/pythonbenchmark</a> </p>
------------------------------------------------------------------- <br><h3> Answer 57931660 Asclepius: </h3><p>This unique class-based approach offers a printable string representation, customizable rounding, and convenient access to the elapsed time as a string or a float. It was developed with Python 3.7.</p>
+------------------------------------------------------------------ <br><h3> Asclepius, Id: 57931660, Score: 5: </h3><p>This unique class-based approach offers a printable string representation, customizable rounding, and convenient access to the elapsed time as a string or a float. It was developed with Python 3.7.</p>
 
 <pre class="lang-py prettyprint-override"><code>import datetime
 import timeit
@@ -789,7 +789,7 @@ Time elapsed is 0:00:04.
 &gt;&gt;&gt; timer()
 7.970274425
 </code></pre>
-<h4> Comment 123340732 Dan Nissenbaum: </h4>This is simple and excellent - easy to code; I&#39;m surprised that (a) this kind of functionality isn&#39;t present in ANY of the existing Python profilers; and (b) that this answer, including a simple class that can be copied-and-pasted, wasn&#39;t offered to this question years ago with many more upvotes.<br>------------------------------------------------------------------ <br><h3> Answer 66730164 ingyhere: </h3><p>As a lambda, obtain time elapsed and time stamps:</p>
+<h4> Dan Nissenbaum, Comment 123340732 Score: 1: </h4>This is simple and excellent - easy to code; I&#39;m surprised that (a) this kind of functionality isn&#39;t present in ANY of the existing Python profilers; and (b) that this answer, including a simple class that can be copied-and-pasted, wasn&#39;t offered to this question years ago with many more upvotes.<br>------------------------------------------------------------------ <br><h3> ingyhere, Id: 66730164, Score: 5: </h3><p>As a lambda, obtain time elapsed and time stamps:</p>
 <pre><code>import datetime
 t_set = lambda: datetime.datetime.now().astimezone().replace(microsecond=0)
 t_diff = lambda t: str(t_set() - t)
@@ -810,7 +810,7 @@ datetime.datetime(2021, 3, 21, 1, 25, 17, tzinfo=datetime.timezone(datetime.time
 '2021-03-21 01:25:22-07:00'
 &gt;&gt;&gt; 
 </code></pre>
-<h4> Comment 122749038 MEMark: </h4>I can&#39;t get this to work. <code>unsupported operand type(s) for -: &#39;datetime.datetime&#39; and &#39;function&#39;</code><br><h4> Comment 122758284 ingyhere: </h4>@MEMark Uncertainty here without seeing the code, but note that this was made for Python 3. The error means a the wrong datatype is being used in place of a <code>datetime</code> object. Could the code be trying <code>t_diff(t_diff())</code> or <code>t_diff(t())</code> instead of <code>t_diff(t)</code> (where <code>t</code> is a scalar set earlier as <code>t = t_set()</code>)?<br>------------------------------------------------------------------ <br><h3> Answer 58910352 Sky: </h3><pre><code>import time
+<h4> MEMark, Comment 122749038 Score: 0: </h4>I can&#39;t get this to work. <code>unsupported operand type(s) for -: &#39;datetime.datetime&#39; and &#39;function&#39;</code><br><h4> ingyhere, Comment 122758284 Score: 0: </h4>@MEMark Uncertainty here without seeing the code, but note that this was made for Python 3. The error means a the wrong datatype is being used in place of a <code>datetime</code> object. Could the code be trying <code>t_diff(t_diff())</code> or <code>t_diff(t())</code> instead of <code>t_diff(t)</code> (where <code>t</code> is a scalar set earlier as <code>t = t_set()</code>)?<br>------------------------------------------------------------------ <br><h3> Sky, Id: 58910352, Score: 3: </h3><pre><code>import time
 
 def getElapsedTime(startTime, units):
     elapsedInSeconds = time.time() - startTime
@@ -821,7 +821,7 @@ def getElapsedTime(startTime, units):
     if units == 'hour':
         return elapsedInSeconds/(60*60)
 </code></pre>
-<h4> Comment 110468298 user1318499: </h4>Don&#39;t do this because <code>time.time()</code> doesn&#39;t necessarily increment uniformly. You can get a negative duration if there&#39;s a daylight savings adjustment or whatever. Replace <code>time.time()</code> with <code>time.monotonic()</code>.<br>------------------------------------------------------------------ <br><h3> Answer 61426352 Aditya Patnaik: </h3><h1>Measure execution time of small code snippets.</h1>
+<h4> user1318499, Comment 110468298 Score: 2: </h4>Don&#39;t do this because <code>time.time()</code> doesn&#39;t necessarily increment uniformly. You can get a negative duration if there&#39;s a daylight savings adjustment or whatever. Replace <code>time.time()</code> with <code>time.monotonic()</code>.<br>------------------------------------------------------------------ <br><h3> Aditya Patnaik, Id: 61426352, Score: 3: </h3><h1>Measure execution time of small code snippets.</h1>
 
 <blockquote>
   <p><strong>Unit of time</strong>: <em>measured in seconds as a float</em></p>
@@ -855,7 +855,7 @@ t.repeat()
 </blockquote>
 
 <p>Source <a href="https://docs.python.org/3/library/timeit.html" rel="nofollow noreferrer" title="In the docs,Scroll down a bit to find time.Timer() class">Python Docs</a>!</p>
------------------------------------------------------------------- <br><h3> Answer 61613140 Xiang ZHU: </h3><p>based on the contextmanager solution given by <a href="https://stackoverflow.com/a/30024601/5095636">https://stackoverflow.com/a/30024601/5095636</a>, hereunder the lambda free version, as flake8 warns on the usage of lambda as per <a href="https://www.flake8rules.com/rules/E731.html" rel="nofollow noreferrer">E731</a>:</p>
+------------------------------------------------------------------ <br><h3> Xiang ZHU, Id: 61613140, Score: 2: </h3><p>based on the contextmanager solution given by <a href="https://stackoverflow.com/a/30024601/5095636">https://stackoverflow.com/a/30024601/5095636</a>, hereunder the lambda free version, as flake8 warns on the usage of lambda as per <a href="https://www.flake8rules.com/rules/E731.html" rel="nofollow noreferrer">E731</a>:</p>
 
 <pre class="lang-py prettyprint-override"><code>from contextlib import contextmanager
 from timeit import default_timer
@@ -889,7 +889,7 @@ t.start
 t.end
 t.duration
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 71723858 N3RDIUM: </h3><h1>For Python 3</h1>
+------------------------------------------------------------------ <br><h3> N3RDIUM, Id: 71723858, Score: 1: </h3><h1>For Python 3</h1>
 <p>If you use the <code>time</code> module, you can get the current timestamp, and then execute your code, and get the timestamp again. Now, the time taken will be the first timestamp minus the second timestamp:</p>
 <pre><code>import time
 
@@ -907,7 +907,7 @@ time_taken = second_stamp - first_stamp
 time_taken_seconds = round(time_taken / 1000)
 print(f'{time_taken_seconds} seconds or {time_taken} milliseconds')
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 72748433 STerliakov: </h3><p>I'm pretty late to the party, but this approach was not covered before. When we want to benchmark manually some piece of code, we may want to find out first which of class methods eats the execution time, and this is sometimes not obvious. I have built the following metaclass to solve exactly this problem:</p>
+------------------------------------------------------------------ <br><h3> STerliakov, Id: 72748433, Score: 1: </h3><p>I'm pretty late to the party, but this approach was not covered before. When we want to benchmark manually some piece of code, we may want to find out first which of class methods eats the execution time, and this is sometimes not obvious. I have built the following metaclass to solve exactly this problem:</p>
 <pre class="lang-py prettyprint-override"><code>from __future__ import annotations
 
 from functools import wraps
@@ -1014,7 +1014,7 @@ baz
 MyClass.baz: 4.0531158447265625e-06
 </code></pre>
 <p>It can be combined with other answers to replace <code>time.time</code> with something more precise.</p>
------------------------------------------------------------------- <br><h3> Answer 58924448 alshaboti: </h3><p>The <code>timeit</code> module is good for timing a small piece of Python code. It can be used at least in three forms: </p>
+------------------------------------------------------------------ <br><h3> alshaboti, Id: 58924448, Score: 0: </h3><p>The <code>timeit</code> module is good for timing a small piece of Python code. It can be used at least in three forms: </p>
 
 <p>1- As a command-line module</p>
 
@@ -1039,13 +1039,13 @@ for i in a:
 elapsed_time = timeit.timeit(code_to_test, number=100)/100
 print(elapsed_time)
 </code></pre>
-<h4> Comment 131664411 Cris Luengo: </h4>You can also pass a lambda, which is a better way of timing.<br>------------------------------------------------------------------ <br><h3> Answer 60407865 Punit Vara: </h3><p>Time can also be measured by %timeit magic function as follow:</p>
+<h4> Cris Luengo, Comment 131664411 Score: 0: </h4>You can also pass a lambda, which is a better way of timing.<br>------------------------------------------------------------------ <br><h3> Punit Vara, Id: 60407865, Score: 0: </h3><p>Time can also be measured by %timeit magic function as follow:</p>
 
 <pre><code>%timeit -t -n 1 print("hello")
 </code></pre>
 
 <p><code>n 1</code> is for running function only 1 time.</p>
------------------------------------------------------------------- <br><h3> Answer 71779784 Michael Litvin: </h3><p>You can use <a href="https://github.com/michaelitvin/benchmark-timer" rel="nofollow noreferrer">Benchmark Timer</a> (disclaimer: I'm the author):</p>
+------------------------------------------------------------------ <br><h3> Michael Litvin, Id: 71779784, Score: 0: </h3><p>You can use <a href="https://github.com/michaelitvin/benchmark-timer" rel="nofollow noreferrer">Benchmark Timer</a> (disclaimer: I'm the author):</p>
 <blockquote>
 <h1>Benchmark Timer</h1>
 <p>Use the <code>BenchmarkTimer</code> class to measure the time it takes to execute some piece of code. <br />
@@ -1091,7 +1091,7 @@ MyTimedCode benchmark: n_iters=3 avg=0.100326s std=0.000414s range=[0.099900s~0.
 List of timings:  [0.10018850000000001, 0.09990049999999995, 0.10088760000000008]
 </code></pre>
 </blockquote>
------------------------------------------------------------------- <br><h3> Answer 53522888 vishes_shell: </h3><p>In addition to <code>%timeit</code> in <em>ipython</em> you can also use <strong><code>%%timeit</code></strong> for multi-line code snippets:</p>
+------------------------------------------------------------------ <br><h3> vishes_shell, Id: 53522888, Score: -4: </h3><p>In addition to <code>%timeit</code> in <em>ipython</em> you can also use <strong><code>%%timeit</code></strong> for multi-line code snippets:</p>
 
 <pre><code>In [1]: %%timeit
    ...: complex_func()

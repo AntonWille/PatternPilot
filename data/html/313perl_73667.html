@@ -1,19 +1,19 @@
- <h2> Title: How can I start an interactive console for Perl? </h2> <h3> ibz, question_id: 73667 </h3>Score: 313, Tags: {perl,console,interactive,read-eval-print-loop} <br><p>How can I start an interactive console for Perl, similar to the <code>irb</code> command for Ruby or <code>python</code> for Python?</p>
------------------------------------------------------------------- <br><h3> Answer 73703 Daniel Papasian: </h3><p>You can use the perl debugger on a trivial program, like so:</p>
+ <h2> Title: How can I start an interactive console for Perl? </h2> <h4> ibz, question_id: 73667 </h4>Score: 313, Tags: {perl,console,interactive,read-eval-print-loop} <br><p>How can I start an interactive console for Perl, similar to the <code>irb</code> command for Ruby or <code>python</code> for Python?</p>
+------------------------------------------------------------------ <br><h3> Daniel Papasian, Id: 73703, Score: 343: </h3><p>You can use the perl debugger on a trivial program, like so:</p>
 <pre><code>perl -de1
 </code></pre>
 <p>This command will start the Perl debugger (<code>-d</code>) on expression <code>1</code> (<code>-e1</code>), because the debugger wants something to debug (usually a file containing Perl code).
 The command could be written as <code>perl -d -e 1</code> as well.</p>
 <p>Alternatively there's <a href="http://search.cpan.org/%7Esukria/perlconsole-0.4/perlconsole" rel="nofollow noreferrer"><em>Alexis Sukrieh</em>'s Perl Console</a> application, but I haven't used it.</p>
-<h4> Comment 41519549 albfan: </h4>If you want something minimimaly usable consider to add <a href="http://linux.die.net/man/1/rlwrap" rel="nofollow noreferrer">rlwrap</a> <code>$ rlwrap perl -d -e 1</code> You would get history and a consistent prompt<br><h4> Comment 66000798 Geremia: </h4>Unfortunately, <code>perl -de1</code> doesn&#39;t seem to support <code>my</code> variables, and hashes don&#39;t work either, for some reason…<br><h4> Comment 66001119 Geremia: </h4><code>perlconsole</code> doesn&#39;t suffer from these problems.<br><h4> Comment 50558566 mklement0: </h4>With the benefit of hindsight: <a href="http://stackoverflow.com/a/22840242/45375">J&#225;n S&#225;ren&#237;k&#39;s answer</a> seems to provide the best almost-out-of-the-box solution (you may have to install <code>rlwrap</code>). All third-party REPL/console solutions, including <code>perlconsole</code>, are cumbersome to install and often have more limitations.<br><h4> Comment 45765147 Zen: </h4><code>control</code>+<code>L</code> doesn&#39;t work under this command interface, how should I refresh the screen?<br>------------------------------------------------------------------ <br><h3> Answer 73765 shelfoo: </h3><p>You could look into psh here: <a href="http://gnp.github.io/psh/" rel="noreferrer">http://gnp.github.io/psh/</a></p>
+<h4> albfan, Comment 41519549 Score: 38: </h4>If you want something minimimaly usable consider to add <a href="http://linux.die.net/man/1/rlwrap" rel="nofollow noreferrer">rlwrap</a> <code>$ rlwrap perl -d -e 1</code> You would get history and a consistent prompt<br><h4> Geremia, Comment 66000798 Score: 4: </h4>Unfortunately, <code>perl -de1</code> doesn&#39;t seem to support <code>my</code> variables, and hashes don&#39;t work either, for some reason…<br><h4> Geremia, Comment 66001119 Score: 2: </h4><code>perlconsole</code> doesn&#39;t suffer from these problems.<br><h4> mklement0, Comment 50558566 Score: 2: </h4>With the benefit of hindsight: <a href="http://stackoverflow.com/a/22840242/45375">J&#225;n S&#225;ren&#237;k&#39;s answer</a> seems to provide the best almost-out-of-the-box solution (you may have to install <code>rlwrap</code>). All third-party REPL/console solutions, including <code>perlconsole</code>, are cumbersome to install and often have more limitations.<br><h4> Zen, Comment 45765147 Score: 0: </h4><code>control</code>+<code>L</code> doesn&#39;t work under this command interface, how should I refresh the screen?<br>------------------------------------------------------------------ <br><h3> shelfoo, Id: 73765, Score: 6: </h3><p>You could look into psh here: <a href="http://gnp.github.io/psh/" rel="noreferrer">http://gnp.github.io/psh/</a></p>
 
 <p>It's a full on shell (you can use it in replacement of bash for example), but uses perl syntax.. so you can create methods on the fly etc.</p>
------------------------------------------------------------------- <br><h3> Answer 74119 Dave Rolsky: </h3><p>Not only did Matt Trout write an article about a REPL, he actually wrote one - <a href="http://search.cpan.org/dist/Devel-REPL" rel="noreferrer">Devel::REPL</a></p>
+------------------------------------------------------------------ <br><h3> Dave Rolsky, Id: 74119, Score: 67: </h3><p>Not only did Matt Trout write an article about a REPL, he actually wrote one - <a href="http://search.cpan.org/dist/Devel-REPL" rel="noreferrer">Devel::REPL</a></p>
 
 <p>I've used it a bit and it works fairly well, and it's under active development.</p>
 
 <p>BTW, I have no idea why someone modded down the person who mentioned using "perl -e" from the console. This isn't really a REPL, true, but it's fantastically useful, and I use it all the time.</p>
-<h4> Comment 67934628 Denilson S&#225; Maia: </h4>By the way, Matt Trout, the <code>re.pl</code> author, wrote an article listing several alternatives, and he himself suggests using <code>reply</code> instead of <code>re.pl</code>: <a href="http://shadow.cat/blog/matt-s-trout/mstpan-17/" rel="nofollow noreferrer">shadow.cat/blog/matt-s-trout/mstpan-17</a><br><h4> Comment 71122773 harmic: </h4>Installed this on Centos 6 / Perl 5.10 just now - it dragged in 88 new/updated modules! Seems like a lot for a REPL ...<br><h4> Comment 8205 Jon Ericson: </h4>I think it was assumed I didn&#39;t understand the question.  I guess I&#39;ll edit it a bit. ;-)<br><h4> Comment 50542841 mklement0: </h4>As of mid-2015: Simply running <code>[sudo] cpan Devel::REPL</code> didn&#39;t work for me, neither on OSX 10.10 (Perl 5.18.2) nor on Ubuntu 14.04 (Perl 5.18.2): I get runtime errors complaining about missing modules; installed one, then gave up after another missing module was reported.<br><h4> Comment 64987748 Starfish: </h4>@mklement0 There&#39;s a cpan setting to download and build prerequisite modules automatically. You might need to turn that setting on. Alternatively, the zero-config <a href="https://github.com/miyagawa/cpanminus" rel="nofollow noreferrer">cpanminus</a> application may be a better option.<br><h4> Comment 64989193 mklement0: </h4>@Starfish: Thanks; to save future readers time (since it sounds like the answer may be short): how do you turn this setting on?<br>------------------------------------------------------------------ <br><h3> Answer 22840242 J&#225;n S&#225;ren&#237;k: </h3><p>If you want history, use <a href="https://linux.die.net/man/1/rlwrap" rel="noreferrer">rlwrap</a>. This could be your <code>~/bin/ips</code> for example:</p>
+<h4> Denilson S&#225; Maia, Comment 67934628 Score: 1: </h4>By the way, Matt Trout, the <code>re.pl</code> author, wrote an article listing several alternatives, and he himself suggests using <code>reply</code> instead of <code>re.pl</code>: <a href="http://shadow.cat/blog/matt-s-trout/mstpan-17/" rel="nofollow noreferrer">shadow.cat/blog/matt-s-trout/mstpan-17</a><br><h4> harmic, Comment 71122773 Score: 0: </h4>Installed this on Centos 6 / Perl 5.10 just now - it dragged in 88 new/updated modules! Seems like a lot for a REPL ...<br><h4> Jon Ericson, Comment 8205 Score: 0: </h4>I think it was assumed I didn&#39;t understand the question.  I guess I&#39;ll edit it a bit. ;-)<br><h4> mklement0, Comment 50542841 Score: 0: </h4>As of mid-2015: Simply running <code>[sudo] cpan Devel::REPL</code> didn&#39;t work for me, neither on OSX 10.10 (Perl 5.18.2) nor on Ubuntu 14.04 (Perl 5.18.2): I get runtime errors complaining about missing modules; installed one, then gave up after another missing module was reported.<br><h4> Starfish, Comment 64987748 Score: 0: </h4>@mklement0 There&#39;s a cpan setting to download and build prerequisite modules automatically. You might need to turn that setting on. Alternatively, the zero-config <a href="https://github.com/miyagawa/cpanminus" rel="nofollow noreferrer">cpanminus</a> application may be a better option.<br><h4> mklement0, Comment 64989193 Score: 0: </h4>@Starfish: Thanks; to save future readers time (since it sounds like the answer may be short): how do you turn this setting on?<br>------------------------------------------------------------------ <br><h3> J&#225;n S&#225;ren&#237;k, Id: 22840242, Score: 45: </h3><p>If you want history, use <a href="https://linux.die.net/man/1/rlwrap" rel="noreferrer">rlwrap</a>. This could be your <code>~/bin/ips</code> for example:</p>
 <pre><code>#!/bin/sh
 echo 'This is Interactive Perl shell'
 rlwrap -A -pgreen -S&quot;perl&gt; &quot; perl -wnE'say eval()//$@'
@@ -25,7 +25,7 @@ perl&gt; 2**128
 3.40282366920938e+38
 perl&gt; 
 </code></pre>
-<h4> Comment 50542648 mklement0: </h4>Kudos for wrapping it up nicely - readline support is not only needed for history, but also for editing the command line. With the exception of multi-line support, this works well; here&#39;s an alias version as an alternative: <code>alias iperl=&#39;rlwrap -A -S &quot;perl&gt; &quot; perl -wnE &#39;\&#39;&#39;say eval()&#47;&#47;$@&#39;\&#39;</code>. OSX users can install <code>rlwrap</code> via <a href="http://brew.sh" rel="nofollow noreferrer">Homebrew</a> with <code>brew install rlwrap</code>.<br><h4> Comment 100588494 kxmh42: </h4>Here is a version that gives a nice output when the expression evaluates to a list or a reference: <code>rlwrap -A -pgreen -S&#39;perl&gt; &#39; perl -MData::Dumper -wnE&#39;say Dumper[eval()]&#47;&#47;$@&#39;</code><br>------------------------------------------------------------------ <br><h3> Answer 76154 raldi: </h3><p>I wrote a script I call "psh":</p>
+<h4> mklement0, Comment 50542648 Score: 8: </h4>Kudos for wrapping it up nicely - readline support is not only needed for history, but also for editing the command line. With the exception of multi-line support, this works well; here&#39;s an alias version as an alternative: <code>alias iperl=&#39;rlwrap -A -S &quot;perl&gt; &quot; perl -wnE &#39;\&#39;&#39;say eval()&#47;&#47;$@&#39;\&#39;</code>. OSX users can install <code>rlwrap</code> via <a href="http://brew.sh" rel="nofollow noreferrer">Homebrew</a> with <code>brew install rlwrap</code>.<br><h4> kxmh42, Comment 100588494 Score: 5: </h4>Here is a version that gives a nice output when the expression evaluates to a list or a reference: <code>rlwrap -A -pgreen -S&#39;perl&gt; &#39; perl -MData::Dumper -wnE&#39;say Dumper[eval()]&#47;&#47;$@&#39;</code><br>------------------------------------------------------------------ <br><h3> raldi, Id: 76154, Score: 40: </h3><p>I wrote a script I call "psh":</p>
 
 <pre><code>#! /usr/bin/perl
 
@@ -50,13 +50,13 @@ $x =~ s/o/a/g = 2
 &gt; $x
 $x = faa
 </code></pre>
-<h4> Comment 44577820 David: </h4>Does this work for one liners only or can handle multiline Perl code like conditional branching, loops, nested statements?<br>------------------------------------------------------------------ <br><h3> Answer 73896 amoore: </h3><p>I think you're asking about a REPL (Read, Evaluate, Print, Loop) interface to perl. There are a few ways to do this:</p>
+<h4> David, Comment 44577820 Score: 5: </h4>Does this work for one liners only or can handle multiline Perl code like conditional branching, loops, nested statements?<br>------------------------------------------------------------------ <br><h3> amoore, Id: 73896, Score: 23: </h3><p>I think you're asking about a REPL (Read, Evaluate, Print, Loop) interface to perl. There are a few ways to do this:</p>
 <ul>
 <li>Matt Trout has <a href="https://web.archive.org/web/20100921094613/http://chainsawblues.vox.com/library/post/a-perl-read-excute-print-loop-repl.html" rel="nofollow noreferrer">an article</a> that describes how to write one</li>
 <li>Adriano Ferreira <a href="https://web.archive.org/web/20150905151804/http://use.perl.org/use.perl.org/articlea9a7.html?sid=07/08/30/1729255" rel="nofollow noreferrer">has described some options</a></li>
 <li>and finally, you can hop on IRC at irc.perl.org and try out one of the eval bots in many of the popular channels. They will evaluate chunks of perl that you pass to them.</li>
 </ul>
-<h4> Comment 64553927 lepe: </h4>Matt Trout&#39;s article has been down since some years ago, you can find it here: <a href="https://web.archive.org/web/20100212100032/http://chainsawblues.vox.com/library/post/a-perl-read-excute-print-loop-repl.html" rel="nofollow noreferrer">web.archive.org/web/20100212100032/http://chainsawblues.vox.&zwnj;&#8203;com/&hellip;</a><br><h4> Comment 67098609 Davor Cubranic: </h4>Matt Trout now has a far more up to date list of REPLs he recommends: <a href="http://shadow.cat/blog/matt-s-trout/mstpan-17/" rel="nofollow noreferrer">shadow.cat/blog/matt-s-trout/mstpan-17</a><br>------------------------------------------------------------------ <br><h3> Answer 73742 Jon Ericson: </h3><p>I use the command line as a console:</p>
+<h4> lepe, Comment 64553927 Score: 1: </h4>Matt Trout&#39;s article has been down since some years ago, you can find it here: <a href="https://web.archive.org/web/20100212100032/http://chainsawblues.vox.com/library/post/a-perl-read-excute-print-loop-repl.html" rel="nofollow noreferrer">web.archive.org/web/20100212100032/http://chainsawblues.vox.&zwnj;&#8203;com/&hellip;</a><br><h4> Davor Cubranic, Comment 67098609 Score: 1: </h4>Matt Trout now has a far more up to date list of REPLs he recommends: <a href="http://shadow.cat/blog/matt-s-trout/mstpan-17/" rel="nofollow noreferrer">shadow.cat/blog/matt-s-trout/mstpan-17</a><br>------------------------------------------------------------------ <br><h3> Jon Ericson, Id: 73742, Score: 21: </h3><p>I use the command line as a console:</p>
 
 <pre><code>$ perl -e 'print "JAPH\n"'
 </code></pre>
@@ -64,11 +64,11 @@ $x = faa
 <p>Then I can use my <em>bash</em> history to get back old commands.  This does not preserve state, however.</p>
 
 <p>This form is most useful when you want to test "one little thing" (like when answering Perl questions).  Often, I find these commands get scraped verbatim into a shell script  or makefile.</p>
-<h4> Comment 62973701 trysis: </h4>With some shells, like <code>fish</code>, you don&#39;t even need the <code>\n</code>.<br>------------------------------------------------------------------ <br><h3> Answer 73698 Frank Wiles: </h3><p>There isn't an interactive console for Perl built in like Python does.  You can however use the Perl Debugger to do debugging related things.  You turn it on with the -d option, but you might want to check out 'man perldebug' to learn about it.</p>
+<h4> trysis, Comment 62973701 Score: 1: </h4>With some shells, like <code>fish</code>, you don&#39;t even need the <code>\n</code>.<br>------------------------------------------------------------------ <br><h3> Frank Wiles, Id: 73698, Score: 20: </h3><p>There isn't an interactive console for Perl built in like Python does.  You can however use the Perl Debugger to do debugging related things.  You turn it on with the -d option, but you might want to check out 'man perldebug' to learn about it.</p>
 <p>After a bit of googling, there is a separate project that implements a Perl console which you can find at
 <a href="https://web.archive.org/web/20170726140417/http://www.sukria.net/perlconsole.html" rel="nofollow noreferrer">Perl Console - Perl code interactive evaluator with completion</a>.</p>
 <p>Hope this helps!</p>
------------------------------------------------------------------- <br><h3> Answer 28372724 Eric Johnson: </h3><p>There are two popular Perl REPLs.</p>
+------------------------------------------------------------------ <br><h3> Eric Johnson, Id: 28372724, Score: 18: </h3><p>There are two popular Perl REPLs.</p>
 <ol>
 <li><a href="https://metacpan.org/pod/Devel::REPL" rel="nofollow noreferrer">Devel::REPL</a> is great.</li>
 <li>But IMO <a href="https://metacpan.org/pod/Reply" rel="nofollow noreferrer">Reply</a> is better.</li>
@@ -77,11 +77,11 @@ $x = faa
 <pre><code>$ reply --help
 reply [-lb] [-I dir] [-M mod] [--version] [--help] [--cfg file]
 </code></pre>
-<h4> Comment 51228833 Apteryx: </h4>+1 for recommending Reply. Devel::REPL&#39;s author himself recommended Reply over its own solution when I ask about a good Perl REPL (console) on IRC. Reply also comes with auto-completion that is very handy for inspecting an object&#39;s available methods and attributes. I could install Reply on Ubuntu with the following command: <code>sudo apt-get install libreply-perl</code>. Then it can be run simply typing <code>reply</code> in a terminal.<br><h4> Comment 102347791 Philippe: </h4>How do you install amd run Reply? Neither the Metacpan, nor the Github page provides instructions.<br><h4> Comment 132351837 Gilles Qu&#233;not: </h4>Check the edited answer. <code>reply</code><br>------------------------------------------------------------------ <br><h3> Answer 73689 Clinton Pierce: </h3><p>You can always just drop into the built-in debugger and run commands from there.</p>
+<h4> Apteryx, Comment 51228833 Score: 9: </h4>+1 for recommending Reply. Devel::REPL&#39;s author himself recommended Reply over its own solution when I ask about a good Perl REPL (console) on IRC. Reply also comes with auto-completion that is very handy for inspecting an object&#39;s available methods and attributes. I could install Reply on Ubuntu with the following command: <code>sudo apt-get install libreply-perl</code>. Then it can be run simply typing <code>reply</code> in a terminal.<br><h4> Philippe, Comment 102347791 Score: 1: </h4>How do you install amd run Reply? Neither the Metacpan, nor the Github page provides instructions.<br><h4> Gilles Qu&#233;not, Comment 132351837 Score: 0: </h4>Check the edited answer. <code>reply</code><br>------------------------------------------------------------------ <br><h3> Clinton Pierce, Id: 73689, Score: 15: </h3><p>You can always just drop into the built-in debugger and run commands from there.</p>
 
 <pre><code>   perl -d -e 1
 </code></pre>
-<h4> Comment 134603189 U. Windl: </h4>See <a href="https://stackoverflow.com/a/73703/6607497">stackoverflow.com/a/73703/6607497</a><br>------------------------------------------------------------------ <br><h3> Answer 32798002 mklement0: </h3><p>I've created <a href="https://github.com/mklement0/perli" rel="noreferrer"><code>perli</code></a>, a <strong>Perl REPL</strong> that runs on <strong>Linux, macOS, and Windows</strong>.</p>
+<h4> U. Windl, Comment 134603189 Score: 0: </h4>See <a href="https://stackoverflow.com/a/73703/6607497">stackoverflow.com/a/73703/6607497</a><br>------------------------------------------------------------------ <br><h3> mklement0, Id: 32798002, Score: 15: </h3><p>I've created <a href="https://github.com/mklement0/perli" rel="noreferrer"><code>perli</code></a>, a <strong>Perl REPL</strong> that runs on <strong>Linux, macOS, and Windows</strong>.</p>
 
 <p>Its focus is automatic result printing, convenient documentation lookups, and easy
 inspection of regular-expression matches.<br>
@@ -105,15 +105,15 @@ If you don't mind invoking Perli as <code>perli.pl</code>, you're all set.<br>
 Otherwise, create a batch file named <code>perli.cmd</code> in the same folder with the following content: <code>@%~dpn.pl %*</code>; this enables invocation as just <code>perli</code>.</p></li>
 </ul></li>
 </ul>
-<h4> Comment 77226253 mklement0: </h4>@sdkks: If you find a problem, do <a href="https://github.com/mklement0/perli/issues" rel="nofollow noreferrer">report it on GitHub</a> and I&#39;ll try to fix it. <code>perli</code> hasn&#39;t been updated in a while, because in my personal use I haven&#39;t come across any issues, and few other people seem to use it, but, as far as I know, it still works as advertised.<br><h4> Comment 117282063 David Moles: </h4>I reported an issue and @mklement0 had it fixed and a new version released in less than 24 hours, FWIW. :)<br><h4> Comment 77223724 user3905644: </h4>I like it can launch <code>perldoc</code> from <code>perli</code> REPL like <code>&#39;someCommand ?&#39;</code> . Looks like it hasn&#39;t been updated for a while though, are you still maintaining perli?<br>------------------------------------------------------------------ <br><h3> Answer 73780 Michael Carman: </h3><p>Perl doesn't have a console but the debugger can be used as one. At a command prompt, type <code>perl -de 1</code>. (The value &quot;1&quot; doesn't matter, it's just a valid statement that does nothing.)</p>
+<h4> mklement0, Comment 77226253 Score: 3: </h4>@sdkks: If you find a problem, do <a href="https://github.com/mklement0/perli/issues" rel="nofollow noreferrer">report it on GitHub</a> and I&#39;ll try to fix it. <code>perli</code> hasn&#39;t been updated in a while, because in my personal use I haven&#39;t come across any issues, and few other people seem to use it, but, as far as I know, it still works as advertised.<br><h4> David Moles, Comment 117282063 Score: 3: </h4>I reported an issue and @mklement0 had it fixed and a new version released in less than 24 hours, FWIW. :)<br><h4> user3905644, Comment 77223724 Score: 2: </h4>I like it can launch <code>perldoc</code> from <code>perli</code> REPL like <code>&#39;someCommand ?&#39;</code> . Looks like it hasn&#39;t been updated for a while though, are you still maintaining perli?<br>------------------------------------------------------------------ <br><h3> Michael Carman, Id: 73780, Score: 9: </h3><p>Perl doesn't have a console but the debugger can be used as one. At a command prompt, type <code>perl -de 1</code>. (The value &quot;1&quot; doesn't matter, it's just a valid statement that does nothing.)</p>
 <p>There are also a couple of options for a Perl shell:<br />
 <a href="https://web.archive.org/web/20120522111043/http://perldoc.perl.org/perlfaq3.html#Is-there-a-Perl-shell%3f" rel="noreferrer">Archived &quot;perlfaq3&quot; page which contain question &quot;Is there Perl Shell?&quot;</a></p>
 <p>For more information read <a href="https://perldoc.perl.org/perlfaq3" rel="noreferrer">perlfaq3</a> (current version).</p>
-<h4> Comment 134603194 U. Windl: </h4>See <a href="https://stackoverflow.com/a/73703/6607497">stackoverflow.com/a/73703/6607497</a><br>------------------------------------------------------------------ <br><h3> Answer 73685 Brian Phillips: </h3><p><code>perl -d</code> is your friend:</p>
+<h4> U. Windl, Comment 134603194 Score: 0: </h4>See <a href="https://stackoverflow.com/a/73703/6607497">stackoverflow.com/a/73703/6607497</a><br>------------------------------------------------------------------ <br><h3> Brian Phillips, Id: 73685, Score: 7: </h3><p><code>perl -d</code> is your friend:</p>
 
 <pre><code>% perl -de 0</code></pre>
-<h4> Comment 134603198 U. Windl: </h4>See <a href="https://stackoverflow.com/a/73703/6607497">stackoverflow.com/a/73703/6607497</a><br>------------------------------------------------------------------ <br><h3> Answer 80890 Johny: </h3><p>re.pl from Devel::REPL</p>
------------------------------------------------------------------- <br><h3> Answer 91565 ysth: </h3><p>I always did:</p>
+<h4> U. Windl, Comment 134603198 Score: 0: </h4>See <a href="https://stackoverflow.com/a/73703/6607497">stackoverflow.com/a/73703/6607497</a><br>------------------------------------------------------------------ <br><h3> Johny, Id: 80890, Score: 7: </h3><p>re.pl from Devel::REPL</p>
+------------------------------------------------------------------ <br><h3> ysth, Id: 91565, Score: 7: </h3><p>I always did:</p>
 
 <pre><code>rlwrap perl -wlne'eval;print$@if$@'
 </code></pre>
@@ -124,11 +124,11 @@ Otherwise, create a batch file named <code>perli.cmd</code> in the same folder w
 </code></pre>
 
 <p>(rlwrap is optional)</p>
------------------------------------------------------------------- <br><h3> Answer 18843800 KIM Taegyoon: </h3><p>Read-eval-print loop:</p>
+------------------------------------------------------------------ <br><h3> KIM Taegyoon, Id: 18843800, Score: 5: </h3><p>Read-eval-print loop:</p>
 
 <pre><code>$ perl -e'while(&lt;&gt;){print eval,"\n"}'
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 31283257 mklement0: </h3><p><sup>Update: I've since created a downloadable REPL - see <a href="https://stackoverflow.com/a/32798002/45375">my other answer</a>.</sup></p>
+------------------------------------------------------------------ <br><h3> mklement0, Id: 31283257, Score: 5: </h3><p><sup>Update: I've since created a downloadable REPL - see <a href="https://stackoverflow.com/a/32798002/45375">my other answer</a>.</sup></p>
 
 <p>With the benefit of hindsight:</p>
 
@@ -185,7 +185,7 @@ iperl&gt; p %ENV  # print key-value pairs in hashtable %ENV
 
 <pre><code>iperl&gt; 22 / 7  # automatically print scalar result of expression: 3.14285714285714
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 35815564 gavenkoa: </h3><p>Under Debian/Ubuntu:</p>
+------------------------------------------------------------------ <br><h3> gavenkoa, Id: 35815564, Score: 4: </h3><p>Under Debian/Ubuntu:</p>
 
 <pre><code>$ sudo apt-get install libdevel-repl-perl
 $ re.pl
@@ -193,21 +193,21 @@ $ re.pl
 $ sudo apt-get install libapp-repl-perl
 $ iperl
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 37551820 Davor Cubranic: </h3><p>Matt Trout's <a href="http://shadow.cat/blog/matt-s-trout/mstpan-17/" rel="nofollow noreferrer">overview</a> lists five choices, from <code>perl -de 0</code> onwards, and he recommends <a href="https://metacpan.org/pod/Reply" rel="nofollow noreferrer"><code>Reply</code></a>, if extensibility via plugins is important, or <code>tinyrepl</code> from <a href="https://metacpan.org/pod/Eval::WithLexicals" rel="nofollow noreferrer"><code>Eval::WithLexicals</code></a>, for a minimal, pure-perl solution that includes readline support and lexical persistence.</p>
+------------------------------------------------------------------ <br><h3> Davor Cubranic, Id: 37551820, Score: 4: </h3><p>Matt Trout's <a href="http://shadow.cat/blog/matt-s-trout/mstpan-17/" rel="nofollow noreferrer">overview</a> lists five choices, from <code>perl -de 0</code> onwards, and he recommends <a href="https://metacpan.org/pod/Reply" rel="nofollow noreferrer"><code>Reply</code></a>, if extensibility via plugins is important, or <code>tinyrepl</code> from <a href="https://metacpan.org/pod/Eval::WithLexicals" rel="nofollow noreferrer"><code>Eval::WithLexicals</code></a>, for a minimal, pure-perl solution that includes readline support and lexical persistence.</p>
 <p>If you use the GNU Guix package manager, you can enter a working environment for tinyrepl with:</p>
 <pre><code>$ guix shell perl perl-eval-withlexicals perl-term-readline-gnu
 [env]$ tinyrepl
 re.pl$ 'hello world!'
 &quot;hello world!&quot;
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 90390 Johny: </h3><p>See also <a href="https://web.archive.org/web/20090109221511/http://blog.jrock.us/articles/Stylish%20REPL.pod" rel="nofollow noreferrer">Stylish REPL (for GNU Emacs)</a></p>
------------------------------------------------------------------- <br><h3> Answer 73868 runrig: </h3><p>Also look for ptkdb on CPAN:
+------------------------------------------------------------------ <br><h3> Johny, Id: 90390, Score: 2: </h3><p>See also <a href="https://web.archive.org/web/20090109221511/http://blog.jrock.us/articles/Stylish%20REPL.pod" rel="nofollow noreferrer">Stylish REPL (for GNU Emacs)</a></p>
+------------------------------------------------------------------ <br><h3> runrig, Id: 73868, Score: 1: </h3><p>Also look for ptkdb on CPAN:
 <a href="http://search.cpan.org/search?query=ptkdb&amp;mode=all" rel="nofollow noreferrer">http://search.cpan.org/search?query=ptkdb&amp;mode=all</a></p>
------------------------------------------------------------------- <br><h3> Answer 80900 Johny: </h3><p>Sepia and PDE have also own REPLs (for GNU Emacs).</p>
------------------------------------------------------------------- <br><h3> Answer 61923730 Ross Attrill: </h3><p>You can do it online (like many things in life) here:</p>
+------------------------------------------------------------------ <br><h3> Johny, Id: 80900, Score: 1: </h3><p>Sepia and PDE have also own REPLs (for GNU Emacs).</p>
+------------------------------------------------------------------ <br><h3> Ross Attrill, Id: 61923730, Score: 0: </h3><p>You can do it online (like many things in life) here:</p>
 
 <p><a href="https://www.tutorialspoint.com/execute_perl_online.php" rel="nofollow noreferrer">https://www.tutorialspoint.com/execute_perl_online.php</a></p>
------------------------------------------------------------------- <br><h3> Answer 67925304 HappyFace: </h3><p>You can use <code>org-babel</code> in <code>emacs</code>; Open an <code>org-mode</code> file, i.e., <code>tmp.org</code>, and then you can do:</p>
+------------------------------------------------------------------ <br><h3> HappyFace, Id: 67925304, Score: 0: </h3><p>You can use <code>org-babel</code> in <code>emacs</code>; Open an <code>org-mode</code> file, i.e., <code>tmp.org</code>, and then you can do:</p>
 <pre><code>#+begin_src perl :results output
 @a = (1,5,9);
 print ((join &quot;, &quot;, @a) . &quot;\n&quot;);

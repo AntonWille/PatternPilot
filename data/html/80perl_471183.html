@@ -1,9 +1,9 @@
- <h2> Title: Command line: search and replace in all filenames matched by grep </h2> <h3> Michael Kristofik, question_id: 471183 </h3>Score: 80, Tags: {linux,perl,awk,sed,grep} <br><p>I'm trying to search and replace a string in all files matched by grep:</p>
+ <h2> Title: Command line: search and replace in all filenames matched by grep </h2> <h4> Michael Kristofik, question_id: 471183 </h4>Score: 80, Tags: {linux,perl,awk,sed,grep} <br><p>I'm trying to search and replace a string in all files matched by grep:</p>
 <p><code>grep -n 'foo' *</code> will give me output in the form:</p>
 <pre><code>[filename]:[line number]:[text]
 </code></pre>
 <p>For each file returned by grep, I'd like to modify the file by replacing <code>foo</code> with <code>bar</code>.</p>
------------------------------------------------------------------- <br><h3> Answer 471560 MattJ: </h3><p>This appears to be what you want, based on the example you gave:</p>
+------------------------------------------------------------------ <br><h3> MattJ, Id: 471560, Score: 108: </h3><p>This appears to be what you want, based on the example you gave:</p>
 
 <pre><code>sed -i 's/foo/bar/g' *
 </code></pre>
@@ -14,7 +14,7 @@
 </code></pre>
 
 <p>The <code>*.html</code> is the expression that files must match, the <code>.bak</code> after the <code>-i</code> makes a copy of the original file, with a .bak extension (it can be any extension you like) and the <code>g</code> at the end of the sed expression tells sed to replace multiple copies on one line (rather than only the first one). The <code>-print</code> to find is a convenience to show which files were being matched. All this depends on the exact versions of these tools on your system.</p>
-<h4> Comment 28086933 MattJ: </h4>@knocte -i tells sed to modify the file, otherwise it just prints the modified version to stdout. If you don&#39;t want the .bak file created, just omit the &#39;.bak&#39; part, -i works standalone too.<br><h4> Comment 37555726 Michiel Kauw-A-Tjoe: </h4>On OSX you need to give the <code>find</code> command a directory to start from, for example <code>find . -name &#39;*.html&#39;</code> or <code>find directoryname&#47; -name &#39;*&#39;</code>.<br><h4> Comment 26537152 kaskelotti: </h4>A word of warning for cygwin users. find and sed combo seems to change the user rights for the files that are streamed through. This can be simply fixed by using the command chmod -R 644 * from the same dir level that was used when find/sed was operated.<br><h4> Comment 28079783 knocte: </h4>A word of warning to the people that don&#39;t want to use the -i argument: if you don&#39;t use it, it doesn&#39;t work (don&#39;t ask me why)<br><h4> Comment 40657269 vish: </h4>i needed to add a -e, otherwise it thought the &#39;s...&#39; part was the suffix <code>sed -ie &#39;s&#47;foo&#47;bar&#47;g&#39; *</code><br><h4> Comment 106596719 KrishPrabakar: </h4>Is &quot;foo&quot;, &quot;bar&quot; are just words (for exact match) or a regex?<br><h4> Comment 106703442 MattJ: </h4>@KrishPrabakar regex<br>------------------------------------------------------------------ <br><h3> Answer 471192 armandino: </h3><p>Do you mean search and replace a string in all files matched by grep?</p>
+<h4> MattJ, Comment 28086933 Score: 4: </h4>@knocte -i tells sed to modify the file, otherwise it just prints the modified version to stdout. If you don&#39;t want the .bak file created, just omit the &#39;.bak&#39; part, -i works standalone too.<br><h4> Michiel Kauw-A-Tjoe, Comment 37555726 Score: 2: </h4>On OSX you need to give the <code>find</code> command a directory to start from, for example <code>find . -name &#39;*.html&#39;</code> or <code>find directoryname&#47; -name &#39;*&#39;</code>.<br><h4> kaskelotti, Comment 26537152 Score: 1: </h4>A word of warning for cygwin users. find and sed combo seems to change the user rights for the files that are streamed through. This can be simply fixed by using the command chmod -R 644 * from the same dir level that was used when find/sed was operated.<br><h4> knocte, Comment 28079783 Score: 0: </h4>A word of warning to the people that don&#39;t want to use the -i argument: if you don&#39;t use it, it doesn&#39;t work (don&#39;t ask me why)<br><h4> vish, Comment 40657269 Score: 0: </h4>i needed to add a -e, otherwise it thought the &#39;s...&#39; part was the suffix <code>sed -ie &#39;s&#47;foo&#47;bar&#47;g&#39; *</code><br><h4> KrishPrabakar, Comment 106596719 Score: 0: </h4>Is &quot;foo&quot;, &quot;bar&quot; are just words (for exact match) or a regex?<br><h4> MattJ, Comment 106703442 Score: 0: </h4>@KrishPrabakar regex<br>------------------------------------------------------------------ <br><h3> armandino, Id: 471192, Score: 71: </h3><p>Do you mean search and replace a string in all files matched by grep?</p>
 
 <pre><code>perl -p -i -e 's/oldstring/newstring/g' `grep -ril searchpattern *`
 </code></pre>
@@ -43,7 +43,7 @@
 <pre><code>perl -p -i -e 's/old/new/g' `ack -l --html searchpattern`
 perl -p -i -e 's/old/new/g' `ack -f --html` # will match all html files
 </code></pre>
-<h4> Comment 10380797 Xeoncross: </h4>I think this might have a problem with files/folders that contain spaces. <code>Can&#39;t open Untitled: No such file or directory, &lt;&gt; line 5</code> when trying &quot;Untitled Folder/file.txt&quot;.<br>------------------------------------------------------------------ <br><h3> Answer 471203 Keltia: </h3><p>If your <code>sed(1)</code> has a <code>-i</code> option, then use it like this:</p>
+<h4> Xeoncross, Comment 10380797 Score: 3: </h4>I think this might have a problem with files/folders that contain spaces. <code>Can&#39;t open Untitled: No such file or directory, &lt;&gt; line 5</code> when trying &quot;Untitled Folder/file.txt&quot;.<br>------------------------------------------------------------------ <br><h3> Keltia, Id: 471203, Score: 14: </h3><p>If your <code>sed(1)</code> has a <code>-i</code> option, then use it like this:</p>
 
 <pre><code>for i in *; do
   sed -i 's/foo/bar/' $i
@@ -55,7 +55,7 @@ done
 <pre><code>ruby -i.bak -pe 'sub(%r{foo}, 'bar')' *
 perl -pi.bak -e 's/foo/bar/' *
 </code></pre>
-<h4> Comment 14126370 Jens: </h4><code>for i in *; do ...</code> is redundant, sed can take a list of files as arguments.<br><h4> Comment 37756606 Magpie: </h4>@Jens why not improve this answer by adding your own example to the one above?<br><h4> Comment 63854808 cat: </h4>Variables should always be quoted <code>for i in *; do; sed -i &#39;s&#47;foo&#47;bar&#47;g&#39; &quot;$i&quot;; done</code><br>------------------------------------------------------------------ <br><h3> Answer 3292996 hans: </h3><p>I like and used the above solution or a system wide search and replace among thousands of files:</p>
+<h4> Jens, Comment 14126370 Score: 2: </h4><code>for i in *; do ...</code> is redundant, sed can take a list of files as arguments.<br><h4> Magpie, Comment 37756606 Score: 2: </h4>@Jens why not improve this answer by adding your own example to the one above?<br><h4> cat, Comment 63854808 Score: 0: </h4>Variables should always be quoted <code>for i in *; do; sed -i &#39;s&#47;foo&#47;bar&#47;g&#39; &quot;$i&quot;; done</code><br>------------------------------------------------------------------ <br><h3> hans, Id: 3292996, Score: 6: </h3><p>I like and used the above solution or a system wide search and replace among thousands of files:</p>
 
 <pre><code>find -name '*.htm?' -print -exec sed -i.bak 's/foo/bar/g' {} \;
 </code></pre>
@@ -63,12 +63,12 @@ perl -pi.bak -e 's/foo/bar/' *
 <p>I assume with the '*.htm?' instead of .html it searches and finds .htm and .html files alike.</p>
 
 <p>I replace the .bak with the more system wide used tilde (~) to make clean up of backup files easier.</p>
------------------------------------------------------------------- <br><h3> Answer 20721349 pymarco: </h3><p>This works using grep without needing to use perl or find.</p>
+------------------------------------------------------------------ <br><h3> pymarco, Id: 20721349, Score: 4: </h3><p>This works using grep without needing to use perl or find.</p>
 
 <pre><code>grep -rli 'old-word' * | xargs -i@ sed -i 's/old-word/new-word/g' @
 </code></pre>
-<h4> Comment 42025604 Tony Adams: </h4>xargs does not have a -i on OSX or BSD <a href="http://www.openbsd.org/cgi-bin/man.cgi/OpenBSD-current/man1/xargs.1?query=xargs&amp;sec=1" rel="nofollow noreferrer">openbsd.org/cgi-bin/man.cgi/OpenBSD-current/man1/&hellip;</a> did you mean to use an upper case &quot;I&quot; ?<br><h4> Comment 42026456 pymarco: </h4>I didn&#39;t know <code>-i</code> didn&#39;t work for other OS&#39;s. Works for me on ubuntu.<br><h4> Comment 63498012 Max Wallace: </h4>My <code>xargs</code> manpage (on Ubuntu) says that <code>-i</code> is deprecated, and to use <code>-I</code> instead. So, we should say: <code>grep -rli &#39;old-word&#39; * | xargs -I filepath sed -i &#39;s&#47;old-word&#47;new-word&#47;g&#39; filepath</code><br>------------------------------------------------------------------ <br><h3> Answer 8342282 koolb: </h3><p><code>find . -type f -print0 | xargs -0 &lt;sed/perl/ruby cmd&gt;</code> will process multiple space contained file names at once loading one interpreter per batch. Much faster.</p>
-<h4> Comment 42025463 Tony Adams: </h4>@knocte, &quot;cmd&quot; is a token for the entire search and replace command for whichever given tool one chooses. This answer answers the question about how to deal with the white-space contained file names.<br>------------------------------------------------------------------ <br><h3> Answer 29191591 jlevy: </h3><p>The answer already given of using <strong>find</strong> and <strong>sed</strong></p>
+<h4> Tony Adams, Comment 42025604 Score: 0: </h4>xargs does not have a -i on OSX or BSD <a href="http://www.openbsd.org/cgi-bin/man.cgi/OpenBSD-current/man1/xargs.1?query=xargs&amp;sec=1" rel="nofollow noreferrer">openbsd.org/cgi-bin/man.cgi/OpenBSD-current/man1/&hellip;</a> did you mean to use an upper case &quot;I&quot; ?<br><h4> pymarco, Comment 42026456 Score: 0: </h4>I didn&#39;t know <code>-i</code> didn&#39;t work for other OS&#39;s. Works for me on ubuntu.<br><h4> Max Wallace, Comment 63498012 Score: 0: </h4>My <code>xargs</code> manpage (on Ubuntu) says that <code>-i</code> is deprecated, and to use <code>-I</code> instead. So, we should say: <code>grep -rli &#39;old-word&#39; * | xargs -I filepath sed -i &#39;s&#47;old-word&#47;new-word&#47;g&#39; filepath</code><br>------------------------------------------------------------------ <br><h3> koolb, Id: 8342282, Score: 3: </h3><p><code>find . -type f -print0 | xargs -0 &lt;sed/perl/ruby cmd&gt;</code> will process multiple space contained file names at once loading one interpreter per batch. Much faster.</p>
+<h4> Tony Adams, Comment 42025463 Score: 0: </h4>@knocte, &quot;cmd&quot; is a token for the entire search and replace command for whichever given tool one chooses. This answer answers the question about how to deal with the white-space contained file names.<br>------------------------------------------------------------------ <br><h3> jlevy, Id: 29191591, Score: 1: </h3><p>The answer already given of using <strong>find</strong> and <strong>sed</strong></p>
 
 <p><code>find -name '*.html' -print -exec sed -i.bak 's/foo/bar/g' {} \;</code></p>
 
@@ -90,7 +90,7 @@ perl -pi.bak -e 's/foo/bar/' *
 </ul>
 
 <p><a href="https://github.com/jlevy/repren" rel="nofollow">Check the README</a> for examples.</p>
------------------------------------------------------------------- <br><h3> Answer 33794818 siliconrockstar: </h3><p>This is actually easier than it seems.</p>
+------------------------------------------------------------------ <br><h3> siliconrockstar, Id: 33794818, Score: 1: </h3><p>This is actually easier than it seems.</p>
 
 <pre><code>grep -Rl 'foo' ./ | xargs -n 1 -I % sh -c "ls %; sed -i 's/foo/bar/g' %";
 </code></pre>
@@ -103,7 +103,7 @@ perl -pi.bak -e 's/foo/bar/' *
 </ul>
 
 <p>Easy peasy.  If you get a good grasp on find, grep, xargs, sed, and awk, almost nothing is impossible when it comes to text file manipulation in bash :)</p>
-<h4> Comment 55356282 siliconrockstar: </h4>Bah, disregard, this pymarco already covered this above.  Leaving my answer for the explanation.<br>------------------------------------------------------------------ <br><h3> Answer 70693991 jian: </h3><p>2022 answer.<br />
+<h4> siliconrockstar, Comment 55356282 Score: 0: </h4>Bah, disregard, this pymarco already covered this above.  Leaving my answer for the explanation.<br>------------------------------------------------------------------ <br><h3> jian, Id: 70693991, Score: 0: </h3><p>2022 answer.<br />
 <a href="https://github.com/BurntSushi/ripgrep/blob/master/FAQ.md#how-can-i-search-and-replace-with-ripgrep" rel="nofollow noreferrer">https://github.com/BurntSushi/ripgrep/blob/master/FAQ.md#how-can-i-search-and-replace-with-ripgrep</a></p>
 <pre><code>rg foo --files-with-matches | xargs sed -i 's/foo/bar/g'
 </code></pre>

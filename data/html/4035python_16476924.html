@@ -1,4 +1,4 @@
- <h2> Title: How to iterate over rows in a Pandas DataFrame? </h2> <h3> Roman, question_id: 16476924 </h3>Score: 4035, Tags: {python,pandas,dataframe,loops} <br><p>I have a pandas dataframe, <code>df</code>:</p>
+ <h2> Title: How to iterate over rows in a Pandas DataFrame? </h2> <h4> Roman, question_id: 16476924 </h4>Score: 4035, Tags: {python,pandas,dataframe,loops} <br><p>I have a pandas dataframe, <code>df</code>:</p>
 <pre class="lang-none prettyprint-override"><code>   c1   c2
 0  10  100
 1  11  110
@@ -21,7 +21,7 @@
 </li>
 </ul>
 <p>But I do not understand what the <code>row</code> object is and how I can work with it.</p>
-<h4> Comment 103162518 oulenz: </h4>In contrast to what cs95 says, there are perfectly fine reasons to want to iterate over a dataframe, so new users should not feel discouraged. One example is if you want to execute some code using the values of each row as input. Also, if your dataframe is reasonably small (e.g. less than 1000 items), performance is not really an issue.<br><h4> Comment 134111017 cs95: </h4>If you are a beginner to this thread and are not familiar with the pandas library, it&#39;s worth taking a step back and evaluating whether iteration is indeed the solution to your problem. In some cases, it is. In most cases, it isn&#39;t. It is important to introduce beginners to the library by easing them into the concept of vectorization so they know the difference between writing &quot;good code&quot;, versus &quot;code that just works&quot; - and also know when to use which.<br><h4> Comment 136158671 Gabriel Staples: </h4>Related: <a href="https://stackoverflow.com/q/54028199/4561887">Are for-loops in pandas really bad? When should I care?</a><br><h4> Comment 136698377 Gabriel Staples: </h4>See also: <a href="https://stackoverflow.com/q/7837722/4561887">What is the most efficient way to loop through dataframes with pandas?</a>.<br>------------------------------------------------------------------ <br><h3> Answer 16476974 waitingkuo: </h3><p><a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.iterrows.html#pandas-dataframe-iterrows" rel="noreferrer"><code>DataFrame.iterrows</code></a> is a generator which yields both the index and row (as a Series):</p>
+<h4> oulenz, Id: 103162518 Score: 171: </h4>In contrast to what cs95 says, there are perfectly fine reasons to want to iterate over a dataframe, so new users should not feel discouraged. One example is if you want to execute some code using the values of each row as input. Also, if your dataframe is reasonably small (e.g. less than 1000 items), performance is not really an issue.<br><h4> cs95, Id: 134111017 Score: 10: </h4>If you are a beginner to this thread and are not familiar with the pandas library, it&#39;s worth taking a step back and evaluating whether iteration is indeed the solution to your problem. In some cases, it is. In most cases, it isn&#39;t. It is important to introduce beginners to the library by easing them into the concept of vectorization so they know the difference between writing &quot;good code&quot;, versus &quot;code that just works&quot; - and also know when to use which.<br><h4> Gabriel Staples, Id: 136158671 Score: 0: </h4>Related: <a href="https://stackoverflow.com/q/54028199/4561887">Are for-loops in pandas really bad? When should I care?</a><br><h4> Gabriel Staples, Id: 136698377 Score: 0: </h4>See also: <a href="https://stackoverflow.com/q/7837722/4561887">What is the most efficient way to loop through dataframes with pandas?</a>.<br>------------------------------------------------------------------ <br><h3> waitingkuo, Id: 16476974, Score: 5237: </h3><p><a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.iterrows.html#pandas-dataframe-iterrows" rel="noreferrer"><code>DataFrame.iterrows</code></a> is a generator which yields both the index and row (as a Series):</p>
 <pre><code>import pandas as pd
 
 df = pd.DataFrame({'c1': [10, 11, 12], 'c2': [100, 110, 120]})
@@ -46,7 +46,7 @@ for index, row in df.iterrows():
 </ul>
 </blockquote>
 <p>Other answers in this thread delve into greater depth on alternatives to iter* functions if you are interested to learn more.</p>
-<h4> Comment 136491868 Gabriel Staples: </h4>Although <code>.iterrows()</code> works, it is around <b>600x</b> slower than the fastest technique. I speed test and demonstrate 13 ways to iterate over a Pandas DataFrame <a href="https://stackoverflow.com/a/77270285/4561887">in my answer here</a>. <code>.iterrows()</code> is the 2nd slowest. 11 of the 13 techniques are faster than <code>.iterrows()</code>, and most of them are still really easy once you see an example of how to do them.<br>------------------------------------------------------------------ <br><h3> Answer 55557758 cs95: </h3><blockquote>
+<h4> Gabriel Staples, Comment 136491868 Score: 0: </h4>Although <code>.iterrows()</code> works, it is around <b>600x</b> slower than the fastest technique. I speed test and demonstrate 13 ways to iterate over a Pandas DataFrame <a href="https://stackoverflow.com/a/77270285/4561887">in my answer here</a>. <code>.iterrows()</code> is the 2nd slowest. 11 of the 13 techniques are faster than <code>.iterrows()</code>, and most of them are still really easy once you see an example of how to do them.<br>------------------------------------------------------------------ <br><h3> cs95, Id: 55557758, Score: 2394: </h3><blockquote>
 <h2>How to iterate over rows in a DataFrame in Pandas</h2>
 </blockquote>
 <h1>Answer: DON'T<sup>*</sup>!</h1>
@@ -138,7 +138,7 @@ result = [f(row[0], ..., row[n]) for row in zip(df['col1'], ..., df['coln'])]
 <p>The aim of this answer is to help new users understand that iteration is not necessarily the solution to every problem, and that better, faster and more idiomatic solutions could exist, and that it is worth investing time in exploring them. I'm not trying to start a war of iteration vs. vectorization, but I want new users to be informed when developing solutions to their problems with this library.</p>
 <p>And finally ... a TLDR to summarize this post</p>
 <p><a href="https://i.stack.imgur.com/FYfgi.jpg" rel="noreferrer"><img src="https://i.stack.imgur.com/FYfgi.jpg" alt="enter image description here" /></a></p>
-<h4> Comment 136020567 Timus: </h4>@GabrielStaples Look <a href="https://pandas.pydata.org/docs/user_guide/indexing.html#basics" rel="nofollow noreferrer">here</a>: <i>&quot;... You can pass a list of columns to <code>[]</code> to select columns in that order. ...&quot;</i><br><h4> Comment 136222735 Gabriel Staples: </h4>I used a lot of what you said and ran with it. Check out <a href="https://stackoverflow.com/a/77270285/4561887">these 13 techniques I came up with and the plot that shows their speed differences</a>. Pure vectorization is <b>1400x</b> faster. List comprehension is pretty good too!<br><h4> Comment 135984293 b_dev: </h4>Iterating could be a tool to help during debugging, say with ipdb, especially during initial development and understanding of edge cases.<br><h4> Comment 136017861 Gabriel Staples: </h4>What is the double-bracket syntax here? What does it mean and where is it officially documented? <code>df[[&#39;col1&#39;, ...,&#39;coln&#39;]].to_numpy()</code><br>------------------------------------------------------------------ <br><h3> Answer 41022840 viddik13: </h3><p>First consider if you really need to <em>iterate</em> over rows in a DataFrame. See <a href="https://stackoverflow.com/a/55557758/3844376">cs95's answer</a> for alternatives.</p>
+<h4> Timus, Comment 136020567 Score: 2: </h4>@GabrielStaples Look <a href="https://pandas.pydata.org/docs/user_guide/indexing.html#basics" rel="nofollow noreferrer">here</a>: <i>&quot;... You can pass a list of columns to <code>[]</code> to select columns in that order. ...&quot;</i><br><h4> Gabriel Staples, Comment 136222735 Score: 0: </h4>I used a lot of what you said and ran with it. Check out <a href="https://stackoverflow.com/a/77270285/4561887">these 13 techniques I came up with and the plot that shows their speed differences</a>. Pure vectorization is <b>1400x</b> faster. List comprehension is pretty good too!<br><h4> b_dev, Comment 135984293 Score: 0: </h4>Iterating could be a tool to help during debugging, say with ipdb, especially during initial development and understanding of edge cases.<br><h4> Gabriel Staples, Comment 136017861 Score: 0: </h4>What is the double-bracket syntax here? What does it mean and where is it officially documented? <code>df[[&#39;col1&#39;, ...,&#39;coln&#39;]].to_numpy()</code><br>------------------------------------------------------------------ <br><h3> viddik13, Id: 41022840, Score: 568: </h3><p>First consider if you really need to <em>iterate</em> over rows in a DataFrame. See <a href="https://stackoverflow.com/a/55557758/3844376">cs95's answer</a> for alternatives.</p>
 <p>If you still need to iterate over rows, you can use methods below. Note some  <strong>important caveats</strong> which are not mentioned in any of the other answers.</p>
 <ul>
 <li><p><a href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.iterrows.html" rel="noreferrer">DataFrame.iterrows()</a></p>
@@ -177,8 +177,8 @@ result = [f(row[0], ..., row[n]) for row in zip(df['col1'], ..., df['coln'])]
 </li>
 </ul>
 <p>See <a href="https://pandas.pydata.org/docs/user_guide/basics.html#iteration" rel="noreferrer">pandas docs on iteration</a> for more details.</p>
-<h4> Comment 89180584 Brian Burns: </h4>Note: you can also say something like <code>for row in df[[&#39;c1&#39;,&#39;c2&#39;]].itertuples(index=True, name=None):</code> to include only certain columns in the row iterator.<br><h4> Comment 124151002 Muhammad Yasirroni: </h4>I don&#39;t know why, but using <code>name=None</code> make <code>itertuples</code> 50% faster in my use case.<br>------------------------------------------------------------------ <br><h3> Answer 10739432 Wes McKinney: </h3><p>You should use <a href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.iterrows.html" rel="noreferrer"><code>df.iterrows()</code></a>. Though iterating row-by-row is not especially efficient since <code>Series</code> objects have to be created.</p>
-<h4> Comment 56363619 Richard Wong: </h4>I have done a bit of testing on the time consumption for df.iterrows(), df.itertuples(), and zip(df[&#39;a&#39;], df[&#39;b&#39;]) and posted the result in the answer of another question: <a href="http://stackoverflow.com/a/34311080/2142098">stackoverflow.com/a/34311080/2142098</a><br>------------------------------------------------------------------ <br><h3> Answer 32680162 e9t: </h3><p>While <code>iterrows()</code> is a good option, sometimes <code>itertuples()</code> can be much faster:</p>
+<h4> Brian Burns, Comment 89180584 Score: 8: </h4>Note: you can also say something like <code>for row in df[[&#39;c1&#39;,&#39;c2&#39;]].itertuples(index=True, name=None):</code> to include only certain columns in the row iterator.<br><h4> Muhammad Yasirroni, Comment 124151002 Score: 0: </h4>I don&#39;t know why, but using <code>name=None</code> make <code>itertuples</code> 50% faster in my use case.<br>------------------------------------------------------------------ <br><h3> Wes McKinney, Id: 10739432, Score: 249: </h3><p>You should use <a href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.iterrows.html" rel="noreferrer"><code>df.iterrows()</code></a>. Though iterating row-by-row is not especially efficient since <code>Series</code> objects have to be created.</p>
+<h4> Richard Wong, Comment 56363619 Score: 9: </h4>I have done a bit of testing on the time consumption for df.iterrows(), df.itertuples(), and zip(df[&#39;a&#39;], df[&#39;b&#39;]) and posted the result in the answer of another question: <a href="http://stackoverflow.com/a/34311080/2142098">stackoverflow.com/a/34311080/2142098</a><br>------------------------------------------------------------------ <br><h3> e9t, Id: 32680162, Score: 183: </h3><p>While <code>iterrows()</code> is a good option, sometimes <code>itertuples()</code> can be much faster:</p>
 
 <pre><code>df = pd.DataFrame({'a': randn(1000), 'b': randn(1000),'N': randint(100, 1000, (1000)), 'x': 'x'})
 
@@ -188,11 +188,11 @@ result = [f(row[0], ..., row[n]) for row in zip(df['col1'], ..., df['coln'])]
 %timeit [row[1] * 2 for row in df.itertuples()]
 # =&gt; 1000 loops, best of 3: 541 µs per loop
 </code></pre>
-<h4> Comment 53208434 Alex: </h4>Much of the time difference in your two examples seems like it is due to the fact that you appear to be using label-based indexing for the .iterrows() command and integer-based indexing for the .itertuples() command.<br><h4> Comment 71581133 miradulo: </h4>@AbeMiessler <code>iterrows()</code> boxes each row of data into a Series, whereas <code>itertuples()</code>does not.<br><h4> Comment 93283838 Ajasja: </h4>I get a &gt;50 times increase as well <a href="https://i.stack.imgur.com/HBe9o.png" rel="nofollow noreferrer">i.stack.imgur.com/HBe9o.png</a> (while changing to attr accessor in the second run).<br>------------------------------------------------------------------ <br><h3> Answer 39370553 PJay: </h3><p>You can use the <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.iloc.html" rel="noreferrer"><code>df.iloc</code></a> function as follows:</p>
+<h4> Alex, Comment 53208434 Score: 10: </h4>Much of the time difference in your two examples seems like it is due to the fact that you appear to be using label-based indexing for the .iterrows() command and integer-based indexing for the .itertuples() command.<br><h4> miradulo, Comment 71581133 Score: 8: </h4>@AbeMiessler <code>iterrows()</code> boxes each row of data into a Series, whereas <code>itertuples()</code>does not.<br><h4> Ajasja, Comment 93283838 Score: 2: </h4>I get a &gt;50 times increase as well <a href="https://i.stack.imgur.com/HBe9o.png" rel="nofollow noreferrer">i.stack.imgur.com/HBe9o.png</a> (while changing to attr accessor in the second run).<br>------------------------------------------------------------------ <br><h3> PJay, Id: 39370553, Score: 160: </h3><p>You can use the <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.iloc.html" rel="noreferrer"><code>df.iloc</code></a> function as follows:</p>
 <pre class="lang-py prettyprint-override"><code>for i in range(0, len(df)):
     print(df.iloc[i]['c1'], df.iloc[i]['c2'])
 </code></pre>
-<h4> Comment 83643245 Ken Williams: </h4>This is the only valid technique I know of if you want to preserve the data types, and also refer to columns by name.  <code>itertuples</code> preserves data types, but gets rid of any name it doesn&#39;t like.  <code>iterrows</code> does the opposite.<br>------------------------------------------------------------------ <br><h3> Answer 30566899 cheekybastard: </h3><p>You can also use <code>df.apply()</code> to iterate over rows and access multiple columns for a function.</p>
+<h4> Ken Williams, Comment 83643245 Score: 22: </h4>This is the only valid technique I know of if you want to preserve the data types, and also refer to columns by name.  <code>itertuples</code> preserves data types, but gets rid of any name it doesn&#39;t like.  <code>iterrows</code> does the opposite.<br>------------------------------------------------------------------ <br><h3> cheekybastard, Id: 30566899, Score: 129: </h3><p>You can also use <code>df.apply()</code> to iterate over rows and access multiple columns for a function.</p>
 <p><a href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.apply.html" rel="nofollow noreferrer">docs: DataFrame.apply()</a></p>
 <pre><code>def valuation_formula(x, y):
     return x * y * 0.5
@@ -200,7 +200,7 @@ result = [f(row[0], ..., row[n]) for row in zip(df['col1'], ..., df['coln'])]
 df['price'] = df.apply(lambda row: valuation_formula(row['x'], row['y']), axis=1)
 </code></pre>
 <p>Note that <code>axis=1</code> here is the same as <code>axis='columns'</code>, and is used do apply the function to each <em>row</em> instead of to each <em>column</em>. If unspecified, the default behavior is to apply to the function to each <em>column</em>.</p>
-<h4> Comment 86313667 gented: </h4>Notice that <code>apply</code> doesn&#39;t &quot;iteratite&quot; over rows, rather it applies a function row-wise. The above code wouldn&#39;t work if you really <i>do</i> need iterations and indeces, for instance when comparing values across different rows (in that case you can do nothing but iterating).<br><h4> Comment 135973412 Gabriel Staples: </h4>@gented, that&#39;s not exactly true. To get access to values in a previous row, for instance, you can simply add a new column containing previous-row values, like this: <code>dataframe[&quot;val_previous&quot;] = dataframe[&quot;val&quot;].shift(1)</code>. Then, you could access this <code>val_previous</code> variable in a given row using this answer.<br>------------------------------------------------------------------ <br><h3> Answer 59413206 Romain Capron: </h3><h2>How to iterate efficiently</h2>
+<h4> gented, Comment 86313667 Score: 14: </h4>Notice that <code>apply</code> doesn&#39;t &quot;iteratite&quot; over rows, rather it applies a function row-wise. The above code wouldn&#39;t work if you really <i>do</i> need iterations and indeces, for instance when comparing values across different rows (in that case you can do nothing but iterating).<br><h4> Gabriel Staples, Comment 135973412 Score: 0: </h4>@gented, that&#39;s not exactly true. To get access to values in a previous row, for instance, you can simply add a new column containing previous-row values, like this: <code>dataframe[&quot;val_previous&quot;] = dataframe[&quot;val&quot;].shift(1)</code>. Then, you could access this <code>val_previous</code> variable in a given row using this answer.<br>------------------------------------------------------------------ <br><h3> Romain Capron, Id: 59413206, Score: 72: </h3><h2>How to iterate efficiently</h2>
 <p>If you really have to iterate a Pandas <code>DataFrame</code>, you will probably want to <strong>avoid using <code>iterrows()</code></strong>. There are different methods, and the usual <code>iterrows()</code> is far from being the best. <strong>`itertuples()`` can be 100 times faster.</strong></p>
 <p><strong>In short:</strong></p>
 <ul>
@@ -284,13 +284,13 @@ print(&quot;4. Polyvalent Itertuples working even with special characters in the
 <ol>
 <li><a href="https://medium.com/swlh/why-pandas-itertuples-is-faster-than-iterrows-and-how-to-make-it-even-faster-bc50c0edd30d" rel="nofollow noreferrer">This article is a very interesting comparison between <code>iterrows()</code> and <code>itertuples()</code></a></li>
 </ol>
------------------------------------------------------------------- <br><h3> Answer 48297889 Lucas B: </h3><p>I was looking for <strong>How to iterate on rows</strong> <strong><em>and</em></strong> <strong>columns</strong> and ended here so:</p>
+------------------------------------------------------------------ <br><h3> Lucas B, Id: 48297889, Score: 53: </h3><p>I was looking for <strong>How to iterate on rows</strong> <strong><em>and</em></strong> <strong>columns</strong> and ended here so:</p>
 
 <pre><code>for i, row in df.iterrows():
     for j, column in row.iteritems():
         print(column)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 70096237 Sachin: </h3><p>We have multiple options to do the same, and lots of folks have shared their answers.</p>
+------------------------------------------------------------------ <br><h3> Sachin, Id: 70096237, Score: 42: </h3><p>We have multiple options to do the same, and lots of folks have shared their answers.</p>
 <p>I found the below two methods easy and efficient to do:</p>
 <ol>
 <li><a href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.iterrows.html" rel="noreferrer">DataFrame.iterrows()</a></li>
@@ -313,7 +313,7 @@ print(&quot;4. Polyvalent Itertuples working even with special characters in the
      print(row.c1, row.c2)
 </code></pre>
 <p>Note: itertuples() is supposed to be faster than iterrows()</p>
------------------------------------------------------------------- <br><h3> Answer 47149876 piRSquared: </h3><p>You can write your own iterator that implements <code>namedtuple</code></p>
+------------------------------------------------------------------ <br><h3> piRSquared, Id: 47149876, Score: 27: </h3><p>You can write your own iterator that implements <code>namedtuple</code></p>
 
 <pre><code>from collections import namedtuple
 
@@ -385,15 +385,15 @@ res.groupby(res.columns.str[4:-1], axis=1).plot(loglog=True);
 <p><a href="https://i.stack.imgur.com/rt88e.png" rel="noreferrer"><img src="https://i.stack.imgur.com/rt88e.png" alt="enter image description here"></a></p>
 
 <p><a href="https://i.stack.imgur.com/azbOF.png" rel="noreferrer"><img src="https://i.stack.imgur.com/azbOF.png" alt="enter image description here"></a></p>
-<h4> Comment 82152350 James L.: </h4>For people who don&#39;t want to read the code: blue line is <code>intertuples</code>, orange line is a list of an iterator thru a yield block. <code>interrows</code> is not compared.<br>------------------------------------------------------------------ <br><h3> Answer 42741552 Pedro Lobito: </h3><p>To loop all rows in a <code>dataframe</code> you can use:</p>
+<h4> James L., Comment 82152350 Score: 5: </h4>For people who don&#39;t want to read the code: blue line is <code>intertuples</code>, orange line is a list of an iterator thru a yield block. <code>interrows</code> is not compared.<br>------------------------------------------------------------------ <br><h3> Pedro Lobito, Id: 42741552, Score: 24: </h3><p>To loop all rows in a <code>dataframe</code> you can use:</p>
 
 <pre><code>for x in range(len(date_example.index)):
     print date_example['Date'].iloc[x]
 </code></pre>
-<h4> Comment 98187416 cs95: </h4>If you want to make this work, call df.columns.get_loc to get the integer index position of the date column (outside the loop), then use a single iloc indexing call inside.<br>------------------------------------------------------------------ <br><h3> Answer 47073107 Grag2015: </h3><pre><code> for ind in df.index:
+<h4> cs95, Comment 98187416 Score: 0: </h4>If you want to make this work, call df.columns.get_loc to get the integer index position of the date column (outside the loop), then use a single iloc indexing call inside.<br>------------------------------------------------------------------ <br><h3> Grag2015, Id: 47073107, Score: 23: </h3><pre><code> for ind in df.index:
      print df['c1'][ind], df['c2'][ind]
 </code></pre>
-<h4> Comment 98185895 cs95: </h4>This is chained indexing. Do not use this!<br>------------------------------------------------------------------ <br><h3> Answer 51069586 Zach: </h3><p>Sometimes a useful pattern is:</p>
+<h4> cs95, Comment 98185895 Score: 6: </h4>This is chained indexing. Do not use this!<br>------------------------------------------------------------------ <br><h3> Zach, Id: 51069586, Score: 17: </h3><p>Sometimes a useful pattern is:</p>
 
 <pre><code># Borrowing @KutalmisB df example
 df = pd.DataFrame({'col1': [1, 2], 'col2': [0.1, 0.2]}, index=['a', 'b'])
@@ -408,7 +408,7 @@ for row_dict in df.to_dict(orient='records'):
 <pre><code>{'col1':1.0, 'col2':0.1}
 {'col1':2.0, 'col2':0.2}
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 60836700 bug_spray: </h3><p><strong>Update</strong>: cs95 has updated <a href="https://stackoverflow.com/questions/16476924/how-to-iterate-over-rows-in-a-dataframe-in-pandas/55557758#55557758">his answer</a> to include plain numpy vectorization. You can simply refer to his answer.</p>
+------------------------------------------------------------------ <br><h3> bug_spray, Id: 60836700, Score: 17: </h3><p><strong>Update</strong>: cs95 has updated <a href="https://stackoverflow.com/questions/16476924/how-to-iterate-over-rows-in-a-dataframe-in-pandas/55557758#55557758">his answer</a> to include plain numpy vectorization. You can simply refer to his answer.</p>
 <hr />
 <p><a href="https://stackoverflow.com/questions/16476924/how-to-iterate-over-rows-in-a-dataframe-in-pandas/55557758#55557758">cs95 shows</a> that Pandas vectorization far outperforms other Pandas methods for computing stuff with dataframes.</p>
 <p>I wanted to add that if you first convert the dataframe to a NumPy array and then use vectorization, it's even faster than Pandas dataframe vectorization, (and that includes the time to turn it back into a dataframe series).</p>
@@ -422,7 +422,7 @@ def just_np_vectorization(df):
     return np_arr[:,0] + np_arr[:,1]
 </code></pre>
 <p><a href="https://i.stack.imgur.com/L0u4A.png" rel="noreferrer"><img src="https://i.stack.imgur.com/L0u4A.png" alt="Enter image description here" /></a></p>
-<h4> Comment 121960481 bug_spray: </h4><a href="https://gist.github.com/Coldsp33d/948f96b384ca5bdf6e8ce203ac97c9a0/revisions" rel="nofollow noreferrer">cs95&#39;s benchmarking code, for your reference</a><br>------------------------------------------------------------------ <br><h3> Answer 49984074 Herpes Free Engineer: </h3><p>To loop all rows in a <code>dataframe</code> and <strong>use</strong> values of each row <strong>conveniently</strong>, <code>namedtuples</code> can be converted to <code>ndarray</code>s. For example:</p>
+<h4> bug_spray, Comment 121960481 Score: 2: </h4><a href="https://gist.github.com/Coldsp33d/948f96b384ca5bdf6e8ce203ac97c9a0/revisions" rel="nofollow noreferrer">cs95&#39;s benchmarking code, for your reference</a><br>------------------------------------------------------------------ <br><h3> Herpes Free Engineer, Id: 49984074, Score: 15: </h3><p>To loop all rows in a <code>dataframe</code> and <strong>use</strong> values of each row <strong>conveniently</strong>, <code>namedtuples</code> can be converted to <code>ndarray</code>s. For example:</p>
 
 <pre><code>df = pd.DataFrame({'col1': [1, 2], 'col2': [0.1, 0.2]}, index=['a', 'b'])
 </code></pre>
@@ -440,14 +440,14 @@ def just_np_vectorization(df):
 </code></pre>
 
 <p>Please note that if <code>index=True</code>, <strong>the index is added as the first element of the tuple</strong>, which may be undesirable for some applications.</p>
------------------------------------------------------------------- <br><h3> Answer 58436037 Zeitgeist: </h3><p>There is a way to iterate throw rows while getting a DataFrame in return, and not a Series. I don't see anyone mentioning that you can pass index as a list for the row to be returned as a DataFrame:</p>
+------------------------------------------------------------------ <br><h3> Zeitgeist, Id: 58436037, Score: 15: </h3><p>There is a way to iterate throw rows while getting a DataFrame in return, and not a Series. I don't see anyone mentioning that you can pass index as a list for the row to be returned as a DataFrame:</p>
 
 <pre><code>for i in range(len(df)):
     row = df.iloc[[i]]
 </code></pre>
 
 <p>Note the usage of double brackets. This returns a DataFrame with a single row.</p>
------------------------------------------------------------------- <br><h3> Answer 62136475 artoby: </h3><p>In short</p>
+------------------------------------------------------------------ <br><h3> artoby, Id: 62136475, Score: 15: </h3><p>In short</p>
 <ul>
 <li>Use vectorization if possible</li>
 <li>If an operation can't be vectorized - use list comprehensions</li>
@@ -457,13 +457,13 @@ def just_np_vectorization(df):
 </ul>
 <h3>Benchmark</h3>
 <p><a href="https://i.stack.imgur.com/ytaWK.png" rel="noreferrer"><img src="https://i.stack.imgur.com/ytaWK.png" alt="Benchmark of iteration over rows in a Pandas DataFrame" /></a></p>
-<h4> Comment 132511413 JohnE: </h4>Cython will help ofc but numpy/numba probably more accessible for most people<br>------------------------------------------------------------------ <br><h3> Answer 66481258 dna-data: </h3><p>Use <code>df.iloc[]</code>. For example, using dataframe 'rows_df':</p>
+<h4> JohnE, Comment 132511413 Score: 0: </h4>Cython will help ofc but numpy/numba probably more accessible for most people<br>------------------------------------------------------------------ <br><h3> dna-data, Id: 66481258, Score: 0: </h3><p>Use <code>df.iloc[]</code>. For example, using dataframe 'rows_df':</p>
 <p><a href="https://i.stack.imgur.com/eRESg.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/eRESg.png" alt="Enter image description here" /></a></p>
 <p><em>Or</em></p>
 <p>To get values from a specific row, you can convert the dataframe into ndarray.</p>
 <p>Then select the row and column values like this:</p>
 <p><a href="https://i.stack.imgur.com/7iMUn.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/7iMUn.png" alt="Enter image description here" /></a></p>
-<h4> Comment 117585284 Scratte: </h4>Consider not posting code in images, but as text in a code block.<br>------------------------------------------------------------------ <br><h3> Answer 65396738 JohnE: </h3><h2>Sometimes loops really are better than vectorized code</h2>
+<h4> Scratte, Comment 117585284 Score: 14: </h4>Consider not posting code in images, but as text in a code block.<br>------------------------------------------------------------------ <br><h3> JohnE, Id: 65396738, Score: 13: </h3><h2>Sometimes loops really are better than vectorized code</h2>
 <p>As many answers here correctly point out, your default plan in Pandas should be to write vectorized code (with its implicit loops) rather than attempting an explicit loop yourself.  But the question remains whether you should <em>ever</em> write loops in Pandas, and if so what's the best way to loop in those situations.</p>
 <p><strong>I believe there is at least one general situation where loops are appropriate: when you need to calculate some function that depends on values in <em>other</em> rows in a somewhat complex manner.  In this case, the looping code is often simpler, more readable, and less error prone than vectorized code.</strong></p>
 <p><strong>The looping code might even be faster too</strong>, as you'll see below, so loops might make sense in cases where speed is of utmost importance. But really, those are just going to be subsets of cases where you probably should have been working in numpy/numba (rather than Pandas) to begin with, because optimized numpy/numba will almost always be faster than Pandas.</p>
@@ -502,7 +502,7 @@ df['desired_result'] = custom_sum( df.x.to_numpy(), df.y.to_numpy() )
 </code></pre>
 <p>And this code is actually <em>faster</em> than the vectorized code.  In some quick tests with 100,000 rows, the above is about 10x faster than the <em>groupby</em> approach.  Note that one key to the speed there is numba, which is optional.  Without the &quot;@nb.jit&quot; line, the looping code is actually about 10x slower than the <em>groupby</em> approach.</p>
 <p>Clearly this example is simple enough that you would likely prefer the one line of pandas to writing a loop with its associated overhead.  However, there are more complex versions of this problem for which the readability or speed of the NumPy/numba loop approach likely makes sense.</p>
------------------------------------------------------------------- <br><h3> Answer 75516239 Jordy: </h3><p>I recommend using <code>df.at[row, column]</code> (<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.at.html" rel="noreferrer">source</a>) for iterate all pandas cells.</p>
+------------------------------------------------------------------ <br><h3> Jordy, Id: 75516239, Score: 13: </h3><p>I recommend using <code>df.at[row, column]</code> (<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.at.html" rel="noreferrer">source</a>) for iterate all pandas cells.</p>
 <p>For example :</p>
 <pre><code>for row in range(len(df)):
   print(df.at[row, 'c1'], df.at[row, 'c2'])
@@ -524,7 +524,7 @@ df['desired_result'] = custom_sum( df.x.to_numpy(), df.y.to_numpy() )
 data-11 110
 data-12 120
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 54896256 Hossein Kalbasi: </h3><p>For both viewing and modifying values, I would use <code>iterrows()</code>. In a for loop and by using tuple unpacking (see the example: <code>i, row</code>), I use the <code>row</code> for only viewing the value and use <code>i</code> with the <code>loc</code> method when I want to modify values. As stated in previous answers, here you should not modify something you are iterating over.</p>
+------------------------------------------------------------------ <br><h3> Hossein Kalbasi, Id: 54896256, Score: 12: </h3><p>For both viewing and modifying values, I would use <code>iterrows()</code>. In a for loop and by using tuple unpacking (see the example: <code>i, row</code>), I use the <code>row</code> for only viewing the value and use <code>i</code> with the <code>loc</code> method when I want to modify values. As stated in previous answers, here you should not modify something you are iterating over.</p>
 
 <pre><code>for i, row in df.iterrows():
     df_column_A = df.loc[i, 'A']
@@ -533,7 +533,7 @@ data-12 120
 </code></pre>
 
 <p>Here the <code>row</code> in the loop is a copy of that row, and not a view of it. Therefore, you should NOT write something like <code>row['A'] = 'New_Value'</code>, it will not modify the DataFrame. However, you can use <code>i</code> and <code>loc</code> and specify the DataFrame to do the work.</p>
------------------------------------------------------------------- <br><h3> Answer 77270285 Gabriel Staples: </h3><p>Key takeaways:</p>
+------------------------------------------------------------------ <br><h3> Gabriel Staples, Id: 77270285, Score: 12: </h3><p>Key takeaways:</p>
 <ol>
 <li>Use vectorization.</li>
 <li><strong>Speed profile</strong> your code! Don't assume something is faster because you <em>think</em> it is faster; speed profile it and <em>prove</em> it is faster. The results may surprise you.</li>
@@ -1141,7 +1141,7 @@ df[&quot;val&quot;] = (
 </ol>
 </li>
 </ol>
------------------------------------------------------------------- <br><h3> Answer 54264778 shubham ranjan: </h3><p>There are so many ways to iterate over the rows in Pandas dataframe. One very simple and intuitive way is:</p>
+------------------------------------------------------------------ <br><h3> shubham ranjan, Id: 54264778, Score: 10: </h3><p>There are so many ways to iterate over the rows in Pandas dataframe. One very simple and intuitive way is:</p>
 
 <pre><code>df = pd.DataFrame({'A':[1, 2, 3], 'B':[4, 5, 6], 'C':[7, 8, 9]})
 print(df)
@@ -1152,13 +1152,13 @@ for i in range(df.shape[0]):
     # For printing more than one columns
     print(df.iloc[i, [0, 2]])
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 64653674 Fran&#231;ois B.: </h3><p>The easiest way, use the <code>apply</code> function</p>
+------------------------------------------------------------------ <br><h3> Fran&#231;ois B., Id: 64653674, Score: 9: </h3><p>The easiest way, use the <code>apply</code> function</p>
 <pre class="lang-py prettyprint-override"><code>def print_row(row):
    print row['c1'], row['c2']
 
 df.apply(lambda row: print_row(row), axis=1)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 68562557 Ernesto Els&#228;&#223;er: </h3><p>Probably the most elegant solution (but certainly not the most efficient):</p>
+------------------------------------------------------------------ <br><h3> Ernesto Els&#228;&#223;er, Id: 68562557, Score: 8: </h3><p>Probably the most elegant solution (but certainly not the most efficient):</p>
 <pre><code>for row in df.values:
     c2 = row[1]
     print(row)
@@ -1174,7 +1174,7 @@ for c1, c2 in df.values:
 <li>there are <a href="https://stackoverflow.com/a/55557758/4248897">good reasons</a> not to use a loop in the first place</li>
 </ul>
 <p>Still, I think this option should be included here, as a straightforward solution to a (one should think) trivial problem.</p>
------------------------------------------------------------------- <br><h3> Answer 47598852 James L.: </h3><p>You can also do NumPy indexing for even greater speed ups. It's not really iterating but works much better than iteration for certain applications.</p>
+------------------------------------------------------------------ <br><h3> James L., Id: 47598852, Score: 6: </h3><p>You can also do NumPy indexing for even greater speed ups. It's not really iterating but works much better than iteration for certain applications.</p>
 
 <pre><code>subset = row['c1'][0:5]
 all = row['c1'][:]
@@ -1185,8 +1185,8 @@ all = row['c1'][:]
 <pre><code>np.asarray(all)
 imgs[:] = cv2.resize(imgs[:], (224,224) ) # Resize every image in an hdf5 file
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 68233908 Ashvani Jaiswal: </h3><p><code>df.iterrows()</code> returns <code>tuple(a, b)</code> where <code>a</code> is the <code>index</code> and <code>b</code> is the <code>row</code>.</p>
------------------------------------------------------------------- <br><h3> Answer 75989939 cottontail: </h3><h4>1. Iterate over <code>df.index</code> and access via <code>at[]</code></h4>
+------------------------------------------------------------------ <br><h3> Ashvani Jaiswal, Id: 68233908, Score: 5: </h3><p><code>df.iterrows()</code> returns <code>tuple(a, b)</code> where <code>a</code> is the <code>index</code> and <code>b</code> is the <code>row</code>.</p>
+------------------------------------------------------------------ <br><h3> cottontail, Id: 75989939, Score: 5: </h3><h4>1. Iterate over <code>df.index</code> and access via <code>at[]</code></h4>
 <p>A method that is quite readable is to iterate over the index (as suggested by <a href="https://stackoverflow.com/a/47073107/19123103">@Grag2015</a>). However, instead of chained indexing used there, use <code>at</code> for efficiency:</p>
 <pre class="lang-py prettyprint-override"><code>for ind in df.index:
     print(df.at[ind, 'col A'])
@@ -1241,7 +1241,7 @@ for index, row in df.to_dict('index').items():
 <hr />
 <p>Finally, as <a href="https://stackoverflow.com/a/55557758/19123103">@cs95</a> mentioned, avoid looping as much possible. Especially if your data is numeric, there'll be an optimized method for your task in the library if you dig a little bit.</p>
 <p>That said, there are some cases where iteration is more efficient than vectorized operations. One common such task is to dump a pandas dataframe into a nested json. At least as of pandas 1.5.3, an <code>itertuples()</code> loop is much faster than any vectorized operation involving <code>groupby.apply</code> method in that case.</p>
------------------------------------------------------------------- <br><h3> Answer 55202153 mjr2000: </h3><p>This example uses iloc to isolate each digit in the data frame. </p>
+------------------------------------------------------------------ <br><h3> mjr2000, Id: 55202153, Score: 4: </h3><p>This example uses iloc to isolate each digit in the data frame. </p>
 
 <pre><code>import pandas as pd
 
@@ -1256,7 +1256,7 @@ for index, row in df.to_dict('index').items():
      for j in range(size[1]):
          print(mjr.iloc[i, j])
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 71234113 gru: </h3><p><strong>Disclaimer:</strong> Although here are so many answers which recommend <strong>not</strong> using an iterative (loop) approach (and I mostly agree), I would still see it as a reasonable approach for the following situation:</p>
+------------------------------------------------------------------ <br><h3> gru, Id: 71234113, Score: 4: </h3><p><strong>Disclaimer:</strong> Although here are so many answers which recommend <strong>not</strong> using an iterative (loop) approach (and I mostly agree), I would still see it as a reasonable approach for the following situation:</p>
 <h2>Extend a dataframe with data from an API</h2>
 <p>Let's say you have a large dataframe which contains incomplete user data. Now you have to extend this data with additional columns, for example, the user's <code>age</code> and <code>gender</code>.</p>
 <p>Both values have to be fetched from a backend API. I'm assuming the API doesn't provide a &quot;batch&quot; endpoint (which would accept multiple user IDs at once). Otherwise, you should rather call the API only once.</p>
@@ -1274,7 +1274,7 @@ for index, row in df.to_dict('index').items():
   users_df.at[index, 'age'] = response_dict.get('age')
   users_df.at[index, 'gender'] = response_dict.get('gender')
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 59264161 morganics: </h3><p>Some libraries (e.g. a Java interop library that I use) require values to be passed in a row at a time, for example, if streaming data. To replicate the streaming nature, I 'stream' my dataframe values one by one, I wrote the below, which comes in handy from time to time.</p>
+------------------------------------------------------------------ <br><h3> morganics, Id: 59264161, Score: 3: </h3><p>Some libraries (e.g. a Java interop library that I use) require values to be passed in a row at a time, for example, if streaming data. To replicate the streaming nature, I 'stream' my dataframe values one by one, I wrote the below, which comes in handy from time to time.</p>
 
 <pre><code>class DataFrameReader:
   def __init__(self, df):
@@ -1345,7 +1345,7 @@ for index, row in df.to_dict('index').items():
 </code></pre>
 
 <p>And preserves the values/ name mapping for the rows being iterated. Obviously, is a lot slower than using apply and Cython as indicated above, but is necessary in some circumstances.</p>
------------------------------------------------------------------- <br><h3> Answer 64177887 imanzabet: </h3><p>Along with the great answers in this post I am going to propose <strong>Divide and Conquer</strong> approach, I am not writing this answer to abolish the other great answers but to fulfill them with another approach which was working efficiently for me. It has two steps of <code>splitting</code> and <code>merging</code> the pandas dataframe:</p>
+------------------------------------------------------------------ <br><h3> imanzabet, Id: 64177887, Score: 2: </h3><p>Along with the great answers in this post I am going to propose <strong>Divide and Conquer</strong> approach, I am not writing this answer to abolish the other great answers but to fulfill them with another approach which was working efficiently for me. It has two steps of <code>splitting</code> and <code>merging</code> the pandas dataframe:</p>
 <p><strong>PROS of Divide and Conquer:</strong></p>
 <ul>
 <li>You don't need to use vectorization or any other methods to cast the type of your dataframe into another type</li>
@@ -1399,7 +1399,7 @@ df_prep_all.to_csv('C:/KtV_prep_all.csv')
 <p><strong>Reference:</strong></p>
 <p><a href="https://stackoverflow.com/questions/7837722/what-is-the-most-efficient-way-to-loop-through-dataframes-with-pandas">Efficient way of iteration over datafreame</a></p>
 <p><a href="https://stackoverflow.com/questions/20906474/import-multiple-csv-files-into-pandas-and-concatenate-into-one-dataframe">Concatenate CSV files into one Pandas Dataframe</a></p>
-<h4> Comment 136525610 tbrugere: </h4>what makes you think this approach is any faster than just directly doing iterrows on the whole dataframe? it has the same memory and time complexity and has more operations (the csv io should be very slow in particular).   Also, this is not a divide&amp;conquer approach stricto sensu. Divide and conquer is a recursive paradigm. You’re just cutting up your dataframe in df_index-sized subtables and using those.<br>------------------------------------------------------------------ <br><h3> Answer 67701850 tbrugere: </h3><p>As <a href="https://stackoverflow.com/questions/16476924/how-to-iterate-over-rows-in-a-dataframe-in-pandas/16476974#16476974">the accepted answer</a> states, the fastest way to apply a function over rows is to use a <strong>vectorized function</strong>, the so-called NumPy <code>ufuncs</code> (universal functions).</p>
+<h4> tbrugere, Comment 136525610 Score: 0: </h4>what makes you think this approach is any faster than just directly doing iterrows on the whole dataframe? it has the same memory and time complexity and has more operations (the csv io should be very slow in particular).   Also, this is not a divide&amp;conquer approach stricto sensu. Divide and conquer is a recursive paradigm. You’re just cutting up your dataframe in df_index-sized subtables and using those.<br>------------------------------------------------------------------ <br><h3> tbrugere, Id: 67701850, Score: 2: </h3><p>As <a href="https://stackoverflow.com/questions/16476924/how-to-iterate-over-rows-in-a-dataframe-in-pandas/16476974#16476974">the accepted answer</a> states, the fastest way to apply a function over rows is to use a <strong>vectorized function</strong>, the so-called NumPy <code>ufuncs</code> (universal functions).</p>
 <p>But what should you do when the function you want to apply isn't already implemented in NumPy?</p>
 <p>Well, using the <code>vectorize</code> decorator from <code>numba</code>, you can easily create ufuncs directly in Python like this:</p>
 <pre class="lang-py prettyprint-override"><code>from numba import vectorize, float64

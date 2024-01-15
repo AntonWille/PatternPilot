@@ -1,5 +1,5 @@
- <h2> Title: How do I get the current time? </h2> <h3> user46646, question_id: 415511 </h3>Score: 3825, Tags: {python,datetime,time} <br><p>How do I get the current time?</p>
-<h4> Comment 108803504 Sławomir Lenart: </h4>please note, the most voted answers are for timezonoe-naive datetime, while we see that in production environment more and more services across the world are connected together and timezone-aware datetime become the required standard<br><h4> Comment 121560464 Hitesh Garg: </h4>This is a very valid point by @SławomirLenart and here is a quick tutorial showing <a href="https://www.codingeek.com/tutorials/python/current-time/" rel="nofollow noreferrer">multiple ways to get the current time based on the timezone</a><br>------------------------------------------------------------------ <br><h3> Answer 415519 Harley Holcombe: </h3><p>Use <a href="https://docs.python.org/3/library/datetime.html" rel="noreferrer"><code>datetime</code></a>:</p>
+ <h2> Title: How do I get the current time? </h2> <h4> user46646, question_id: 415511 </h4>Score: 3825, Tags: {python,datetime,time} <br><p>How do I get the current time?</p>
+<h4> Sławomir Lenart, Id: 108803504 Score: 77: </h4>please note, the most voted answers are for timezonoe-naive datetime, while we see that in production environment more and more services across the world are connected together and timezone-aware datetime become the required standard<br><h4> Hitesh Garg, Id: 121560464 Score: 6: </h4>This is a very valid point by @SławomirLenart and here is a quick tutorial showing <a href="https://www.codingeek.com/tutorials/python/current-time/" rel="nofollow noreferrer">multiple ways to get the current time based on the timezone</a><br>------------------------------------------------------------------ <br><h3> Harley Holcombe, Id: 415519, Score: 3872: </h3><p>Use <a href="https://docs.python.org/3/library/datetime.html" rel="noreferrer"><code>datetime</code></a>:</p>
 <pre><code>&gt;&gt;&gt; import datetime
 &gt;&gt;&gt; now = datetime.datetime.now()
 &gt;&gt;&gt; now
@@ -18,23 +18,23 @@ datetime.time(15, 8, 24, 78915)
 <pre><code>&gt;&gt;&gt; from datetime import datetime
 </code></pre>
 <p>Then remove the prefix <code>datetime.</code> from all of the above.</p>
-<h4> Comment 92133163 Greg Lindahl: </h4>It would be nice if this answer covered timezones (maybe UTC as an example) and perhaps begin with time.time().<br><h4> Comment 103229643 JiyuuSensei: </h4>@Toskan the format was not part of the question, so it shouldn&#39;t be part of the answer. There&#39;s already a link provided to more documentation of the module which contains stuff like formatting.<br><h4> Comment 103530798 RTHarston: </h4>Which version of Python was the original answer given in? Just typing <code>datetime.datetime.now()</code> in my Python 2.7 interactive console (IronPython hasn&#39;t updated yet) gives me the same behavior as the newer example using <code>print()</code> in the answer. I haven&#39;t successfully replicated what the original answer shows (datetime.datetime(2009, 1, 6, 15, 8, 24, 78915)). (Not that I really want to, the print() behavior is preferred, but I am curious.)<br><h4> Comment 103606056 Harley Holcombe: </h4>@BobVicktor: Python 2.7, 3.7 and 3.8 all give the same behaviour for me, not sure what you&#39;re seeing.<br><h4> Comment 103613470 RTHarston: </h4>@HarleyHolcombe Hmm... maybe it is an IronPython thing? When I type <code>datetime.now()</code> on its own it prints it out the same was as your answer shows <code>print(datetime.now())</code>...<br><h4> Comment 117991670 Chiel: </h4>Consider <code>import datetime as dt</code> if you want to use other datetime modules, such as <code>datetime.time</code>.<br><h4> Comment 118476247 ingyhere: </h4>@GregLindahl Timezone Aware: <code>datetime.datetime.now(tz=pytz.UTC).astimezone()</code> ... Or, something similar, like the actual timezone where the system is located. Alternately, <code>datetime.datetime.now(datetime.timezone.utc).astimezone()</code> or <code>datetime.datetime.utcnow().astimezone()</code> depending on the Python version and use case.<br>------------------------------------------------------------------ <br><h3> Answer 415525 Sean James: </h3><p>Use <a href="http://docs.python.org/3.3/library/time.html?highlight=time.strftime#time.strftime" rel="noreferrer"><code>time.strftime()</code></a>:</p>
+<h4> Greg Lindahl, Comment 92133163 Score: 54: </h4>It would be nice if this answer covered timezones (maybe UTC as an example) and perhaps begin with time.time().<br><h4> JiyuuSensei, Comment 103229643 Score: 15: </h4>@Toskan the format was not part of the question, so it shouldn&#39;t be part of the answer. There&#39;s already a link provided to more documentation of the module which contains stuff like formatting.<br><h4> RTHarston, Comment 103530798 Score: 0: </h4>Which version of Python was the original answer given in? Just typing <code>datetime.datetime.now()</code> in my Python 2.7 interactive console (IronPython hasn&#39;t updated yet) gives me the same behavior as the newer example using <code>print()</code> in the answer. I haven&#39;t successfully replicated what the original answer shows (datetime.datetime(2009, 1, 6, 15, 8, 24, 78915)). (Not that I really want to, the print() behavior is preferred, but I am curious.)<br><h4> Harley Holcombe, Comment 103606056 Score: 0: </h4>@BobVicktor: Python 2.7, 3.7 and 3.8 all give the same behaviour for me, not sure what you&#39;re seeing.<br><h4> RTHarston, Comment 103613470 Score: 0: </h4>@HarleyHolcombe Hmm... maybe it is an IronPython thing? When I type <code>datetime.now()</code> on its own it prints it out the same was as your answer shows <code>print(datetime.now())</code>...<br><h4> Chiel, Comment 117991670 Score: 0: </h4>Consider <code>import datetime as dt</code> if you want to use other datetime modules, such as <code>datetime.time</code>.<br><h4> ingyhere, Comment 118476247 Score: 0: </h4>@GregLindahl Timezone Aware: <code>datetime.datetime.now(tz=pytz.UTC).astimezone()</code> ... Or, something similar, like the actual timezone where the system is located. Alternately, <code>datetime.datetime.now(datetime.timezone.utc).astimezone()</code> or <code>datetime.datetime.utcnow().astimezone()</code> depending on the Python version and use case.<br>------------------------------------------------------------------ <br><h3> Sean James, Id: 415525, Score: 1199: </h3><p>Use <a href="http://docs.python.org/3.3/library/time.html?highlight=time.strftime#time.strftime" rel="noreferrer"><code>time.strftime()</code></a>:</p>
 <pre><code>&gt;&gt;&gt; from time import gmtime, strftime
 &gt;&gt;&gt; strftime(&quot;%Y-%m-%d %H:%M:%S&quot;, gmtime())
 '2009-01-05 22:14:39'
 </code></pre>
-<h4> Comment 87193375 Nathan majicvr.com: </h4>Is this better/worse than @ParaMeterz&#39;s answer below?  Why should we use the <code>time</code> module vs. the <code>datetime</code> module?<br><h4> Comment 100286908 Jeyekomon: </h4>@Saeed: Use the function <code>localtime()</code> instead of the <code>gmtime()</code> to get your local time.<br><h4> Comment 96975027 Voyager: </h4>This is UTC time, different from datetime module<br><h4> Comment 92989036 Saeed: </h4>It doesn&#39;t return current hour of my computer.<br><h4> Comment 102705010 Packard CPW: </h4>@frank See <a href="https://stackoverflow.com/q/7479777/9382524">related question</a> on <code>datetime</code> vs. <code>time</code>.<br><h4> Comment 127334454 starriet: </h4>Note: <code>time.strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)</code> defaults to use <code>time.localtime()</code>. Also, <code>time.gmtime()</code> sets DST(daylight saving time) flag to 0, whereas <code>time.localtime()</code> sets DST flag to 1 if DST applies to that time.<br>------------------------------------------------------------------ <br><h3> Answer 14229023 ParaMeterz: </h3><pre><code>from datetime import datetime
+<h4> Nathan majicvr.com, Comment 87193375 Score: 62: </h4>Is this better/worse than @ParaMeterz&#39;s answer below?  Why should we use the <code>time</code> module vs. the <code>datetime</code> module?<br><h4> Jeyekomon, Comment 100286908 Score: 41: </h4>@Saeed: Use the function <code>localtime()</code> instead of the <code>gmtime()</code> to get your local time.<br><h4> Voyager, Comment 96975027 Score: 14: </h4>This is UTC time, different from datetime module<br><h4> Saeed, Comment 92989036 Score: 6: </h4>It doesn&#39;t return current hour of my computer.<br><h4> Packard CPW, Comment 102705010 Score: 5: </h4>@frank See <a href="https://stackoverflow.com/q/7479777/9382524">related question</a> on <code>datetime</code> vs. <code>time</code>.<br><h4> starriet, Comment 127334454 Score: 0: </h4>Note: <code>time.strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)</code> defaults to use <code>time.localtime()</code>. Also, <code>time.gmtime()</code> sets DST(daylight saving time) flag to 0, whereas <code>time.localtime()</code> sets DST flag to 1 if DST applies to that time.<br>------------------------------------------------------------------ <br><h3> ParaMeterz, Id: 14229023, Score: 855: </h3><pre><code>from datetime import datetime
 datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 </code></pre>
 <p>Example output: <code>'2013-09-18 11:16:32'</code></p>
 <p>See list of <a href="https://docs.python.org/library/datetime.html#strftime-and-strptime-format-codes" rel="noreferrer"><code>strftime</code> directives</a>.</p>
------------------------------------------------------------------- <br><h3> Answer 5877368 Ray: </h3><p>Similar to <a href="https://stackoverflow.com/questions/415511/how-to-get-current-time-in-python/415519#415519">Harley's answer</a>, but use the <code>str()</code> function for a quick-n-dirty, slightly more human readable format:</p>
+------------------------------------------------------------------ <br><h3> Ray, Id: 5877368, Score: 528: </h3><p>Similar to <a href="https://stackoverflow.com/questions/415511/how-to-get-current-time-in-python/415519#415519">Harley's answer</a>, but use the <code>str()</code> function for a quick-n-dirty, slightly more human readable format:</p>
 
 <pre><code>&gt;&gt;&gt; from datetime import datetime
 &gt;&gt;&gt; str(datetime.now())
 '2011-05-03 17:45:35.177000'
 </code></pre>
-<h4> Comment 103531399 RTHarston: </h4>@pppery Nor does the op say it isn&#39;t about getting a string of the time. The op doesn&#39;t say at all what they want to do with the time, so why is it a bad thing to show how to turn it in to a string? Most of the answers talk about getting a string from the time, so it appears to be a common use case, so why single out Ray&#39;s answer? What use is simply getting the time without knowing how to <i>do</i> anything with it? You can print it, or do math on it, and only a couple of the answers show how to do math on it, so I think printing/getting a string is a common use. ;-) (I know it is what I came for.)<br><h4> Comment 105533356 John: </h4>The fact that this answer has more than 440 upvotes suggests that the minor addition of the string method <i>was</i> useful to a lot of people.<br><h4> Comment 97972802 pppery: </h4>Not relevant; the &quot;str&quot; step is not within the scope of the question<br><h4> Comment 115842017 Ice Bear: </h4>@pppery The fact that it is another way to answer the question which makes it  RELEVANT to other people who has a similar question to this question. So there is nothing wrong with this :)<br><h4> Comment 106723811 pppery: </h4>The fact that 440 people were looking for content that is not an actual answer to the question does not make that content an answer to the question.<br><h4> Comment 97463393 Lukas: </h4>@ppperry, then just simply assign a variable to Ray&#39;s answer - like: <i>myTime = str(datetime.now())</i>.<br>------------------------------------------------------------------ <br><h3> Answer 28576383 Russia Must Remove Putin: </h3><blockquote>
+<h4> RTHarston, Comment 103531399 Score: 22: </h4>@pppery Nor does the op say it isn&#39;t about getting a string of the time. The op doesn&#39;t say at all what they want to do with the time, so why is it a bad thing to show how to turn it in to a string? Most of the answers talk about getting a string from the time, so it appears to be a common use case, so why single out Ray&#39;s answer? What use is simply getting the time without knowing how to <i>do</i> anything with it? You can print it, or do math on it, and only a couple of the answers show how to do math on it, so I think printing/getting a string is a common use. ;-) (I know it is what I came for.)<br><h4> John, Comment 105533356 Score: 13: </h4>The fact that this answer has more than 440 upvotes suggests that the minor addition of the string method <i>was</i> useful to a lot of people.<br><h4> pppery, Comment 97972802 Score: 5: </h4>Not relevant; the &quot;str&quot; step is not within the scope of the question<br><h4> Ice Bear, Comment 115842017 Score: 5: </h4>@pppery The fact that it is another way to answer the question which makes it  RELEVANT to other people who has a similar question to this question. So there is nothing wrong with this :)<br><h4> pppery, Comment 106723811 Score: 3: </h4>The fact that 440 people were looking for content that is not an actual answer to the question does not make that content an answer to the question.<br><h4> Lukas, Comment 97463393 Score: 1: </h4>@ppperry, then just simply assign a variable to Ray&#39;s answer - like: <i>myTime = str(datetime.now())</i>.<br>------------------------------------------------------------------ <br><h3> Russia Must Remove Putin, Id: 28576383, Score: 518: </h3><blockquote>
 <h1>How do I get the current time in Python?</h1>
 </blockquote>
 <h2>The <code>time</code> module</h2>
@@ -104,7 +104,7 @@ datetime.datetime(2015, 2, 18, 6, 9, 30, 728550, tzinfo=&lt;UTC&gt;)
 <p>One could ostensibly serialize this object for UTC time and store <em>that</em> in a database, but it would require far more memory and be more prone to error than simply storing the Unix Epoch time, which I demonstrated first.</p>
 <p>The other ways of viewing times are much more error-prone, especially when dealing with data that may come from different time zones. You want there to be no confusion as to which timezone a string or serialized datetime object was intended for.</p>
 <p>If you're displaying the time with Python for the user, <code>ctime</code> works nicely, not in a table (it doesn't typically sort well), but perhaps in a clock. However, I personally recommend, when dealing with time in Python, either using Unix time, or a timezone aware UTC <code>datetime</code> object.</p>
-<h4> Comment 133919678 FObersteiner: </h4>This could be improved by adding a reference to <a href="https://docs.python.org/3/library/zoneinfo.html#module-zoneinfo" rel="nofollow noreferrer">zoneinfo</a>; pytz, although presend on many dependency specs, is outdated since Python 3.9.<br><h4> Comment 112749992 ArtOfWarfare: </h4>I think everyone can agree that <code>ctime</code> has got to be the weirdest way of formatting a datetime ever. Abbreviated day of the week and month, day of month, 24 hour h:m:s, and then a four digit year. Nerds that like to sort date strings, Americans, Europeans... everyone - yes, everyone - can find at least two things to be irritated about in that format. Although I&#39;ll use it because it&#39;s super easy.<br><h4> Comment 112750729 Russia Must Remove Putin: </h4>As I say above regarding <code>ctime</code>: &quot;You can also represent the current time in the way preferred by your operating system (which means it can change when you change your system preferences, so don&#39;t rely on this to be standard across all systems, as I&#39;ve seen others expect). This is typically user friendly, but doesn&#39;t typically result in strings one can sort chronologically:&quot;<br>------------------------------------------------------------------ <br><h3> Answer 415527 Vijay Dev: </h3><pre><code>&gt;&gt;&gt; from time import gmtime, strftime
+<h4> FObersteiner, Comment 133919678 Score: 1: </h4>This could be improved by adding a reference to <a href="https://docs.python.org/3/library/zoneinfo.html#module-zoneinfo" rel="nofollow noreferrer">zoneinfo</a>; pytz, although presend on many dependency specs, is outdated since Python 3.9.<br><h4> ArtOfWarfare, Comment 112749992 Score: 0: </h4>I think everyone can agree that <code>ctime</code> has got to be the weirdest way of formatting a datetime ever. Abbreviated day of the week and month, day of month, 24 hour h:m:s, and then a four digit year. Nerds that like to sort date strings, Americans, Europeans... everyone - yes, everyone - can find at least two things to be irritated about in that format. Although I&#39;ll use it because it&#39;s super easy.<br><h4> Russia Must Remove Putin, Comment 112750729 Score: 0: </h4>As I say above regarding <code>ctime</code>: &quot;You can also represent the current time in the way preferred by your operating system (which means it can change when you change your system preferences, so don&#39;t rely on this to be standard across all systems, as I&#39;ve seen others expect). This is typically user friendly, but doesn&#39;t typically result in strings one can sort chronologically:&quot;<br>------------------------------------------------------------------ <br><h3> Vijay Dev, Id: 415527, Score: 121: </h3><pre><code>&gt;&gt;&gt; from time import gmtime, strftime
 &gt;&gt;&gt; strftime("%a, %d %b %Y %X +0000", gmtime())
 'Tue, 06 Jan 2009 04:54:56 +0000'
 </code></pre>
@@ -112,7 +112,7 @@ datetime.datetime(2015, 2, 18, 6, 9, 30, 728550, tzinfo=&lt;UTC&gt;)
 <p>That outputs the current GMT in the specified format. There is also a <a href="https://docs.python.org/3/library/time.html#time.localtime" rel="noreferrer"><code>localtime()</code></a> method. </p>
 
 <p>This <a href="http://docs.python.org/library/time.html#module-time" rel="noreferrer">page</a> has more details.</p>
------------------------------------------------------------------- <br><h3> Answer 416605 maxp: </h3><p>Do</p>
+------------------------------------------------------------------ <br><h3> maxp, Id: 416605, Score: 157: </h3><p>Do</p>
 
 <pre><code>from time import time
 
@@ -124,7 +124,7 @@ t = time()
 </ul>
 
 <p>There is some difference for Unix and Windows platforms.</p>
-<h4> Comment 104791551 monkey: </h4>My result on Windows 10 home was 1576095264.2682993 - for Windows, this might just give the time in seconds.<br>------------------------------------------------------------------ <br><h3> Answer 19710846 Ethereal: </h3><p>The previous answers are all good suggestions, but I find it easiest to use <code>ctime()</code>:</p>
+<h4> monkey, Comment 104791551 Score: 0: </h4>My result on Windows 10 home was 1576095264.2682993 - for Windows, this might just give the time in seconds.<br>------------------------------------------------------------------ <br><h3> Ethereal, Id: 19710846, Score: 85: </h3><p>The previous answers are all good suggestions, but I find it easiest to use <code>ctime()</code>:</p>
 
 <pre><code>In [2]: from time import ctime
 In [3]: ctime()
@@ -132,20 +132,20 @@ Out[3]: 'Thu Oct 31 11:40:53 2013'
 </code></pre>
 
 <p>This gives a nicely formatted string representation of the current local time. </p>
-<h4> Comment 131843498 shripal mehta: </h4>This is actually very efficient way to do it.  Importing just a function (instead of whole class) consumes less time-space and even helps avoid any potential name-confusion for other functions in the class or stack.<br>------------------------------------------------------------------ <br><h3> Answer 18980227 nacholibre: </h3><p>The quickest way is:</p>
+<h4> shripal mehta, Comment 131843498 Score: 0: </h4>This is actually very efficient way to do it.  Importing just a function (instead of whole class) consumes less time-space and even helps avoid any potential name-confusion for other functions in the class or stack.<br>------------------------------------------------------------------ <br><h3> nacholibre, Id: 18980227, Score: 80: </h3><p>The quickest way is:</p>
 
 <pre><code>&gt;&gt;&gt; import time
 &gt;&gt;&gt; time.strftime("%Y%m%d")
 '20130924'
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 4538034 bluish: </h3><p>If you need current time as a <code>time</code> object:</p>
+------------------------------------------------------------------ <br><h3> bluish, Id: 4538034, Score: 66: </h3><p>If you need current time as a <code>time</code> object:</p>
 
 <pre><code>&gt;&gt;&gt; import datetime
 &gt;&gt;&gt; now = datetime.datetime.now()
 &gt;&gt;&gt; datetime.time(now.hour, now.minute, now.second)
 datetime.time(11, 23, 44)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 28371709 Tom: </h3><p>You can use the <code>time</code> module:</p>
+------------------------------------------------------------------ <br><h3> Tom, Id: 28371709, Score: 51: </h3><p>You can use the <code>time</code> module:</p>
 <pre><code>&gt;&gt;&gt; import time
 &gt;&gt;&gt; print(time.strftime(&quot;%d/%m/%Y&quot;))
 06/02/2015
@@ -155,14 +155,14 @@ datetime.time(11, 23, 44)
 <pre><code>&gt;&gt;&gt; time.strftime(&quot;%a, %d %b %Y %H:%M:%S&quot;)
 'Fri, 06 Feb 2015 17:45:09'
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 17287377 emmagras: </h3><p><code>.isoformat()</code> is in the documentation, but not yet here
+------------------------------------------------------------------ <br><h3> emmagras, Id: 17287377, Score: 48: </h3><p><code>.isoformat()</code> is in the documentation, but not yet here
 (this is mighty similar to @Ray Vega's answer):</p>
 
 <pre><code>&gt;&gt;&gt; import datetime
 &gt;&gt;&gt; datetime.datetime.now().isoformat()
 '2013-06-24T20:35:55.982000'
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 39046637 C8H10N4O2: </h3><p>Why not ask the <a href="http://tycho.usno.navy.mil/cgi-bin/timer.pl">U.S. Naval Observatory</a>, the official timekeeper of the United States Navy?</p>
+------------------------------------------------------------------ <br><h3> C8H10N4O2, Id: 39046637, Score: 43: </h3><p>Why not ask the <a href="http://tycho.usno.navy.mil/cgi-bin/timer.pl">U.S. Naval Observatory</a>, the official timekeeper of the United States Navy?</p>
 
 <pre><code>import requests
 from lxml import html
@@ -173,7 +173,7 @@ print(tree.xpath('//html//body//h3//pre/text()')[1])
 </code></pre>
 
 <p>If you live in the D.C. area (like me) the latency might not be too bad...</p>
-<h4> Comment 67872923 sudobangbang: </h4>@C8H10N4O2 While you are correct that the other answers assume that your computer already knows the correct time, this answer assumes that the computer has a connection to the internet,  that you are in the U.S., and that they will never take down that file/alter the link. Far more assumptions in this answer than accepted. Still clever none the less<br><h4> Comment 118923061 Roland: </h4>Excellent to have another source for time than the builtin clock! Even a good alternative to the more logical choice of NTP.<br><h4> Comment 128780535 MikeF: </h4>Site is no longer available $ curl <a href="http://tycho.usno.navy.mil/cgi-bin/timer.pl" rel="nofollow noreferrer">tycho.usno.navy.mil/cgi-bin/timer.pl</a> curl: (6) Could not resolve host: tycho.usno.navy.mil<br>------------------------------------------------------------------ <br><h3> Answer 46365153 prudhvi Indana: </h3><p>Using <a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.now.html" rel="nofollow noreferrer">pandas</a> to get the current time, kind of overkilling the problem at hand:</p>
+<h4> sudobangbang, Comment 67872923 Score: 23: </h4>@C8H10N4O2 While you are correct that the other answers assume that your computer already knows the correct time, this answer assumes that the computer has a connection to the internet,  that you are in the U.S., and that they will never take down that file/alter the link. Far more assumptions in this answer than accepted. Still clever none the less<br><h4> Roland, Comment 118923061 Score: 1: </h4>Excellent to have another source for time than the builtin clock! Even a good alternative to the more logical choice of NTP.<br><h4> MikeF, Comment 128780535 Score: 1: </h4>Site is no longer available $ curl <a href="http://tycho.usno.navy.mil/cgi-bin/timer.pl" rel="nofollow noreferrer">tycho.usno.navy.mil/cgi-bin/timer.pl</a> curl: (6) Could not resolve host: tycho.usno.navy.mil<br>------------------------------------------------------------------ <br><h3> prudhvi Indana, Id: 46365153, Score: 43: </h3><p>Using <a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.now.html" rel="nofollow noreferrer">pandas</a> to get the current time, kind of overkilling the problem at hand:</p>
 <pre><code>import pandas as pd
 print(pd.datetime.now())
 print(pd.datetime.now().date())
@@ -196,7 +196,7 @@ print(pd.datetime.now().microsecond)
 56
 92693
 </code></pre>
-<h4> Comment 113372620 bfree67: </h4>This method will be deprecated in future versions of pandas. Use the datetime module instead.<br>------------------------------------------------------------------ <br><h3> Answer 47151173 durjoy: </h3><p>if you are using numpy already then directly you can use numpy.datetime64() 
+<h4> bfree67, Comment 113372620 Score: 4: </h4>This method will be deprecated in future versions of pandas. Use the datetime module instead.<br>------------------------------------------------------------------ <br><h3> durjoy, Id: 47151173, Score: 35: </h3><p>if you are using numpy already then directly you can use numpy.datetime64() 
 function.</p>
 
 <pre><code>import numpy as np
@@ -218,7 +218,7 @@ str(pd.to_datetime('now'))
 
 <pre><code>str(pd.to_datetime('today'))
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 27866830 Kristen G.: </h3><p>This is what I ended up going with: </p>
+------------------------------------------------------------------ <br><h3> Kristen G., Id: 27866830, Score: 33: </h3><p>This is what I ended up going with: </p>
 
 <pre><code>&gt;&gt;&gt;from time import strftime
 &gt;&gt;&gt;strftime("%m/%d/%Y %H:%M")
@@ -228,7 +228,7 @@ str(pd.to_datetime('now'))
 <p>Also, this table is a necessary reference for choosing the appropriate format codes to get the date formatted just the way you want it (from Python "datetime" documentation <a href="https://docs.python.org/2/library/datetime.html#strftime-strptime-behavior" rel="noreferrer">here</a>).</p>
 
 <p><img src="https://i.stack.imgur.com/i6Hg7.jpg" alt="strftime format code table"></p>
-<h4> Comment 44144405 jfs: </h4><code>strftime(time_format)</code> returns the current local time as a string that corresponds to the given <code>time_format</code>. Note: <code>time.strftime()</code> and <code>datetime.strftime()</code> support different directive sets e.g., <a href="https://docs.python.org/2/library/time.html#time.strftime" rel="nofollow noreferrer"><code>%z</code> is not supported by <code>time.strftime()</code> on Python 2</a>.<br><h4> Comment 44337103 jfs: </h4>Many <code>time</code> module functions are thin wrappers around corresponding C functions. <code>datetime</code> is a higher level and it is usually more portable.<br><h4> Comment 44336829 Kristen G.: </h4>Is it better practice to use datetime instead of time?<br>------------------------------------------------------------------ <br><h3> Answer 27611645 jfs: </h3><p><code>datetime.now()</code> returns the current time as a naive datetime object that represents time in the local timezone. That value may be ambiguous e.g., during DST transitions ("fall back"). To avoid ambiguity either UTC timezone should be used:</p>
+<h4> jfs, Comment 44144405 Score: 2: </h4><code>strftime(time_format)</code> returns the current local time as a string that corresponds to the given <code>time_format</code>. Note: <code>time.strftime()</code> and <code>datetime.strftime()</code> support different directive sets e.g., <a href="https://docs.python.org/2/library/time.html#time.strftime" rel="nofollow noreferrer"><code>%z</code> is not supported by <code>time.strftime()</code> on Python 2</a>.<br><h4> jfs, Comment 44337103 Score: 2: </h4>Many <code>time</code> module functions are thin wrappers around corresponding C functions. <code>datetime</code> is a higher level and it is usually more portable.<br><h4> Kristen G., Comment 44336829 Score: 1: </h4>Is it better practice to use datetime instead of time?<br>------------------------------------------------------------------ <br><h3> jfs, Id: 27611645, Score: 32: </h3><p><code>datetime.now()</code> returns the current time as a naive datetime object that represents time in the local timezone. That value may be ambiguous e.g., during DST transitions ("fall back"). To avoid ambiguity either UTC timezone should be used:</p>
 
 <pre><code>from datetime import datetime
 
@@ -243,12 +243,12 @@ print(utc_time) # -&gt; 2014-12-22 22:48:59.916417
 now = datetime.now(timezone.utc).astimezone()
 print(now) # -&gt; 2014-12-23 01:49:25.837541+03:00
 </code></pre>
-<h4> Comment 120146982 Seth: </h4>FYI, it is not recommended to use <code>datetime.utcnow()</code> to represent the current time in UTC as that still returns a &#39;naive&#39; datetime object -- instead, it is recommended to use <code>datetime.now(timezone.utc)</code> as that returns an &#39;aware&#39; datetime object.  See the Python docs for more details: <a href="https://docs.python.org/3/library/datetime.html#datetime.datetime.utcnow" rel="nofollow noreferrer">docs.python.org/3/library/&hellip;</a><br><h4> Comment 120174968 jfs: </h4>@Seth notice that the Python 3.2+ solution uses <code>timezone.utc</code> already. Perhaps, now that Python 2.7 is EOLed the naive-datetime may be dropped<br><h4> Comment 120257662 Seth: </h4>Ah, I didn&#39;t realize that was there purely for compatibility with Python 2.7 -- perhaps that should be clarified in the post? At least to me, it seemed like this post was implying that both the naive and aware methods were (still) equally acceptable ways to get the UTC time, which is why I pointed out that that&#39;s not what Python&#39;s (latest) documentation says.<br>------------------------------------------------------------------ <br><h3> Answer 23753208 user2030113: </h3><pre><code>&gt;&gt;&gt; import datetime, time
+<h4> Seth, Comment 120146982 Score: 0: </h4>FYI, it is not recommended to use <code>datetime.utcnow()</code> to represent the current time in UTC as that still returns a &#39;naive&#39; datetime object -- instead, it is recommended to use <code>datetime.now(timezone.utc)</code> as that returns an &#39;aware&#39; datetime object.  See the Python docs for more details: <a href="https://docs.python.org/3/library/datetime.html#datetime.datetime.utcnow" rel="nofollow noreferrer">docs.python.org/3/library/&hellip;</a><br><h4> jfs, Comment 120174968 Score: 0: </h4>@Seth notice that the Python 3.2+ solution uses <code>timezone.utc</code> already. Perhaps, now that Python 2.7 is EOLed the naive-datetime may be dropped<br><h4> Seth, Comment 120257662 Score: 0: </h4>Ah, I didn&#39;t realize that was there purely for compatibility with Python 2.7 -- perhaps that should be clarified in the post? At least to me, it seemed like this post was implying that both the naive and aware methods were (still) equally acceptable ways to get the UTC time, which is why I pointed out that that&#39;s not what Python&#39;s (latest) documentation says.<br>------------------------------------------------------------------ <br><h3> user2030113, Id: 23753208, Score: 25: </h3><pre><code>&gt;&gt;&gt; import datetime, time
 &gt;&gt;&gt; time = time.strftime("%H:%M:%S:%MS", time.localtime())
 &gt;&gt;&gt; print time
 '00:21:38:20S'
 </code></pre>
-<h4> Comment 99753936 ZF007: </h4>%MS does not give you milliseconds!!<br><h4> Comment 41772893 hlin117: </h4>I think you mean to say &quot;datetime.now().strftime(...)&quot;<br><h4> Comment 42051747 user2030113: </h4>yes it can be done as you said. &quot;datetime.datetime.now().strftime(&quot;%H:%M:%S:%MS&quot;)&quot;<br>------------------------------------------------------------------ <br><h3> Answer 43302976 theBuzzyCoder: </h3><pre><code>import datetime
+<h4> ZF007, Comment 99753936 Score: 4: </h4>%MS does not give you milliseconds!!<br><h4> hlin117, Comment 41772893 Score: 0: </h4>I think you mean to say &quot;datetime.now().strftime(...)&quot;<br><h4> user2030113, Comment 42051747 Score: 0: </h4>yes it can be done as you said. &quot;datetime.datetime.now().strftime(&quot;%H:%M:%S:%MS&quot;)&quot;<br>------------------------------------------------------------------ <br><h3> theBuzzyCoder, Id: 43302976, Score: 25: </h3><pre><code>import datetime
 date_time = datetime.datetime.now()
 
 date = date_time.date()  # Gives the date
@@ -259,7 +259,7 @@ print time.hour, time.minute, time.second, time.microsecond
 </code></pre>
 
 <p>Do <code>dir(date)</code> or any variables including the package. You can get all the attributes and methods associated with the variable.</p>
-<h4> Comment 74120348 theBuzzyCoder: </h4>@snofty and @user1016274, if <code>import datetime</code> then it is <code>datetime.datetime.now()</code>\n if <code>from datetime import datetime</code> then it is <code>datetime.now()</code><br>------------------------------------------------------------------ <br><h3> Answer 51829852 Ben: </h3><p>This question doesn't need a new answer just for the sake of it ... a shiny new-ish toy/module, however, is enough justification.  That being the <a href="https://pendulum.eustace.io/docs/" rel="noreferrer">Pendulum library</a>, which appears to do the sort of things which arrow attempted, except without the inherent flaws and bugs which beset arrow.</p>
+<h4> theBuzzyCoder, Comment 74120348 Score: 0: </h4>@snofty and @user1016274, if <code>import datetime</code> then it is <code>datetime.datetime.now()</code>\n if <code>from datetime import datetime</code> then it is <code>datetime.now()</code><br>------------------------------------------------------------------ <br><h3> Ben, Id: 51829852, Score: 25: </h3><p>This question doesn't need a new answer just for the sake of it ... a shiny new-ish toy/module, however, is enough justification.  That being the <a href="https://pendulum.eustace.io/docs/" rel="noreferrer">Pendulum library</a>, which appears to do the sort of things which arrow attempted, except without the inherent flaws and bugs which beset arrow.</p>
 
 <p>For instance, the answer to the original question:</p>
 
@@ -282,7 +282,7 @@ Australia/Melbourne
 <p>Presumably most of the rest of you mean somewhere else.</p>
 
 <p>And on it goes.  Long story short: Pendulum attempts to do for date and time what requests did for HTTP.  It's worth consideration, particularly for both its ease of use and extensive documentation.</p>
------------------------------------------------------------------- <br><h3> Answer 69101777 RITIK KUMAR: </h3><p>try this one:-</p>
+------------------------------------------------------------------ <br><h3> RITIK KUMAR, Id: 69101777, Score: 11: </h3><p>try this one:-</p>
 <pre><code>from datetime import datetime
 
 now = datetime.now()
@@ -290,7 +290,7 @@ now = datetime.now()
 current_time = now.strftime(&quot;%H:%M:%S&quot;)
 print(&quot;Current Time =&quot;, current_time)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 49048869 Madhusudhan R: </h3><p>By default, <code>now()</code> function returns output in the <code>YYYY-MM-DD HH:MM:SS:MS</code> format. Use the below sample script to get the current date and time in a Python script and print results on the screen. Create file <code>getDateTime1.py</code> with the below content.</p>
+------------------------------------------------------------------ <br><h3> Madhusudhan R, Id: 49048869, Score: 22: </h3><p>By default, <code>now()</code> function returns output in the <code>YYYY-MM-DD HH:MM:SS:MS</code> format. Use the below sample script to get the current date and time in a Python script and print results on the screen. Create file <code>getDateTime1.py</code> with the below content.</p>
 
 <pre><code>import datetime
 
@@ -302,7 +302,7 @@ print (str(currentDT))
 
 <pre><code>2018-03-01 17:03:46.759624
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 33704374 Back2Basics: </h3><p>Try the arrow module from <a href="http://crsmithdev.com/arrow/" rel="noreferrer">http://crsmithdev.com/arrow/</a>:</p>
+------------------------------------------------------------------ <br><h3> Back2Basics, Id: 33704374, Score: 21: </h3><p>Try the arrow module from <a href="http://crsmithdev.com/arrow/" rel="noreferrer">http://crsmithdev.com/arrow/</a>:</p>
 
 <pre><code>import arrow
 arrow.now()
@@ -333,7 +333,7 @@ arrow.now()
 <pre><code>arrow.get('2013-05-11T21:23:58.970460+00:00').humanize()
 &gt;&gt;&gt; '2 years ago'
 </code></pre>
-<h4> Comment 55185449 jfs: </h4>beware that <code>arrow.now(&#39;Time&#47;Zone&#39;)</code> may fail for some timezones (<code>arrow</code> uses <a href="https://github.com/dateutil/dateutil/issues/112" rel="nofollow noreferrer"><code>dateutil</code> that has broken utc -&gt; local conversions</a> that are used inside <code>arrow.now()</code>. Note: <a href="http://stackoverflow.com/q/31886808/4279"><code>pytz</code> has no such issue</a>. Also, <a href="http://stackoverflow.com/questions/28087218/parse-date-and-time-from-string-with-time-zone-using-arrow/28095706#comment44593877_28095706">there are other timezone-related issues</a><br>------------------------------------------------------------------ <br><h3> Answer 38433505 y.selivonchyk: </h3><p>To get exactly <strong>3</strong> <strong>decimal points</strong> for milliseconds <code>11:34:23.751</code> run this:</p>
+<h4> jfs, Comment 55185449 Score: 7: </h4>beware that <code>arrow.now(&#39;Time&#47;Zone&#39;)</code> may fail for some timezones (<code>arrow</code> uses <a href="https://github.com/dateutil/dateutil/issues/112" rel="nofollow noreferrer"><code>dateutil</code> that has broken utc -&gt; local conversions</a> that are used inside <code>arrow.now()</code>. Note: <a href="http://stackoverflow.com/q/31886808/4279"><code>pytz</code> has no such issue</a>. Also, <a href="http://stackoverflow.com/questions/28087218/parse-date-and-time-from-string-with-time-zone-using-arrow/28095706#comment44593877_28095706">there are other timezone-related issues</a><br>------------------------------------------------------------------ <br><h3> y.selivonchyk, Id: 38433505, Score: 19: </h3><p>To get exactly <strong>3</strong> <strong>decimal points</strong> for milliseconds <code>11:34:23.751</code> run this:</p>
 <pre><code>def get_time_str(decimal_points=3):
         return time.strftime(&quot;%H:%M:%S&quot;, time.localtime()) + '.%d' % (time.time() % 1 * 10**decimal_points)
 </code></pre>
@@ -360,7 +360,7 @@ time.strftime(&quot;%H:%M:%S&quot;, time.localtime()) + '.%d' % (time.time() % 1
 <pre><code>def get_time_str(decimal_points=3):
     return time.strftime(&quot;%H:%M:%S&quot;, time.localtime()) + '.%d' % (time.time() % 1 * 10**decimal_points)
 </code></pre>
-<h4> Comment 66752643 Greg Graham: </h4>This works in Python 3:     time.strftime(&quot;%H:%M:%S&quot;, time.localtime()) + &#39;.{}&#39;.format(int(time.time()  % 1 * 1000))<br>------------------------------------------------------------------ <br><h3> Answer 58451609 champion-runner: </h3><p><strong>Current time of a timezone</strong></p>
+<h4> Greg Graham, Comment 66752643 Score: 1: </h4>This works in Python 3:     time.strftime(&quot;%H:%M:%S&quot;, time.localtime()) + &#39;.{}&#39;.format(int(time.time()  % 1 * 1000))<br>------------------------------------------------------------------ <br><h3> champion-runner, Id: 58451609, Score: 19: </h3><p><strong>Current time of a timezone</strong></p>
 
 <pre><code>from datetime import datetime
 import pytz
@@ -380,7 +380,7 @@ print("India time:", datetime_India.strftime("%H:%M:%S"))
 #list timezones
 pytz.all_timezones
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 47548082 Richie Bendall: </h3><p>You can use this function to get the time (unfortunately it doesn't say AM or PM):</p>
+------------------------------------------------------------------ <br><h3> Richie Bendall, Id: 47548082, Score: 18: </h3><p>You can use this function to get the time (unfortunately it doesn't say AM or PM):</p>
 
 <pre><code>def gettime():
     from datetime import datetime
@@ -416,7 +416,7 @@ pytz.all_timezones
     from datetime import datetime
     return (str(datetime.now())).split('.')[1]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 51395703 motagirl2: </h3><p>If you just want the current timestamp in ms (for example, to measure execution time), you can also use the "timeit" module:</p>
+------------------------------------------------------------------ <br><h3> motagirl2, Id: 51395703, Score: 18: </h3><p>If you just want the current timestamp in ms (for example, to measure execution time), you can also use the "timeit" module:</p>
 
 <pre><code>import timeit
 start_time = timeit.default_timer()
@@ -424,7 +424,7 @@ do_stuff_you_want_to_measure()
 end_time = timeit.default_timer()
 print("Elapsed time: {}".format(end_time - start_time))
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 62205205 Umutambyi Gad: </h3><p>You can  try the following</p>
+------------------------------------------------------------------ <br><h3> Umutambyi Gad, Id: 62205205, Score: 18: </h3><p>You can  try the following</p>
 <pre><code>import datetime
 
 now = datetime.datetime.now()
@@ -436,7 +436,7 @@ print(now)
 now = datetime.datetime.now()
 print(now.strftime(&quot;%Y-%b-%d, %A %I:%M:%S&quot;))
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 51206016 kungphu: </h3><p>Because no one has mentioned it yet, and this is something I ran into recently... a pytz timezone's fromutc() method combined with datetime's utcnow() is the best way I've found to get a useful current time (and date) in any timezone.</p>
+------------------------------------------------------------------ <br><h3> kungphu, Id: 51206016, Score: 15: </h3><p>Because no one has mentioned it yet, and this is something I ran into recently... a pytz timezone's fromutc() method combined with datetime's utcnow() is the best way I've found to get a useful current time (and date) in any timezone.</p>
 
 <pre><code>from datetime import datetime
 
@@ -450,13 +450,13 @@ local_time = JST.fromutc(datetime.utcnow())
 </code></pre>
 
 <p>If all you want is the time, you can then get that with <code>local_time.time()</code>.</p>
-<h4> Comment 91197334 kungphu: </h4>I didn&#39;t include that since it&#39;s already been covered in other answers (and display formatting wasn&#39;t part of the question).<br><h4> Comment 91155825 GraphicalDot: </h4>Surprisingly, All the above answers didnt mention Time zones. you should also include strftime to get the format you wanted.<br>------------------------------------------------------------------ <br><h3> Answer 38366394 Abhijeet Deshani: </h3><pre><code>import datetime
+<h4> kungphu, Comment 91197334 Score: 1: </h4>I didn&#39;t include that since it&#39;s already been covered in other answers (and display formatting wasn&#39;t part of the question).<br><h4> GraphicalDot, Comment 91155825 Score: 0: </h4>Surprisingly, All the above answers didnt mention Time zones. you should also include strftime to get the format you wanted.<br>------------------------------------------------------------------ <br><h3> Abhijeet Deshani, Id: 38366394, Score: 10: </h3><pre><code>import datetime
 date_time = str(datetime.datetime.now()).split()
 date,time = date_time
 </code></pre>
 
 <p><strong>date</strong> will print date and <strong>time</strong> will print time.</p>
------------------------------------------------------------------- <br><h3> Answer 58357045 Jobin James: </h3><pre><code>import datetime
+------------------------------------------------------------------ <br><h3> Jobin James, Id: 58357045, Score: 14: </h3><pre><code>import datetime
 
 todays_date = datetime.date.today()
 print(todays_date)
@@ -467,7 +467,7 @@ current_time = datetime.datetime.now().strftime('%H:%M')
 print(current_time)
 &gt;&gt;&gt; 23:38
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 61290837 Littin Rajan: </h3><p><strong>Method1: Getting Current Date and Time from system datetime</strong></p>
+------------------------------------------------------------------ <br><h3> Littin Rajan, Id: 61290837, Score: 13: </h3><p><strong>Method1: Getting Current Date and Time from system datetime</strong></p>
 
 <p>The <strong>datetime</strong> module supplies classes for manipulating dates and times.</p>
 
@@ -585,7 +585,7 @@ Hour: 19
 Minute: 30
 Second: 20
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 57937132 Sai Kiran Sangam: </h3><p>You can do so using ctime():</p>
+------------------------------------------------------------------ <br><h3> Sai Kiran Sangam, Id: 57937132, Score: 12: </h3><p>You can do so using ctime():</p>
 
 <pre><code>from time import time, ctime
 t = time()
@@ -597,14 +597,14 @@ ctime(t)
 <p><code>Sat Sep 14 21:27:08 2019</code></p>
 
 <p>These outputs are different because the timestamp returned by <code>ctime()</code> depends on your geographical location.</p>
------------------------------------------------------------------- <br><h3> Answer 29980465 Amr El Aswar: </h3><p>The following is what I use to get the time without having to format. Some people don't like the split method, but it is useful here:</p>
+------------------------------------------------------------------ <br><h3> Amr El Aswar, Id: 29980465, Score: 9: </h3><p>The following is what I use to get the time without having to format. Some people don't like the split method, but it is useful here:</p>
 
 <pre><code>from time import ctime
 print ctime().split()[3]
 </code></pre>
 
 <p>It will print in HH:MM:SS format.</p>
------------------------------------------------------------------- <br><h3> Answer 56458580 Anupam: </h3><p>This question is for Python but since Django is one of the most widely used frameworks for Python, its important to note that if you are using Django you can always use <code>timezone.now()</code> instead of <code>datetime.datetime.now()</code>. The former is timezone 'aware' while the latter is not. </p>
+------------------------------------------------------------------ <br><h3> Anupam, Id: 56458580, Score: 9: </h3><p>This question is for Python but since Django is one of the most widely used frameworks for Python, its important to note that if you are using Django you can always use <code>timezone.now()</code> instead of <code>datetime.datetime.now()</code>. The former is timezone 'aware' while the latter is not. </p>
 
 <p>See <a href="https://stackoverflow.com/a/26950056/1526703">this SO answer</a> and the <a href="https://docs.djangoproject.com/en/dev/topics/i18n/timezones/#naive-and-aware-datetime-objects" rel="noreferrer">Django doc</a> for details and rationale behind <code>timezone.now()</code>.</p>
 
@@ -612,7 +612,7 @@ print ctime().split()[3]
 
 now = timezone.now()
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 54287129 Sachin: </h3><p>This is so simple.
+------------------------------------------------------------------ <br><h3> Sachin, Id: 54287129, Score: 8: </h3><p>This is so simple.
 Try:</p>
 
 <pre><code>import datetime
@@ -620,7 +620,7 @@ date_time = str(datetime.datetime.now())
 date = date_time.split()[0]
 time = date_time.split()[1]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 68065961 Faraaz Kurawle: </h3><p>Here's the code which will only show time according to your question:</p>
+------------------------------------------------------------------ <br><h3> Faraaz Kurawle, Id: 68065961, Score: 0: </h3><p>Here's the code which will only show time according to your question:</p>
 <pre><code> from datetime import datetime
  time= datetime.now()
  b = time.strftime(&quot;%H:%M:%S&quot;)
@@ -631,7 +631,7 @@ time = date_time.split()[1]
 <li>Then used <code>.strftime</code> to get desired value i.e time only.</li>
 </ul>
 <p><a href="https://www.tutorialspoint.com/python/time_strftime.htm" rel="nofollow noreferrer"><code>strftime</code></a> is used to retrieve the desired output or to change the default format according to our need.</p>
------------------------------------------------------------------- <br><h3> Answer 48283832 Bojan Petrovic: </h3><pre><code>from time import ctime
+------------------------------------------------------------------ <br><h3> Bojan Petrovic, Id: 48283832, Score: 7: </h3><pre><code>from time import ctime
 
 // Day {Mon,Tue,..}
 print ctime().split()[0]
@@ -650,7 +650,7 @@ print ctime().split()[4]
 <p>Brackets are used to 'select' wanted argument in list.</p>
 
 <p>One should call just one code line. One should not call them like I did, that was just an example, because in some cases you will get different values, rare but not impossible cases. </p>
-<h4> Comment 83555120 Toby Speight: </h4>You might also want to explain why extracting parts from multiple calls of <code>ctime()</code> like that (using &quot;current&quot; time at each call) will not necessarily give a useful value in combination with each other.<br><h4> Comment 98734503 gerrit: </h4>What is <code>&#47;&#47;</code> doing here?<br>------------------------------------------------------------------ <br><h3> Answer 54979470 Ram Prajapati: </h3><p>Get current date time attributes:</p>
+<h4> Toby Speight, Comment 83555120 Score: 1: </h4>You might also want to explain why extracting parts from multiple calls of <code>ctime()</code> like that (using &quot;current&quot; time at each call) will not necessarily give a useful value in combination with each other.<br><h4> gerrit, Comment 98734503 Score: 1: </h4>What is <code>&#47;&#47;</code> doing here?<br>------------------------------------------------------------------ <br><h3> Ram Prajapati, Id: 54979470, Score: 7: </h3><p>Get current date time attributes:</p>
 
 <pre><code>import datetime
 
@@ -671,7 +671,7 @@ import time;
 ticks = time.time()
 print "Number of ticks since "12:00am, Jan 1, 1970":", ticks
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 75926222 Muhammad Ali: </h3><h2>There are a lot of methods for getting current time in python in different formats.</h2>
+------------------------------------------------------------------ <br><h3> Muhammad Ali, Id: 75926222, Score: 7: </h3><h2>There are a lot of methods for getting current time in python in different formats.</h2>
 <p>I have listed all, you can use them according to your needs.</p>
 <h2><strong>By Datetime method</strong></h2>
 <pre><code>from datetime import datetime
@@ -769,7 +769,7 @@ tm_hour=11, tm_min=24, tm_sec=59, tm_wday=0, tm_yday=171, tm_isdst=0)</p>
 <li><strong>ISO format:</strong> to avoid any problems in communicating the date and time related data all around the world.</li>
 <li><strong>Greenmeantime:</strong> The USA had already decided to base its own national time zone scheme on Greenwich and countries like Ireland, Canada also consider their reference as GMT.</li>
 </ul>
-<h4> Comment 133919579 FObersteiner: </h4>What exactly is the difference to <a href="https://stackoverflow.com/a/28576383/10197418">this answer</a> for instance? Btw. you&#39;re not up-to-date; we have time zone handling in the standard library, see <a href="https://docs.python.org/3/library/zoneinfo.html#module-zoneinfo" rel="nofollow noreferrer">zoneinfo</a>.<br>------------------------------------------------------------------ <br><h3> Answer 50517665 Samuel Nde: </h3><p>First import the datetime module from datetime</p>
+<h4> FObersteiner, Comment 133919579 Score: 0: </h4>What exactly is the difference to <a href="https://stackoverflow.com/a/28576383/10197418">this answer</a> for instance? Btw. you&#39;re not up-to-date; we have time zone handling in the standard library, see <a href="https://docs.python.org/3/library/zoneinfo.html#module-zoneinfo" rel="nofollow noreferrer">zoneinfo</a>.<br>------------------------------------------------------------------ <br><h3> Samuel Nde, Id: 50517665, Score: 5: </h3><p>First import the datetime module from datetime</p>
 
 <pre><code>from datetime import datetime
 </code></pre>
@@ -785,7 +785,7 @@ tm_hour=11, tm_min=24, tm_sec=59, tm_wday=0, tm_yday=171, tm_isdst=0)</p>
 </code></pre>
 
 <p>Converting the datetime.now() to a string yields an answer that is in the format that feels like the regular DATES AND TIMES we are used to.</p>
------------------------------------------------------------------- <br><h3> Answer 61322999 Lucas Urban: </h3><p>The <code>time</code> module can import all sorts of time stuff, inculduing sleep and other types of stuff including - the current time type</p>
+------------------------------------------------------------------ <br><h3> Lucas Urban, Id: 61322999, Score: 4: </h3><p>The <code>time</code> module can import all sorts of time stuff, inculduing sleep and other types of stuff including - the current time type</p>
 
 <pre><code>import time
 time.strftime("%T", time.localtime())
@@ -799,7 +799,7 @@ time.strftime("%T", time.localtime())
 22:33:44
 00:00:00
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 62359990 Ransaka Ravihara: </h3><p>we can accomplish that Using datetime module</p>
+------------------------------------------------------------------ <br><h3> Ransaka Ravihara, Id: 62359990, Score: 4: </h3><p>we can accomplish that Using datetime module</p>
 
 <pre><code>&gt;&gt;&gt; from datetime import datetime
 &gt;&gt;&gt; now = datetime.now() #get a datetime object containing current date and time
@@ -820,14 +820,14 @@ Current Time = 17:56:54
 &gt;&gt;&gt; print("Europe time::", datetime_eu.strftime("%H:%M:%S"))
 Europe time:: 14:45:31
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 62608622 Tom Carrick: </h3><p>From Python 3.9, the <a href="https://docs.python.org/3.9/library/zoneinfo.html" rel="nofollow noreferrer"><code>zoneinfo</code></a> module can be used for getting timezones rather than using a third party library.</p>
+------------------------------------------------------------------ <br><h3> Tom Carrick, Id: 62608622, Score: 4: </h3><p>From Python 3.9, the <a href="https://docs.python.org/3.9/library/zoneinfo.html" rel="nofollow noreferrer"><code>zoneinfo</code></a> module can be used for getting timezones rather than using a third party library.</p>
 <p>To get the current time in a particular timezone:</p>
 <pre class="lang-py prettyprint-override"><code>from datetime import datetime
 from zoneinfo import ZoneInfo
 
 datetime.now(tz=ZoneInfo(&quot;Europe/Amsterdam&quot;))
 </code></pre>
-<h4> Comment 112351965 Sandun: </h4>The latest version of Python available for download is 3.8.5!  <a href="https://www.python.org/downloads/" rel="nofollow noreferrer">python.org/downloads</a><br><h4> Comment 112375474 Tom Carrick: </h4>Sure, but in the future, when other people are reading this, that won&#39;t be the case. In fact, the first release candidate was released today: <a href="https://docs.python.org/3.9/whatsnew/3.9.html" rel="nofollow noreferrer">docs.python.org/3.9/whatsnew/3.9.html</a><br>------------------------------------------------------------------ <br><h3> Answer 66849416 Harsh: </h3><pre><code>import datetime
+<h4> Sandun, Comment 112351965 Score: 0: </h4>The latest version of Python available for download is 3.8.5!  <a href="https://www.python.org/downloads/" rel="nofollow noreferrer">python.org/downloads</a><br><h4> Tom Carrick, Comment 112375474 Score: 0: </h4>Sure, but in the future, when other people are reading this, that won&#39;t be the case. In fact, the first release candidate was released today: <a href="https://docs.python.org/3.9/whatsnew/3.9.html" rel="nofollow noreferrer">docs.python.org/3.9/whatsnew/3.9.html</a><br>------------------------------------------------------------------ <br><h3> Harsh, Id: 66849416, Score: 4: </h3><pre><code>import datetime
 
 print('date='+datetime.datetime.now().__str__().split(' ')[0]+' '+'time='+datetime.datetime.now().__str__().split(' ')[1]
 
@@ -836,7 +836,7 @@ print('date='+datetime.datetime.now().__str__().split(' ')[0]+' '+'time='+dateti
 <pre><code>from PyQt5 import QDateTime
 print(QDateTime.currentDateTime().__str__().split('(')[1].rstrip(')'))
 </code></pre>
-<h4> Comment 118167469 Molitoris: </h4>Compared to the other answers, yours is quit long and complex<br><h4> Comment 131843817 shripal mehta: </h4>@Molitoris, it is advised to (re)use the functions available from already imported libraries. So, this is useful for those who are already working on Qt-Python.<br>------------------------------------------------------------------ <br><h3> Answer 70782771 Abduvahob Kaxarov: </h3><p>If you using it for django datetime sometimes won't work on server so I recommend using timezone</p>
+<h4> Molitoris, Comment 118167469 Score: 5: </h4>Compared to the other answers, yours is quit long and complex<br><h4> shripal mehta, Comment 131843817 Score: 0: </h4>@Molitoris, it is advised to (re)use the functions available from already imported libraries. So, this is useful for those who are already working on Qt-Python.<br>------------------------------------------------------------------ <br><h3> Abduvahob Kaxarov, Id: 70782771, Score: 4: </h3><p>If you using it for django datetime sometimes won't work on server so I recommend using timezone</p>
 <p>But for use django timezone you should set your country timezone code in your settings.py</p>
 <pre><code>TIME_ZONE = 'Asia/Tashkent'
 </code></pre>
@@ -877,7 +877,7 @@ time.strftime('%M') // '01' minute
 
 time.strftime('%m') // '01' second
 </code></pre>
-<h4> Comment 132134828 Abduvahob Kaxarov: </h4>Thanks for your attention, but the question is not about using multiple times it&#39;s about getting the time. here I showed how to get not only time others too.<br><h4> Comment 132126659 user3435121: </h4>Your example may cause bad programming. strftime() or now() should never be used multiple times. If you use that method at 23:59:59 your result may mix data from 2 different days.<br>------------------------------------------------------------------ <br><h3> Answer 71917138 rachwa: </h3><p>If you use <em>pandas</em> a lot you can use <a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html" rel="nofollow noreferrer"><code>Timestamp</code></a>, which is the equivalent of <em>Python</em>’s <a href="https://docs.python.org/3/library/datetime.html" rel="nofollow noreferrer"><code>Datetime</code></a>:</p>
+<h4> Abduvahob Kaxarov, Comment 132134828 Score: 0: </h4>Thanks for your attention, but the question is not about using multiple times it&#39;s about getting the time. here I showed how to get not only time others too.<br><h4> user3435121, Comment 132126659 Score: 0: </h4>Your example may cause bad programming. strftime() or now() should never be used multiple times. If you use that method at 23:59:59 your result may mix data from 2 different days.<br>------------------------------------------------------------------ <br><h3> rachwa, Id: 71917138, Score: 4: </h3><p>If you use <em>pandas</em> a lot you can use <a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html" rel="nofollow noreferrer"><code>Timestamp</code></a>, which is the equivalent of <em>Python</em>’s <a href="https://docs.python.org/3/library/datetime.html" rel="nofollow noreferrer"><code>Datetime</code></a>:</p>
 <pre><code>In [1]: import pandas as pd
 
 In [2]: pd.Timestamp.now()
@@ -887,7 +887,7 @@ Out[2]: Timestamp('2022-06-21 21:52:50.568788')
 <pre><code>In [3]: pd.Timestamp.now().strftime(&quot;%H:%M:%S&quot;)
 Out[3]: '21:53:01'
 </code></pre>
-<h4> Comment 129398749 rachwa: </h4>Yeah, it&#39;s meant for people who use <i>pandas</i> on a daily basis and therefore already imported the library.<br><h4> Comment 129392510 Sysanin: </h4>Solution is valid, but it is an overkill to have pandas dependency just for getting current time.<br>------------------------------------------------------------------ <br><h3> Answer 62425566 James McGuigan: </h3><p>If you want the time for purpose of timing function calls, then you want time.perf_counter().</p>
+<h4> rachwa, Comment 129398749 Score: 1: </h4>Yeah, it&#39;s meant for people who use <i>pandas</i> on a daily basis and therefore already imported the library.<br><h4> Sysanin, Comment 129392510 Score: 0: </h4>Solution is valid, but it is an overkill to have pandas dependency just for getting current time.<br>------------------------------------------------------------------ <br><h3> James McGuigan, Id: 62425566, Score: 2: </h3><p>If you want the time for purpose of timing function calls, then you want time.perf_counter().</p>
 
 <pre><code>start_time = time.perf_counter()
 expensive_function()
@@ -914,7 +914,7 @@ print(f'expensive_function() took {round(time_taken,2)}s')
 <ul>
 <li><a href="https://docs.python.org/3/library/time.html#time.perf_counter" rel="nofollow noreferrer">https://docs.python.org/3/library/time.html#time.perf_counter</a></li>
 </ul>
------------------------------------------------------------------- <br><h3> Answer 71191706 Kofi: </h3><p>Attributes of now() can be used to get the current time in python:</p>
+------------------------------------------------------------------ <br><h3> Kofi, Id: 71191706, Score: 2: </h3><p>Attributes of now() can be used to get the current time in python:</p>
 <pre><code># importing datetime module for now()
 import datetime
     
@@ -945,7 +945,7 @@ print (current_time.second)
 print (&quot;Microsecond : &quot;, end = &quot;&quot;)
 print (current_time.microsecond)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 73575408 Olney1: </h3><p>There are so many complex solutions here it could be confusing for a beginner. I find this is the most simple solution to the question - as it just returns the current time as asked (no frills):</p>
+------------------------------------------------------------------ <br><h3> Olney1, Id: 73575408, Score: 2: </h3><p>There are so many complex solutions here it could be confusing for a beginner. I find this is the most simple solution to the question - as it just returns the current time as asked (no frills):</p>
 <pre><code>import datetime
 
 time_now = datetime.datetime.now()
@@ -960,11 +960,11 @@ time_now = datetime.datetime.now()
 print(time_now)
 </code></pre>
 <p>Although this approach is shorter to write, it returns the current date and milliseconds as well, which may not be required when simply looking to return the current time.</p>
------------------------------------------------------------------- <br><h3> Answer 71103877 Matei Piele: </h3><p>Gets the current time and converts it to string:</p>
+------------------------------------------------------------------ <br><h3> Matei Piele, Id: 71103877, Score: 0: </h3><p>Gets the current time and converts it to string:</p>
 <pre><code>from datetime import datetime
 datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 74837315 陳遠謀: </h3><pre><code>import datetime
+------------------------------------------------------------------ <br><h3> 陳遠謀, Id: 74837315, Score: -1: </h3><pre><code>import datetime
 import pytz # for timezone()
 import time
 
@@ -980,7 +980,7 @@ print(&quot;datetime.utcnow():&quot;, current_time3)
 print(&quot;datetime.datetime.now().isoformat():&quot;, current_time4)
 print('time.gmtime(time.time()): ', current_time5)
 </code></pre>
-<h4> Comment 132130105 Simas Joneliunas: </h4>There are, already, 52 other answers posted. How would your code block with no commentary contribute something new to the discussion?<br>------------------------------------------------------------------ <br><h3> Answer 70742500 Sankar guru: </h3><p><strong>Use this  method for UTC DateTime, local Date-Time, and convert am and pm</strong></p>
+<h4> Simas Joneliunas, Comment 132130105 Score: 1: </h4>There are, already, 52 other answers posted. How would your code block with no commentary contribute something new to the discussion?<br>------------------------------------------------------------------ <br><h3> Sankar guru, Id: 70742500, Score: -1: </h3><p><strong>Use this  method for UTC DateTime, local Date-Time, and convert am and pm</strong></p>
 <pre><code>import pytz
 from datetime import datetime
 
@@ -1000,7 +1000,7 @@ print(&quot;Date and time AM and PM&quot;)
 now = today.strftime(&quot;%Y-%M-%d:%I:%M %p&quot;)
 print(now)
 </code></pre>
-<h4> Comment 125165755 Wolfgang Kuehn: </h4>Downvote for using the deprecated <i>pytz</i>, compounded by the fact that there also is a <code>datetime.timezone.utc</code>.<br>------------------------------------------------------------------ <br><h3> Answer 75206161 Brian: </h3><p>If you need a time-zone aware solution. I like to use the following 5 lines of code to get the current time.</p>
+<h4> Wolfgang Kuehn, Comment 125165755 Score: 1: </h4>Downvote for using the deprecated <i>pytz</i>, compounded by the fact that there also is a <code>datetime.timezone.utc</code>.<br>------------------------------------------------------------------ <br><h3> Brian, Id: 75206161, Score: -1: </h3><p>If you need a time-zone aware solution. I like to use the following 5 lines of code to get the current time.</p>
 <pre><code>from datetime import datetime
 import pytz
 
@@ -1015,4 +1015,4 @@ current_time = my_time.strftime('%Y-%m-%d %H:%M:%S') # current_time would be som
 </code></pre>
 <p>You can find the list of all timezones using <code>pytz.all_timezones</code>.</p>
 <p>The meaning of the symbols in <code>%Y-%m-%d %H:%M:%S</code> can be found in <a href="https://www.geeksforgeeks.org/python-strftime-function/" rel="nofollow noreferrer">geeksforgeeks Python strftime() function</a></p>
-<h4> Comment 133919592 FObersteiner: </h4>Btw. we have time zone handling in the standard library, see <a href="https://docs.python.org/3/library/zoneinfo.html#module-zoneinfo" rel="nofollow noreferrer">zoneinfo</a>.<br>
+<h4> FObersteiner, Comment 133919592 Score: 0: </h4>Btw. we have time zone handling in the standard library, see <a href="https://docs.python.org/3/library/zoneinfo.html#module-zoneinfo" rel="nofollow noreferrer">zoneinfo</a>.<br>

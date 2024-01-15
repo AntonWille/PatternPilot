@@ -1,4 +1,4 @@
- <h2> Title: How to print without a newline or space </h2> <h3> Andrea Ambu, question_id: 493386 </h3>Score: 2418, Tags: {python,trailing-newline} <br><p>Consider these examples using <code>print</code> in Python:</p>
+ <h2> Title: How to print without a newline or space </h2> <h4> Andrea Ambu, question_id: 493386 </h4>Score: 2418, Tags: {python,trailing-newline} <br><p>Consider these examples using <code>print</code> in Python:</p>
 <pre class="lang-py prettyprint-override"><code>&gt;&gt;&gt; for i in range(4): print('.')
 .
 .
@@ -8,7 +8,7 @@
 . . . .
 </code></pre>
 <p>Either a newline or a space is added between each value. How can I avoid that, so that the output is <code>....</code> instead? In other words, how can I &quot;append&quot; strings to the standard output stream?</p>
-<h4> Comment 8999807 guettli: </h4>For those who search the string formating documentation of python: <a href="http://docs.python.org/library/stdtypes.html#string-formatting" rel="nofollow noreferrer">docs.python.org/library/stdtypes.html#string-formatting</a><br><h4> Comment 116018639 Dock: </h4>Bit late to the party, but why not <code>print(&quot;.&quot; * 10)</code>?<br><h4> Comment 96167954 Vignesh Bayari R.: </h4>Looks like a similar question had been asked previously: <a href="https://stackoverflow.com/q/255147/9325817">https://stackoverflow.com/q/255147/9325817</a><br><h4> Comment 118524708 Hitesh Garg: </h4>Explanation on <a href="https://www.codingeek.com/tutorials/python/python-io-user-input-ouput/#2_how_to_print_output_to_the_screen" rel="nofollow noreferrer">how to use <code>sep</code> and <code>end</code> in python print statement</a><br>------------------------------------------------------------------ <br><h3> Answer 17494240 Subbu: </h3><p>You can do the same in Python 3 as follows:</p>
+<h4> guettli, Id: 8999807 Score: 8: </h4>For those who search the string formating documentation of python: <a href="http://docs.python.org/library/stdtypes.html#string-formatting" rel="nofollow noreferrer">docs.python.org/library/stdtypes.html#string-formatting</a><br><h4> Dock, Id: 116018639 Score: 1: </h4>Bit late to the party, but why not <code>print(&quot;.&quot; * 10)</code>?<br><h4> Vignesh Bayari R., Id: 96167954 Score: 1: </h4>Looks like a similar question had been asked previously: <a href="https://stackoverflow.com/q/255147/9325817">https://stackoverflow.com/q/255147/9325817</a><br><h4> Hitesh Garg, Id: 118524708 Score: 0: </h4>Explanation on <a href="https://www.codingeek.com/tutorials/python/python-io-user-input-ouput/#2_how_to_print_output_to_the_screen" rel="nofollow noreferrer">how to use <code>sep</code> and <code>end</code> in python print statement</a><br>------------------------------------------------------------------ <br><h3> Subbu, Id: 17494240, Score: 6: </h3><p>You can do the same in Python 3 as follows:</p>
 <pre><code>#!usr/bin/python
 
 i = 0
@@ -17,7 +17,7 @@ while i&lt;10 :
     i = i+1
 </code></pre>
 <p>And execute it with <code>python filename.py</code> or <code>python3 filename.py</code>.</p>
------------------------------------------------------------------- <br><h3> Answer 493399 codelogic: </h3><p>In Python 3, you can use the <code>sep=</code> and <code>end=</code> parameters of the <a href="https://docs.python.org/library/functions.html#print" rel="noreferrer"><code>print</code></a> function:</p>
+------------------------------------------------------------------ <br><h3> codelogic, Id: 493399, Score: 3272: </h3><p>In Python 3, you can use the <code>sep=</code> and <code>end=</code> parameters of the <a href="https://docs.python.org/library/functions.html#print" rel="noreferrer"><code>print</code></a> function:</p>
 
 <p>To not add a newline to the end of the string:</p>
 
@@ -59,7 +59,7 @@ sys.stdout.write('.')
 </code></pre>
 
 <p>to ensure <code>stdout</code> is flushed immediately.</p>
-<h4> Comment 95851263 Rishav: </h4>Can someone explain why would I need to <code>flush</code> and what does it do actually?<br><h4> Comment 83381606 gunit: </h4>Thanks! In Python 3.6.3, that flush=True is crucial, or else it doesn&#39;t work as intended.<br><h4> Comment 99936286 Great Turtle: </h4>It&#39;s a few months late, but to answer @Rishav flush empties the buffer and displays the output right now. Without flush you might have your exact text printed eventually, but only when the system gets around to processing the graphics instead of the IO.  Flush makes the text visible immediately by &quot;flushing&quot; the cache.<br><h4> Comment 113015114 David Parks: </h4>If you&#39;re having trouble with buffering you can unbuffer all python output with <code>python -u my.py</code>.  This is often a good idea if you want to watch progress in real-time.<br><h4> Comment 115054431 Timo: </h4>I use format strings and do not want a new line between the string and the <b>?</b>:<code>line = f&quot;{line[6:]}?&quot;</code> Is there also an &quot;end&quot;?<br>------------------------------------------------------------------ <br><h3> Answer 11685717 KDP: </h3><p>For Python 2 and earlier, it should be as simple as described in <em><a href="http://legacy.python.org/search/hypermail/python-1992/0115.html" rel="nofollow noreferrer">Re: How does one print without a CR?</a></em> by <a href="https://en.wikipedia.org/wiki/Guido_van_Rossum" rel="nofollow noreferrer">Guido van Rossum</a> (paraphrased):</p>
+<h4> Rishav, Comment 95851263 Score: 8: </h4>Can someone explain why would I need to <code>flush</code> and what does it do actually?<br><h4> gunit, Comment 83381606 Score: 12: </h4>Thanks! In Python 3.6.3, that flush=True is crucial, or else it doesn&#39;t work as intended.<br><h4> Great Turtle, Comment 99936286 Score: 11: </h4>It&#39;s a few months late, but to answer @Rishav flush empties the buffer and displays the output right now. Without flush you might have your exact text printed eventually, but only when the system gets around to processing the graphics instead of the IO.  Flush makes the text visible immediately by &quot;flushing&quot; the cache.<br><h4> David Parks, Comment 113015114 Score: 4: </h4>If you&#39;re having trouble with buffering you can unbuffer all python output with <code>python -u my.py</code>.  This is often a good idea if you want to watch progress in real-time.<br><h4> Timo, Comment 115054431 Score: 0: </h4>I use format strings and do not want a new line between the string and the <b>?</b>:<code>line = f&quot;{line[6:]}?&quot;</code> Is there also an &quot;end&quot;?<br>------------------------------------------------------------------ <br><h3> KDP, Id: 11685717, Score: 303: </h3><p>For Python 2 and earlier, it should be as simple as described in <em><a href="http://legacy.python.org/search/hypermail/python-1992/0115.html" rel="nofollow noreferrer">Re: How does one print without a CR?</a></em> by <a href="https://en.wikipedia.org/wiki/Guido_van_Rossum" rel="nofollow noreferrer">Guido van Rossum</a> (paraphrased):</p>
 <blockquote>
 <p>Is it possible to print something, but not automatically have a
 carriage return appended to it?</p>
@@ -73,7 +73,7 @@ carriage return appended to it?</p>
 0 1 2 3 4 5 6 7 8 9
 &gt;&gt;&gt;
 </code></pre>
-<h4> Comment 49671483 Zags: </h4>This is specifically listed in the question as undesirable behavior because of the spaces<br><h4> Comment 51225446 Eric Leschinski: </h4>On the contrary, the answer should be deleted for two reasons: it has undesirable side effects which you can&#39;t disable (included extra spaces), and It isn&#39;t forward compatible with python 3 (the parenthesis force a conversion to a tuple).  I expect these sorts of shoddy constructs from PHP, not Python.  So it&#39;s best to not ever use this.<br><h4> Comment 56008739 Shadur: </h4>@nathanbasanese Simple or not, it has a side effect that <i>the asker explicitly does not want</i>. Downvoted.<br><h4> Comment 52511329 Nathan Basanese: </h4>// , This is the simplest way to get it done in Python 2, though, and there is a LOT of one-off code out there for really old OSes. Probably not the best solution, or even recommended.  However, one of the great advantages of StackOverflow is that it lets us know what weirdo tricks are out there. KDP, would you include a quick warning at the top about what @Eric Leschinski said? It does make sense, after all.<br><h4> Comment 100791778 Peter Cordes: </h4>@Cylindric: often people find questions via google that aren&#39;t a perfect match for what <i>they</i> want, but the answer still works for them.  Presumably most of the 291 upvotes on this were from people who were fine with a trailing space, unlike the requirements in the question.  That&#39;s just how SO works, especially for FAQs that come up in many different contexts.  It doesn&#39;t <i>justify</i> this answer or mean any of that is a good thing, it just explains how we got here and tells us that this answer actually helped (or at least looked good) for a lot of people.<br><h4> Comment 72404799 AKS: </h4>How can I get rid of that space after each N i.e. I want <code>0123456..</code><br><h4> Comment 93917393 shrewmouse: </h4>You didn&#39;t answer the question.  &quot;How to print without newline or <b><i>SPACE</i></b>?&quot;  He specifically says without spaces.<br><h4> Comment 106611885 peawormsworth: </h4>The answer is dated and incorrect for Python3.  Dowvnote because the author did not update this answer to indicate that it is for legacy code. And the answer is an incomplete solution to the posted problem.<br><h4> Comment 94179310 Joe&#39;: </h4>@shrewmouse <code>print &#39;\b&#39;+str(i),</code><br><h4> Comment 94179510 shrewmouse: </h4>@Joe&#39;, you are still printing a space.  It&#39;s just masked by the backspace.<br><h4> Comment 136909122 gluttony: </h4>Indeed, does not answer the question (still spaces between i&#39;s) and does not work in python 3, I tried <code>print(i,)</code> and <code>print(i),</code>, both writes new lines and the second one writes a <code>(None,)</code> between each i&#39;s. Edit: just find out right after, works with <code>print(i, end=&quot;&quot;)</code>, and <code>print</code> in <code>else</code> must have parenthesis, so <code>print()</code>.<br><h4> Comment 104719489 Steven Lu: </h4>Probably fair to say that the answer doesn&#39;t deserve to be deleted, but it definitely can benefit from having language that calls out its drawbacks, of which there are many.<br>------------------------------------------------------------------ <br><h3> Answer 493500 Beau: </h3><p><em>Note: The title of this question used to be something like &quot;How to printf in Python&quot;</em></p>
+<h4> Zags, Comment 49671483 Score: 110: </h4>This is specifically listed in the question as undesirable behavior because of the spaces<br><h4> Eric Leschinski, Comment 51225446 Score: 96: </h4>On the contrary, the answer should be deleted for two reasons: it has undesirable side effects which you can&#39;t disable (included extra spaces), and It isn&#39;t forward compatible with python 3 (the parenthesis force a conversion to a tuple).  I expect these sorts of shoddy constructs from PHP, not Python.  So it&#39;s best to not ever use this.<br><h4> Shadur, Comment 56008739 Score: 25: </h4>@nathanbasanese Simple or not, it has a side effect that <i>the asker explicitly does not want</i>. Downvoted.<br><h4> Nathan Basanese, Comment 52511329 Score: 11: </h4>// , This is the simplest way to get it done in Python 2, though, and there is a LOT of one-off code out there for really old OSes. Probably not the best solution, or even recommended.  However, one of the great advantages of StackOverflow is that it lets us know what weirdo tricks are out there. KDP, would you include a quick warning at the top about what @Eric Leschinski said? It does make sense, after all.<br><h4> Peter Cordes, Comment 100791778 Score: 6: </h4>@Cylindric: often people find questions via google that aren&#39;t a perfect match for what <i>they</i> want, but the answer still works for them.  Presumably most of the 291 upvotes on this were from people who were fine with a trailing space, unlike the requirements in the question.  That&#39;s just how SO works, especially for FAQs that come up in many different contexts.  It doesn&#39;t <i>justify</i> this answer or mean any of that is a good thing, it just explains how we got here and tells us that this answer actually helped (or at least looked good) for a lot of people.<br><h4> AKS, Comment 72404799 Score: 5: </h4>How can I get rid of that space after each N i.e. I want <code>0123456..</code><br><h4> shrewmouse, Comment 93917393 Score: 4: </h4>You didn&#39;t answer the question.  &quot;How to print without newline or <b><i>SPACE</i></b>?&quot;  He specifically says without spaces.<br><h4> peawormsworth, Comment 106611885 Score: 2: </h4>The answer is dated and incorrect for Python3.  Dowvnote because the author did not update this answer to indicate that it is for legacy code. And the answer is an incomplete solution to the posted problem.<br><h4> Joe&#39;, Comment 94179310 Score: 1: </h4>@shrewmouse <code>print &#39;\b&#39;+str(i),</code><br><h4> shrewmouse, Comment 94179510 Score: 1: </h4>@Joe&#39;, you are still printing a space.  It&#39;s just masked by the backspace.<br><h4> gluttony, Comment 136909122 Score: 0: </h4>Indeed, does not answer the question (still spaces between i&#39;s) and does not work in python 3, I tried <code>print(i,)</code> and <code>print(i),</code>, both writes new lines and the second one writes a <code>(None,)</code> between each i&#39;s. Edit: just find out right after, works with <code>print(i, end=&quot;&quot;)</code>, and <code>print</code> in <code>else</code> must have parenthesis, so <code>print()</code>.<br><h4> Steven Lu, Comment 104719489 Score: 0: </h4>Probably fair to say that the answer doesn&#39;t deserve to be deleted, but it definitely can benefit from having language that calls out its drawbacks, of which there are many.<br>------------------------------------------------------------------ <br><h3> Beau, Id: 493500, Score: 179: </h3><p><em>Note: The title of this question used to be something like &quot;How to printf in Python&quot;</em></p>
 <p>Since people may come here looking for it based on the title, Python also supports printf-style substitution:</p>
 <pre><code>&gt;&gt;&gt; strings = [ &quot;one&quot;, &quot;two&quot;, &quot;three&quot; ]
 &gt;&gt;&gt;
@@ -88,7 +88,7 @@ Item 2: three
 <pre><code>&gt;&gt;&gt; print &quot;.&quot; * 10
 ..........
 </code></pre>
-<h4> Comment 1384560 ayman: </h4>This answers the title of the question, but not the body.  That said, it provided me with what I was looking for.  :)<br><h4> Comment 313121 Beau: </h4>Indeed, it is missing the point. :) Since there was already a great answer to the question I was just elaborating on some related techniques that might prove useful.<br><h4> Comment 1039898 Dan: </h4>Based on the title of the question, I believe this answer is more appropriate analog to how one commonly uses printf in C/C++<br><h4> Comment 14977635 Beau: </h4>@Vanuan, I explained in the bottom of my answer that the title of the question changed at some point. :)<br><h4> Comment 14942779 Vanuan: </h4>it&#39;s not the answer to the question<br><h4> Comment 63988287 pppery: </h4>This answer is not relevant anymore.<br><h4> Comment 24869637 kiminoa: </h4>Is there a way to use the printf style and get no newlines?  print &quot;%s, &quot;, % i ... doesn&#39;t work. :-/<br>------------------------------------------------------------------ <br><h3> Answer 5071123 k107: </h3><p>Use the Python 3-style print function for Python 2.6+ <em>(it will also break any existing keyworded print statements in the same file)</em>.</p>
+<h4> ayman, Comment 1384560 Score: 17: </h4>This answers the title of the question, but not the body.  That said, it provided me with what I was looking for.  :)<br><h4> Beau, Comment 313121 Score: 11: </h4>Indeed, it is missing the point. :) Since there was already a great answer to the question I was just elaborating on some related techniques that might prove useful.<br><h4> Dan, Comment 1039898 Score: 8: </h4>Based on the title of the question, I believe this answer is more appropriate analog to how one commonly uses printf in C/C++<br><h4> Beau, Comment 14977635 Score: 4: </h4>@Vanuan, I explained in the bottom of my answer that the title of the question changed at some point. :)<br><h4> Vanuan, Comment 14942779 Score: 2: </h4>it&#39;s not the answer to the question<br><h4> pppery, Comment 63988287 Score: 2: </h4>This answer is not relevant anymore.<br><h4> kiminoa, Comment 24869637 Score: 0: </h4>Is there a way to use the printf style and get no newlines?  print &quot;%s, &quot;, % i ... doesn&#39;t work. :-/<br>------------------------------------------------------------------ <br><h3> k107, Id: 5071123, Score: 100: </h3><p>Use the Python 3-style print function for Python 2.6+ <em>(it will also break any existing keyworded print statements in the same file)</em>.</p>
 <pre><code># For Python 2 to use the print() function, removing the print keyword
 from __future__ import print_function
 for x in xrange(10):
@@ -114,14 +114,14 @@ print 'done'
 printf('%i %f', 10, 3.14)
 #hello world10 3.140000
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 4348063 lenooh: </h3><p>How to print on the same line:</p>
+------------------------------------------------------------------ <br><h3> lenooh, Id: 4348063, Score: 48: </h3><p>How to print on the same line:</p>
 
 <pre><code>import sys
 for i in xrange(0,10):
    sys.stdout.write(".")
    sys.stdout.flush()
 </code></pre>
-<h4> Comment 128196291 rob: </h4>Real time output of status and still relevant 10+ years later in Python 3 !<br>------------------------------------------------------------------ <br><h3> Answer 493422 SilentGhost: </h3><p>The <code>print</code> function in Python 3.x has an optional <code>end</code> parameter that lets you modify the ending character:</p>
+<h4> rob, Comment 128196291 Score: 0: </h4>Real time output of status and still relevant 10+ years later in Python 3 !<br>------------------------------------------------------------------ <br><h3> SilentGhost, Id: 493422, Score: 42: </h3><p>The <code>print</code> function in Python 3.x has an optional <code>end</code> parameter that lets you modify the ending character:</p>
 <pre class="lang-py prettyprint-override"><code>print(&quot;HELLO&quot;, end=&quot;&quot;)
 print(&quot;HELLO&quot;)
 </code></pre>
@@ -139,7 +139,7 @@ print(&quot;HELLO&quot;)
 <p>If you wanted to use this in Python 2.x just add this at the <strong>start</strong> of your file:</p>
 <pre><code>from __future__ import print_function
 </code></pre>
-<h4> Comment 101892721 McPeppr: </h4>what does &quot;sep&quot; do?<br><h4> Comment 108898232 TheTechRobo the Nerd: </h4>@McPeppr I know that this is old but I have edited the answer nonetheless for more clarity. Check it now.<br><h4> Comment 109005970 McPeppr: </h4>Thanks for the edit. sep will come in handy. So far I used sep.join(list) to concatenate elements of a list with a separator in between - perfect for writing csv-files<br>------------------------------------------------------------------ <br><h3> Answer 30881087 sohail288: </h3><p>Using <em>functools.partial</em> to create a new function called <em>printf</em>:</p>
+<h4> McPeppr, Comment 101892721 Score: 2: </h4>what does &quot;sep&quot; do?<br><h4> TheTechRobo the Nerd, Comment 108898232 Score: 2: </h4>@McPeppr I know that this is old but I have edited the answer nonetheless for more clarity. Check it now.<br><h4> McPeppr, Comment 109005970 Score: 0: </h4>Thanks for the edit. sep will come in handy. So far I used sep.join(list) to concatenate elements of a list with a separator in between - perfect for writing csv-files<br>------------------------------------------------------------------ <br><h3> sohail288, Id: 30881087, Score: 24: </h3><p>Using <em>functools.partial</em> to create a new function called <em>printf</em>:</p>
 <pre><code>&gt;&gt;&gt; import functools
 
 &gt;&gt;&gt; printf = functools.partial(print, end=&quot;&quot;)
@@ -148,7 +148,7 @@ print(&quot;HELLO&quot;)
 Hello world
 </code></pre>
 <p>It is an easy way to wrap a function with default parameters.</p>
-<h4> Comment 121144157 TheTechRobo the Nerd: </h4>I used to want to do that but couldn&#39;t because <code>otherfunction = function(1)</code> would just store the result of <code>function(1)</code>, not turn <code>otherfunction</code> into a wrapper. Thanks!<br>------------------------------------------------------------------ <br><h3> Answer 38286476 Yaelle: </h3><p>In Python 3+, <a href="https://docs.python.org/library/functions.html#print" rel="noreferrer"><code>print</code></a> is a function. When you call</p>
+<h4> TheTechRobo the Nerd, Comment 121144157 Score: 1: </h4>I used to want to do that but couldn&#39;t because <code>otherfunction = function(1)</code> would just store the result of <code>function(1)</code>, not turn <code>otherfunction</code> into a wrapper. Thanks!<br>------------------------------------------------------------------ <br><h3> Yaelle, Id: 38286476, Score: 20: </h3><p>In Python 3+, <a href="https://docs.python.org/library/functions.html#print" rel="noreferrer"><code>print</code></a> is a function. When you call</p>
 <pre><code>print('Hello, World!')
 </code></pre>
 <p>Python translates it to</p>
@@ -158,8 +158,8 @@ Hello world
 <pre><code>print('Hello, World!', end='')
 print('Hello, World!', end=' ')
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 24685004 user3763437: </h3><p>In Python 2.x, you can just add <code>,</code> at the end of the <code>print</code> function, so it won't print on a new line.</p>
-<h4> Comment 64001509 pppery: </h4>The OP doesn;t want a space appended<br><h4> Comment 93917549 shrewmouse: </h4>Didn&#39;t answer the question.  No spaces.<br><h4> Comment 52511209 Nathan Basanese: </h4>// , This actually made it print out nothing. Don&#39;t we need to then add another print statement without an argument at the end, as shown in <a href="http://stackoverflow.com/a/493500/2146138">stackoverflow.com/a/493500/2146138</a>? Would you be willing to edit this answer with a reeeally short two or three line example?<br><h4> Comment 108898080 TheTechRobo the Nerd: </h4>This no longer works in Python 2.x and only answers half of what the OP wanted. Why 16 upvotes?<br><h4> Comment 121136534 Peter Mortensen: </h4>@TheTechRobo36414519: It was 25 upvotes and 9 downvotes (total of 16). Since then it got one upvote and one downvote (so right now the total is still 16).<br>------------------------------------------------------------------ <br><h3> Answer 31569705 n611x007: </h3><p>Python <strong>3</strong>:</p>
+------------------------------------------------------------------ <br><h3> user3763437, Id: 24685004, Score: 14: </h3><p>In Python 2.x, you can just add <code>,</code> at the end of the <code>print</code> function, so it won't print on a new line.</p>
+<h4> pppery, Comment 64001509 Score: 5: </h4>The OP doesn;t want a space appended<br><h4> shrewmouse, Comment 93917549 Score: 4: </h4>Didn&#39;t answer the question.  No spaces.<br><h4> Nathan Basanese, Comment 52511209 Score: 3: </h4>// , This actually made it print out nothing. Don&#39;t we need to then add another print statement without an argument at the end, as shown in <a href="http://stackoverflow.com/a/493500/2146138">stackoverflow.com/a/493500/2146138</a>? Would you be willing to edit this answer with a reeeally short two or three line example?<br><h4> TheTechRobo the Nerd, Comment 108898080 Score: 2: </h4>This no longer works in Python 2.x and only answers half of what the OP wanted. Why 16 upvotes?<br><h4> Peter Mortensen, Comment 121136534 Score: 0: </h4>@TheTechRobo36414519: It was 25 upvotes and 9 downvotes (total of 16). Since then it got one upvote and one downvote (so right now the total is still 16).<br>------------------------------------------------------------------ <br><h3> n611x007, Id: 31569705, Score: 13: </h3><p>Python <strong>3</strong>:</p>
 <pre><code>print('.', end='')
 </code></pre>
 <p>Python <strong>2.6+</strong>:</p>
@@ -180,7 +180,7 @@ sys.stdout.write('.')
 # To see the problem, try:
 print('.', 'x'), # This will print `('.', 'x') `
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 51931940 susan097: </h3><p>In general, there are two ways to do this:</p>
+------------------------------------------------------------------ <br><h3> susan097, Id: 51931940, Score: 10: </h3><p>In general, there are two ways to do this:</p>
 <p><strong>Print without a newline in Python 3.x</strong></p>
 <p>Append nothing after the print statement and remove '\n' by using <code>end=''</code>, as:</p>
 <pre><code>&gt;&gt;&gt; print('hello')
@@ -206,7 +206,7 @@ hello world
     print &quot;{} .&quot;.format(i),
 </code></pre>
 <p>You can visit this <a href="https://www.geeksforgeeks.org/print-without-newline-python/" rel="noreferrer">link</a>.</p>
-<h4> Comment 94041395 shrewmouse: </h4>What about the space?<br><h4> Comment 94042362 susan097: </h4>use <code>end=&quot; &quot;</code> e.g.: print(&#39;hello&#39;, end=&#39;&#39; &quot;);print(&#39;world&#39;)<br><h4> Comment 94048854 shrewmouse: </h4>Your 2.7 solution does not remove the space.<br><h4> Comment 94077420 susan097: </h4>I mention that remove &#39;\n&#39; not space, space is by default in python2. See what this looks: <code>print &#39;hello&#39; ;print&#39;there&#39;</code> in <a href="https://paiza.io/projects/e/35So9iUPfMdIORGzJTb2NQ" rel="nofollow noreferrer">paiza.io/projects/e/35So9iUPfMdIORGzJTb2NQ</a><br><h4> Comment 94107411 shrewmouse: </h4>Right, that is why your answer was down-voted.  You did not answer the question, &quot;How to print without newline or space?&quot;.  Your answer for 2.x doesn&#39;t answer the question.  You answer for 3.0 is the same as many of the other answers that were posted over nine years ago.  Simply stated, this answer adds nothing useful to the community and you should delete it.<br><h4> Comment 94127874 susan097: </h4>I have mentioned that Print without newline in Python 2.x in answer. It does the work as asked in question, i have checked it twice. I think that my answer can be simple one that&#39;s why i post it. Anyway thanks for your suggestion. Should i delete it?<br><h4> Comment 94128065 shrewmouse: </h4>You just said &quot;I mention that remove &#39;\n&#39; not space, space is by default in python2. See what this looks: print &#39;hello&#39; ;print&#39;there&#39;&quot;.  You just admitted that your code does not answer the question (i.e. your code does not remove the SPACE).  Your python 3 example is identical to most of the other answers; it adds nothing new.  Yes, you should delete your answer.<br>------------------------------------------------------------------ <br><h3> Answer 33870664 alvas: </h3><p>You can try:</p>
+<h4> shrewmouse, Comment 94041395 Score: 0: </h4>What about the space?<br><h4> susan097, Comment 94042362 Score: 0: </h4>use <code>end=&quot; &quot;</code> e.g.: print(&#39;hello&#39;, end=&#39;&#39; &quot;);print(&#39;world&#39;)<br><h4> shrewmouse, Comment 94048854 Score: 0: </h4>Your 2.7 solution does not remove the space.<br><h4> susan097, Comment 94077420 Score: 0: </h4>I mention that remove &#39;\n&#39; not space, space is by default in python2. See what this looks: <code>print &#39;hello&#39; ;print&#39;there&#39;</code> in <a href="https://paiza.io/projects/e/35So9iUPfMdIORGzJTb2NQ" rel="nofollow noreferrer">paiza.io/projects/e/35So9iUPfMdIORGzJTb2NQ</a><br><h4> shrewmouse, Comment 94107411 Score: 0: </h4>Right, that is why your answer was down-voted.  You did not answer the question, &quot;How to print without newline or space?&quot;.  Your answer for 2.x doesn&#39;t answer the question.  You answer for 3.0 is the same as many of the other answers that were posted over nine years ago.  Simply stated, this answer adds nothing useful to the community and you should delete it.<br><h4> susan097, Comment 94127874 Score: 0: </h4>I have mentioned that Print without newline in Python 2.x in answer. It does the work as asked in question, i have checked it twice. I think that my answer can be simple one that&#39;s why i post it. Anyway thanks for your suggestion. Should i delete it?<br><h4> shrewmouse, Comment 94128065 Score: 0: </h4>You just said &quot;I mention that remove &#39;\n&#39; not space, space is by default in python2. See what this looks: print &#39;hello&#39; ;print&#39;there&#39;&quot;.  You just admitted that your code does not answer the question (i.e. your code does not remove the SPACE).  Your python 3 example is identical to most of the other answers; it adds nothing new.  Yes, you should delete your answer.<br>------------------------------------------------------------------ <br><h3> alvas, Id: 33870664, Score: 9: </h3><p>You can try:</p>
 
 <pre><code>import sys
 import time
@@ -221,20 +221,20 @@ sys.stdout.flush()
 # Finalize the new message by printing a return carriage.
 sys.stdout.write('\n')
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 71908637 oFinally: </h3><p>Just use <code>end=''</code></p>
+------------------------------------------------------------------ <br><h3> oFinally, Id: 71908637, Score: 9: </h3><p>Just use <code>end=''</code></p>
 <pre class="lang-py prettyprint-override"><code>for i in range(5):
   print('a',end='')
 
 # aaaaa
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 70648460 LunaticXXD10: </h3><p>just use the <code>end</code> =&quot;&quot; or <code>sep</code> =&quot;&quot;</p>
+------------------------------------------------------------------ <br><h3> LunaticXXD10, Id: 70648460, Score: 8: </h3><p>just use the <code>end</code> =&quot;&quot; or <code>sep</code> =&quot;&quot;</p>
 <pre><code>&gt;&gt;&gt; for i in range(10):
         print('.', end = &quot;&quot;)
 </code></pre>
 <p>output:</p>
 <pre><code>.........
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 11076668 ssgam: </h3><p>I recently had the same problem...</p>
+------------------------------------------------------------------ <br><h3> ssgam, Id: 11076668, Score: 7: </h3><p>I recently had the same problem...</p>
 <p>I solved it by doing:</p>
 <pre><code>import sys, os
 
@@ -249,7 +249,7 @@ for i in range(1,10):
     print(i)
 </code></pre>
 <p>This works on both Unix and Windows, but I have not tested it on Mac OS X.</p>
-<h4> Comment 64464727 pppery: </h4>Breaks <code>sys.__stdout__</code><br>------------------------------------------------------------------ <br><h3> Answer 28778131 DisneyWizard: </h3><p><a href="https://stackoverflow.com/questions/493386/how-to-print-without-a-newline-or-space/4348063#4348063">lenooh satisfied</a> my query. I discovered this article while searching for 'python suppress newline'. I'm using <a href="https://en.wikipedia.org/wiki/IDLE" rel="nofollow noreferrer">IDLE 3</a> on Raspberry Pi to develop Python 3.2 for <a href="https://en.wikipedia.org/wiki/PuTTY" rel="nofollow noreferrer">PuTTY</a>.</p>
+<h4> pppery, Comment 64464727 Score: 2: </h4>Breaks <code>sys.__stdout__</code><br>------------------------------------------------------------------ <br><h3> DisneyWizard, Id: 28778131, Score: 5: </h3><p><a href="https://stackoverflow.com/questions/493386/how-to-print-without-a-newline-or-space/4348063#4348063">lenooh satisfied</a> my query. I discovered this article while searching for 'python suppress newline'. I'm using <a href="https://en.wikipedia.org/wiki/IDLE" rel="nofollow noreferrer">IDLE 3</a> on Raspberry Pi to develop Python 3.2 for <a href="https://en.wikipedia.org/wiki/PuTTY" rel="nofollow noreferrer">PuTTY</a>.</p>
 <p>I wanted to create a progress bar on the PuTTY command line. I didn't want the page scrolling away. I wanted a horizontal line to reassure the user from freaking out that the program hasn't cruncxed to a halt nor been sent to lunch on a merry infinite loop - as a plea to 'leave me be, I'm doing fine, but this may take some time.' interactive message - like a progress bar in text.</p>
 <p>The <code>print('Skimming for', search_string, '\b! .001', end='')</code> initializes the message by preparing for the next screen-write, which will print three backspaces as ⌫⌫⌫ rubout and then a period, wiping off '001' and extending the line of periods.</p>
 <p>After <code>search_string</code> parrots user input, the <code>\b!</code> trims the exclamation point of my <code>search_string</code> text to back over the space which <code>print()</code> otherwise forces, properly placing the punctuation. That's followed by a space and the first 'dot' of the 'progress bar' which I'm simulating.</p>
@@ -281,7 +281,7 @@ if not (len(list)==items):
 <p>The progress bar meat is in the <code>sys.stdout.write('\b\b\b.'+format(page, '03'))</code> line. First, to erase to the left, it backs up the cursor over the three numeric characters with the '\b\b\b' as ⌫⌫⌫ rubout and drops a new period to add to the progress bar length. Then it writes three digits of the page it has progressed to so far. Because <code>sys.stdout.write()</code> waits for a full buffer or the output channel to close, the <code>sys.stdout.flush()</code> forces the immediate write. <code>sys.stdout.flush()</code> is built into the end of <code>print()</code> which is bypassed with <code>print(txt, end='' )</code>. Then the code loops through its mundane time intensive operations while it prints nothing more until it returns here to wipe three digits back, add a period and write three digits again, incremented.</p>
 <p>The three digits wiped and rewritten is by no means necessary - it's just a flourish which exemplifies <code>sys.stdout.write()</code> versus <code>print()</code>. You could just as easily prime with a period and forget the three fancy backslash-b ⌫ backspaces (of course not writing formatted page counts as well) by just printing the period bar longer by one each time through - without spaces or newlines using just the <code>sys.stdout.write('.'); sys.stdout.flush()</code> pair.</p>
 <p>Please note that the Raspberry Pi IDLE 3 Python shell does not honor the backspace as ⌫ rubout, but instead prints a space, creating an apparent list of fractions instead.</p>
------------------------------------------------------------------- <br><h3> Answer 31590081 Bala.K: </h3><p>You want to print something in the <em>for</em> loop right; but you don't want it print in new line every time...</p>
+------------------------------------------------------------------ <br><h3> Bala.K, Id: 31590081, Score: 5: </h3><p>You want to print something in the <em>for</em> loop right; but you don't want it print in new line every time...</p>
 <p>For example:</p>
 <pre><code> for i in range (0,5):
    print &quot;hi&quot;
@@ -304,19 +304,19 @@ hi hi hi hi hi hi right????</p>
 <p>OUTPUT:</p>
 <pre class="lang-none prettyprint-override"><code>hi hi hi hi hi
 </code></pre>
-<h4> Comment 90795167 Cool Javelin: </h4>No, the OP wants hihihihihi, not hi hi hi hi hi<br>------------------------------------------------------------------ <br><h3> Answer 33901457 jarr: </h3><p>Many of these answers seem a little complicated. In Python 3.x you simply do this:</p>
+<h4> Cool Javelin, Comment 90795167 Score: 6: </h4>No, the OP wants hihihihihi, not hi hi hi hi hi<br>------------------------------------------------------------------ <br><h3> jarr, Id: 33901457, Score: 5: </h3><p>Many of these answers seem a little complicated. In Python 3.x you simply do this:</p>
 
 <pre><code>print(&lt;expr&gt;, &lt;expr&gt;, ..., &lt;expr&gt;, end=" ")
 </code></pre>
 
 <p>The default value of end is <code>"\n"</code>. We are simply changing it to a space or you can also use <code>end=""</code> (no space) to do what <code>printf</code> normally does.</p>
------------------------------------------------------------------- <br><h3> Answer 42687762 Bikram Kumar: </h3><p>You will notice that all the above answers are correct. But I wanted to make a shortcut to always writing the &quot; end='' &quot; parameter in the end.</p>
+------------------------------------------------------------------ <br><h3> Bikram Kumar, Id: 42687762, Score: 5: </h3><p>You will notice that all the above answers are correct. But I wanted to make a shortcut to always writing the &quot; end='' &quot; parameter in the end.</p>
 <p>You could define a function like</p>
 <pre><code>def Print(*args, sep='', end='', file=None, flush=False):
     print(*args, sep=sep, end=end, file=file, flush=flush)
 </code></pre>
 <p>It would accept all the number of parameters. Even it will accept all the other parameters, like file, flush, etc. and with the same name.</p>
-<h4> Comment 83793336 Otzen: </h4>It do not run, it complaints that <code>*arg</code> is in beginning (python 2.7), and putting it at the end did run, but did not work completely right. I defined a function that only took <code>Print(*args)</code>, and then just called print with <code>sep=&#39;&#39;, end=&#39;&#39;</code>. And now it works as I want. So one upvote for the idea.<br>------------------------------------------------------------------ <br><h3> Answer 62711015 Crystalline Core: </h3><pre><code> for i in range(0, 5): #setting the value of (i) in the range 0 to 5 
+<h4> Otzen, Comment 83793336 Score: 0: </h4>It do not run, it complaints that <code>*arg</code> is in beginning (python 2.7), and putting it at the end did run, but did not work completely right. I defined a function that only took <code>Print(*args)</code>, and then just called print with <code>sep=&#39;&#39;, end=&#39;&#39;</code>. And now it works as I want. So one upvote for the idea.<br>------------------------------------------------------------------ <br><h3> Crystalline Core, Id: 62711015, Score: 3: </h3><pre><code> for i in range(0, 5): #setting the value of (i) in the range 0 to 5 
      print(i)
 </code></pre>
 <p>The above code gives the following output:</p>
@@ -345,7 +345,7 @@ hi hi hi hi hi hi right????</p>
 
  less than it's limit. (1 less than int_2)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 52846176 U13-Forward: </h3><p>Or have a function like:</p>
+------------------------------------------------------------------ <br><h3> U13-Forward, Id: 52846176, Score: 2: </h3><p>Or have a function like:</p>
 <pre><code>def Print(s):
     return sys.stdout.write(str(s))
 </code></pre>
@@ -356,10 +356,10 @@ hi hi hi hi hi hi right????</p>
 <p>Outputs:</p>
 <pre><code>0123456789
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 26444106 tyersome: </h3><pre><code>for i in xrange(0,10): print '\b.',
+------------------------------------------------------------------ <br><h3> tyersome, Id: 26444106, Score: 1: </h3><pre><code>for i in xrange(0,10): print '\b.',
 </code></pre>
 <p>This worked in both 2.7.8 &amp; 2.5.2 (<a href="https://en.wikipedia.org/wiki/Enthought" rel="nofollow noreferrer">Enthought Canopy</a> and OS X terminal, respectively) -- no module imports or time travel required.</p>
-<h4> Comment 43905790 Keith Thompson: </h4>That prints backspace characters to standard output. It might <i>look</i> correct if standard output happens to be a terminal, but if it&#39;s redirected to a file that file will contain control characters.<br><h4> Comment 44020854 Keith Thompson: </h4>Nevertheless, the Python code does not do the same thing as the C code in the question.<br><h4> Comment 44020563 tyersome: </h4>True, but I can&#39;t imagine that anyone would want to use this for anything other than a low-tech progress bar ...<br><h4> Comment 98944156 fcm: </h4>you can test with <code>sys.stdout.isatty()</code> if not redirected to a file.<br>------------------------------------------------------------------ <br><h3> Answer 76434047 ignacy: </h3><p>To print without ending a line, you can do this:</p>
+<h4> Keith Thompson, Comment 43905790 Score: 9: </h4>That prints backspace characters to standard output. It might <i>look</i> correct if standard output happens to be a terminal, but if it&#39;s redirected to a file that file will contain control characters.<br><h4> Keith Thompson, Comment 44020854 Score: 2: </h4>Nevertheless, the Python code does not do the same thing as the C code in the question.<br><h4> tyersome, Comment 44020563 Score: 1: </h4>True, but I can&#39;t imagine that anyone would want to use this for anything other than a low-tech progress bar ...<br><h4> fcm, Comment 98944156 Score: 0: </h4>you can test with <code>sys.stdout.isatty()</code> if not redirected to a file.<br>------------------------------------------------------------------ <br><h3> ignacy, Id: 76434047, Score: 1: </h3><p>To print without ending a line, you can do this:</p>
 <pre class="lang-py prettyprint-override"><code>print(&quot;Hello&quot;, end='')
 </code></pre>
 <p>So if you add</p>
@@ -368,7 +368,7 @@ hi hi hi hi hi hi right????</p>
 <p>The output will look like this:</p>
 <pre><code>Hello Hello again!
 </code></pre>
-<h4> Comment 135646497 livefree75: </h4>I get &quot;invalid syntax&quot; (Python 2.6)<br>------------------------------------------------------------------ <br><h3> Answer 70335504 ghost21blade: </h3><p>Python3 :</p>
+<h4> livefree75, Comment 135646497 Score: 0: </h4>I get &quot;invalid syntax&quot; (Python 2.6)<br>------------------------------------------------------------------ <br><h3> ghost21blade, Id: 70335504, Score: 0: </h3><p>Python3 :</p>
 <pre><code>print('Hello',end='')
 </code></pre>
 <p>Example :</p>
@@ -381,7 +381,7 @@ print('world')
 <pre><code>print('Hello','world',sep=',')
 </code></pre>
 <p>Output:<code>Hello,world</code></p>
------------------------------------------------------------------- <br><h3> Answer 75265800 My Car: </h3><p>Here are three codes for you to choose one:</p>
+------------------------------------------------------------------ <br><h3> My Car, Id: 75265800, Score: 0: </h3><p>Here are three codes for you to choose one:</p>
 <pre class="lang-py prettyprint-override"><code>print(&quot;&quot;.join([&quot;.&quot; for i in range(4)]))
 </code></pre>
 <p>or</p>
@@ -390,7 +390,7 @@ print('world')
 <p>or</p>
 <pre class="lang-py prettyprint-override"><code>print(&quot;.&quot;, &quot;.&quot;, &quot;.&quot;, &quot;.&quot;, sep=&quot;&quot;)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 44015312 mchrgr2000: </h3><p>You do not need to import any library. Just use the delete character:</p>
+------------------------------------------------------------------ <br><h3> mchrgr2000, Id: 44015312, Score: -4: </h3><p>You do not need to import any library. Just use the delete character:</p>
 <pre><code>BS = u'\0008' # The Unicode point for the &quot;delete&quot; character
 for i in range(10):print(BS + &quot;.&quot;),
 </code></pre>

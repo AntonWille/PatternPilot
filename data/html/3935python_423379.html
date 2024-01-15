@@ -1,8 +1,8 @@
- <h2> Title: How to use a global variable in a function? </h2> <h3> user46646, question_id: 423379 </h3>Score: 3935, Tags: {python,global-variables,scope} <br><p>How do I create or use a global variable inside a function?</p>
+ <h2> Title: How to use a global variable in a function? </h2> <h4> user46646, question_id: 423379 </h4>Score: 3935, Tags: {python,global-variables,scope} <br><p>How do I create or use a global variable inside a function?</p>
 <p>How do I use a global variable that was defined in one function inside other functions?</p>
 <hr />
 <p><sub>Failing to use the <code>global</code> keyword where appropriate often causes <code>UnboundLocalError</code>. The precise rules for this are explained at <a href="https://stackoverflow.com/questions/370357">UnboundLocalError on local variable when reassigned after first use</a>. Generally, please close other questions as a duplicate of <em>that</em> question when an explanation is sought, and <em>this</em> question when someone simply needs to know the <code>global</code> keyword.</sub></p>
------------------------------------------------------------------- <br><h3> Answer 423596 Paul Stephenson: </h3><p>You can use a global variable within other functions by declaring it as <code>global</code> <strong>within each function that assigns a value to it</strong>:</p>
+------------------------------------------------------------------ <br><h3> Paul Stephenson, Id: 423596, Score: 5155: </h3><p>You can use a global variable within other functions by declaring it as <code>global</code> <strong>within each function that assigns a value to it</strong>:</p>
 <pre><code>globvar = 0
 
 def set_globvar_to_one():
@@ -17,7 +17,7 @@ print_globvar()       # Prints 1
 </code></pre>
 <p>Since it's unclear whether <code>globvar = 1</code> is creating a local variable or changing a global variable, Python defaults to creating a local variable, and makes you explicitly choose the other behavior with the <code>global</code> keyword.</p>
 <p>See other answers if you want to share a global variable across modules.</p>
-<h4> Comment 136676730 mikb: </h4>I&#39;d also point out (because I have been seeing it a lot recently), that if the global object is not a scalar (like a list or a dict), it doesn&#39;t need a global keyword if you are manipulating the members of the object (eg the items in a dict), rather than the object itself: for dicts a and b,  a.update(b) does not change the binding of a.<br><h4> Comment 136822936 Santiago Ortiz Ceballos: </h4>Worths mentioning that it depends on the mutability of the variable, if it is an inmutable one (number, string, tuples, frozen sets) the default behavior is to assign a new memory space for the assigned value.   But if it would be a mutable one, it shold works.<br>------------------------------------------------------------------ <br><h3> Answer 423668 Jeff Shannon: </h3><p>If I'm understanding your situation correctly, what you're seeing is the result of how Python handles local (function) and global (module) namespaces.</p>
+<h4> mikb, Comment 136676730 Score: 1: </h4>I&#39;d also point out (because I have been seeing it a lot recently), that if the global object is not a scalar (like a list or a dict), it doesn&#39;t need a global keyword if you are manipulating the members of the object (eg the items in a dict), rather than the object itself: for dicts a and b,  a.update(b) does not change the binding of a.<br><h4> Santiago Ortiz Ceballos, Comment 136822936 Score: 0: </h4>Worths mentioning that it depends on the mutability of the variable, if it is an inmutable one (number, string, tuples, frozen sets) the default behavior is to assign a new memory space for the assigned value.   But if it would be a mutable one, it shold works.<br>------------------------------------------------------------------ <br><h3> Jeff Shannon, Id: 423668, Score: 904: </h3><p>If I'm understanding your situation correctly, what you're seeing is the result of how Python handles local (function) and global (module) namespaces.</p>
 <p>Say you've got a module like this:</p>
 <pre><code># sample.py
 _my_global = 5
@@ -39,7 +39,7 @@ func2()
 <p>What's going on here is that Python assumes that any name that is <em>assigned to</em>, anywhere within a function, is local to that function unless explicitly told otherwise.  If it is only <em>reading</em> from a name, and the name doesn't exist locally, it will try to look up the name in any containing scopes (e.g. the module's global scope).</p>
 <p>When you assign 42 to the name <code>_my_global</code>, therefore, Python creates a local variable that shadows the global variable of the same name.  That local goes out of scope and is <a href="http://www.digi.com/wiki/developer/index.php/Python_Garbage_Collection" rel="noreferrer">garbage-collected</a> when <code>func1()</code> returns; meanwhile, <code>func2()</code> can never see anything other than the (unmodified) global name.  Note that this namespace decision happens at compile time, not at runtime -- if you were to read the value of <code>_my_global</code> inside <code>func1()</code> before you assign to it, you'd get an <code>UnboundLocalError</code>, because Python has already decided that it must be a local variable but it has not had any value associated with it yet.  But by using the '<code>global</code>' statement, you tell Python that it should look elsewhere for the name instead of assigning to it locally.</p>
 <p>(I believe that this behavior originated largely through optimization of local namespaces -- without this behavior,  Python's VM would need to perform at least three name lookups each time a new name is assigned to inside a function (to ensure that the name didn't already exist at module/builtin level), which would significantly slow down a very common operation.)</p>
-<h4> Comment 83890525 BlackJack: </h4>@Vassilis: It is common to upper case <i>all</i> letters: <code>MY_GLOBAL = 5</code>. See the <a href="http://www.python.org/dev/peps/pep-0008/" rel="nofollow noreferrer">Style Guide for Python Code</a>.<br><h4> Comment 83890430 BlackJack: </h4>@watashiSHUN: The namespace decision <i>does</i> happen at compile time. Deciding that <code>x</code> is local is different from checking at runtime if the local name was bound to a value before it is used the first time.<br><h4> Comment 133755766 streamofstars: </h4>@BlackJack Unless this changed between 2018 and 2023, as per PEP8 to which you linked yourself, it&#39;s the constants that are supposed to be uppercase. Global variables are clearly described in PEP8 as to follow the same convention as functions, which are lowercase.<br><h4> Comment 53998527 watashiSHUN: </h4>You mentioned that the namespace decision happens at <b>compile time</b>, I don&#39;t think it is true. from what I learn python&#39;s compilation <a href="http://stackoverflow.com/questions/33026506/how-does-python-implement-mutual-recursion">only checks for syntax error, not name error</a> try this example <b>def A(): x+=1</b>, if you don&#39;t run it, it will <b>not give UnboundLocalError</b>, please verify thank you<br><h4> Comment 83833173 Vassilis: </h4>It is common to use a capital letter for global variables like <code>MyGlobal = 5</code><br><h4> Comment 133779422 BlackJack: </h4>@streamofstars Yes and there are only constants at that level.  Nobody in their right mind wants global variables/state. 😉<br>------------------------------------------------------------------ <br><h3> Answer 423401 gimel: </h3><p>You may want to explore the notion of <a href="http://docs.python.org/reference/datamodel.html" rel="noreferrer">namespaces</a>. In Python, the <a href="http://docs.python.org/tutorial/modules.html" rel="noreferrer">module</a> is the natural place for <em>global</em> data:</p>
+<h4> BlackJack, Comment 83890525 Score: 21: </h4>@Vassilis: It is common to upper case <i>all</i> letters: <code>MY_GLOBAL = 5</code>. See the <a href="http://www.python.org/dev/peps/pep-0008/" rel="nofollow noreferrer">Style Guide for Python Code</a>.<br><h4> BlackJack, Comment 83890430 Score: 5: </h4>@watashiSHUN: The namespace decision <i>does</i> happen at compile time. Deciding that <code>x</code> is local is different from checking at runtime if the local name was bound to a value before it is used the first time.<br><h4> streamofstars, Comment 133755766 Score: 2: </h4>@BlackJack Unless this changed between 2018 and 2023, as per PEP8 to which you linked yourself, it&#39;s the constants that are supposed to be uppercase. Global variables are clearly described in PEP8 as to follow the same convention as functions, which are lowercase.<br><h4> watashiSHUN, Comment 53998527 Score: 1: </h4>You mentioned that the namespace decision happens at <b>compile time</b>, I don&#39;t think it is true. from what I learn python&#39;s compilation <a href="http://stackoverflow.com/questions/33026506/how-does-python-implement-mutual-recursion">only checks for syntax error, not name error</a> try this example <b>def A(): x+=1</b>, if you don&#39;t run it, it will <b>not give UnboundLocalError</b>, please verify thank you<br><h4> Vassilis, Comment 83833173 Score: 1: </h4>It is common to use a capital letter for global variables like <code>MyGlobal = 5</code><br><h4> BlackJack, Comment 133779422 Score: 0: </h4>@streamofstars Yes and there are only constants at that level.  Nobody in their right mind wants global variables/state. 😉<br>------------------------------------------------------------------ <br><h3> gimel, Id: 423401, Score: 277: </h3><p>You may want to explore the notion of <a href="http://docs.python.org/reference/datamodel.html" rel="noreferrer">namespaces</a>. In Python, the <a href="http://docs.python.org/tutorial/modules.html" rel="noreferrer">module</a> is the natural place for <em>global</em> data:</p>
 <blockquote>
 <p>Each module has its own private symbol table, which is used as the global symbol table by all functions defined in the module. Thus, the author of a module can use global variables in the module without worrying about accidental clashes with a user’s global variables. On the other hand, if you know what you are doing you can touch a module’s global variables with the same notation used to refer to its functions, <code>modname.itemname</code>.</p>
 </blockquote>
@@ -67,7 +67,7 @@ config.x = 1
 import mod
 print config.x
 </code></pre>
-<h4> Comment 94196170 jhylands: </h4>@vladosaurus does  <code>from config import x</code> solve that?<br><h4> Comment 83098999 vladosaurus: </h4>for a reason I don&#39;t like the <code>config.x</code>  can I get rid of it?  I came with <code>x = lambda: config.x</code> and then I have the <i>new</i> value in <code>x()</code>.   for some reason, having <code>a = config.x</code> does not do the trick for me.<br>------------------------------------------------------------------ <br><h3> Answer 6664227 SingleNegationElimination: </h3><p>Python uses a simple heuristic to decide which scope it should load a variable from, between local and global.  If a variable name appears on the left hand side of an assignment, but is not declared global, it is assumed to be local.  If it does not appear on the left hand side of an assignment, it is assumed to be global.  </p>
+<h4> jhylands, Comment 94196170 Score: 6: </h4>@vladosaurus does  <code>from config import x</code> solve that?<br><h4> vladosaurus, Comment 83098999 Score: 1: </h4>for a reason I don&#39;t like the <code>config.x</code>  can I get rid of it?  I came with <code>x = lambda: config.x</code> and then I have the <i>new</i> value in <code>x()</code>.   for some reason, having <code>a = config.x</code> does not do the trick for me.<br>------------------------------------------------------------------ <br><h3> SingleNegationElimination, Id: 6664227, Score: 121: </h3><p>Python uses a simple heuristic to decide which scope it should load a variable from, between local and global.  If a variable name appears on the left hand side of an assignment, but is not declared global, it is assumed to be local.  If it does not appear on the left hand side of an assignment, it is assumed to be global.  </p>
 
 <pre><code>&gt;&gt;&gt; import dis
 &gt;&gt;&gt; def foo():
@@ -98,12 +98,12 @@ print config.x
 </code></pre>
 
 <p>See how baz, which appears on the left side of an assignment in <code>foo()</code>, is the only <code>LOAD_FAST</code> variable.</p>
-<h4> Comment 106317214 Robert: </h4>@MartijnPieters For the name after <code>as</code> in an <code>except</code> clause this wasn&#39;t obvious to me. But it gets auto-deleted to save memory.<br><h4> Comment 51714387 Martijn Pieters: </h4>The heuristic looks for <i>binding operations</i>. Assignment is one such operation, importing another. But the target of a <code>for</code> loop and the name after <code>as</code> in <code>with</code> and <code>except</code> statements also are bound to.<br><h4> Comment 106317485 Martijn Pieters: </h4>@Robert: not to save memory, but to avoid creating a circular reference, which can lead to memory leaks. That&#39;s because an exception references a traceback, and the traceback references every local and global namespace along the whole call stack, including the <code>as ...</code> target in the exception handler.<br>------------------------------------------------------------------ <br><h3> Answer 423641 J S: </h3><p>If you want to refer to a global variable in a function, you can use the <strong>global</strong> keyword to declare which variables are global. You don't have to use it in all cases (as someone here incorrectly claims) - if the name referenced in an expression cannot be found in local scope or scopes in the functions in which this function is defined, it is looked up among global variables.</p>
+<h4> Robert, Comment 106317214 Score: 0: </h4>@MartijnPieters For the name after <code>as</code> in an <code>except</code> clause this wasn&#39;t obvious to me. But it gets auto-deleted to save memory.<br><h4> Martijn Pieters, Comment 51714387 Score: 15: </h4>The heuristic looks for <i>binding operations</i>. Assignment is one such operation, importing another. But the target of a <code>for</code> loop and the name after <code>as</code> in <code>with</code> and <code>except</code> statements also are bound to.<br><h4> Martijn Pieters, Comment 106317485 Score: 2: </h4>@Robert: not to save memory, but to avoid creating a circular reference, which can lead to memory leaks. That&#39;s because an exception references a traceback, and the traceback references every local and global namespace along the whole call stack, including the <code>as ...</code> target in the exception handler.<br>------------------------------------------------------------------ <br><h3> J S, Id: 423641, Score: 77: </h3><p>If you want to refer to a global variable in a function, you can use the <strong>global</strong> keyword to declare which variables are global. You don't have to use it in all cases (as someone here incorrectly claims) - if the name referenced in an expression cannot be found in local scope or scopes in the functions in which this function is defined, it is looked up among global variables.</p>
 
 <p>However, if you assign to a new variable not declared as global in the function, it is implicitly declared as local, and it can overshadow any existing global variable with the same name.</p>
 
 <p>Also, global variables are useful, contrary to some OOP zealots who claim otherwise - especially for smaller scripts, where OOP is overkill.</p>
-<h4> Comment 102505940 Paul Uszak: </h4>Absolutely re. zealots.  Most Python users use it for scripting and create little functions to separate out small bits of code.<br><h4> Comment 136676779 mikb: </h4>I disagree. This is structured vs unstructured programming, not OOP. Python follows C in having only functions, and global variables generally imply side effects. An idiom like x = f(x) where f returns x, rather than f() with a &quot;global x&quot; declaration, is surely cleaner and clearer (as well as explicit rather than implicit).<br>------------------------------------------------------------------ <br><h3> Answer 34559513 Russia Must Remove Putin: </h3><blockquote>
+<h4> Paul Uszak, Comment 102505940 Score: 0: </h4>Absolutely re. zealots.  Most Python users use it for scripting and create little functions to separate out small bits of code.<br><h4> mikb, Comment 136676779 Score: 0: </h4>I disagree. This is structured vs unstructured programming, not OOP. Python follows C in having only functions, and global variables generally imply side effects. An idiom like x = f(x) where f returns x, rather than f() with a &quot;global x&quot; declaration, is surely cleaner and clearer (as well as explicit rather than implicit).<br>------------------------------------------------------------------ <br><h3> Russia Must Remove Putin, Id: 34559513, Score: 71: </h3><blockquote>
   <h1>If I create a global variable in one function, how can I use that variable in another function?</h1>
 </blockquote>
 
@@ -214,7 +214,7 @@ Foo().foo()
 </code></pre>
 
 <p>But I would suggest instead of using global variables you use class attributes, to avoid cluttering the module namespace. Also note we don't use <code>self</code> arguments here - these could be class methods (handy if mutating the class attribute from the usual <code>cls</code> argument) or static methods (no <code>self</code> or <code>cls</code>).</p>
-<h4> Comment 105760662 fpaekoaij: </h4>Cool, but what to do if I want to create a global variable inside a function inside a class and want to use that variable inside another function inside another class? Kinda stuck here<br><h4> Comment 105760720 Russia Must Remove Putin: </h4>@anonmanx I don&#39;t know why you&#39;re stuck, it&#39;s the same behavior in a method as in a regular function. But I&#39;ll update my answer with your remark and some demo code, ok?<br><h4> Comment 105760875 fpaekoaij: </h4>okay, got it. So I will have to explicitly call that function for using that global variable.<br>------------------------------------------------------------------ <br><h3> Answer 24572187 Rauni Lillemets: </h3><p>In addition to already existing answers and to make this more confusing:</p>
+<h4> fpaekoaij, Comment 105760662 Score: 0: </h4>Cool, but what to do if I want to create a global variable inside a function inside a class and want to use that variable inside another function inside another class? Kinda stuck here<br><h4> Russia Must Remove Putin, Comment 105760720 Score: 3: </h4>@anonmanx I don&#39;t know why you&#39;re stuck, it&#39;s the same behavior in a method as in a regular function. But I&#39;ll update my answer with your remark and some demo code, ok?<br><h4> fpaekoaij, Comment 105760875 Score: 0: </h4>okay, got it. So I will have to explicitly call that function for using that global variable.<br>------------------------------------------------------------------ <br><h3> Rauni Lillemets, Id: 24572187, Score: 60: </h3><p>In addition to already existing answers and to make this more confusing:</p>
 
 <blockquote>
   <p>In Python, variables that are only referenced inside a function are
@@ -234,7 +234,7 @@ Foo().foo()
 </blockquote>
 
 <p>Source: <em><a href="https://docs.python.org/2/faq/programming.html#what-are-the-rules-for-local-and-global-variables-in-python">What are the rules for local and global variables in Python?</a></em>.</p>
------------------------------------------------------------------- <br><h3> Answer 19151605 Bohdan: </h3><p>With parallel execution, global variables can cause unexpected results if you don't understand what is happening. Here is an example of using a global variable within multiprocessing. We can clearly see that each process works with its own copy of the variable:</p>
+------------------------------------------------------------------ <br><h3> Bohdan, Id: 19151605, Score: 43: </h3><p>With parallel execution, global variables can cause unexpected results if you don't understand what is happening. Here is an example of using a global variable within multiprocessing. We can clearly see that each process works with its own copy of the variable:</p>
 
 <pre><code>import multiprocessing
 import os
@@ -292,7 +292,7 @@ pid=[53971] old_value=[34] new_value=[12] get_value=[82]
 pid=[53972] old_value=[59] new_value=[13] get_value=[ 4]
 pid=[53973] old_value=[87] new_value=[14] get_value=[70]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 19347254 user2876408: </h3><p>As it turns out the answer is always simple.</p>
+------------------------------------------------------------------ <br><h3> user2876408, Id: 19347254, Score: 37: </h3><p>As it turns out the answer is always simple.</p>
 
 <p>Here is a small sample module with a simple way to show it in a <code>main</code> definition:</p>
 
@@ -318,7 +318,7 @@ if __name__ == '__main__':
 </code></pre>
 
 <p>This simple code works just like that, and it will execute. I hope it helps.</p>
-<h4> Comment 40543494 swdev: </h4>This is probably the simplest yet very useful python trick for me. I name this module <code>global_vars</code>, and initialize the data in <code>init_global_vars</code>, that being called in the startup script. Then, I simply create accessor method for each defined global var. I hope I can upvote this multiple times! Thanks Peter!<br><h4> Comment 47268475 jtlz2: </h4>What if there are many many global variables and I don&#39;t want to have to list them one-by-one after a global statement?<br><h4> Comment 28873293 barlop: </h4>thanks, i&#39;m new to python, but know a bit of java.  what you said worked for me. and writing global a&lt;ENTER&gt; within the class.. seems to make more sense to me than within a function writing &#39;global a&#39;..  I notice you can&#39;t say  global a=4<br>------------------------------------------------------------------ <br><h3> Answer 27287648 gxyd: </h3><p>What you are saying is to use the method like this:</p>
+<h4> swdev, Comment 40543494 Score: 2: </h4>This is probably the simplest yet very useful python trick for me. I name this module <code>global_vars</code>, and initialize the data in <code>init_global_vars</code>, that being called in the startup script. Then, I simply create accessor method for each defined global var. I hope I can upvote this multiple times! Thanks Peter!<br><h4> jtlz2, Comment 47268475 Score: 1: </h4>What if there are many many global variables and I don&#39;t want to have to list them one-by-one after a global statement?<br><h4> barlop, Comment 28873293 Score: 1: </h4>thanks, i&#39;m new to python, but know a bit of java.  what you said worked for me. and writing global a&lt;ENTER&gt; within the class.. seems to make more sense to me than within a function writing &#39;global a&#39;..  I notice you can&#39;t say  global a=4<br>------------------------------------------------------------------ <br><h3> gxyd, Id: 27287648, Score: 34: </h3><p>What you are saying is to use the method like this:</p>
 <pre><code>globvar = 5
 
 def f():
@@ -335,7 +335,7 @@ def f():
 f()   #prints 5
 </code></pre>
 <p>Both give the same output.</p>
------------------------------------------------------------------- <br><h3> Answer 27580376 Mohamed El-Saka: </h3><p>You need to reference the global variable in every function you want to use.</p>
+------------------------------------------------------------------ <br><h3> Mohamed El-Saka, Id: 27580376, Score: 31: </h3><p>You need to reference the global variable in every function you want to use.</p>
 
 <p>As follows:</p>
 
@@ -360,7 +360,7 @@ var from printLocalText: local version from printLocalText
 [Finished in 0.1s]
 """
 </code></pre>
-<h4> Comment 46534476 spazm: </h4>&#39;in every function you want to use&#39; is subtly incorrect, should be closer to: &#39;in every function where you want to <i>update</i>&#39;<br>------------------------------------------------------------------ <br><h3> Answer 28329600 Sagar Mehta: </h3><p>Try this:</p>
+<h4> spazm, Comment 46534476 Score: 4: </h4>&#39;in every function you want to use&#39; is subtly incorrect, should be closer to: &#39;in every function where you want to <i>update</i>&#39;<br>------------------------------------------------------------------ <br><h3> Sagar Mehta, Id: 28329600, Score: 31: </h3><p>Try this:</p>
 <pre class="lang-py prettyprint-override"><code>def x1():
     global x
     x += 1
@@ -381,16 +381,16 @@ x2()
 # x1:  6
 # x2:  7
 </code></pre>
-<h4> Comment 114987502 not2qubit: </h4>Congratulations! Finally someone who got the most important point of using <code>global</code>. Namely using a variable in a function that was defined <b>after</b> the function itself.<br>------------------------------------------------------------------ <br><h3> Answer 427818 Kylotan: </h3><p>You're not actually storing the global in a local variable, just creating a local reference to the same object that your original global reference refers to. Remember that pretty much everything in Python is a name referring to an object, and nothing gets copied in usual operation.</p>
+<h4> not2qubit, Comment 114987502 Score: 0: </h4>Congratulations! Finally someone who got the most important point of using <code>global</code>. Namely using a variable in a function that was defined <b>after</b> the function itself.<br>------------------------------------------------------------------ <br><h3> Kylotan, Id: 427818, Score: 28: </h3><p>You're not actually storing the global in a local variable, just creating a local reference to the same object that your original global reference refers to. Remember that pretty much everything in Python is a name referring to an object, and nothing gets copied in usual operation.</p>
 
 <p>If you didn't have to explicitly specify when an identifier was to refer to a predefined global, then you'd presumably have to explicitly specify when an identifier is a new local variable instead (for example, with something like the 'var' command seen in JavaScript). Since local variables are more common than global variables in any serious and non-trivial system, Python's system makes more sense in most cases.</p>
 
 <p>You <em>could</em> have a language which attempted to guess, using a global variable if it existed or creating a local variable if it didn't. However, that would be very error-prone. For example, importing another module could inadvertently introduce a global variable by that name, changing the behaviour of your program.</p>
------------------------------------------------------------------- <br><h3> Answer 43285234 Martin Thoma: </h3><p>In case you have a local variable with the same name, you might want to use the <a href="https://docs.python.org/3/library/functions.html#globals" rel="noreferrer"><code>globals()</code> function</a>.</p>
+------------------------------------------------------------------ <br><h3> Martin Thoma, Id: 43285234, Score: 24: </h3><p>In case you have a local variable with the same name, you might want to use the <a href="https://docs.python.org/3/library/functions.html#globals" rel="noreferrer"><code>globals()</code> function</a>.</p>
 
 <pre><code>globals()['your_global_var'] = 42
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 33320055 user5473311: </h3><p>Following on and as an add on, use a file to contain all global variables all declared locally and then <code>import as</code>:</p>
+------------------------------------------------------------------ <br><h3> user5473311, Id: 33320055, Score: 21: </h3><p>Following on and as an add on, use a file to contain all global variables all declared locally and then <code>import as</code>:</p>
 
 <p>File <em>initval.py</em>:</p>
 
@@ -409,7 +409,7 @@ def getmystocks():
 def getmycharts():
     for ic in range(iv.Stocksin):
 </code></pre>
-<h4> Comment 75306337 oHo: </h4>What is the advantage to move the global variables to another file? Is it just to group together the global variables in a tiny file? And why using the statement <code>import ... as ...</code>? Why not just <code>import ...</code>?<br><h4> Comment 75306618 oHo: </h4>Ah... I have finally understood the advantage: No need to use the keyword <code>global</code> :-) =&gt; +1  :-) Please edit your answer to clarify these interrogations that other people may also have. Cheers<br><h4> Comment 129931045 taiyodayo: </h4>I found this approach very versatile and easy to manage. I have lots of variables (50+) that I want to make available for many separate module files.<br>------------------------------------------------------------------ <br><h3> Answer 34664752 Mike Lampton: </h3><p>Writing to explicit elements of a global array does not apparently need the global declaration, though writing to it "wholesale" does have that requirement:</p>
+<h4> oHo, Comment 75306337 Score: 1: </h4>What is the advantage to move the global variables to another file? Is it just to group together the global variables in a tiny file? And why using the statement <code>import ... as ...</code>? Why not just <code>import ...</code>?<br><h4> oHo, Comment 75306618 Score: 1: </h4>Ah... I have finally understood the advantage: No need to use the keyword <code>global</code> :-) =&gt; +1  :-) Please edit your answer to clarify these interrogations that other people may also have. Cheers<br><h4> taiyodayo, Comment 129931045 Score: 0: </h4>I found this approach very versatile and easy to manage. I have lots of variables (50+) that I want to make available for many separate module files.<br>------------------------------------------------------------------ <br><h3> Mike Lampton, Id: 34664752, Score: 17: </h3><p>Writing to explicit elements of a global array does not apparently need the global declaration, though writing to it "wholesale" does have that requirement:</p>
 
 <pre><code>import numpy as np
 
@@ -456,7 +456,7 @@ print "After func6(), hostMatrix = \n", hostMatrix
 func7()
 print "After func7(), hostMatrix = \n", hostMatrix
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 46058078 Rafa&#235;l Dera: </h3><p>I'm adding this as I haven't seen it in any of the other answers and it might be useful for someone struggling with something similar. The <a href="https://docs.python.org/library/functions.html#globals" rel="nofollow noreferrer"><code>globals()</code></a> function returns a mutable global symbol dictionary where you can "magically" make data available for the rest of your code. 
+------------------------------------------------------------------ <br><h3> Rafa&#235;l Dera, Id: 46058078, Score: 9: </h3><p>I'm adding this as I haven't seen it in any of the other answers and it might be useful for someone struggling with something similar. The <a href="https://docs.python.org/library/functions.html#globals" rel="nofollow noreferrer"><code>globals()</code></a> function returns a mutable global symbol dictionary where you can "magically" make data available for the rest of your code. 
 For example:</p>
 
 <pre><code>from pickle import load
@@ -476,7 +476,7 @@ def dumpfile(name):
 </code></pre>
 
 <p>Will just let you dump/load variables out of and into the global namespace. Super convenient, no muss, no fuss. Pretty sure it's Python 3 only.</p>
-<h4> Comment 98710279 Kiran Jonnalagadda: </h4><code>globals()</code> always returns globals available in the local context, so a mutation here may not reflect in another module.<br>------------------------------------------------------------------ <br><h3> Answer 71663780 SHIVAM SINGH: </h3><pre><code>global_var = 10  # will be considered as a global variable
+<h4> Kiran Jonnalagadda, Comment 98710279 Score: 3: </h4><code>globals()</code> always returns globals available in the local context, so a mutation here may not reflect in another module.<br>------------------------------------------------------------------ <br><h3> SHIVAM SINGH, Id: 71663780, Score: 9: </h3><pre><code>global_var = 10  # will be considered as a global variable
 
 
 def func_1():
@@ -499,7 +499,7 @@ print(&quot;Global scope:&quot;, global_var) # will print 22
 <p>The <code>func_1()</code> accessed that global variable using the keyword <code>global</code> which points to the variable which is written in the global scope. If I didn't write the global keyword the variable <code>global_var</code> inside <code>func_1</code> is considered a local variable that is only usable inside the function. Then inside <code>func_1</code>, I have incremented that global variable by 1.</p>
 <p>The same happened in <code>func_2()</code>.</p>
 <p>After calling <code>func_1</code> and <code>func_2</code>, you'll see the <code>global_var</code> is changed</p>
-<h4> Comment 126780096 SHIVAM SINGH: </h4><code>global_var</code> is a global variable and all functions and classes can access that variable.  The func_1() accessed that global variable using the keyword <code>global</code> which means to point to the variable which is written in the global scope. If I didn&#39;t write the <code>global</code> keyword the variable <code>global_var</code> inside <code>func_1</code> is considered a local variable which is only usable inside the function. Then inside <code>func_1</code> I have incremented that global variable by 1.   The same happened in func_2().   After calling func_1 and func_2, you&#39;ll see the <code>global_var</code> is changed.<br>------------------------------------------------------------------ <br><h3> Answer 45769568 llewellyn falco: </h3><p>Reference the class namespace where you want the change to show up.  </p>
+<h4> SHIVAM SINGH, Comment 126780096 Score: 0: </h4><code>global_var</code> is a global variable and all functions and classes can access that variable.  The func_1() accessed that global variable using the keyword <code>global</code> which means to point to the variable which is written in the global scope. If I didn&#39;t write the <code>global</code> keyword the variable <code>global_var</code> inside <code>func_1</code> is considered a local variable which is only usable inside the function. Then inside <code>func_1</code> I have incremented that global variable by 1.   The same happened in func_2().   After calling func_1 and func_2, you&#39;ll see the <code>global_var</code> is changed.<br>------------------------------------------------------------------ <br><h3> llewellyn falco, Id: 45769568, Score: 8: </h3><p>Reference the class namespace where you want the change to show up.  </p>
 
 <p>In this example, runner is using <strong>max</strong> from the file config. I want my test to change the value of <strong>max</strong> when runner is using it.</p>
 
@@ -524,7 +524,7 @@ class RunnerTest(unittest):
        runner.max = 0                  # &lt;----- 2. set global 
        check_threads()
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 61992762 thomas: </h3><h2>Globals are fine - Except with Multiprocessing</h2>
+------------------------------------------------------------------ <br><h3> thomas, Id: 61992762, Score: 8: </h3><h2>Globals are fine - Except with Multiprocessing</h2>
 
 <p>Globals in connection with multiprocessing on different platforms/envrionments 
 as Windows/Mac OS on the one side and Linux on the other are troublesome.</p>
@@ -579,7 +579,7 @@ task 1: counter = 1
 task 2: counter = 1
 task 3: counter = 1
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 63629668 Mohsen Haddadi: </h3><p>There are 2 ways to declare a variable as global:</p>
+------------------------------------------------------------------ <br><h3> Mohsen Haddadi, Id: 63629668, Score: 7: </h3><p>There are 2 ways to declare a variable as global:</p>
 <p><strong>1. assign variable inside functions and use global line</strong></p>
 <pre><code>def declare_a_global_variable():
     global global_variable_1
@@ -639,7 +639,7 @@ print('variable is: %s'%variable) # prints peter
 print('list_variable_1 is: %s'%list_variable_1) # prints ['a', 'b']
 print('list_variable_2 is: %s'%list_variable_2) # prints ['C', 'D']
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 67339244 Pavn: </h3><p>Though this has been answered, I am giving solution again as I prefer single line
+------------------------------------------------------------------ <br><h3> Pavn, Id: 67339244, Score: 5: </h3><p>Though this has been answered, I am giving solution again as I prefer single line
 This is if you wish to create global variable within function</p>
 <pre><code>def someFunc():
     x=20
@@ -648,7 +648,7 @@ someFunc() # invoking function so that variable Y is created globally
 print(y) # output 50
 print(x) #NameError: name 'x' is not defined as x was defined locally within function
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 71074895 Oscar Nguyen: </h3><p>Like this code:</p>
+------------------------------------------------------------------ <br><h3> Oscar Nguyen, Id: 71074895, Score: 1: </h3><p>Like this code:</p>
 <pre><code>myVar = 12
 
 def myFunc():
@@ -666,7 +666,7 @@ myFunc()
 print(myVar2)
 </code></pre>
 <p>and then you have 100 in the document.</p>
------------------------------------------------------------------- <br><h3> Answer 71883300 zeeshan12396: </h3><pre><code>Initialized = 0  #Here This Initialized is global variable  
+------------------------------------------------------------------ <br><h3> zeeshan12396, Id: 71883300, Score: 0: </h3><pre><code>Initialized = 0  #Here This Initialized is global variable  
 
 def Initialize():
      print(&quot;Initialized!&quot;)
@@ -682,11 +682,11 @@ while Initialized == 0:
 else:
     print(&quot;Lets do something else now!&quot;)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 74636428 zaldi 1: </h3><p>if you want to access global var you just add global keyword inside your function
+------------------------------------------------------------------ <br><h3> zaldi 1, Id: 74636428, Score: -5: </h3><p>if you want to access global var you just add global keyword inside your function
 ex:
 global_var = 'yeah'</p>
 <pre><code>def someFunc():
    global global_var;
    print(nam_of_var)
 </code></pre>
-<h4> Comment 131819104 tricknology: </h4>Answer is incomplete, please add a functioning example.<br>
+<h4> tricknology, Comment 131819104 Score: 0: </h4>Answer is incomplete, please add a functioning example.<br>

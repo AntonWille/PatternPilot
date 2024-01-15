@@ -1,5 +1,5 @@
- <h2> Title: How to find the index for a given item in a list? </h2> <h3> Eugene M, question_id: 176918 </h3>Score: 4360, Tags: {python,list,indexing} <br><p>Given a list <code>[&quot;foo&quot;, &quot;bar&quot;, &quot;baz&quot;]</code> and an item in the list <code>&quot;bar&quot;</code>, how do I get its index <code>1</code>?</p>
-<h4> Comment 87637156 Ṃųỻịgǻňạcểơửṩ: </h4>Are you returning:  [1] The lowest index in case there are multiple instances of <code>&quot;bar&quot;</code>, [2] All the indices of <code>&quot;bar&quot;</code>?<br><h4> Comment 87899930 smci: </h4>a) Is it guaranteed that item is in the list, or else how we should handle the error case? (return None/ raise ValueError) b) Are list entries guaranteed to be unique, and should we return the first index of a match, or all indexes?<br><h4> Comment 106017049 Athanassios: </h4>View the answers with numpy integration, numpy arrays are far more efficient than Python lists. If the list is short it&#39;s no problem making a copy of it from a Python list, if it isn&#39;t then perhaps you should consider storing the elements in numpy array in the first place.<br><h4> Comment 132223171 Karl Knechtel: </h4>I’m voting to close this question (in protest) because there are already 42 undeleted answers (and 16 more deleted) for a simple, one-liner reference question that almost all have the same built-in function at their core (as they should, because it&#39;s the only reasonable and sane approach to the problem and everything surrounding it is just error-checking or creatively re-interpreting the specification, which still only leaves one other reasonable, sane approach to the expanded problem).<br><h4> Comment 132223178 Karl Knechtel: </h4>There is no realistic chance of a better approach becoming possible in future versions of Python, because the existing approach is already just calling a single, built-in method on the list - as simple as it gets.<br>------------------------------------------------------------------ <br><h3> Answer 176921 Alex Coventry: </h3><pre class="lang-py prettyprint-override"><code>&gt;&gt;&gt; [&quot;foo&quot;, &quot;bar&quot;, &quot;baz&quot;].index(&quot;bar&quot;)
+ <h2> Title: How to find the index for a given item in a list? </h2> <h4> Eugene M, question_id: 176918 </h4>Score: 4360, Tags: {python,list,indexing} <br><p>Given a list <code>[&quot;foo&quot;, &quot;bar&quot;, &quot;baz&quot;]</code> and an item in the list <code>&quot;bar&quot;</code>, how do I get its index <code>1</code>?</p>
+<h4> Ṃųỻịgǻňạcểơửṩ, Id: 87637156 Score: 16: </h4>Are you returning:  [1] The lowest index in case there are multiple instances of <code>&quot;bar&quot;</code>, [2] All the indices of <code>&quot;bar&quot;</code>?<br><h4> smci, Id: 87899930 Score: 7: </h4>a) Is it guaranteed that item is in the list, or else how we should handle the error case? (return None/ raise ValueError) b) Are list entries guaranteed to be unique, and should we return the first index of a match, or all indexes?<br><h4> Athanassios, Id: 106017049 Score: 1: </h4>View the answers with numpy integration, numpy arrays are far more efficient than Python lists. If the list is short it&#39;s no problem making a copy of it from a Python list, if it isn&#39;t then perhaps you should consider storing the elements in numpy array in the first place.<br><h4> Karl Knechtel, Id: 132223171 Score: 1: </h4>I’m voting to close this question (in protest) because there are already 42 undeleted answers (and 16 more deleted) for a simple, one-liner reference question that almost all have the same built-in function at their core (as they should, because it&#39;s the only reasonable and sane approach to the problem and everything surrounding it is just error-checking or creatively re-interpreting the specification, which still only leaves one other reasonable, sane approach to the expanded problem).<br><h4> Karl Knechtel, Id: 132223178 Score: 0: </h4>There is no realistic chance of a better approach becoming possible in future versions of Python, because the existing approach is already just calling a single, built-in method on the list - as simple as it gets.<br>------------------------------------------------------------------ <br><h3> Alex Coventry, Id: 176921, Score: 5939: </h3><pre class="lang-py prettyprint-override"><code>&gt;&gt;&gt; [&quot;foo&quot;, &quot;bar&quot;, &quot;baz&quot;].index(&quot;bar&quot;)
 1
 </code></pre>
 <p>See <a href="https://docs.python.org/tutorial/datastructures.html#more-on-lists" rel="noreferrer">the documentation</a> for the built-in <code>.index()</code> method of the list:</p>
@@ -48,7 +48,7 @@ ValueError: 2 is not in list
 </code></pre>
 <p>If this is a concern, either <a href="https://stackoverflow.com/questions/12934190">explicitly check first</a> using <code>item in my_list</code>, or handle the exception with <code>try</code>/<code>except</code> as appropriate.</p>
 <p>The explicit check is simple and readable, but it must iterate the list a second time. See <a href="https://stackoverflow.com/questions/11360858">What is the EAFP principle in Python?</a> for more guidance on this choice.</p>
-<h4> Comment 117784802 Alex Coventry: </h4>@jvel07, see the list/generator comprehension examples in my answer.<br><h4> Comment 106768489 izhang05: </h4>What data structure should be used if the list is very long?<br><h4> Comment 84022735 mold: </h4>index returns the first item whose value is &quot;bar&quot;. If &quot;bar&quot; exists twice at list, you&#39;ll never find the key for the second &quot;bar&quot;. See documentation: <a href="https://docs.python.org/3/tutorial/datastructures.html" rel="nofollow noreferrer">docs.python.org/3/tutorial/datastructures.html</a><br><h4> Comment 102440270 slybloty: </h4>If you&#39;re only searching for one element (the first), I found that <code>index()</code> is just under 90% faster than list comprehension against lists of integers.<br><h4> Comment 106791778 Alex Coventry: </h4>@izhang: Some auxillary index, like an {element -&gt; list_index} dict, if the elements are hashable, and the position in the list matters.<br><h4> Comment 123837630 Eric Walker: </h4>Raising an exception seems like a poor design choice in hindsight.<br><h4> Comment 117669732 jvel07: </h4>that&#39;s true, @mpoletto... What can be done in that case of having multiple same values???<br><h4> Comment 117293654 Dvd Avins: </h4>sequence1 = sorted(sequence2, key=.sequence3.index) is a very handy idiom. You may use index more often if that&#39;s in your repertoire.<br>------------------------------------------------------------------ <br><h3> Answer 17202481 TerryA: </h3><p>The majority of answers explain how to find <strong>a single index</strong>, but their methods do not return multiple indexes if the item is in the list multiple times. Use <a href="https://docs.python.org/library/functions.html#enumerate" rel="noreferrer"><code>enumerate()</code></a>:</p>
+<h4> Alex Coventry, Comment 117784802 Score: 1: </h4>@jvel07, see the list/generator comprehension examples in my answer.<br><h4> izhang05, Comment 106768489 Score: 2: </h4>What data structure should be used if the list is very long?<br><h4> mold, Comment 84022735 Score: 44: </h4>index returns the first item whose value is &quot;bar&quot;. If &quot;bar&quot; exists twice at list, you&#39;ll never find the key for the second &quot;bar&quot;. See documentation: <a href="https://docs.python.org/3/tutorial/datastructures.html" rel="nofollow noreferrer">docs.python.org/3/tutorial/datastructures.html</a><br><h4> slybloty, Comment 102440270 Score: 11: </h4>If you&#39;re only searching for one element (the first), I found that <code>index()</code> is just under 90% faster than list comprehension against lists of integers.<br><h4> Alex Coventry, Comment 106791778 Score: 1: </h4>@izhang: Some auxillary index, like an {element -&gt; list_index} dict, if the elements are hashable, and the position in the list matters.<br><h4> Eric Walker, Comment 123837630 Score: 1: </h4>Raising an exception seems like a poor design choice in hindsight.<br><h4> jvel07, Comment 117669732 Score: 0: </h4>that&#39;s true, @mpoletto... What can be done in that case of having multiple same values???<br><h4> Dvd Avins, Comment 117293654 Score: 0: </h4>sequence1 = sorted(sequence2, key=.sequence3.index) is a very handy idiom. You may use index more often if that&#39;s in your repertoire.<br>------------------------------------------------------------------ <br><h3> TerryA, Id: 17202481, Score: 711: </h3><p>The majority of answers explain how to find <strong>a single index</strong>, but their methods do not return multiple indexes if the item is in the list multiple times. Use <a href="https://docs.python.org/library/functions.html#enumerate" rel="noreferrer"><code>enumerate()</code></a>:</p>
 
 <pre><code>for i, j in enumerate(['foo', 'bar', 'baz']):
     if j == 'bar':
@@ -77,10 +77,10 @@ ValueError: 2 is not in list
 $ python -m timeit "[i for i, j in enumerate(['foo', 'bar', 'baz']*500) if j == 'bar']"
 10000 loops, best of 3: 196 usec per loop
 </code></pre>
-<h4> Comment 81667087 Alex Coventry: </h4>In my hands, the enumerate version is consistently slightly faster. Some implementation details may have changed since the measurement above was posted.<br><h4> Comment 96024401 Cristik: </h4>This was already answered since &#39;11: <a href="https://stackoverflow.com/questions/6294179/how-to-find-all-occurrences-of-an-element-in-a-list" title="how to find all occurrences of an element in a list">stackoverflow.com/questions/6294179/&hellip;</a><br><h4> Comment 80871776 Tupelo Thistlehead: </h4>Enumeration works better than the index-based methods for me, since I&#39;m looking to gather the indices of strings using &#39;startswith&quot; , and I need to gather multiple occurrences. Or is there a way to use index with &quot;startswith&quot; that I couldn&#39;t figure out<br><h4> Comment 134689128 Brian Keith: </h4>This is a good solution and it&#39;s much more flexible than the accepted solution. For example, if you only are expecting to have 1 value in the list, you can add a if statement to raise an exception <code>if len([i for i, j in enumerate([&#39;foo&#39;, &#39;bar&#39;, &#39;baz&#39;]) if j == &#39;bar&#39;]) &gt; 1</code> otherwise you could just return <code>[i for i, j in enumerate([&#39;foo&#39;, &#39;bar&#39;, &#39;baz&#39;]) if j == &#39;bar&#39;][0]</code><br><h4> Comment 133097586 UnusualWays: </h4>In Python 3 <code>izip</code> should be replaced by the built in <code>zip</code>. See <a href="https://stackoverflow.com/a/32659581/15422118">here</a><br>------------------------------------------------------------------ <br><h3> Answer 17300987 FMc: </h3><p>To get all indexes:</p>
+<h4> Alex Coventry, Comment 81667087 Score: 9: </h4>In my hands, the enumerate version is consistently slightly faster. Some implementation details may have changed since the measurement above was posted.<br><h4> Cristik, Comment 96024401 Score: 4: </h4>This was already answered since &#39;11: <a href="https://stackoverflow.com/questions/6294179/how-to-find-all-occurrences-of-an-element-in-a-list" title="how to find all occurrences of an element in a list">stackoverflow.com/questions/6294179/&hellip;</a><br><h4> Tupelo Thistlehead, Comment 80871776 Score: 3: </h4>Enumeration works better than the index-based methods for me, since I&#39;m looking to gather the indices of strings using &#39;startswith&quot; , and I need to gather multiple occurrences. Or is there a way to use index with &quot;startswith&quot; that I couldn&#39;t figure out<br><h4> Brian Keith, Comment 134689128 Score: 1: </h4>This is a good solution and it&#39;s much more flexible than the accepted solution. For example, if you only are expecting to have 1 value in the list, you can add a if statement to raise an exception <code>if len([i for i, j in enumerate([&#39;foo&#39;, &#39;bar&#39;, &#39;baz&#39;]) if j == &#39;bar&#39;]) &gt; 1</code> otherwise you could just return <code>[i for i, j in enumerate([&#39;foo&#39;, &#39;bar&#39;, &#39;baz&#39;]) if j == &#39;bar&#39;][0]</code><br><h4> UnusualWays, Comment 133097586 Score: 0: </h4>In Python 3 <code>izip</code> should be replaced by the built in <code>zip</code>. See <a href="https://stackoverflow.com/a/32659581/15422118">here</a><br>------------------------------------------------------------------ <br><h3> FMc, Id: 17300987, Score: 240: </h3><p>To get all indexes:</p>
 <pre><code>indexes = [i for i, x in enumerate(xs) if x == 'foo']
 </code></pre>
-<h4> Comment 96024408 Cristik: </h4>There&#39;s already another question for this, added in &#39;11: <a href="https://stackoverflow.com/questions/6294179/how-to-find-all-occurrences-of-an-element-in-a-list" title="how to find all occurrences of an element in a list">stackoverflow.com/questions/6294179/&hellip;</a><br>------------------------------------------------------------------ <br><h3> Answer 7241298 HongboZhu: </h3><p><code>index()</code> returns the <strong>first</strong> index of value!</p>
+<h4> Cristik, Comment 96024408 Score: 7: </h4>There&#39;s already another question for this, added in &#39;11: <a href="https://stackoverflow.com/questions/6294179/how-to-find-all-occurrences-of-an-element-in-a-list" title="how to find all occurrences of an element in a list">stackoverflow.com/questions/6294179/&hellip;</a><br>------------------------------------------------------------------ <br><h3> HongboZhu, Id: 7241298, Score: 156: </h3><p><code>index()</code> returns the <strong>first</strong> index of value!</p>
 
 <blockquote>
   <p>|  index(...)<br>
@@ -100,11 +100,11 @@ $ python -m timeit "[i for i, j in enumerate(['foo', 'bar', 'baz']*500) if j == 
 
 all_indices("foo", ["foo","bar","baz","foo"])
 </code></pre>
-<h4> Comment 88386024 Peter Mortensen: </h4>And if doesn&#39;t exist in the list?<br><h4> Comment 90585615 Nam G VU: </h4>Not-exist item will raise ValueError<br><h4> Comment 96024411 Cristik: </h4>This answer would fit better here: <a href="https://stackoverflow.com/questions/6294179/how-to-find-all-occurrences-of-an-element-in-a-list" title="how to find all occurrences of an element in a list">stackoverflow.com/questions/6294179/&hellip;</a><br>------------------------------------------------------------------ <br><h3> Answer 12054409 savinson: </h3><pre><code>a = ["foo","bar","baz",'bar','any','much']
+<h4> Peter Mortensen, Comment 88386024 Score: 3: </h4>And if doesn&#39;t exist in the list?<br><h4> Nam G VU, Comment 90585615 Score: 1: </h4>Not-exist item will raise ValueError<br><h4> Cristik, Comment 96024411 Score: 1: </h4>This answer would fit better here: <a href="https://stackoverflow.com/questions/6294179/how-to-find-all-occurrences-of-an-element-in-a-list" title="how to find all occurrences of an element in a list">stackoverflow.com/questions/6294179/&hellip;</a><br>------------------------------------------------------------------ <br><h3> savinson, Id: 12054409, Score: 109: </h3><pre><code>a = ["foo","bar","baz",'bar','any','much']
 
 indexes = [index for index in range(len(a)) if a[index] == 'bar']
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 16034499 tanzil: </h3><p>A problem will arise if the element is not in the list. This function handles the issue:</p>
+------------------------------------------------------------------ <br><h3> tanzil, Id: 16034499, Score: 108: </h3><p>A problem will arise if the element is not in the list. This function handles the issue:</p>
 
 <pre><code># if element is found it returns index of element else returns None
 
@@ -115,14 +115,14 @@ def find_element_in_list(element, list_element):
     except ValueError:
         return None
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 23862698 user3670684: </h3><p>You have to set a condition to check if the element you're searching is in the list</p>
+------------------------------------------------------------------ <br><h3> user3670684, Id: 23862698, Score: 74: </h3><p>You have to set a condition to check if the element you're searching is in the list</p>
 
 <pre><code>if 'your_element' in mylist:
     print mylist.index('your_element')
 else:
     print None
 </code></pre>
-<h4> Comment 102080650 stefanct: </h4>However, it might double the complexity. Did anybody check?<br><h4> Comment 106032707 ApproachingDarknessFish: </h4>@stefanct Time complexity is still linear but it will iterate through the list twice.<br><h4> Comment 91453790 devssh: </h4>This helps us to avoid try catch!<br><h4> Comment 120446114 Matthew Strasiotto: </h4>@stefanct this likely does double the complexity, I believe the <code>in</code> operator on a list has linear runtime. @ApproachingDarknessFish stated it would iterate twice which answers your question, and is right in saying that doubling the linear complexity is not a huge deal.  I wouldn&#39;t call iterating over a list twice a severe disadvantage in many use cases, as complexity theory tells us that O(n) + O(n) -&gt; O(2*n) -&gt; O(n), ie- the change is typically neglibile.<br><h4> Comment 106037228 stefanct: </h4>@ApproachingDarknessFish That is obviously what I meant. Even if pedantically it is the same <i>order</i> of complexity, iterating twice might be a severe disadvantage in many use cases thus I brought it up. And we still don&#39;t know the answer...<br>------------------------------------------------------------------ <br><h3> Answer 45808300 Russia Must Remove Putin: </h3><blockquote>
+<h4> stefanct, Comment 102080650 Score: 4: </h4>However, it might double the complexity. Did anybody check?<br><h4> ApproachingDarknessFish, Comment 106032707 Score: 2: </h4>@stefanct Time complexity is still linear but it will iterate through the list twice.<br><h4> devssh, Comment 91453790 Score: 2: </h4>This helps us to avoid try catch!<br><h4> Matthew Strasiotto, Comment 120446114 Score: 1: </h4>@stefanct this likely does double the complexity, I believe the <code>in</code> operator on a list has linear runtime. @ApproachingDarknessFish stated it would iterate twice which answers your question, and is right in saying that doubling the linear complexity is not a huge deal.  I wouldn&#39;t call iterating over a list twice a severe disadvantage in many use cases, as complexity theory tells us that O(n) + O(n) -&gt; O(2*n) -&gt; O(n), ie- the change is typically neglibile.<br><h4> stefanct, Comment 106037228 Score: 1: </h4>@ApproachingDarknessFish That is obviously what I meant. Even if pedantically it is the same <i>order</i> of complexity, iterating twice might be a severe disadvantage in many use cases thus I brought it up. And we still don&#39;t know the answer...<br>------------------------------------------------------------------ <br><h3> Russia Must Remove Putin, Id: 45808300, Score: 56: </h3><blockquote>
 <h2>Finding the index of an item given a list containing it in Python</h2>
 <p>For a list <code>[&quot;foo&quot;, &quot;bar&quot;, &quot;baz&quot;]</code> and an item in the list <code>&quot;bar&quot;</code>, what's the cleanest way to get its index (1) in Python?</p>
 </blockquote>
@@ -241,7 +241,7 @@ Int64Index([1, 3], dtype='int64')
 </code></pre>
 <p>What these usages seem to have in common is that they seem to operate on lists of constrained sizes (important because of O(n) lookup time for <code>list.index</code>), and they're mostly used in parsing (and UI in the case of Idle).</p>
 <p>While there are use-cases for it, they are fairly uncommon. If you find yourself looking for this answer, ask yourself if what you're doing is the most direct usage of the tools provided by the language for your use-case.</p>
------------------------------------------------------------------- <br><h3> Answer 33765024 rbrisuda: </h3><p>If you want all indexes, then you can use <a href="http://en.wikipedia.org/wiki/NumPy" rel="noreferrer">NumPy</a>:</p>
+------------------------------------------------------------------ <br><h3> rbrisuda, Id: 33765024, Score: 62: </h3><p>If you want all indexes, then you can use <a href="http://en.wikipedia.org/wiki/NumPy" rel="noreferrer">NumPy</a>:</p>
 
 <pre><code>import numpy as np
 
@@ -254,7 +254,7 @@ print item_index
 </code></pre>
 
 <p>It is clear, readable solution.</p>
-<h4> Comment 67281380 Andr&#225;s Asz&#243;di: </h4>What about lists of strings, lists of non-numeric objects, etc... ?<br><h4> Comment 96024431 Cristik: </h4>This answer should be better posted here: <a href="https://stackoverflow.com/questions/6294179/how-to-find-all-occurrences-of-an-element-in-a-list" title="how to find all occurrences of an element in a list">stackoverflow.com/questions/6294179/&hellip;</a><br><h4> Comment 106017106 Athanassios: </h4>This is the best one I have read. numpy arrays are far more efficient than Python lists. If the list is short it&#39;s no problem making a copy of it from a Python list, if it isn&#39;t then perhaps the developer should consider storing the elements in numpy array in the first place.<br>------------------------------------------------------------------ <br><h3> Answer 16593099 Graham Giller: </h3><p>All of the proposed functions here reproduce inherent language behavior but obscure what's going on.</p>
+<h4> Andr&#225;s Asz&#243;di, Comment 67281380 Score: 5: </h4>What about lists of strings, lists of non-numeric objects, etc... ?<br><h4> Cristik, Comment 96024431 Score: 2: </h4>This answer should be better posted here: <a href="https://stackoverflow.com/questions/6294179/how-to-find-all-occurrences-of-an-element-in-a-list" title="how to find all occurrences of an element in a list">stackoverflow.com/questions/6294179/&hellip;</a><br><h4> Athanassios, Comment 106017106 Score: 1: </h4>This is the best one I have read. numpy arrays are far more efficient than Python lists. If the list is short it&#39;s no problem making a copy of it from a Python list, if it isn&#39;t then perhaps the developer should consider storing the elements in numpy array in the first place.<br>------------------------------------------------------------------ <br><h3> Graham Giller, Id: 16593099, Score: 55: </h3><p>All of the proposed functions here reproduce inherent language behavior but obscure what's going on.</p>
 
 <pre><code>[i for i in range(len(mylist)) if mylist[i]==myterm]  # get the indices
 
@@ -264,7 +264,7 @@ mylist.index(myterm) if myterm in mylist else None    # get the first index and 
 </code></pre>
 
 <p>Why write a function with exception handling if the language provides the methods to do what you want itself?</p>
-<h4> Comment 71277902 Eric Duminil: </h4>The 3rd method iterates twice over the list, right?<br><h4> Comment 88386098 Peter Mortensen: </h4>Re: <i>&quot;All of the proposed functions here&quot;</i>: At the time of writing perhaps, but you ought to check newer answers to see if it is still true.<br>------------------------------------------------------------------ <br><h3> Answer 45559614 PythonProgrammi: </h3><h3>Getting all the occurrences and the position of one or more (identical) items in a list</h3>
+<h4> Eric Duminil, Comment 71277902 Score: 11: </h4>The 3rd method iterates twice over the list, right?<br><h4> Peter Mortensen, Comment 88386098 Score: 1: </h4>Re: <i>&quot;All of the proposed functions here&quot;</i>: At the time of writing perhaps, but you ought to check newer answers to see if it is still true.<br>------------------------------------------------------------------ <br><h3> PythonProgrammi, Id: 45559614, Score: 34: </h3><h3>Getting all the occurrences and the position of one or more (identical) items in a list</h3>
 
 <p>With enumerate(alist) you can store the first element (n) that is the index of the list when the element x is equal to what you look for.</p>
 
@@ -307,25 +307,25 @@ print(indexlist("1", "010101010"))
 <pre><code>0
 4
 </code></pre>
-<h4> Comment 96024446 Cristik: </h4>This answer should be better posted here: <a href="https://stackoverflow.com/questions/6294179/how-to-find-all-occurrences-of-an-element-in-a-list" title="how to find all occurrences of an element in a list">stackoverflow.com/questions/6294179/&hellip;</a><br>------------------------------------------------------------------ <br><h3> Answer 71900535 Babatunde Mustapha: </h3><pre><code>me = [&quot;foo&quot;, &quot;bar&quot;, &quot;baz&quot;]
+<h4> Cristik, Comment 96024446 Score: 2: </h4>This answer should be better posted here: <a href="https://stackoverflow.com/questions/6294179/how-to-find-all-occurrences-of-an-element-in-a-list" title="how to find all occurrences of an element in a list">stackoverflow.com/questions/6294179/&hellip;</a><br>------------------------------------------------------------------ <br><h3> Babatunde Mustapha, Id: 71900535, Score: 33: </h3><pre><code>me = [&quot;foo&quot;, &quot;bar&quot;, &quot;baz&quot;]
 me.index(&quot;bar&quot;) 
 </code></pre>
 <p>You can apply this for any member of the list to get their index</p>
------------------------------------------------------------------- <br><h3> Answer 33644671 Arnaldo P. Figueira Figueira: </h3><p>All indexes with the <a href="https://docs.python.org/2/library/functions.html#zip" rel="noreferrer"><code>zip</code></a> function:</p>
+------------------------------------------------------------------ <br><h3> Arnaldo P. Figueira Figueira, Id: 33644671, Score: 26: </h3><p>All indexes with the <a href="https://docs.python.org/2/library/functions.html#zip" rel="noreferrer"><code>zip</code></a> function:</p>
 
 <pre><code>get_indexes = lambda x, xs: [i for (y, i) in zip(xs, range(len(xs))) if x == y]
 
 print get_indexes(2, [1, 2, 3, 4, 5, 6, 3, 2, 3, 2])
 print get_indexes('f', 'xsfhhttytffsafweef')
 </code></pre>
-<h4> Comment 96024438 Cristik: </h4>This answer should be better posted here: <a href="https://stackoverflow.com/questions/6294179/how-to-find-all-occurrences-of-an-element-in-a-list" title="how to find all occurrences of an element in a list">stackoverflow.com/questions/6294179/&hellip;</a><br><h4> Comment 134457160 ggorlen: </h4><code>enumerate(xs)</code> is clearer than <code>zip(xs, range(len(xs))</code>. Also, this doesn&#39;t answer the question.<br>------------------------------------------------------------------ <br><h3> Answer 16807733 kiriloff: </h3><p>Simply you can go with</p>
+<h4> Cristik, Comment 96024438 Score: 3: </h4>This answer should be better posted here: <a href="https://stackoverflow.com/questions/6294179/how-to-find-all-occurrences-of-an-element-in-a-list" title="how to find all occurrences of an element in a list">stackoverflow.com/questions/6294179/&hellip;</a><br><h4> ggorlen, Comment 134457160 Score: 0: </h4><code>enumerate(xs)</code> is clearer than <code>zip(xs, range(len(xs))</code>. Also, this doesn&#39;t answer the question.<br>------------------------------------------------------------------ <br><h3> kiriloff, Id: 16807733, Score: 25: </h3><p>Simply you can go with</p>
 
 <pre><code>a = [['hand', 'head'], ['phone', 'wallet'], ['lost', 'stock']]
 b = ['phone', 'lost']
 
 res = [[x[0] for x in a].index(y) for y in b]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 16822116 Mathitis2Software: </h3><p>Another option</p>
+------------------------------------------------------------------ <br><h3> Mathitis2Software, Id: 16822116, Score: 21: </h3><p>Another option</p>
 
 <pre><code>&gt;&gt;&gt; a = ['red', 'blue', 'green', 'red']
 &gt;&gt;&gt; b = 'red'
@@ -339,7 +339,7 @@ res = [[x[0] for x in a].index(y) for y in b]
 [0, 3]
 &gt;&gt;&gt; 
 </code></pre>
-<h4> Comment 96024441 Cristik: </h4>This answer should be better posted here: <a href="https://stackoverflow.com/questions/6294179/how-to-find-all-occurrences-of-an-element-in-a-list" title="how to find all occurrences of an element in a list">stackoverflow.com/questions/6294179/&hellip;</a><br><h4> Comment 134457156 ggorlen: </h4>What does this have to do with the question?<br>------------------------------------------------------------------ <br><h3> Answer 27712517 MrWonderful: </h3><h1>And now, for something completely different...  </h1>
+<h4> Cristik, Comment 96024441 Score: 3: </h4>This answer should be better posted here: <a href="https://stackoverflow.com/questions/6294179/how-to-find-all-occurrences-of-an-element-in-a-list" title="how to find all occurrences of an element in a list">stackoverflow.com/questions/6294179/&hellip;</a><br><h4> ggorlen, Comment 134457156 Score: 0: </h4>What does this have to do with the question?<br>------------------------------------------------------------------ <br><h3> MrWonderful, Id: 27712517, Score: 21: </h3><h1>And now, for something completely different...  </h1>
 
 <p>... like confirming the existence of the item before getting the index.  The nice thing about this approach is the function always returns a list of indices -- even if it is an empty list.  It works with strings as well.</p>
 
@@ -426,16 +426,16 @@ Type "help", "copyright", "credits" or "license" for more information.
 <p>And now, after reviewing this question and all the answers, I realize that this is exactly what <a href="https://stackoverflow.com/users/55857/fmc">FMc</a> suggested in his <a href="https://stackoverflow.com/questions/176918/finding-the-index-of-an-item-given-a-list-containing-it-in-python/17300987#17300987">earlier answer</a>.  At the time I originally answered this question, I didn't even <em>see</em> that answer, because I didn't understand it.  I hope that my somewhat more verbose example will aid understanding.  </p>
 
 <p>If the single line of code above still <em>doesn't</em> make sense to you, I highly recommend you Google 'python list comprehension' and take a few minutes to familiarize yourself.  It's just one of the many powerful features that make it a joy to use Python to develop code.</p>
------------------------------------------------------------------- <br><h3> Answer 71017253 Kofi: </h3><p>List comprehension would be the best option to acquire a compact implementation in finding the index of an item in a list.</p>
+------------------------------------------------------------------ <br><h3> Kofi, Id: 71017253, Score: 11: </h3><p>List comprehension would be the best option to acquire a compact implementation in finding the index of an item in a list.</p>
 <pre><code>a_list = [&quot;a&quot;, &quot;b&quot;, &quot;a&quot;]
 print([index for (index , item) in enumerate(a_list) if item == &quot;a&quot;])
 </code></pre>
-<h4> Comment 136680260 Rolf of Saxony: </h4>Works nicely for integers and floats too, as well as finding all occurrences<br>------------------------------------------------------------------ <br><h3> Answer 70702309 LunaticXXD10: </h3><p>Here's a two-liner using Python's <code>index()</code> function:</p>
+<h4> Rolf of Saxony, Comment 136680260 Score: 0: </h4>Works nicely for integers and floats too, as well as finding all occurrences<br>------------------------------------------------------------------ <br><h3> LunaticXXD10, Id: 70702309, Score: 19: </h3><p>Here's a two-liner using Python's <code>index()</code> function:</p>
 <pre><code>LIST = ['foo' ,'boo', 'shoo']
 print(LIST.index('boo'))
 </code></pre>
 <p>Output: <code>1</code></p>
------------------------------------------------------------------- <br><h3> Answer 22708420 bvanlew: </h3><p>A variant on the answer from FMc and user7177 will give a dict that can return all indices for any entry:</p>
+------------------------------------------------------------------ <br><h3> bvanlew, Id: 22708420, Score: 16: </h3><p>A variant on the answer from FMc and user7177 will give a dict that can return all indices for any entry:</p>
 
 <pre><code>&gt;&gt;&gt; a = ['foo','bar','baz','bar','any', 'foo', 'much']
 &gt;&gt;&gt; l = dict(zip(set(a), map(lambda y: [i for i,z in enumerate(a) if z is y ], set(a))))
@@ -449,11 +449,11 @@ print(LIST.index('boo'))
 </code></pre>
 
 <p>You could also use this as a one liner to get all indices for a single entry. There are no guarantees for efficiency, though I did use set(a) to reduce the number of times the lambda is called.</p>
-<h4> Comment 96024448 Cristik: </h4>This answer should be better posted here: <a href="https://stackoverflow.com/questions/6294179/how-to-find-all-occurrences-of-an-element-in-a-list" title="how to find all occurrences of an element in a list">stackoverflow.com/questions/6294179/&hellip;</a><br>------------------------------------------------------------------ <br><h3> Answer 50537324 Ketan: </h3><p>Finding index of item x in list L:</p>
+<h4> Cristik, Comment 96024448 Score: 2: </h4>This answer should be better posted here: <a href="https://stackoverflow.com/questions/6294179/how-to-find-all-occurrences-of-an-element-in-a-list" title="how to find all occurrences of an element in a list">stackoverflow.com/questions/6294179/&hellip;</a><br>------------------------------------------------------------------ <br><h3> Ketan, Id: 50537324, Score: 15: </h3><p>Finding index of item x in list L:</p>
 
 <pre><code>idx = L.index(x) if (x in L) else -1
 </code></pre>
-<h4> Comment 96024472 Cristik: </h4>This iterates the array twice, thus it could result in performance issues for large arrays.<br><h4> Comment 129087974 Ketan: </h4>@Cristik - Correct. Not suitable if there is no reasonably low upper bound available for the list length.<br><h4> Comment 129087991 Ketan: </h4>Should be used only for non-repetitive tasks/deployments, or if the list length is relatively small enough to not affect overall performance noticeably.<br>------------------------------------------------------------------ <br><h3> Answer 30283031 dylankb: </h3><p>This solution is not as powerful as others, but if you're a beginner and only know about <code>for</code>loops it's still possible to find the first index of an item while avoiding the ValueError:</p>
+<h4> Cristik, Comment 96024472 Score: 6: </h4>This iterates the array twice, thus it could result in performance issues for large arrays.<br><h4> Ketan, Comment 129087974 Score: 0: </h4>@Cristik - Correct. Not suitable if there is no reasonably low upper bound available for the list length.<br><h4> Ketan, Comment 129087991 Score: 0: </h4>Should be used only for non-repetitive tasks/deployments, or if the list length is relatively small enough to not affect overall performance noticeably.<br>------------------------------------------------------------------ <br><h3> dylankb, Id: 30283031, Score: 13: </h3><p>This solution is not as powerful as others, but if you're a beginner and only know about <code>for</code>loops it's still possible to find the first index of an item while avoiding the ValueError:</p>
 
 <pre><code>def find_element(p,t):
     i = 0
@@ -464,7 +464,7 @@ print(LIST.index('boo'))
             i +=1
     return -1
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 63631183 Badri Paudel: </h3><p>There is a chance that that value may not be present so to avoid this ValueError, we can check if that actually exists in the list .</p>
+------------------------------------------------------------------ <br><h3> Badri Paudel, Id: 63631183, Score: 10: </h3><p>There is a chance that that value may not be present so to avoid this ValueError, we can check if that actually exists in the list .</p>
 <pre><code>list =  [&quot;foo&quot;, &quot;bar&quot;, &quot;baz&quot;]
 
 item_to_find = &quot;foo&quot;
@@ -475,14 +475,14 @@ if item_to_find in list:
 else:
     print(&quot;That word does not exist&quot;) 
 </code></pre>
-<h4> Comment 134457149 ggorlen: </h4>Calling a variable <code>list</code> overwrites a builtin function. Calling <code>in</code>, then <code>index</code> means you&#39;re doing two searches. Better to <code>try</code>/<code>except</code> <code>.index()</code> as suggested in other threads.<br>------------------------------------------------------------------ <br><h3> Answer 49093542 Hamed Baatour: </h3><p>Python <code>index()</code> method throws an error if the item was not found. So instead you can make it similar to the <code>indexOf()</code> function of JavaScript which returns <code>-1</code> if the item was not found:</p>
+<h4> ggorlen, Comment 134457149 Score: 0: </h4>Calling a variable <code>list</code> overwrites a builtin function. Calling <code>in</code>, then <code>index</code> means you&#39;re doing two searches. Better to <code>try</code>/<code>except</code> <code>.index()</code> as suggested in other threads.<br>------------------------------------------------------------------ <br><h3> Hamed Baatour, Id: 49093542, Score: 8: </h3><p>Python <code>index()</code> method throws an error if the item was not found. So instead you can make it similar to the <code>indexOf()</code> function of JavaScript which returns <code>-1</code> if the item was not found:</p>
 <pre><code>def indexof( array, elem):
 try:
     return array.index(elem)
 except ValueError:
     return -1
 </code></pre>
-<h4> Comment 103542321 Sapphire_Brick: </h4>however, <i>JavaScript</i> has the philosophy that weird results are better than errors, so it makes sense to return -1, but in Python, it can make a hard to track down bug, since -1 returns an item from the end of the list.<br><h4> Comment 136399812 Sergio Abreu: </h4>-1 is not a weird result in java/javascript. It is a language convenction of &quot;not found in list&quot;. It is possible to use this java intelligence in Python doing a simple verification: if theindex &gt; -1: or if theindex &gt;= 0: which does the same.<br>------------------------------------------------------------------ <br><h3> Answer 67031974 Blackjack: </h3><p>It just uses the python function <code>array.index()</code> and with a simple Try / Except it returns the position of the record if it is found in the list and return -1 if it is not found in the list (like on JavaScript with the function <code>indexOf()</code>).</p>
+<h4> Sapphire_Brick, Comment 103542321 Score: 8: </h4>however, <i>JavaScript</i> has the philosophy that weird results are better than errors, so it makes sense to return -1, but in Python, it can make a hard to track down bug, since -1 returns an item from the end of the list.<br><h4> Sergio Abreu, Comment 136399812 Score: 0: </h4>-1 is not a weird result in java/javascript. It is a language convenction of &quot;not found in list&quot;. It is possible to use this java intelligence in Python doing a simple verification: if theindex &gt; -1: or if theindex &gt;= 0: which does the same.<br>------------------------------------------------------------------ <br><h3> Blackjack, Id: 67031974, Score: 8: </h3><p>It just uses the python function <code>array.index()</code> and with a simple Try / Except it returns the position of the record if it is found in the list and return -1 if it is not found in the list (like on JavaScript with the function <code>indexOf()</code>).</p>
 <pre class="lang-py prettyprint-override"><code>fruits = ['apple', 'banana', 'cherry']
 
 try:
@@ -491,7 +491,7 @@ except:
   pos = -1
 </code></pre>
 <p>In this case &quot;mango&quot; is not present in the list <code>fruits</code> so the <code>pos</code> variable is -1, if I had searched for &quot;cherry&quot; the <code>pos</code> variable would be 2.</p>
------------------------------------------------------------------- <br><h3> Answer 49159543 Ankit Gupta: </h3><p>There is a more functional answer to this.</p>
+------------------------------------------------------------------ <br><h3> Ankit Gupta, Id: 49159543, Score: 7: </h3><p>There is a more functional answer to this.</p>
 
 <pre><code>list(filter(lambda x: x[1]=="bar",enumerate(["foo", "bar", "baz", "bar", "baz", "bar", "a", "b", "c"])))
 </code></pre>
@@ -502,7 +502,7 @@ except:
     return list(map(lambda x: x[0],\
        (list(filter(lambda x: x[1]==element, enumerate(lst))))))
 </code></pre>
-<h4> Comment 90833412 y2k-shubham: </h4>This answer feels at home for <code>Scala</code> / <i>functional-programming</i> enthusiasts<br><h4> Comment 110563298 Caveman: </h4>When only a single value is needed in a list that has many matches this one takes long.<br>------------------------------------------------------------------ <br><h3> Answer 62518645 Caveman: </h3><h3>For one comparable</h3>
+<h4> y2k-shubham, Comment 90833412 Score: 1: </h4>This answer feels at home for <code>Scala</code> / <i>functional-programming</i> enthusiasts<br><h4> Caveman, Comment 110563298 Score: 0: </h4>When only a single value is needed in a list that has many matches this one takes long.<br>------------------------------------------------------------------ <br><h3> Caveman, Id: 62518645, Score: 7: </h3><h3>For one comparable</h3>
 <pre class="lang-py prettyprint-override"><code># Throws ValueError if nothing is found
 some_list = ['foo', 'bar', 'baz'].index('baz')
 # some_list == 2
@@ -521,7 +521,7 @@ index_of_value_you_like = next(
     i for i, user in enumerate(users)
     if user.is_staff()]
 </code></pre>
-<h4> Comment 115324980 tejasvi88: </h4><code>idx = next((i for i, v in enumerate(ls) if v == chk), -1)</code> to get the behavior similar to str.index(chk).<br><h4> Comment 115326695 Caveman: </h4>@tejasvi88 Decided to put some extra work into the answer<br>------------------------------------------------------------------ <br><h3> Answer 31230699 Coder123: </h3><pre><code>name ="bar"
+<h4> tejasvi88, Comment 115324980 Score: 0: </h4><code>idx = next((i for i, v in enumerate(ls) if v == chk), -1)</code> to get the behavior similar to str.index(chk).<br><h4> Caveman, Comment 115326695 Score: 0: </h4>@tejasvi88 Decided to put some extra work into the answer<br>------------------------------------------------------------------ <br><h3> Coder123, Id: 31230699, Score: 6: </h3><pre><code>name ="bar"
 list = [["foo", 1], ["bar", 2], ["baz", 3]]
 new_list=[]
 for item in list:
@@ -535,7 +535,7 @@ print (location)
 </code></pre>
 
 <p>This accounts for if the string is not in the list too, if it isn't in the list then <code>location = -1</code></p>
------------------------------------------------------------------- <br><h3> Answer 45654421 jihed gasmi: </h3><p>Since Python lists are zero-based, we can use the zip built-in function as follows:</p>
+------------------------------------------------------------------ <br><h3> jihed gasmi, Id: 45654421, Score: 5: </h3><p>Since Python lists are zero-based, we can use the zip built-in function as follows:</p>
 
 <pre><code>&gt;&gt;&gt; [i for i,j in zip(range(len(haystack)), haystack) if j == 'needle' ]
 </code></pre>
@@ -543,7 +543,7 @@ print (location)
 <p>where "haystack" is the list in question and "needle" is the item to look for.</p>
 
 <p>(Note: Here we are iterating using i to get the indexes, but if we need rather to focus on the items we can switch to j.)</p>
-<h4> Comment 82944682 PythonProgrammi: </h4>[i for i,j in enumerate(haystack) if j==‘needle’] is more compact and readable, I think.<br>------------------------------------------------------------------ <br><h3> Answer 52263806 FatihAkici: </h3><h1>If performance is of concern:</h1>
+<h4> PythonProgrammi, Comment 82944682 Score: 5: </h4>[i for i,j in enumerate(haystack) if j==‘needle’] is more compact and readable, I think.<br>------------------------------------------------------------------ <br><h3> FatihAkici, Id: 52263806, Score: 5: </h3><h1>If performance is of concern:</h1>
 
 <p>It is mentioned in numerous answers that the built-in method of <code>list.index(item)</code> method is an O(n) algorithm. It is fine if you need to perform this once. But if you need to access the indices of elements a number of times, it makes more sense to first create a dictionary (O(n)) of item-index pairs, and then access the index at O(1) every time you need it.</p>
 
@@ -572,13 +572,13 @@ for i,e in enumerate(myList):
 # Lookup
 myDict["foo"] # Returns [0, 4]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 72121787 Deepeshkumar: </h3><p>One can use zip() function to get the index of the value in the list. The code could be;</p>
+------------------------------------------------------------------ <br><h3> Deepeshkumar, Id: 72121787, Score: -1: </h3><p>One can use zip() function to get the index of the value in the list. The code could be;</p>
 <pre><code>list1 = [&quot;foo&quot;,&quot;bar&quot;,&quot;baz&quot;]
 for index,value in zip(range(0,len(list1)),list1):
     if value == &quot;bar&quot;:
         print(index)
 </code></pre>
-<h4> Comment 128132244 Wondercricket: </h4><code>zip(range(0,len(list1)),list1)</code> is overkill when you could just do <code>enumerate(list1)</code><br><h4> Comment 128687539 LunaticXXD10: </h4>the code is an overkill<br>------------------------------------------------------------------ <br><h3> Answer 61016685 Vlad Bezden: </h3><p>If you are going to find an index once then using "index" method is fine. However, if you are going to search your data more than once then I recommend using <a href="https://docs.python.org/3/library/bisect.html" rel="noreferrer">bisect</a> module. Keep in mind that using bisect module data must be sorted. So you sort data once and then you can use bisect.
+<h4> Wondercricket, Comment 128132244 Score: 1: </h4><code>zip(range(0,len(list1)),list1)</code> is overkill when you could just do <code>enumerate(list1)</code><br><h4> LunaticXXD10, Comment 128687539 Score: 1: </h4>the code is an overkill<br>------------------------------------------------------------------ <br><h3> Vlad Bezden, Id: 61016685, Score: 5: </h3><p>If you are going to find an index once then using "index" method is fine. However, if you are going to search your data more than once then I recommend using <a href="https://docs.python.org/3/library/bisect.html" rel="noreferrer">bisect</a> module. Keep in mind that using bisect module data must be sorted. So you sort data once and then you can use bisect.
 Using <a href="https://docs.python.org/3/library/bisect.html" rel="noreferrer">bisect</a> module on my machine is about 20 times faster than using index method.</p>
 
 <p>Here is an example of code using Python 3.8 and above syntax:</p>
@@ -610,7 +610,7 @@ print(f"{t1=:.4f}, {t2=:.4f}, diffs {t1/t2=:.2f}")
 
 <pre><code>t1=0.0400, t2=0.0020, diffs t1/t2=19.60
 </code></pre>
-<h4> Comment 134456442 ggorlen: </h4>&quot;Using bisect module on my machine is about 20 times faster than using index method.&quot; is a somewhat inaccurate way to describe the relationship between the two algorithms. It&#39;s not a linear relationship, so on small lists of, say, 10 elements, both algorithms should perform about the same. On slightly larger lists, you may begin to notice a difference. On massive lists, binary search may be thousands of times faster.<br>------------------------------------------------------------------ <br><h3> Answer 69425614 MD SHAYON: </h3><p>I find this two solution is better and I tried it by myself</p>
+<h4> ggorlen, Comment 134456442 Score: 0: </h4>&quot;Using bisect module on my machine is about 20 times faster than using index method.&quot; is a somewhat inaccurate way to describe the relationship between the two algorithms. It&#39;s not a linear relationship, so on small lists of, say, 10 elements, both algorithms should perform about the same. On slightly larger lists, you may begin to notice a difference. On massive lists, binary search may be thousands of times faster.<br>------------------------------------------------------------------ <br><h3> MD SHAYON, Id: 69425614, Score: 5: </h3><p>I find this two solution is better and I tried it by myself</p>
 <pre><code>&gt;&gt;&gt; expences = [2200, 2350, 2600, 2130, 2190]
 &gt;&gt;&gt; 2000 in expences
 False
@@ -632,7 +632,7 @@ False
 
 
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 48530557 mold: </h3><p>For those coming from another language like me, maybe with a simple loop it's easier to understand and use it:</p>
+------------------------------------------------------------------ <br><h3> mold, Id: 48530557, Score: 4: </h3><p>For those coming from another language like me, maybe with a simple loop it's easier to understand and use it:</p>
 <pre><code>mylist = [
     &quot;foo&quot;, &quot;bar&quot;, 
     &quot;baz&quot;, &quot;bar&quot;
@@ -642,7 +642,7 @@ for index, item in enumerate(mylist):
         print(index, item)
 </code></pre>
 <p>I am thankful for <em><a href="https://www.codecademy.com/en/forum_questions/5087f2d786a27b02000041a9" rel="nofollow noreferrer">So what exactly does enumerate do?</a></em>. That helped me to understand.</p>
-<h4> Comment 134751129 mold: </h4>It&#39;s only an example to understand how you can find repeated items - enumerate helps to do it.<br><h4> Comment 135591250 mold: </h4>@ggorlen I understood you about <b>newlist</b> variable that I used to define the result of <code>enumerate(mylist)</code>. That&#39;s why I cut that line and put <b>enumerate</b> function on loop. And it&#39;s better now. Remembering that all everything is an object in Python, but you can call <b>enumerate</b> as &quot;built-in&quot; function as official documentation does, of course. And, when I use enumerate to put a list in order, I continue having a list. Otherwise, you would need to call it a dictionary, which is not the case.<br>------------------------------------------------------------------ <br><h3> Answer 70615103 sargupta: </h3><pre><code>text = [&quot;foo&quot;, &quot;bar&quot;, &quot;baz&quot;]
+<h4> mold, Comment 134751129 Score: 0: </h4>It&#39;s only an example to understand how you can find repeated items - enumerate helps to do it.<br><h4> mold, Comment 135591250 Score: 0: </h4>@ggorlen I understood you about <b>newlist</b> variable that I used to define the result of <code>enumerate(mylist)</code>. That&#39;s why I cut that line and put <b>enumerate</b> function on loop. And it&#39;s better now. Remembering that all everything is an object in Python, but you can call <b>enumerate</b> as &quot;built-in&quot; function as official documentation does, of course. And, when I use enumerate to put a list in order, I continue having a list. Otherwise, you would need to call it a dictionary, which is not the case.<br>------------------------------------------------------------------ <br><h3> sargupta, Id: 70615103, Score: 4: </h3><pre><code>text = [&quot;foo&quot;, &quot;bar&quot;, &quot;baz&quot;]
 target = &quot;bar&quot;
 
 [index for index, value in enumerate(text) if value == target]
@@ -653,7 +653,7 @@ list contains a large number of elements, better to <strong>apply binary
 search with O(log n) runtime complexity</strong>
 .</p>
 </blockquote>
-<h4> Comment 134456436 ggorlen: </h4>You can only binary search if the list is sorted, and sorting is O(n log(n)).<br>------------------------------------------------------------------ <br><h3> Answer 53306924 Siddharth Satpathy: </h3><p>Let’s give the name <code>lst</code> to the list that you have. One can convert the list <code>lst</code> to a <code>numpy array</code>. And, then use <a href="https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.where.html" rel="nofollow noreferrer">numpy.where</a> to get the index of the chosen item in the list. Following is the way in which you will implement it.</p>
+<h4> ggorlen, Comment 134456436 Score: 0: </h4>You can only binary search if the list is sorted, and sorting is O(n log(n)).<br>------------------------------------------------------------------ <br><h3> Siddharth Satpathy, Id: 53306924, Score: 3: </h3><p>Let’s give the name <code>lst</code> to the list that you have. One can convert the list <code>lst</code> to a <code>numpy array</code>. And, then use <a href="https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.where.html" rel="nofollow noreferrer">numpy.where</a> to get the index of the chosen item in the list. Following is the way in which you will implement it.</p>
 
 <pre><code>import numpy as np
 
@@ -662,11 +662,11 @@ print np.where( np.array(lst) == 'bar')[0][0]
 
 &gt;&gt;&gt; 1
 </code></pre>
-<h4> Comment 110563268 Caveman: </h4>Does not work if the item is an instance of a class<br>------------------------------------------------------------------ <br><h3> Answer 73924789 My Car: </h3><p>Try the following code:</p>
+<h4> Caveman, Comment 110563268 Score: 0: </h4>Does not work if the item is an instance of a class<br>------------------------------------------------------------------ <br><h3> My Car, Id: 73924789, Score: 4: </h3><p>Try the following code:</p>
 <pre><code>[&quot;foo&quot;, &quot;bar&quot;, &quot;baz&quot;].index(&quot;bar&quot;)
 </code></pre>
 <p>Refer to: <a href="https://www.programiz.com/python-programming/methods/list/index" rel="nofollow noreferrer">https://www.programiz.com/python-programming/methods/list/index</a></p>
------------------------------------------------------------------- <br><h3> Answer 52502151 pylang: </h3><p>As indicated by @TerryA, many answers discuss how to find <em>one</em> index.</p>
+------------------------------------------------------------------ <br><h3> pylang, Id: 52502151, Score: 3: </h3><p>As indicated by @TerryA, many answers discuss how to find <em>one</em> index.</p>
 
 <p><a href="https://github.com/erikrose/more-itertools" rel="nofollow noreferrer"><code>more_itertools</code></a> is a third-party library with tools to locate <em>multiple</em> indices within an iterable. </p>
 
@@ -693,7 +693,7 @@ iterable = ["foo", "bar", "baz", "ham", "foo", "bar", "baz"]
 </code></pre>
 
 <p>See also more options with <a href="https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.locate" rel="nofollow noreferrer"><code>more_itertools.locate</code></a>.  Install via <a href="https://github.com/erikrose/more-itertools" rel="nofollow noreferrer"><code>&gt; pip install more_itertools</code></a>.</p>
------------------------------------------------------------------- <br><h3> Answer 70523709 Franz Gastring: </h3><p>Certain structures in python contains a index method that works beautifully to solve this question.</p>
+------------------------------------------------------------------ <br><h3> Franz Gastring, Id: 70523709, Score: 2: </h3><p>Certain structures in python contains a index method that works beautifully to solve this question.</p>
 <pre><code>'oi tchau'.index('oi')     # 0
 ['oi','tchau'].index('oi') # 0
 ('oi','tchau').index('oi') # 0
@@ -702,7 +702,7 @@ iterable = ["foo", "bar", "baz", "ham", "foo", "bar", "baz"]
 <p><a href="https://www.programiz.com/python-programming/methods/list/index" rel="nofollow noreferrer">In lists</a></p>
 <p><a href="https://www.programiz.com/python-programming/methods/list/index" rel="nofollow noreferrer">In tuples</a></p>
 <p><a href="https://www.programiz.com/python-programming/methods/list/index" rel="nofollow noreferrer">In string</a></p>
------------------------------------------------------------------- <br><h3> Answer 70143454 Abdul Niyas P M: </h3><p>Pythonic way would to use <code>enumerate</code> but you can also use <a href="https://docs.python.org/3/library/operator.html#operator.indexOf" rel="nofollow noreferrer"><code>indexOf</code></a> from <code>operator</code> module. Please note that this will raise <a href="https://github.com/python/cpython/blob/3.10/Lib/operator.py#L179" rel="nofollow noreferrer"><code>ValueError</code> if <code>b</code> not in <code>a</code>.</a></p>
+------------------------------------------------------------------ <br><h3> Abdul Niyas P M, Id: 70143454, Score: 1: </h3><p>Pythonic way would to use <code>enumerate</code> but you can also use <a href="https://docs.python.org/3/library/operator.html#operator.indexOf" rel="nofollow noreferrer"><code>indexOf</code></a> from <code>operator</code> module. Please note that this will raise <a href="https://github.com/python/cpython/blob/3.10/Lib/operator.py#L179" rel="nofollow noreferrer"><code>ValueError</code> if <code>b</code> not in <code>a</code>.</a></p>
 <pre><code>&gt;&gt;&gt; from operator import indexOf
 &gt;&gt;&gt;
 &gt;&gt;&gt;
@@ -719,7 +719,7 @@ indexOf(a, b, /)
 &gt;&gt;&gt; indexOf([&quot;foo&quot;, &quot;bar&quot;, &quot;baz&quot;], &quot;bar&quot;) # with list
 1
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 55218236 sahasrara62: </h3><p>using dictionary , where process the list first and then add the index to it </p>
+------------------------------------------------------------------ <br><h3> sahasrara62, Id: 55218236, Score: 1: </h3><p>using dictionary , where process the list first and then add the index to it </p>
 
 <pre><code>from collections import defaultdict
 
@@ -734,7 +734,7 @@ print(index_dict[word_index_to_find])
 
 # output :  [0, 5]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 76245607 ggorlen: </h3><p>Amazingly, <a href="https://docs.python.org/3/library/functions.html#next" rel="nofollow noreferrer"><code>next</code></a>'s fallback value second parameter mentioned in <a href="https://stackoverflow.com/questions/604802/python-finding-an-element-in-a-list#comment116866572_3785811">this comment</a> in a duplicate thread hasn't been shown here yet.</p>
+------------------------------------------------------------------ <br><h3> ggorlen, Id: 76245607, Score: 1: </h3><p>Amazingly, <a href="https://docs.python.org/3/library/functions.html#next" rel="nofollow noreferrer"><code>next</code></a>'s fallback value second parameter mentioned in <a href="https://stackoverflow.com/questions/604802/python-finding-an-element-in-a-list#comment116866572_3785811">this comment</a> in a duplicate thread hasn't been shown here yet.</p>
 <p>The basic <code>.index()</code> works well when you can compare whole objects, but it's common to need to search a list of objects or dicts for a particular item by a certain property, in which case a generator with a condition is the natural choice:</p>
 <pre class="lang-py prettyprint-override"><code>&gt;&gt;&gt; users = [{&quot;id&quot;: 2, &quot;name&quot;: &quot;foo&quot;}, {&quot;id&quot;: 3, &quot;name&quot;: &quot;bar&quot;}]
 &gt;&gt;&gt; target_id = 2
@@ -770,13 +770,13 @@ None
 &gt;&gt;&gt; find(&quot;foobAr&quot;, str.isupper) # works on any iterable!
 'A'
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 74799887 saolof: </h3><p>Don't. If you absolutely need to, use the <code>.index(item...)</code> method on list. However, it takes linear time, and if you find yourself reaching for it, you are probably misusing lists to do something you should not do with them.</p>
+------------------------------------------------------------------ <br><h3> saolof, Id: 74799887, Score: 0: </h3><p>Don't. If you absolutely need to, use the <code>.index(item...)</code> method on list. However, it takes linear time, and if you find yourself reaching for it, you are probably misusing lists to do something you should not do with them.</p>
 <p>Most likely, you care either about 1) a two-way mapping between integers and items, or 2) about finding an item in a <em>sorted</em> list of items.</p>
 <p>For the first one, use a pair of dictionaries. If you want a library that does this for you, use the <code>bidict</code> library.</p>
 <p>For the second one, use methods that can properly make use of the fact that the list is sorted. Use the built-in <code>bisect</code> module in python.</p>
 <p>If you find yourself wanting to insert items in a sorted list, you should also not use a sorted list. Either weaken the sorted requirement to a heap using the builtin  <code>heapq</code> module, or use the <code>sortedcontainers</code> library.</p>
 <p>It is bad practice to use a data structure that is not designed for what you want to do. Using one that matches the task you give it will both telegraph to the reader that you want to do that specific thing, and also make your solution a lot faster/more scalable in practice.</p>
------------------------------------------------------------------- <br><h3> Answer 75044299 Sanu: </h3><p>A simple solution in python:</p>
+------------------------------------------------------------------ <br><h3> Sanu, Id: 75044299, Score: 0: </h3><p>A simple solution in python:</p>
 <pre><code>li1=[&quot;foo&quot;,&quot;bar&quot;,&quot;baz&quot;]
 for i in range(len(li1)):
      if li1[i]==&quot;bar&quot;:
@@ -788,7 +788,7 @@ for i in range(len(li1)):
         if lis[i]==element:
             return i
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 77157264 Hadi Mir: </h3><p>One of the simplest ways to find the index of an element in a list is to do as follows</p>
+------------------------------------------------------------------ <br><h3> Hadi Mir, Id: 77157264, Score: 0: </h3><p>One of the simplest ways to find the index of an element in a list is to do as follows</p>
 <p><div class="snippet" data-lang="js" data-hide="false" data-console="true" data-babel="false">
 <div class="snippet-code">
 <pre class="snippet-code-js lang-js prettyprint-override"><code>arr = ["foo", "bar", "baz"] 
@@ -801,7 +801,7 @@ except:
 </div>
 </div>
 </p>
------------------------------------------------------------------- <br><h3> Answer 77369448 Alejadro Xalabarder: </h3><p>A function &quot;indexof&quot; similar to another languages that returs -1 if the element is not found can be written like</p>
+------------------------------------------------------------------ <br><h3> Alejadro Xalabarder, Id: 77369448, Score: 0: </h3><p>A function &quot;indexof&quot; similar to another languages that returs -1 if the element is not found can be written like</p>
 <pre><code>def indexof (obj, elem, offset=0):
     if elem in obj[offset:]:
         return offset + obj[offset:].index(elem)
@@ -832,8 +832,8 @@ print (indexof(obj, &quot;foo&quot;, 1))
         return offset + sublist.index(elem)
     return -1
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 67384774 illuminato: </h3><p>Simple option:</p>
+------------------------------------------------------------------ <br><h3> illuminato, Id: 67384774, Score: -1: </h3><p>Simple option:</p>
 <pre><code>a = [&quot;foo&quot;, &quot;bar&quot;, &quot;baz&quot;]
 [i for i in range(len(a)) if a[i].find(&quot;bar&quot;) != -1]
 </code></pre>
-<h4> Comment 122403300 Mehmet Burak Sayıcı: </h4>Not every element in the list is string.<br>
+<h4> Mehmet Burak Sayıcı, Comment 122403300 Score: 1: </h4>Not every element in the list is string.<br>

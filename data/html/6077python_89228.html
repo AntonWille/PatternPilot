@@ -1,5 +1,5 @@
- <h2> Title: How do I execute a program or call a system command? </h2> <h3> freshWoWer, question_id: 89228 </h3>Score: 6077, Tags: {python,shell,terminal,subprocess,command} <br><p>How do I call an external command within Python as if I had typed it in a shell or command prompt?</p>
------------------------------------------------------------------- <br><h3> Answer 89243 David Cournapeau: </h3><p>Use <a href="https://docs.python.org/library/subprocess.html#subprocess.run" rel="noreferrer"><code>subprocess.run</code></a>:</p>
+ <h2> Title: How do I execute a program or call a system command? </h2> <h4> freshWoWer, question_id: 89228 </h4>Score: 6077, Tags: {python,shell,terminal,subprocess,command} <br><p>How do I call an external command within Python as if I had typed it in a shell or command prompt?</p>
+------------------------------------------------------------------ <br><h3> David Cournapeau, Id: 89243, Score: 5765: </h3><p>Use <a href="https://docs.python.org/library/subprocess.html#subprocess.run" rel="noreferrer"><code>subprocess.run</code></a>:</p>
 <pre class="lang-py prettyprint-override"><code>import subprocess
 
 subprocess.run([&quot;ls&quot;, &quot;-l&quot;]) 
@@ -8,7 +8,7 @@ subprocess.run([&quot;ls&quot;, &quot;-l&quot;])
 <p>On Python 3.4 and earlier, use <code>subprocess.call</code> instead of <code>.run</code>:</p>
 <pre class="lang-py prettyprint-override"><code>subprocess.call([&quot;ls&quot;, &quot;-l&quot;])
 </code></pre>
-<h4> Comment 55091938 Murmel: </h4>@KevinWheeler You should NOT use <code>shell=True</code>, for this purpose Python comes with <a href="https://docs.python.org/2/library/os.path.html#os.path.expandvars" rel="nofollow noreferrer">os.path.expandvars</a>. In your case you can write: <code>os.path.expandvars(&quot;$PATH&quot;)</code>. @SethMMorton please reconsider your comment -&gt; <a href="https://docs.python.org/2/library/subprocess.html#frequently-used-arguments" rel="nofollow noreferrer">Why not to use shell=True</a><br><h4> Comment 52559086 Kevin Wheeler: </h4>Is there a way to use variable substitution? IE I tried to do <code>echo $PATH</code> by using <code>call([&quot;echo&quot;, &quot;$PATH&quot;])</code>, but it just echoed the literal string <code>$PATH</code> instead of doing any substitution. I know I could get the PATH environment variable, but I&#39;m wondering if there is an easy way to have the command behave exactly as if I had executed it in bash.<br><h4> Comment 123644441 Charlie Parker: </h4>what if I want to pipe things e.g. <code>pip list | grep anatome</code>?<br><h4> Comment 127649670 Sergey Anisimov: </h4>Many arguments version looks like that:  <code>subprocess.run([&quot;balcon.exe&quot;,&quot;-n&quot;,&quot;Tatyana&quot;,&quot;-t&quot;, &quot;Hello world&quot;])</code><br><h4> Comment 134537130 user3064538: </h4>@thatrandomperson your comment is useless because you didn&#39;t provide an example. no one is able to evaluate what you actually tried, why you expected it to work and explain to you why it didn&#39;t work. We just have to take your word that a function used by millions of programs &quot;doesn&#39;t work&quot;?<br><h4> Comment 52598063 SethMMorton: </h4>@KevinWheeler You&#39;ll have to use <code>shell=True</code> for that to work.<br>------------------------------------------------------------------ <br><h3> Answer 95246 EmmEff: </h3><p>Typical implementation:</p>
+<h4> Murmel, Comment 55091938 Score: 73: </h4>@KevinWheeler You should NOT use <code>shell=True</code>, for this purpose Python comes with <a href="https://docs.python.org/2/library/os.path.html#os.path.expandvars" rel="nofollow noreferrer">os.path.expandvars</a>. In your case you can write: <code>os.path.expandvars(&quot;$PATH&quot;)</code>. @SethMMorton please reconsider your comment -&gt; <a href="https://docs.python.org/2/library/subprocess.html#frequently-used-arguments" rel="nofollow noreferrer">Why not to use shell=True</a><br><h4> Kevin Wheeler, Comment 52559086 Score: 9: </h4>Is there a way to use variable substitution? IE I tried to do <code>echo $PATH</code> by using <code>call([&quot;echo&quot;, &quot;$PATH&quot;])</code>, but it just echoed the literal string <code>$PATH</code> instead of doing any substitution. I know I could get the PATH environment variable, but I&#39;m wondering if there is an easy way to have the command behave exactly as if I had executed it in bash.<br><h4> Charlie Parker, Comment 123644441 Score: 0: </h4>what if I want to pipe things e.g. <code>pip list | grep anatome</code>?<br><h4> Sergey Anisimov, Comment 127649670 Score: 0: </h4>Many arguments version looks like that:  <code>subprocess.run([&quot;balcon.exe&quot;,&quot;-n&quot;,&quot;Tatyana&quot;,&quot;-t&quot;, &quot;Hello world&quot;])</code><br><h4> user3064538, Comment 134537130 Score: 0: </h4>@thatrandomperson your comment is useless because you didn&#39;t provide an example. no one is able to evaluate what you actually tried, why you expected it to work and explain to you why it didn&#39;t work. We just have to take your word that a function used by millions of programs &quot;doesn&#39;t work&quot;?<br><h4> SethMMorton, Comment 52598063 Score: 0: </h4>@KevinWheeler You&#39;ll have to use <code>shell=True</code> for that to work.<br>------------------------------------------------------------------ <br><h3> EmmEff, Id: 95246, Score: 437: </h3><p>Typical implementation:</p>
 <pre class="lang-py prettyprint-override"><code>import subprocess
 
 p = subprocess.Popen('ls', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -17,7 +17,7 @@ for line in p.stdout.readlines():
 retval = p.wait()
 </code></pre>
 <p>You are free to do what you want with the <code>stdout</code> data in the pipe.  In fact, you can simply omit those parameters (<code>stdout=</code> and <code>stderr=</code>) and it'll behave like <code>os.system()</code>.</p>
-<h4> Comment 18336103 jfs: </h4><code>.readlines()</code> reads <i>all</i> lines at once i.e., it blocks until the subprocess exits (closes its end of the pipe). To read in real time (if there is no buffering issues) you could: <code>for line in iter(p.stdout.readline, &#39;&#39;): print line,</code><br><h4> Comment 18358805 jfs: </h4>the child process may use block-buffering in non-interactive mode instead of line-buffering so <code>p.stdout.readline()</code> (note: no <code>s</code> at the end) won&#39;t see any data until the child fills its buffer. If the child doesn&#39;t produce much data then the output won&#39;t be in real time. See the second reason in <a href="http://www.noah.org/wiki/Pexpect#Q:_Why_not_just_use_a_pipe_.28popen.28.29.29.3F" rel="nofollow noreferrer">Q: Why not just use a pipe (popen())?</a>. Some workarounds are provided <a href="http://stackoverflow.com/a/12471855/4279">in this answer</a> (pexpect, pty, stdbuf)<br><h4> Comment 94039263 tripleee: </h4>This answer was fine for its time, but we should no longer recommend <code>Popen</code> for simple tasks. This also needlessly specifies <code>shell=True</code>. Try one of the <code>subprocess.run()</code> answers.<br><h4> Comment 18358836 jfs: </h4>the buffering issue only matters if you want output in real time and doesn&#39;t apply to your code that doesn&#39;t print anything until <i>all</i> data is received<br><h4> Comment 18358478 EmmEff: </h4>Could you elaborate on what you mean by &quot;if there is no buffering issues&quot;?  If the process blocks definitely, the subprocess call also blocks.  The same could happen with my original example as well. What else could happen with respect to buffering?<br>------------------------------------------------------------------ <br><h3> Answer 92395 Eli Courtwright: </h3><p>Here is a summary of ways to call external programs, including their advantages and disadvantages:</p>
+<h4> jfs, Comment 18336103 Score: 60: </h4><code>.readlines()</code> reads <i>all</i> lines at once i.e., it blocks until the subprocess exits (closes its end of the pipe). To read in real time (if there is no buffering issues) you could: <code>for line in iter(p.stdout.readline, &#39;&#39;): print line,</code><br><h4> jfs, Comment 18358805 Score: 20: </h4>the child process may use block-buffering in non-interactive mode instead of line-buffering so <code>p.stdout.readline()</code> (note: no <code>s</code> at the end) won&#39;t see any data until the child fills its buffer. If the child doesn&#39;t produce much data then the output won&#39;t be in real time. See the second reason in <a href="http://www.noah.org/wiki/Pexpect#Q:_Why_not_just_use_a_pipe_.28popen.28.29.29.3F" rel="nofollow noreferrer">Q: Why not just use a pipe (popen())?</a>. Some workarounds are provided <a href="http://stackoverflow.com/a/12471855/4279">in this answer</a> (pexpect, pty, stdbuf)<br><h4> tripleee, Comment 94039263 Score: 10: </h4>This answer was fine for its time, but we should no longer recommend <code>Popen</code> for simple tasks. This also needlessly specifies <code>shell=True</code>. Try one of the <code>subprocess.run()</code> answers.<br><h4> jfs, Comment 18358836 Score: 7: </h4>the buffering issue only matters if you want output in real time and doesn&#39;t apply to your code that doesn&#39;t print anything until <i>all</i> data is received<br><h4> EmmEff, Comment 18358478 Score: 4: </h4>Could you elaborate on what you mean by &quot;if there is no buffering issues&quot;?  If the process blocks definitely, the subprocess call also blocks.  The same could happen with my original example as well. What else could happen with respect to buffering?<br>------------------------------------------------------------------ <br><h3> Eli Courtwright, Id: 92395, Score: 3541: </h3><p>Here is a summary of ways to call external programs, including their advantages and disadvantages:</p>
 <ol>
 <li><p><a href="https://docs.python.org/3/library/os.html#os.system" rel="noreferrer"><code>os.system</code></a> passes the command and arguments to your system's shell. This is nice because you can actually run multiple commands at once in this manner and set up pipes and input/output redirection. For example:</p>
 <pre class="lang-py prettyprint-override"><code>os.system(&quot;some_command &lt; input_file | another_command &gt; output_file&quot;)  
@@ -50,7 +50,7 @@ retval = p.wait()
 <pre class="lang-py prettyprint-override"><code>print subprocess.Popen(&quot;echo %s &quot; % user_input, stdout=PIPE).stdout.read()
 </code></pre>
 <p>and imagine that the user enters something &quot;<code>my mama didnt love me &amp;&amp; rm -rf /</code>&quot; which could erase the whole filesystem.</p>
-<h4> Comment 49018699 Jean: </h4>Nice answer/explanation.  How is this answer justifying Python&#39;s motto as described in this article ?  <a href="http://www.fastcompany.com/3026446/the-fall-of-perl-the-webs-most-promising-language" rel="nofollow noreferrer">fastcompany.com/3026446/&hellip;</a>  &quot;Stylistically, Perl and Python have different philosophies. Perl’s best known mottos is &quot; There’s More Than One Way to Do It&quot;. Python is designed to have one obvious way to do it&quot;  Seem like it should be the other way! In Perl I know only two ways to execute a command - using back-tick or <code>open</code>.<br><h4> Comment 53820265 johnthagen: </h4>If using Python 3.5+, use <code>subprocess.run()</code>. <a href="https://docs.python.org/3.5/library/subprocess.html#subprocess.run" rel="nofollow noreferrer">docs.python.org/3.5/library/subprocess.html#subprocess.run</a><br><h4> Comment 94039654 tripleee: </h4>This is arguably the wrong way around. Most people only need <code>subprocess.run()</code> or its older siblings <code>subprocess.check_call()</code> et al. For cases where these do not suffice, see <code>subprocess.Popen()</code>. <code>os.popen()</code> should perhaps not be mentioned at all, or come even after &quot;hack your own fork/exec/spawn code&quot;.<br><h4> Comment 62619897 Evgeni Sergeev: </h4>What one typically needs to know is what is done with the child process&#39;s STDOUT and STDERR, because if they are ignored, under some (quite common) conditions, eventually the child process will issue a system call to write to STDOUT (STDERR too?) that would exceed the output buffer provided for the process by the OS, and the OS will cause it to block until some process reads from that buffer. So, with the currently recommended ways, <code>subprocess.run(..)</code>, what exactly does <i>&quot;This does not capture stdout or stderr by default.&quot;</i> imply? What about <code>subprocess.check_output(..)</code> and STDERR?<br><h4> Comment 80783837 Charlie Parker: </h4>which of the commands you recommended block my script? i.e. if I want to run multiple commands in a <code>for</code> loop how do I do it without it blocking my python script? I don&#39;t care about the output of the command I just want to run lots of them.<br><h4> Comment 130160646 Ben L: </h4>Can you please explain when to use &quot;shell=True&quot; and when not to use it?<br><h4> Comment 130180611 Eli Courtwright: </h4>@BenL: That causes the command to be passed directly to a shell (e.g. bash) as opposed to doing a fork/exec using the underlying system calls.  Using shell might be required because some commands aren&#39;t actually executable programs and are instead shell commands build into your shell (e.g. <code>export</code> in bash is a shell command).  Using a shell is a bad idea if you&#39;re taking untrusted user input, because it&#39;s more likely to cause a security issue.<br>------------------------------------------------------------------ <br><h3> Answer 2251026 newtover: </h3><p>Some hints on detaching the child process from the calling one (starting the child process in background).</p>
+<h4> Jean, Comment 49018699 Score: 55: </h4>Nice answer/explanation.  How is this answer justifying Python&#39;s motto as described in this article ?  <a href="http://www.fastcompany.com/3026446/the-fall-of-perl-the-webs-most-promising-language" rel="nofollow noreferrer">fastcompany.com/3026446/&hellip;</a>  &quot;Stylistically, Perl and Python have different philosophies. Perl’s best known mottos is &quot; There’s More Than One Way to Do It&quot;. Python is designed to have one obvious way to do it&quot;  Seem like it should be the other way! In Perl I know only two ways to execute a command - using back-tick or <code>open</code>.<br><h4> johnthagen, Comment 53820265 Score: 28: </h4>If using Python 3.5+, use <code>subprocess.run()</code>. <a href="https://docs.python.org/3.5/library/subprocess.html#subprocess.run" rel="nofollow noreferrer">docs.python.org/3.5/library/subprocess.html#subprocess.run</a><br><h4> tripleee, Comment 94039654 Score: 14: </h4>This is arguably the wrong way around. Most people only need <code>subprocess.run()</code> or its older siblings <code>subprocess.check_call()</code> et al. For cases where these do not suffice, see <code>subprocess.Popen()</code>. <code>os.popen()</code> should perhaps not be mentioned at all, or come even after &quot;hack your own fork/exec/spawn code&quot;.<br><h4> Evgeni Sergeev, Comment 62619897 Score: 11: </h4>What one typically needs to know is what is done with the child process&#39;s STDOUT and STDERR, because if they are ignored, under some (quite common) conditions, eventually the child process will issue a system call to write to STDOUT (STDERR too?) that would exceed the output buffer provided for the process by the OS, and the OS will cause it to block until some process reads from that buffer. So, with the currently recommended ways, <code>subprocess.run(..)</code>, what exactly does <i>&quot;This does not capture stdout or stderr by default.&quot;</i> imply? What about <code>subprocess.check_output(..)</code> and STDERR?<br><h4> Charlie Parker, Comment 80783837 Score: 0: </h4>which of the commands you recommended block my script? i.e. if I want to run multiple commands in a <code>for</code> loop how do I do it without it blocking my python script? I don&#39;t care about the output of the command I just want to run lots of them.<br><h4> Ben L, Comment 130160646 Score: 0: </h4>Can you please explain when to use &quot;shell=True&quot; and when not to use it?<br><h4> Eli Courtwright, Comment 130180611 Score: 0: </h4>@BenL: That causes the command to be passed directly to a shell (e.g. bash) as opposed to doing a fork/exec using the underlying system calls.  Using shell might be required because some commands aren&#39;t actually executable programs and are instead shell commands build into your shell (e.g. <code>export</code> in bash is a shell command).  Using a shell is a bad idea if you&#39;re taking untrusted user input, because it&#39;s more likely to cause a security issue.<br>------------------------------------------------------------------ <br><h3> newtover, Id: 2251026, Score: 277: </h3><p>Some hints on detaching the child process from the calling one (starting the child process in background).</p>
 
 <p>Suppose you want to start a long task from a CGI script. That is, the child process should live longer than the CGI script execution process.</p>
 
@@ -89,21 +89,21 @@ pid = subprocess.Popen([sys.executable, "longtask.py"],
 </code></pre>
 
 <p>I have not checked the code on other platforms and do not know the reasons of the behaviour on FreeBSD. If anyone knows, please share your ideas. Googling on starting background processes in Python does not shed any light yet.</p>
-<h4> Comment 54511646 Eryk Sun: </h4>The following is incorrect: &quot;[o]n windows (win xp), the parent process will not finish until the longtask.py has finished its work&quot;. The parent will exit normally, but the console window (conhost.exe instance) only closes when the last attached process exits, and the child may have inherited the parent&#39;s console. Setting <code>DETACHED_PROCESS</code> in <code>creationflags</code> avoids this by preventing the child from inheriting or creating a console. If you instead want a new console, use <code>CREATE_NEW_CONSOLE</code> (0x00000010).<br><h4> Comment 54543759 Eryk Sun: </h4>I didn&#39;t mean that executing as a detached process is incorrect. That said, you may need to set the standard handles to files, pipes, or <code>os.devnull</code> because some console programs exit with an error otherwise. Create a new console when you want the child process to interact with the user concurrently with the parent process. It would be confusing to try to do both in a single window.<br><h4> Comment 18336228 jfs: </h4>you might also need CREATE_NEW_PROCESS_GROUP flag. See <a href="http://stackoverflow.com/q/13243807/4279">Popen waiting for child process even when the immediate child has terminated</a><br><h4> Comment 41807947 ubershmekel: </h4>I&#39;m seeing <code>import subprocess as sp;sp.Popen(&#39;calc&#39;)</code> not waiting for the subprocess to complete. It seems the creationflags aren&#39;t necessary. What am I missing?<br><h4> Comment 41828669 newtover: </h4>@ubershmekel, I am not sure what you mean and don&#39;t have a windows installation. If I recall correctly, without the flags you can not close the <code>cmd</code> instance from which you started the <code>calc</code>.<br><h4> Comment 96483004 Charlie Parker: </h4>your answer seems strange to me. I just opened a <code>subprocess.Popen</code> and nothing bad happened (not had to wait). Why exactly do we need to worry about the scenario you are pointing out? I&#39;m skeptical.<br><h4> Comment 2615898 maranas: </h4>i noticed a possible &quot;quirk&quot; with developing py2exe apps in pydev+eclipse. i was able to tell that the main script was not detached because eclipse&#39;s output window was not terminating; even if the script executes to completion it is still waiting for returns. but, when i tried compiling to a py2exe executable, the expected behavior occurs (runs the processes as detached, then quits). i am not sure, but the executable name is not in the process list anymore. this works for all approaches (os.system(&quot;start *&quot;), os.spawnl with os.P_DETACH, subprocs, etc.)<br><h4> Comment 13051553 Alexey Lebedev: </h4>Windows gotcha: even though I spawned process with DETACHED_PROCESS, when I killed my Python daemon all ports opened by it wouldn&#39;t free until all spawned processes terminate. WScript.Shell solved all my problems. Example here: <a href="http://pastebin.com/xGmuvwSx" rel="nofollow noreferrer">pastebin.com/xGmuvwSx</a><br><h4> Comment 85343139 Dr_Zaszuś: </h4><code>stdout=subprocess.PIPE</code> will make your code hang up if you have long output from a child. For more details see <a href="https://thraxil.org/users/anders/posts/2008/03/13/Subprocess-Hanging-PIPE-is-your-enemy/" rel="nofollow noreferrer">thraxil.org/users/anders/posts/2008/03/13/&hellip;</a><br><h4> Comment 41897323 ubershmekel: </h4>I&#39;m on Windows 8.1 and <code>calc</code> seems to survive the closing of <code>python</code>.<br><h4> Comment 48222496 SuperBiasedMan: </h4>Is there any significance to using &#39;0x00000008&#39;? Is that a specific value that has to be used or one of multiple options?<br>------------------------------------------------------------------ <br><h3> Answer 89237 nimish: </h3><pre class="lang-py prettyprint-override"><code>import os
+<h4> Eryk Sun, Comment 54511646 Score: 10: </h4>The following is incorrect: &quot;[o]n windows (win xp), the parent process will not finish until the longtask.py has finished its work&quot;. The parent will exit normally, but the console window (conhost.exe instance) only closes when the last attached process exits, and the child may have inherited the parent&#39;s console. Setting <code>DETACHED_PROCESS</code> in <code>creationflags</code> avoids this by preventing the child from inheriting or creating a console. If you instead want a new console, use <code>CREATE_NEW_CONSOLE</code> (0x00000010).<br><h4> Eryk Sun, Comment 54543759 Score: 3: </h4>I didn&#39;t mean that executing as a detached process is incorrect. That said, you may need to set the standard handles to files, pipes, or <code>os.devnull</code> because some console programs exit with an error otherwise. Create a new console when you want the child process to interact with the user concurrently with the parent process. It would be confusing to try to do both in a single window.<br><h4> jfs, Comment 18336228 Score: 3: </h4>you might also need CREATE_NEW_PROCESS_GROUP flag. See <a href="http://stackoverflow.com/q/13243807/4279">Popen waiting for child process even when the immediate child has terminated</a><br><h4> ubershmekel, Comment 41807947 Score: 2: </h4>I&#39;m seeing <code>import subprocess as sp;sp.Popen(&#39;calc&#39;)</code> not waiting for the subprocess to complete. It seems the creationflags aren&#39;t necessary. What am I missing?<br><h4> newtover, Comment 41828669 Score: 1: </h4>@ubershmekel, I am not sure what you mean and don&#39;t have a windows installation. If I recall correctly, without the flags you can not close the <code>cmd</code> instance from which you started the <code>calc</code>.<br><h4> Charlie Parker, Comment 96483004 Score: 0: </h4>your answer seems strange to me. I just opened a <code>subprocess.Popen</code> and nothing bad happened (not had to wait). Why exactly do we need to worry about the scenario you are pointing out? I&#39;m skeptical.<br><h4> maranas, Comment 2615898 Score: 0: </h4>i noticed a possible &quot;quirk&quot; with developing py2exe apps in pydev+eclipse. i was able to tell that the main script was not detached because eclipse&#39;s output window was not terminating; even if the script executes to completion it is still waiting for returns. but, when i tried compiling to a py2exe executable, the expected behavior occurs (runs the processes as detached, then quits). i am not sure, but the executable name is not in the process list anymore. this works for all approaches (os.system(&quot;start *&quot;), os.spawnl with os.P_DETACH, subprocs, etc.)<br><h4> Alexey Lebedev, Comment 13051553 Score: 0: </h4>Windows gotcha: even though I spawned process with DETACHED_PROCESS, when I killed my Python daemon all ports opened by it wouldn&#39;t free until all spawned processes terminate. WScript.Shell solved all my problems. Example here: <a href="http://pastebin.com/xGmuvwSx" rel="nofollow noreferrer">pastebin.com/xGmuvwSx</a><br><h4> Dr_Zaszuś, Comment 85343139 Score: 0: </h4><code>stdout=subprocess.PIPE</code> will make your code hang up if you have long output from a child. For more details see <a href="https://thraxil.org/users/anders/posts/2008/03/13/Subprocess-Hanging-PIPE-is-your-enemy/" rel="nofollow noreferrer">thraxil.org/users/anders/posts/2008/03/13/&hellip;</a><br><h4> ubershmekel, Comment 41897323 Score: 0: </h4>I&#39;m on Windows 8.1 and <code>calc</code> seems to survive the closing of <code>python</code>.<br><h4> SuperBiasedMan, Comment 48222496 Score: 0: </h4>Is there any significance to using &#39;0x00000008&#39;? Is that a specific value that has to be used or one of multiple options?<br>------------------------------------------------------------------ <br><h3> nimish, Id: 89237, Score: 225: </h3><pre class="lang-py prettyprint-override"><code>import os
 os.system(&quot;your command&quot;)
 </code></pre>
 <p>Note that this is dangerous, since the command isn't cleaned. See the documentation of <a href="https://docs.python.org/3/library/os.html" rel="noreferrer">the <code>os</code></a> and <a href="https://docs.python.org/3/library/sys.html" rel="noreferrer"><code>sys</code></a> modules. There are a bunch of functions (<a href="https://docs.python.org/3/library/os.html#os.execl" rel="noreferrer"><code>exec*</code></a> and <a href="https://docs.python.org/3/library/os.html#os.spawnl" rel="noreferrer"><code>spawn*</code></a>) that will do similar things.</p>
-<h4> Comment 88457934 nimish: </h4>No idea what I meant nearly a decade ago (check the date!), but if I had to guess, it would be that there&#39;s no validation done.<br><h4> Comment 94038788 tripleee: </h4>This should now point to <code>subprocess</code> as a slightly more versatile and portable solution. Running external commands is of course inherently unportable (you have to make sure the command is available on every architecture you need to support) and passing user input as an external command is inherently unsafe.<br><h4> Comment 133983043 Nathan B: </h4>And how do you get the output?<br><h4> Comment 134557176 user3064538: </h4>@NathanB by using <code>result = subprocess.run()</code> instead and then doing <code>result.stdout</code>. It might also be possible by <a href="https://stackoverflow.com/a/40417352">intercepting stdout</a><br>------------------------------------------------------------------ <br><h3> Answer 89255 sirwart: </h3><p>I'd recommend using the <a href="http://docs.python.org/library/subprocess.html" rel="noreferrer">subprocess</a> module instead of os.system because it does shell escaping for you and is therefore much safer.</p>
+<h4> nimish, Comment 88457934 Score: 20: </h4>No idea what I meant nearly a decade ago (check the date!), but if I had to guess, it would be that there&#39;s no validation done.<br><h4> tripleee, Comment 94038788 Score: 4: </h4>This should now point to <code>subprocess</code> as a slightly more versatile and portable solution. Running external commands is of course inherently unportable (you have to make sure the command is available on every architecture you need to support) and passing user input as an external command is inherently unsafe.<br><h4> Nathan B, Comment 133983043 Score: 0: </h4>And how do you get the output?<br><h4> user3064538, Comment 134557176 Score: 0: </h4>@NathanB by using <code>result = subprocess.run()</code> instead and then doing <code>result.stdout</code>. It might also be possible by <a href="https://stackoverflow.com/a/40417352">intercepting stdout</a><br>------------------------------------------------------------------ <br><h3> sirwart, Id: 89255, Score: 176: </h3><p>I'd recommend using the <a href="http://docs.python.org/library/subprocess.html" rel="noreferrer">subprocess</a> module instead of os.system because it does shell escaping for you and is therefore much safer.</p>
 
 <pre><code>subprocess.call(['ping', 'localhost'])
 </code></pre>
-<h4> Comment 94078666 Lie Ryan: </h4>This is incorrect: &quot;<b>it does shell escaping for you and is therefore much safer</b>&quot;. subprocess doesn&#39;t do shell escaping, subprocess doesn&#39;t pass your command through the shell, so there&#39;s no need to shell escape.<br><h4> Comment 91805349 Daniel F: </h4>If you want to <b>create a list out of a command with parameters</b>, a list which can be used with <code>subprocess</code> when <code>shell=False</code>, then use <code>shlex.split</code> for an easy way to do this <a href="https://docs.python.org/2/library/shlex.html#shlex.split" rel="nofollow noreferrer">docs.python.org/2/library/shlex.html#shlex.split</a> (it&#39;s the recommended way according to the docs <a href="https://docs.python.org/2/library/subprocess.html#popen-constructor" rel="nofollow noreferrer">docs.python.org/2/library/subprocess.html#popen-constructor</a>)<br>------------------------------------------------------------------ <br><h3> Answer 89238 Alexandra Franks: </h3><pre><code>import os
+<h4> Lie Ryan, Comment 94078666 Score: 14: </h4>This is incorrect: &quot;<b>it does shell escaping for you and is therefore much safer</b>&quot;. subprocess doesn&#39;t do shell escaping, subprocess doesn&#39;t pass your command through the shell, so there&#39;s no need to shell escape.<br><h4> Daniel F, Comment 91805349 Score: 0: </h4>If you want to <b>create a list out of a command with parameters</b>, a list which can be used with <code>subprocess</code> when <code>shell=False</code>, then use <code>shlex.split</code> for an easy way to do this <a href="https://docs.python.org/2/library/shlex.html#shlex.split" rel="nofollow noreferrer">docs.python.org/2/library/shlex.html#shlex.split</a> (it&#39;s the recommended way according to the docs <a href="https://docs.python.org/2/library/subprocess.html#popen-constructor" rel="nofollow noreferrer">docs.python.org/2/library/subprocess.html#popen-constructor</a>)<br>------------------------------------------------------------------ <br><h3> Alexandra Franks, Id: 89238, Score: 172: </h3><pre><code>import os
 cmd = 'ls -al'
 os.system(cmd)
 </code></pre>
 
 <p>If you want to return the results of the command, you can use <a href="https://docs.python.org/2/library/os.html#os.popen" rel="noreferrer"><code>os.popen</code></a>. However, this is deprecated since version 2.6 in favor of the <a href="https://docs.python.org/2/library/subprocess.html#module-subprocess" rel="noreferrer">subprocess module</a>, which other answers have covered well.</p>
-<h4> Comment 39233700 tew: </h4>popen <a href="https://docs.python.org/2/library/os.html#os.popen" rel="nofollow noreferrer">is deprecated</a> in favor of <a href="https://docs.python.org/2/library/subprocess.html" rel="nofollow noreferrer">subprocess</a>.<br><h4> Comment 81287939 Stefan Gruenwald: </h4>You can also save your result with the os.system call, since it works like the UNIX shell itself, like for example os.system(&#39;ls -l &gt; test2.txt&#39;)<br>------------------------------------------------------------------ <br><h3> Answer 40319875 Tom Fuller: </h3><p>There are lots of different libraries which allow you to call external commands with Python. For each library I've given a description and shown an example of calling an external command. The command I used as the example is <code>ls -l</code> (list all files). If you want to find out more about any of the libraries I've listed and linked the documentation for each of them.</p>
+<h4> tew, Comment 39233700 Score: 16: </h4>popen <a href="https://docs.python.org/2/library/os.html#os.popen" rel="nofollow noreferrer">is deprecated</a> in favor of <a href="https://docs.python.org/2/library/subprocess.html" rel="nofollow noreferrer">subprocess</a>.<br><h4> Stefan Gruenwald, Comment 81287939 Score: 0: </h4>You can also save your result with the os.system call, since it works like the UNIX shell itself, like for example os.system(&#39;ls -l &gt; test2.txt&#39;)<br>------------------------------------------------------------------ <br><h3> Tom Fuller, Id: 40319875, Score: 135: </h3><p>There are lots of different libraries which allow you to call external commands with Python. For each library I've given a description and shown an example of calling an external command. The command I used as the example is <code>ls -l</code> (list all files). If you want to find out more about any of the libraries I've listed and linked the documentation for each of them.</p>
 <h3>Sources</h3>
 <ul>
 <li>subprocess: <a href="https://docs.python.org/3.5/library/subprocess.html" rel="noreferrer">https://docs.python.org/3.5/library/subprocess.html</a></li>
@@ -159,7 +159,7 @@ r.std_out # Get output
 </code></pre>
 <h3><em>commands</em></h3>
 <p><code>commands</code> contains wrapper functions for <code>os.popen</code>, but it has been removed from Python 3 since <code>subprocess</code> is a better alternative.</p>
-<h4> Comment 135182929 innisfree: </h4>I think it should be <code>ls_cmd = plumbum.local[&quot;ls -l&quot;]</code> # Get command<br>------------------------------------------------------------------ <br><h3> Answer 15954964 Honza Javorek: </h3><h3>With the standard library</h3>
+<h4> innisfree, Comment 135182929 Score: 0: </h4>I think it should be <code>ls_cmd = plumbum.local[&quot;ls -l&quot;]</code> # Get command<br>------------------------------------------------------------------ <br><h3> Honza Javorek, Id: 15954964, Score: 88: </h3><h3>With the standard library</h3>
 
 <p>Use the <a href="https://docs.python.org/3/library/subprocess.html#subprocess.run" rel="noreferrer">subprocess module</a> (Python 3):</p>
 
@@ -195,7 +195,7 @@ print(ifconfig('wlan0'))
 </code></pre>
 
 <p>However, <code>sh</code> dropped Windows support, so it's not as awesome as it used to be. Install by <code>pip install sh</code>.</p>
------------------------------------------------------------------- <br><h3> Answer 9676642 Jorge E. Cardona: </h3><p>I always use <code>fabric</code> for doing these things. Here is a demo code:</p>
+------------------------------------------------------------------ <br><h3> Jorge E. Cardona, Id: 9676642, Score: 86: </h3><p>I always use <code>fabric</code> for doing these things. Here is a demo code:</p>
 <pre><code>from fabric.operations import local
 result = local('ls', capture=True)
 print &quot;Content:/n%s&quot; % (result, )
@@ -207,7 +207,7 @@ print vgdisplay()
 print vgdisplay('-v')
 print vgdisplay(v=True)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 3879406 athanassis: </h3><p>Check the "pexpect" Python library, too.</p>
+------------------------------------------------------------------ <br><h3> athanassis, Id: 3879406, Score: 84: </h3><p>Check the "pexpect" Python library, too.</p>
 
 <p>It allows for interactive controlling of external programs/commands, even ssh, ftp, telnet, etc. You can just type something like:</p>
 
@@ -219,7 +219,7 @@ child.sendline('anonymous')
 
 child.expect('(?i)password')
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 5824565 Facundo Casco: </h3><p>If you need the output from the command you are calling,
+------------------------------------------------------------------ <br><h3> Facundo Casco, Id: 5824565, Score: 83: </h3><p>If you need the output from the command you are calling,
 then you can use <a href="https://docs.python.org/3.6/library/subprocess.html#subprocess.check_output" rel="noreferrer">subprocess.check_output</a> (Python 2.7+).</p>
 
 <pre><code>&gt;&gt;&gt; subprocess.check_output(["ls", "-l", "/dev/null"])
@@ -231,7 +231,7 @@ then you can use <a href="https://docs.python.org/3.6/library/subprocess.html#su
 <blockquote>
   <p>If shell is <code>True</code>, the specified command will be executed through the shell. This can be useful if you are using Python primarily for the enhanced control flow it offers over most system shells and still want convenient access to other shell features such as shell pipes, filename wildcards, environment variable expansion, and expansion of ~ to a user’s home directory. However, note that Python itself offers implementations of many shell-like features (in particular, <code>glob</code>, <code>fnmatch</code>, <code>os.walk()</code>, <code>os.path.expandvars()</code>, <code>os.path.expanduser()</code>, and <code>shutil</code>).</p>
 </blockquote>
-<h4> Comment 84050970 Bruno Bronosky: </h4>Note that <code>check_output</code> requires a list rather than a string. If you don&#39;t rely on quoted spaces to make your call valid, the simplest, most readable way to do this is <code>subprocess.check_output(&quot;ls -l &#47;dev&#47;null&quot;.split())</code>.<br><h4> Comment 120034000 tripleee: </h4>Like the answer vaguely mentions, and many other answers on this page explain in more detail, you can pass a list, or with <code>shell=True</code> a single string which the shell then takes care of parsing and executing. Using plain <code>.split()</code> is fine under the circumstances you mention, but beginners typically don&#39;t understand the nuances; you are probably better off recommending <code>shlex.split()</code> which does handle quoting and backslash escapes correctly.<br>------------------------------------------------------------------ <br><h3> Answer 46815111 Russia Must Remove Putin: </h3><blockquote>
+<h4> Bruno Bronosky, Comment 84050970 Score: 2: </h4>Note that <code>check_output</code> requires a list rather than a string. If you don&#39;t rely on quoted spaces to make your call valid, the simplest, most readable way to do this is <code>subprocess.check_output(&quot;ls -l &#47;dev&#47;null&quot;.split())</code>.<br><h4> tripleee, Comment 120034000 Score: 0: </h4>Like the answer vaguely mentions, and many other answers on this page explain in more detail, you can pass a list, or with <code>shell=True</code> a single string which the shell then takes care of parsing and executing. Using plain <code>.split()</code> is fine under the circumstances you mention, but beginners typically don&#39;t understand the nuances; you are probably better off recommending <code>shlex.split()</code> which does handle quoting and backslash escapes correctly.<br>------------------------------------------------------------------ <br><h3> Russia Must Remove Putin, Id: 46815111, Score: 57: </h3><blockquote>
 <h2>How to execute a program or call a system command from Python</h2>
 </blockquote>
 <p>Simple, use <code>subprocess.run</code>, which returns a <code>CompletedProcess</code> object:</p>
@@ -347,7 +347,7 @@ the class uses the Windows CreateProcess() function. The arguments to
 Popen are as follows.</p>
 </blockquote>
 <p>Understanding the remaining documentation on <code>Popen</code> will be left as an exercise for the reader.</p>
-<h4> Comment 92598860 James Hirschorn: </h4>A simple example of two-way communication between a primary process and a subprocess can be found here: <a href="https://stackoverflow.com/a/52841475/1349673">stackoverflow.com/a/52841475/1349673</a><br>------------------------------------------------------------------ <br><h3> Answer 13402722 Joe: </h3><h1>Update:</h1>
+<h4> James Hirschorn, Comment 92598860 Score: 1: </h4>A simple example of two-way communication between a primary process and a subprocess can be found here: <a href="https://stackoverflow.com/a/52841475/1349673">stackoverflow.com/a/52841475/1349673</a><br>------------------------------------------------------------------ <br><h3> Joe, Id: 13402722, Score: 69: </h3><h1>Update:</h1>
 
 <p><code>subprocess.run</code> is the recommended approach <a href="https://docs.python.org/3.6/whatsnew/3.5.html#whatsnew-subprocess" rel="noreferrer">as of Python 3.5</a> if your code does not need to maintain compatibility with earlier Python versions. It's more consistent and offers similar ease-of-use as Envoy. (Piping isn't as straightforward though. See <a href="https://stackoverflow.com/questions/7389662/link-several-popen-commands-with-pipes">this question for how</a>.)</p>
 
@@ -402,7 +402,7 @@ stdout=b'crw-rw-rw- 1 root root 1, 3 Jan 23 16:23 /dev/null\n')
 &gt;&gt;&gt; r.history
 [&lt;Response 'uptime'&gt;]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 13106558 Usman Khan: </h3><p>This is how I run my commands. This code has everything you need pretty much</p>
+------------------------------------------------------------------ <br><h3> Usman Khan, Id: 13106558, Score: 66: </h3><p>This is how I run my commands. This code has everything you need pretty much</p>
 
 <pre><code>from subprocess import Popen, PIPE
 cmd = "ls -l ~/"
@@ -411,14 +411,14 @@ out, err = p.communicate()
 print "Return code: ", p.returncode
 print out.rstrip(), err.rstrip()
 </code></pre>
-<h4> Comment 34789609 Adam Matan: </h4>I think it&#39;s acceptable for hard-coded commands, if it increases readability.<br>------------------------------------------------------------------ <br><h3> Answer 89262 Ben Hoffstein: </h3><p>Use <em><a href="https://docs.python.org/2/library/subprocess.html" rel="noreferrer">subprocess</a></em>.</p>
+<h4> Adam Matan, Comment 34789609 Score: 4: </h4>I think it&#39;s acceptable for hard-coded commands, if it increases readability.<br>------------------------------------------------------------------ <br><h3> Ben Hoffstein, Id: 89262, Score: 55: </h3><p>Use <em><a href="https://docs.python.org/2/library/subprocess.html" rel="noreferrer">subprocess</a></em>.</p>
 
 <p>...or for a very simple command:</p>
 
 <pre><code>import os
 os.system('cat testfile')
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 64341833 fameman: </h3><p><em>As of <strong>Python 3.7.0 released on June 27th 2018 (<a href="https://docs.python.org/3/whatsnew/3.7.html" rel="noreferrer">https://docs.python.org/3/whatsnew/3.7.html</a>)</strong>, you can achieve your desired result in the most powerful while equally simple way. This answer intends to show you the essential summary of various options in a short manner. For in-depth answers, please see the other ones.</em></p>
+------------------------------------------------------------------ <br><h3> fameman, Id: 64341833, Score: 47: </h3><p><em>As of <strong>Python 3.7.0 released on June 27th 2018 (<a href="https://docs.python.org/3/whatsnew/3.7.html" rel="noreferrer">https://docs.python.org/3/whatsnew/3.7.html</a>)</strong>, you can achieve your desired result in the most powerful while equally simple way. This answer intends to show you the essential summary of various options in a short manner. For in-depth answers, please see the other ones.</em></p>
 <hr />
 <h1>TL;DR in 2021</h1>
 <p>The big advantage of <code>os.system(...)</code> was its simplicity. <code>subprocess</code> is better and still easy to use, especially as of <strong>Python 3.5</strong>.</p>
@@ -497,10 +497,10 @@ subprocess.run(shlex.split(&quot;ls -a&quot;))
 <p>TypeError: <strong>init</strong>() got an unexpected keyword argument [...]</p>
 </blockquote>
 <p><em>You're likely using a version of Python older than 3.7.0; update it to the most recent one available. Otherwise there are other answers in this Stack Overflow post showing you older alternative solutions.</em></p>
-<h4> Comment 118133803 fameman: </h4>Summing up, <code>os.system(...)</code> is valid to use, indeed. But as soon as you&#39;re writing more than a quick python helper script, I&#39;d recommend you to go for subprocess.run without <code>shell=True</code>. For more information about the drawbacks of os.system, I&#39;d like to propose you a read through this SO answer: <a href="https://stackoverflow.com/a/44731082/6685358">stackoverflow.com/a/44731082/6685358</a><br><h4> Comment 118105684 reducing activity: </h4>&quot;The big advantage of os.system(...) was its simplicity. subprocess is better&quot; - how subprocess is better? I am happily using os.system, not sure how switching to subprocess and remembering extra <code>shell=True</code> benefits me. What kind of thing is better in subprocess?<br><h4> Comment 118133731 fameman: </h4>You&#39;re right in that <code>os.system(...)</code> is a reasonable choice for executing commands in terms of simple &quot;blind&quot; execution. However, the use cases are rather limited - as soon as you want to capture the output, you have to use a whole other library and then you start having both - subprocess and os for similar use cases in your code. I prefer to keep the code clean and use only one of them.  Second, and I would have put that section at the top but the TL;DR has to answer the question <b>exactly</b>, you should <b>not</b> use <code>shell=True</code>, but instead what I&#39;ve written in the <code>Preferred Way</code> section.<br><h4> Comment 118133786 fameman: </h4>The problem with <code>os.system(...)</code> and <code>shell=True</code> is that you&#39;re spawning a new shell process, just to execute your command. This means, you have to do manual escaping which is not as simple as you might think - especially when targeting both POSIX and Windows. For user-supplied input, this is a no-go (just imagine the user entered something with <code>&quot;</code> quotes - you&#39;d have to escape them as well). Also, the shell process itself could load code you don&#39;t need - not only does it delay the program, but it could also lead to unexpected side effects, ending with a wrong return code.<br>------------------------------------------------------------------ <br><h3> Answer 89304 Martin W: </h3><p><code>os.system</code> is OK, but kind of dated.  It's also not very secure.  Instead, try <code>subprocess</code>.  <code>subprocess</code> does not call sh directly and is therefore more secure than <code>os.system</code>.</p>
+<h4> fameman, Comment 118133803 Score: 2: </h4>Summing up, <code>os.system(...)</code> is valid to use, indeed. But as soon as you&#39;re writing more than a quick python helper script, I&#39;d recommend you to go for subprocess.run without <code>shell=True</code>. For more information about the drawbacks of os.system, I&#39;d like to propose you a read through this SO answer: <a href="https://stackoverflow.com/a/44731082/6685358">stackoverflow.com/a/44731082/6685358</a><br><h4> reducing activity, Comment 118105684 Score: 1: </h4>&quot;The big advantage of os.system(...) was its simplicity. subprocess is better&quot; - how subprocess is better? I am happily using os.system, not sure how switching to subprocess and remembering extra <code>shell=True</code> benefits me. What kind of thing is better in subprocess?<br><h4> fameman, Comment 118133731 Score: 1: </h4>You&#39;re right in that <code>os.system(...)</code> is a reasonable choice for executing commands in terms of simple &quot;blind&quot; execution. However, the use cases are rather limited - as soon as you want to capture the output, you have to use a whole other library and then you start having both - subprocess and os for similar use cases in your code. I prefer to keep the code clean and use only one of them.  Second, and I would have put that section at the top but the TL;DR has to answer the question <b>exactly</b>, you should <b>not</b> use <code>shell=True</code>, but instead what I&#39;ve written in the <code>Preferred Way</code> section.<br><h4> fameman, Comment 118133786 Score: 1: </h4>The problem with <code>os.system(...)</code> and <code>shell=True</code> is that you&#39;re spawning a new shell process, just to execute your command. This means, you have to do manual escaping which is not as simple as you might think - especially when targeting both POSIX and Windows. For user-supplied input, this is a no-go (just imagine the user entered something with <code>&quot;</code> quotes - you&#39;d have to escape them as well). Also, the shell process itself could load code you don&#39;t need - not only does it delay the program, but it could also lead to unexpected side effects, ending with a wrong return code.<br>------------------------------------------------------------------ <br><h3> Martin W, Id: 89304, Score: 43: </h3><p><code>os.system</code> is OK, but kind of dated.  It's also not very secure.  Instead, try <code>subprocess</code>.  <code>subprocess</code> does not call sh directly and is therefore more secure than <code>os.system</code>.</p>
 
 <p>Get more information <a href="https://docs.python.org/library/subprocess.html" rel="noreferrer">here</a>.</p>
-<h4> Comment 94039191 tripleee: </h4>While I agree with the overall recommendation, <code>subprocess</code> does not remove all of the security problems, and has some pesky issues of its own.<br>------------------------------------------------------------------ <br><h3> Answer 26305089 stuckintheshuck: </h3><p>There is also <a href="http://plumbum.readthedocs.org/en/latest/">Plumbum</a></p>
+<h4> tripleee, Comment 94039191 Score: 3: </h4>While I agree with the overall recommendation, <code>subprocess</code> does not remove all of the security problems, and has some pesky issues of its own.<br>------------------------------------------------------------------ <br><h3> stuckintheshuck, Id: 26305089, Score: 40: </h3><p>There is also <a href="http://plumbum.readthedocs.org/en/latest/">Plumbum</a></p>
 
 <pre><code>&gt;&gt;&gt; from plumbum import local
 &gt;&gt;&gt; ls = local["ls"]
@@ -512,7 +512,7 @@ u'build.py\ndist\ndocs\nLICENSE\nplumbum\nREADME.rst\nsetup.py\ntests\ntodo.txt\
 &gt;&gt;&gt; notepad()                                   # Notepad window pops up
 u''                                             # Notepad window is closed by user, command returns
 </code></pre>
-<h4> Comment 118415297 Peter Mortensen: </h4>An explanation would be in order.<br>------------------------------------------------------------------ <br><h3> Answer 31114625 Niranga: </h3><p>Use:</p>
+<h4> Peter Mortensen, Comment 118415297 Score: 0: </h4>An explanation would be in order.<br>------------------------------------------------------------------ <br><h3> Niranga, Id: 31114625, Score: 33: </h3><p>Use:</p>
 
 <pre><code>import os
 
@@ -524,13 +524,13 @@ os.system(cmd)
 <p><strong>os - This module provides a portable way of using operating system-dependent functionality.</strong></p>
 
 <p>For the more <code>os</code> functions, <a href="https://docs.python.org/2/library/os.html" rel="noreferrer">here</a> is the documentation.</p>
-<h4> Comment 56118340 Corey Goldberg: </h4>it&#39;s also deprecated.  use subprocess<br>------------------------------------------------------------------ <br><h3> Answer 50101887 Samadi Salahedine: </h3><p>It can be this simple:</p>
+<h4> Corey Goldberg, Comment 56118340 Score: 2: </h4>it&#39;s also deprecated.  use subprocess<br>------------------------------------------------------------------ <br><h3> Samadi Salahedine, Id: 50101887, Score: 33: </h3><p>It can be this simple:</p>
 
 <pre><code>import os
 cmd = "your command"
 os.system(cmd)
 </code></pre>
-<h4> Comment 94038650 tripleee: </h4>This fails to point out the drawbacks, which are explained in much more detail in <a href="https://www.python.org/dev/peps/pep-0324/" rel="nofollow noreferrer">PEP-324</a>. The documentation for <code>os.system</code> explicitly recommends avoiding it in favor of <code>subprocess</code>.<br>------------------------------------------------------------------ <br><h3> Answer 2030768 Atinc Delican: </h3><p>There is another difference here which is not mentioned previously.</p>
+<h4> tripleee, Comment 94038650 Score: 2: </h4>This fails to point out the drawbacks, which are explained in much more detail in <a href="https://www.python.org/dev/peps/pep-0324/" rel="nofollow noreferrer">PEP-324</a>. The documentation for <code>os.system</code> explicitly recommends avoiding it in favor of <code>subprocess</code>.<br>------------------------------------------------------------------ <br><h3> Atinc Delican, Id: 2030768, Score: 27: </h3><p>There is another difference here which is not mentioned previously.</p>
 
 <p><code>subprocess.Popen</code> executes the &lt;command> as a subprocess. In my case, I need to execute file &lt;a> which needs to communicate with another program, &lt;b>. </p>
 
@@ -543,9 +543,9 @@ Everything is normal when I run both from the terminal.</p>
 <p>If you try <code>os.system("kwrite")</code>, program flow freezes until the user closes kwrite. To overcome that I tried instead <code>os.system(konsole -e kwrite)</code>. This time program continued to flow, but kwrite became the subprocess of the console.</p>
 
 <p>Anyone runs the kwrite not being a subprocess (i.e. in the system monitor it must appear at the leftmost edge of the tree).</p>
-<h4> Comment 88350869 Peter Mortensen: </h4>What do you mean by <i>&quot;Anyone runs the kwrite not being a subprocess&quot;</i>?<br><h4> Comment 120034031 tripleee: </h4>It is baffling indeed that <code>subprocess</code> runs a subprocess.<br>------------------------------------------------------------------ <br><h3> Answer 10988365 Saurabh Bangad: </h3><p><code>os.system</code> does not allow you to store results, so if you want to store results in some list or something, a <code>subprocess.call</code> works.</p>
------------------------------------------------------------------- <br><h3> Answer 4728086 cdunn2001: </h3><p><code>subprocess.check_call</code> is convenient if you don't want to test return values. It throws an exception on any error.</p>
------------------------------------------------------------------- <br><h3> Answer 23391049 Emil Stenstr&#246;m: </h3><p>I tend to use <a href="https://docs.python.org/2/library/subprocess.html" rel="noreferrer">subprocess</a> together with <a href="https://docs.python.org/2/library/shlex.html" rel="noreferrer">shlex</a> (to handle escaping of quoted strings):</p>
+<h4> Peter Mortensen, Comment 88350869 Score: 1: </h4>What do you mean by <i>&quot;Anyone runs the kwrite not being a subprocess&quot;</i>?<br><h4> tripleee, Comment 120034031 Score: 0: </h4>It is baffling indeed that <code>subprocess</code> runs a subprocess.<br>------------------------------------------------------------------ <br><h3> Saurabh Bangad, Id: 10988365, Score: 27: </h3><p><code>os.system</code> does not allow you to store results, so if you want to store results in some list or something, a <code>subprocess.call</code> works.</p>
+------------------------------------------------------------------ <br><h3> cdunn2001, Id: 4728086, Score: 25: </h3><p><code>subprocess.check_call</code> is convenient if you don't want to test return values. It throws an exception on any error.</p>
+------------------------------------------------------------------ <br><h3> Emil Stenstr&#246;m, Id: 23391049, Score: 25: </h3><p>I tend to use <a href="https://docs.python.org/2/library/subprocess.html" rel="noreferrer">subprocess</a> together with <a href="https://docs.python.org/2/library/shlex.html" rel="noreferrer">shlex</a> (to handle escaping of quoted strings):</p>
 
 <pre><code>&gt;&gt;&gt; import subprocess, shlex
 &gt;&gt;&gt; command = 'ls -l "/your/path/with spaces/"'
@@ -554,7 +554,7 @@ Everything is normal when I run both from the terminal.</p>
 ["ls", "-l", "/your/path/with spaces/"]
 &gt;&gt;&gt; subprocess.call(call_params)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 40824514 Yuval Atzmon: </h3><p>Under Linux, in case you would like to call an external command that will execute independently (will keep running after the Python script terminates), you can use a simple queue as <a href="http://vicerveza.homeunix.net/%7Eviric/soft/ts/" rel="noreferrer">task spooler</a> or the <a href="https://linux.die.net/man/1/at" rel="noreferrer">at</a> command.</p>
+------------------------------------------------------------------ <br><h3> Yuval Atzmon, Id: 40824514, Score: 20: </h3><p>Under Linux, in case you would like to call an external command that will execute independently (will keep running after the Python script terminates), you can use a simple queue as <a href="http://vicerveza.homeunix.net/%7Eviric/soft/ts/" rel="noreferrer">task spooler</a> or the <a href="https://linux.die.net/man/1/at" rel="noreferrer">at</a> command.</p>
 <p>An example with task spooler:</p>
 <pre><code>import os
 os.system('ts &lt;your-command&gt;')
@@ -567,11 +567,11 @@ os.system('ts &lt;your-command&gt;')
 <li><p>Installing <code>ts</code> doesn't requires admin privileges. You can download and compile it from source with a simple <code>make</code>, add it to your path and you're done.</p>
 </li>
 </ol>
-<h4> Comment 94039329 tripleee: </h4><code>ts</code> is not standard on any distro I know of, though the pointer to <code>at</code> is mildly useful. You should probably also mention <code>batch</code>. As elsewhere, the <code>os.system()</code> recommendation should probably at least mention that <code>subprocess</code> is its recommended replacement.<br>------------------------------------------------------------------ <br><h3> Answer 23416345 houqp: </h3><p>I wrote a library for this, <em><a href="https://github.com/houqp/shell.py" rel="nofollow noreferrer">shell.py</a></em>.</p>
+<h4> tripleee, Comment 94039329 Score: 1: </h4><code>ts</code> is not standard on any distro I know of, though the pointer to <code>at</code> is mildly useful. You should probably also mention <code>batch</code>. As elsewhere, the <code>os.system()</code> recommendation should probably at least mention that <code>subprocess</code> is its recommended replacement.<br>------------------------------------------------------------------ <br><h3> houqp, Id: 23416345, Score: 21: </h3><p>I wrote a library for this, <em><a href="https://github.com/houqp/shell.py" rel="nofollow noreferrer">shell.py</a></em>.</p>
 <p>It's basically a wrapper for popen and shlex for now. It also supports piping commands, so you can chain commands easier in Python. So you can do things like:</p>
 <pre><code>ex('echo hello shell.py') | &quot;awk '{print $2}'&quot;
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 52339862 Valery Ramusik: </h3><p><strong><a href="http://www.pyinvoke.org/" rel="noreferrer">Invoke</a></strong> is a Python (2.7 and 3.4+) task execution tool and library. It provides a clean, high-level API for running shell commands:</p>
+------------------------------------------------------------------ <br><h3> Valery Ramusik, Id: 52339862, Score: 20: </h3><p><strong><a href="http://www.pyinvoke.org/" rel="noreferrer">Invoke</a></strong> is a Python (2.7 and 3.4+) task execution tool and library. It provides a clean, high-level API for running shell commands:</p>
 <pre><code>&gt;&gt;&gt; from invoke import run
 &gt;&gt;&gt; cmd = &quot;pip install -r requirements.txt&quot;
 &gt;&gt;&gt; result = run(cmd, hide=True, warn=True)
@@ -580,7 +580,7 @@ True
 &gt;&gt;&gt; print(result.stdout.splitlines()[-1])
 Successfully installed invocations-0.13.0 pep8-1.5.7 spec-1.3.1
 </code></pre>
-<h4> Comment 96968474 user9074332: </h4>This is a great library.  I was trying to explain it to a coworker the other day adn described it like this: <code>invoke</code> is to <code>subprocess</code> as <code>requests</code> is to <code>urllib3</code>.<br>------------------------------------------------------------------ <br><h3> Answer 37877635 Swadhikar: </h3><p>In Windows you can just import the <code>subprocess</code> module and run external commands by calling <code>subprocess.Popen()</code>, <code>subprocess.Popen().communicate()</code> and <code>subprocess.Popen().wait()</code> as below:</p>
+<h4> user9074332, Comment 96968474 Score: 0: </h4>This is a great library.  I was trying to explain it to a coworker the other day adn described it like this: <code>invoke</code> is to <code>subprocess</code> as <code>requests</code> is to <code>urllib3</code>.<br>------------------------------------------------------------------ <br><h3> Swadhikar, Id: 37877635, Score: 19: </h3><p>In Windows you can just import the <code>subprocess</code> module and run external commands by calling <code>subprocess.Popen()</code>, <code>subprocess.Popen().communicate()</code> and <code>subprocess.Popen().wait()</code> as below:</p>
 
 <pre><code># Python script to run a command line
 import subprocess
@@ -611,7 +611,7 @@ print "This process detail: \n", execute(command)
 <pre><code>This process detail:
 python.exe                     604 RDP-Tcp#0                  4      5,660 K
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 11507283 kanghyojmun: </h3><p>You can use Popen, and then you can check the procedure's status:</p>
+------------------------------------------------------------------ <br><h3> kanghyojmun, Id: 11507283, Score: 18: </h3><p>You can use Popen, and then you can check the procedure's status:</p>
 
 <pre><code>from subprocess import Popen
 
@@ -621,7 +621,7 @@ if proc.poll() is None:
 </code></pre>
 
 <p>Check out <a href="http://docs.python.org/library/subprocess.html#popen-objects" rel="noreferrer">subprocess.Popen</a>.</p>
------------------------------------------------------------------- <br><h3> Answer 25476624 amehta: </h3><p>A simple way is to use the <a href="https://docs.python.org/2/library/os.html" rel="noreferrer">os module</a>:</p>
+------------------------------------------------------------------ <br><h3> amehta, Id: 25476624, Score: 18: </h3><p>A simple way is to use the <a href="https://docs.python.org/2/library/os.html" rel="noreferrer">os module</a>:</p>
 
 <pre><code>import os
 os.system('ls')
@@ -638,7 +638,7 @@ subprocess.check_call('ls')
 <pre><code>import subprocess
 r = subprocess.check_output('ls')
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 38477871 IRSHAD: </h3><p>To fetch the network id from the <a href="https://en.wikipedia.org/wiki/OpenStack" rel="noreferrer">OpenStack</a> <a href="https://en.wikipedia.org/wiki/OpenStack#Networking_(Neutron)" rel="noreferrer">Neutron</a>:</p>
+------------------------------------------------------------------ <br><h3> IRSHAD, Id: 38477871, Score: 17: </h3><p>To fetch the network id from the <a href="https://en.wikipedia.org/wiki/OpenStack" rel="noreferrer">OpenStack</a> <a href="https://en.wikipedia.org/wiki/OpenStack#Networking_(Neutron)" rel="noreferrer">Neutron</a>:</p>
 
 <pre><code>#!/usr/bin/python
 import os
@@ -664,7 +664,7 @@ print(networkId)
 
 <pre><code>27a74fcd-37c0-4789-9414-9531b7e3f126
 </code></pre>
-<h4> Comment 94039444 tripleee: </h4>You should not recommend <code>os.popen()</code> in 2016. The Awk script could easily be replaced with native Python code.<br>------------------------------------------------------------------ <br><h3> Answer 11644161 Garfield: </h3><p>Very simplest way to run any command and get the result back:</p>
+<h4> tripleee, Comment 94039444 Score: 0: </h4>You should not recommend <code>os.popen()</code> in 2016. The Awk script could easily be replaced with native Python code.<br>------------------------------------------------------------------ <br><h3> Garfield, Id: 11644161, Score: 15: </h3><p>Very simplest way to run any command and get the result back:</p>
 
 <pre><code>from commands import getstatusoutput
 
@@ -673,7 +673,7 @@ try:
 except Exception, e:
     return None
 </code></pre>
-<h4> Comment 94038710 tripleee: </h4>Indeed, the <a href="https://docs.python.org/2/library/commands.html" rel="nofollow noreferrer"><code>commands</code> documentation from Python 2.7</a> says it was deprecated in 2.6 and will be removed in 3.0.<br>------------------------------------------------------------------ <br><h3> Answer 59090212 N.Nonkovic: </h3><p><em><strong>MOST OF THE CASES:</strong></em></p>
+<h4> tripleee, Comment 94038710 Score: 4: </h4>Indeed, the <a href="https://docs.python.org/2/library/commands.html" rel="nofollow noreferrer"><code>commands</code> documentation from Python 2.7</a> says it was deprecated in 2.6 and will be removed in 3.0.<br>------------------------------------------------------------------ <br><h3> N.Nonkovic, Id: 59090212, Score: 14: </h3><p><em><strong>MOST OF THE CASES:</strong></em></p>
 <p><strong>For the most of cases, a short snippet of code like this is all you are going to need</strong>:</p>
 <pre class="lang-py prettyprint-override"><code>import subprocess
 import shlex
@@ -719,7 +719,7 @@ def run_command(cmd_interpreter: str, command: str) -&gt; None:
     subprocess.check_call(shlex.split(base_command)
 
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 49441486 am5: </h3><p>Often, I use the following function for external commands, and this is especially handy for <strong>long running processes</strong>. The below method <strong>tails process output</strong> <em>while</em> it is running and returns the output, <strong>raises an exception</strong> if process fails.</p>
+------------------------------------------------------------------ <br><h3> am5, Id: 49441486, Score: 13: </h3><p>Often, I use the following function for external commands, and this is especially handy for <strong>long running processes</strong>. The below method <strong>tails process output</strong> <em>while</em> it is running and returns the output, <strong>raises an exception</strong> if process fails.</p>
 
 <p>It comes out if the process is done using the <strong>poll() method on the process</strong>.</p>
 
@@ -751,7 +751,7 @@ def exec_long_running_proc(command, args):
 
 <pre><code>exec_long_running_proc(command = "hive", args=["-f", hql_path])
 </code></pre>
-<h4> Comment 93572709 am5: </h4>@sbk <code>repr(arg)</code> didn&#39;t really help, the above code handles spaces as well. Now the following works <code>exec_long_running_proc(command = &quot;ls&quot;, args=[&quot;-l&quot;, &quot;~&#47;test file*&quot;])</code><br><h4> Comment 87797622 sbk: </h4>You&#39;ll get unexpected results passing an arg with space. Using <code>repr(arg)</code> instead of <code>str(arg)</code> might help by the mere coincidence that python and sh escape quotes the same way<br>------------------------------------------------------------------ <br><h3> Answer 33118899 user2081554: </h3><p>Here are my two cents: In my view, this is the best practice when dealing with external commands...</p>
+<h4> am5, Comment 93572709 Score: 1: </h4>@sbk <code>repr(arg)</code> didn&#39;t really help, the above code handles spaces as well. Now the following works <code>exec_long_running_proc(command = &quot;ls&quot;, args=[&quot;-l&quot;, &quot;~&#47;test file*&quot;])</code><br><h4> sbk, Comment 87797622 Score: 1: </h4>You&#39;ll get unexpected results passing an arg with space. Using <code>repr(arg)</code> instead of <code>str(arg)</code> might help by the mere coincidence that python and sh escape quotes the same way<br>------------------------------------------------------------------ <br><h3> user2081554, Id: 33118899, Score: 12: </h3><p>Here are my two cents: In my view, this is the best practice when dealing with external commands...</p>
 
 <p>These are the return values from the execute method...</p>
 
@@ -800,7 +800,7 @@ def exec_long_running_proc(command, args):
     else:
         return [True, stdout, stderr]
 </code></pre>
-<h4> Comment 63894693 pppery: </h4>Deadlock potential: use the <code>.communicate</code> method instead<br><h4> Comment 94039026 tripleee: </h4>Better yet, avoid <code>Popen()</code> and use the higher-level API which is now collected into the single function <code>subprocess.run()</code><br>------------------------------------------------------------------ <br><h3> Answer 17202916 imagineerThat: </h3><p>Just to add to the discussion, if you include using a Python console, you can call external commands from <a href="http://en.wikipedia.org/wiki/IPython" rel="noreferrer">IPython</a>. While in the IPython prompt, you can call shell commands by prefixing '!'. You can also combine Python code with the shell, and assign the output of shell scripts to Python variables.</p>
+<h4> pppery, Comment 63894693 Score: 1: </h4>Deadlock potential: use the <code>.communicate</code> method instead<br><h4> tripleee, Comment 94039026 Score: 0: </h4>Better yet, avoid <code>Popen()</code> and use the higher-level API which is now collected into the single function <code>subprocess.run()</code><br>------------------------------------------------------------------ <br><h3> imagineerThat, Id: 17202916, Score: 11: </h3><p>Just to add to the discussion, if you include using a Python console, you can call external commands from <a href="http://en.wikipedia.org/wiki/IPython" rel="noreferrer">IPython</a>. While in the IPython prompt, you can call shell commands by prefixing '!'. You can also combine Python code with the shell, and assign the output of shell scripts to Python variables.</p>
 
 <p>For instance:</p>
 
@@ -812,7 +812,7 @@ Out[10]:
  'file2',
  'file3',]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 53063521 C&#233;dric: </h3><p>I wrote a small library to help with this use case:</p>
+------------------------------------------------------------------ <br><h3> C&#233;dric, Id: 53063521, Score: 11: </h3><p>I wrote a small library to help with this use case:</p>
 <p><a href="https://pypi.org/project/citizenshell/" rel="nofollow noreferrer">https://pypi.org/project/citizenshell/</a></p>
 <p>It can be installed using</p>
 <pre><code>pip install citizenshell
@@ -838,7 +838,7 @@ assert result.exit_code() == 13
 &gt;&gt;&gt; It is 14:24:55!
 </code></pre>
 <p>More examples can be found at <a href="https://github.com/meuter/citizenshell" rel="nofollow noreferrer">https://github.com/meuter/citizenshell</a></p>
------------------------------------------------------------------- <br><h3> Answer 23030076 andruso: </h3><p>Use <a href="https://docs.python.org/2/library/subprocess.html" rel="noreferrer">subprocess.call</a>:</p>
+------------------------------------------------------------------ <br><h3> andruso, Id: 23030076, Score: 9: </h3><p>Use <a href="https://docs.python.org/2/library/subprocess.html" rel="noreferrer">subprocess.call</a>:</p>
 
 
 
@@ -850,7 +850,7 @@ call(["echo", "Hello", "world"])
 # Single string argument varies across platforms so better split it
 call("echo Hello world".split(" "))
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 49644672 rashok: </h3><p><strong>Calling an external command in Python</strong></p>
+------------------------------------------------------------------ <br><h3> rashok, Id: 49644672, Score: 10: </h3><p><strong>Calling an external command in Python</strong></p>
 
 <p>A simple way to call an external command is using <code>os.system(...)</code>. And this function returns the exit value of the command. But the drawback is we won't get stdout and stderr.</p>
 
@@ -881,7 +881,7 @@ print 'some_cmd.sh output : ' + out
 os.system('kill -15 ' + str(proc.pid))
 print 'Output : ' proc.communicate()[0]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 16062355 Jens Timmerman: </h3><p>There are a lot of different ways to run external commands in Python,
+------------------------------------------------------------------ <br><h3> Jens Timmerman, Id: 16062355, Score: 9: </h3><p>There are a lot of different ways to run external commands in Python,
 and all of them have their own plus sides and drawbacks.</p>
 <p>My colleagues and me have been writing Python system administration tools, so we need to run a lot of external commands, and sometimes you want them to block or run asynchronously, time-out, update every second, etc.</p>
 <p>There are also different ways of handling the return code and errors,
@@ -890,7 +890,7 @@ and you might want to parse the output, and provide new input (in an <a href="ht
 almost anything you would want, and if not, it's very flexible so you can easily extend it:</p>
 <p><a href="https://github.com/hpcugent/vsc-base/blob/master/lib/vsc/utils/run.py" rel="nofollow noreferrer">https://github.com/hpcugent/vsc-base/blob/master/lib/vsc/utils/run.py</a></p>
 <p>It doesn't work stand-alone and requires some of our other tools, and got a lot of specialised functionality over the years, so it might not be a drop-in replacement for you, but it can give you a lot of information on how the internals of Python for running commands work and ideas on how to handle certain situations.</p>
------------------------------------------------------------------- <br><h3> Answer 38012358 David Okwii: </h3><p>Use:</p>
+------------------------------------------------------------------ <br><h3> David Okwii, Id: 38012358, Score: 9: </h3><p>Use:</p>
 
 <pre><code>import subprocess
 
@@ -911,7 +911,7 @@ print p.split("\n")
  '/dev/sda5       340G  222G  100G  69% /home',
  '']
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 48548332 user8468899: </h3><p>As an example (in Linux):</p>
+------------------------------------------------------------------ <br><h3> user8468899, Id: 48548332, Score: 9: </h3><p>As an example (in Linux):</p>
 
 <pre><code>import subprocess
 subprocess.run('mkdir test.dir', shell=True)
@@ -933,7 +933,7 @@ os.system('mkdir test.dir')
 <p>Best practice would be to use subprocess instead of os, with .run favored over .call. 
 All you need to know about subprocess is <a href="https://docs.python.org/3.5/library/subprocess.html" rel="noreferrer">here</a>.
 Also, note that all Python documentation is available for download from <a href="https://docs.python.org/3/download.html" rel="noreferrer">here</a>. I downloaded the PDF packed as .zip. I mention this because there's a nice overview of the os module in tutorial.pdf (page 81). Besides, it's an authoritative resource for Python coders.</p>
-<h4> Comment 85785785 Nick: </h4>According to <a href="https://docs.python.org/2/library/subprocess.html#frequently-used-arguments" rel="nofollow noreferrer">docs.python.org/2/library/&hellip;</a>, &quot;shell=True&quot; may raise a security concern.<br><h4> Comment 94038828 tripleee: </h4>The basic warning is in the documentation but this question explains it in more detail: <a href="https://stackoverflow.com/questions/3172470/actual-meaning-of-shell-true-in-subprocess" title="actual meaning of shell true in subprocess">stackoverflow.com/questions/3172470/&hellip;</a><br><h4> Comment 85832373 user8468899: </h4>@Nick Predley: noted, but &quot;shell=False&quot; doesn&#39;t perform the desired function. What specifically are the security concerns and what&#39;s the alternative? Please let me know asap: I do not wish to post anything which may cause problems for anyone viewing this.<br>------------------------------------------------------------------ <br><h3> Answer 54414217 Farzad Vertigo: </h3><p>For using <code>subprocess</code> in Python 3.5+, the following did the trick for me on Linux:</p>
+<h4> Nick, Comment 85785785 Score: 2: </h4>According to <a href="https://docs.python.org/2/library/subprocess.html#frequently-used-arguments" rel="nofollow noreferrer">docs.python.org/2/library/&hellip;</a>, &quot;shell=True&quot; may raise a security concern.<br><h4> tripleee, Comment 94038828 Score: 1: </h4>The basic warning is in the documentation but this question explains it in more detail: <a href="https://stackoverflow.com/questions/3172470/actual-meaning-of-shell-true-in-subprocess" title="actual meaning of shell true in subprocess">stackoverflow.com/questions/3172470/&hellip;</a><br><h4> user8468899, Comment 85832373 Score: 0: </h4>@Nick Predley: noted, but &quot;shell=False&quot; doesn&#39;t perform the desired function. What specifically are the security concerns and what&#39;s the alternative? Please let me know asap: I do not wish to post anything which may cause problems for anyone viewing this.<br>------------------------------------------------------------------ <br><h3> Farzad Vertigo, Id: 54414217, Score: 9: </h3><p>For using <code>subprocess</code> in Python 3.5+, the following did the trick for me on Linux:</p>
 <pre><code>import subprocess
 
 # subprocess.run() returns a completed process object that can be inspected
@@ -948,7 +948,7 @@ print(c.stdout.decode('utf-8'))
 drwxrwxr-x  4 farzad farzad 4.0K Jan 22  2018 scripts
 .... # Some other lines
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 22395328 Jake W: </h3><p>After some research, I have the following code which works very well for me. It basically prints both standard output and standard error in real time.</p>
+------------------------------------------------------------------ <br><h3> Jake W, Id: 22395328, Score: 8: </h3><p>After some research, I have the following code which works very well for me. It basically prints both standard output and standard error in real time.</p>
 <pre><code>stdout_result = 1
 stderr_result = 1
 
@@ -1000,7 +1000,7 @@ def exec_command(command, cwd=None):
 
     return stdout_result + stderr_result
 </code></pre>
-<h4> Comment 50758994 jfs: </h4>your code may lose data when the subprocess exits while there is some data is buffered. Read until EOF instead, see <a href="http://stackoverflow.com/q/4984428/4279">teed_call()</a><br>------------------------------------------------------------------ <br><h3> Answer 39969619 Rajiv Sharma: </h3><p>Here is calling an external command and return or print the command's output:</p>
+<h4> jfs, Comment 50758994 Score: 4: </h4>your code may lose data when the subprocess exits while there is some data is buffered. Read until EOF instead, see <a href="http://stackoverflow.com/q/4984428/4279">teed_call()</a><br>------------------------------------------------------------------ <br><h3> Rajiv Sharma, Id: 39969619, Score: 8: </h3><p>Here is calling an external command and return or print the command's output:</p>
 
 <p>Python <a href="https://docs.python.org/2/library/subprocess.html" rel="nofollow noreferrer">Subprocess</a> check_output is good for</p>
 
@@ -1012,18 +1012,18 @@ def exec_command(command, cwd=None):
 proc = subprocess.check_output('ipconfig /all')
 print proc
 </code></pre>
-<h4> Comment 94038929 tripleee: </h4>The argument should properly be tokenized into a list, or you should explicitly pass in <code>shell=True</code>. In Python 3.x (where x &gt; 3 I think) you can retrieve the output as a proper string with <code>universal_newlines=True</code> and you probably want to switch to <code>subproces.run()</code><br>------------------------------------------------------------------ <br><h3> Answer 50242060 dportman: </h3><p>If you need to call a shell command from a Python notebook (like <a href="https://en.wikipedia.org/wiki/IPython#Project_Jupyter" rel="noreferrer">Jupyter</a>, Zeppelin, Databricks, or Google Cloud Datalab) you can just use the <code>!</code> prefix.</p>
+<h4> tripleee, Comment 94038929 Score: 0: </h4>The argument should properly be tokenized into a list, or you should explicitly pass in <code>shell=True</code>. In Python 3.x (where x &gt; 3 I think) you can retrieve the output as a proper string with <code>universal_newlines=True</code> and you probably want to switch to <code>subproces.run()</code><br>------------------------------------------------------------------ <br><h3> dportman, Id: 50242060, Score: 8: </h3><p>If you need to call a shell command from a Python notebook (like <a href="https://en.wikipedia.org/wiki/IPython#Project_Jupyter" rel="noreferrer">Jupyter</a>, Zeppelin, Databricks, or Google Cloud Datalab) you can just use the <code>!</code> prefix.</p>
 
 <p>For example,</p>
 
 <pre><code>!ls -ilF
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 57696996 noɥʇʎԀʎzɐɹƆ: </h3><p>If you're writing a Python shell script and have <a href="http://en.wikipedia.org/wiki/IPython" rel="nofollow noreferrer">IPython</a> installed on your system, you can use the bang prefix to run a shell command inside IPython:</p>
+------------------------------------------------------------------ <br><h3> noɥʇʎԀʎzɐɹƆ, Id: 57696996, Score: 8: </h3><p>If you're writing a Python shell script and have <a href="http://en.wikipedia.org/wiki/IPython" rel="nofollow noreferrer">IPython</a> installed on your system, you can use the bang prefix to run a shell command inside IPython:</p>
 
 <pre><code>!ls
 filelist = !ls
 </code></pre>
-<h4> Comment 104456009 noɥʇʎԀʎzɐɹƆ: </h4>@PeterMortensen I don&#39;t think it works in DOS, but it should work in Cygwin.<br>------------------------------------------------------------------ <br><h3> Answer 16089689 Colonel Panic: </h3><p>Update 2015: Python 3.5 added <a href="https://docs.python.org/3/library/subprocess.html#subprocess.run" rel="nofollow noreferrer">subprocess.run</a> which is much easier to use than subprocess.Popen. I recommend that.</p>
+<h4> noɥʇʎԀʎzɐɹƆ, Comment 104456009 Score: 0: </h4>@PeterMortensen I don&#39;t think it works in DOS, but it should work in Cygwin.<br>------------------------------------------------------------------ <br><h3> Colonel Panic, Id: 16089689, Score: 7: </h3><p>Update 2015: Python 3.5 added <a href="https://docs.python.org/3/library/subprocess.html#subprocess.run" rel="nofollow noreferrer">subprocess.run</a> which is much easier to use than subprocess.Popen. I recommend that.</p>
 <pre class="lang-py prettyprint-override"><code>&gt;&gt;&gt; subprocess.run([&quot;ls&quot;, &quot;-l&quot;])  # doesn't capture output
 CompletedProcess(args=['ls', '-l'], returncode=0)
 
@@ -1036,7 +1036,7 @@ subprocess.CalledProcessError: Command 'exit 1' returned non-zero exit status 1
 CompletedProcess(args=['ls', '-l', '/dev/null'], returncode=0,
 stdout=b'crw-rw-rw- 1 root root 1, 3 Jan 23 16:23 /dev/null\n', stderr=b'')
 </code></pre>
-<h4> Comment 22988454 Misch: </h4>Deprecated doesn&#39;t only mean &quot;isn&#39;t developed anymore&quot; but also &quot;you are discouraged from using this&quot;. Deprecated features may break anytime, may be removed anytime, or may dangerous. You should never use this in important code. Deprecation is merely a better way than removing a feature immediately, because it gives programmers the time to adapt and replace their deprecated functions.<br><h4> Comment 23118703 Misch: </h4>With dangerous, I didn&#39;t mean that it may be removed anytime (that&#39;s a different problem), neither did I say that it is dangerous to use this specific module. However it may become dangerous if a security vulnerability is discovered but the module isn&#39;t further developed or maintained. (I don&#39;t want to say that this module is or isn&#39;t vulnerable to security issues, just talking about deprecated stuff in general)<br><h4> Comment 22988607 Misch: </h4>Just to prove my point: &quot;Deprecated since version 2.6: The commands module has been removed in Python 3. Use the subprocess module instead.&quot;<br><h4> Comment 23118138 Colonel Panic: </h4>It&#39;s not dangerous! The Python devs are careful only to break features between major releases (ie. between 2.x and 3.x). I&#39;ve been using the commands module since 2004&#39;s Python 2.4. It works the same today in Python 2.7.<br>------------------------------------------------------------------ <br><h3> Answer 39447501 liuyip: </h3><p>There are many ways to call a command.</p>
+<h4> Misch, Comment 22988454 Score: 10: </h4>Deprecated doesn&#39;t only mean &quot;isn&#39;t developed anymore&quot; but also &quot;you are discouraged from using this&quot;. Deprecated features may break anytime, may be removed anytime, or may dangerous. You should never use this in important code. Deprecation is merely a better way than removing a feature immediately, because it gives programmers the time to adapt and replace their deprecated functions.<br><h4> Misch, Comment 23118703 Score: 6: </h4>With dangerous, I didn&#39;t mean that it may be removed anytime (that&#39;s a different problem), neither did I say that it is dangerous to use this specific module. However it may become dangerous if a security vulnerability is discovered but the module isn&#39;t further developed or maintained. (I don&#39;t want to say that this module is or isn&#39;t vulnerable to security issues, just talking about deprecated stuff in general)<br><h4> Misch, Comment 22988607 Score: 4: </h4>Just to prove my point: &quot;Deprecated since version 2.6: The commands module has been removed in Python 3. Use the subprocess module instead.&quot;<br><h4> Colonel Panic, Comment 23118138 Score: 0: </h4>It&#39;s not dangerous! The Python devs are careful only to break features between major releases (ie. between 2.x and 3.x). I&#39;ve been using the commands module since 2004&#39;s Python 2.4. It works the same today in Python 2.7.<br>------------------------------------------------------------------ <br><h3> liuyip, Id: 39447501, Score: 4: </h3><p>There are many ways to call a command.</p>
 
 <ul>
 <li>For example:</li>
@@ -1071,7 +1071,7 @@ stdout=b'crw-rw-rw- 1 root root 1, 3 Jan 23 16:23 /dev/null\n', stderr=b'')
 cmd = " ".join(exename,parameters)
 os.popen(cmd)
 </code></pre>
-<h4> Comment 94038976 tripleee: </h4><code>os.popen</code> should not be recommended and perhaps even mentioned any longer. The <code>subpocess</code> example should pass the arguments as a list instead of joining them with spaces.<br>------------------------------------------------------------------ <br><h3> Answer 36058314 chtenb: </h3><p>For Python 3.5+ it is recommended that you use the <a href="https://docs.python.org/3.5/library/subprocess.html#subprocess.run" rel="nofollow noreferrer">run function from the subprocess module</a>. This returns a <code>CompletedProcess</code> object, from which you can easily obtain the output as well as return code.</p>
+<h4> tripleee, Comment 94038976 Score: 0: </h4><code>os.popen</code> should not be recommended and perhaps even mentioned any longer. The <code>subpocess</code> example should pass the arguments as a list instead of joining them with spaces.<br>------------------------------------------------------------------ <br><h3> chtenb, Id: 36058314, Score: 6: </h3><p>For Python 3.5+ it is recommended that you use the <a href="https://docs.python.org/3.5/library/subprocess.html#subprocess.run" rel="nofollow noreferrer">run function from the subprocess module</a>. This returns a <code>CompletedProcess</code> object, from which you can easily obtain the output as well as return code.</p>
 
 <pre><code>from subprocess import PIPE, run
 
@@ -1079,7 +1079,7 @@ command = ['echo', 'hello']
 result = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True)
 print(result.returncode, result.stdout, result.stderr)
 </code></pre>
-<h4> Comment 72595849 Greg Eremeev: </h4>answer with run function was added in 2015 year. You repeated it. I think it was a reason of down vote<br>------------------------------------------------------------------ <br><h3> Answer 55440842 geckos: </h3><p>If you are <strong>not</strong> using user input in the commands, you can use this:</p>
+<h4> Greg Eremeev, Comment 72595849 Score: 3: </h4>answer with run function was added in 2015 year. You repeated it. I think it was a reason of down vote<br>------------------------------------------------------------------ <br><h3> geckos, Id: 55440842, Score: 5: </h3><p>If you are <strong>not</strong> using user input in the commands, you can use this:</p>
 <pre><code>from os import getcwd
 from subprocess import check_output
 from shlex import quote
@@ -1120,14 +1120,14 @@ Out[50]: 2.6801227919995654
 In [51]: timeit(&quot;check_output('ls -l', universal_newlines=True, shell=True)&quot;, number=1000, globals=globals())
 Out[51]: 3.243950183999914
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 58297652 Vishal: </h3><pre class="lang-py prettyprint-override"><code>import subprocess
+------------------------------------------------------------------ <br><h3> Vishal, Id: 58297652, Score: 5: </h3><pre class="lang-py prettyprint-override"><code>import subprocess
 
 p = subprocess.run(["ls", "-ltr"], capture_output=True)
 print(p.stdout.decode(), p.stderr.decode())
 </code></pre>
 
 <p><strong><a href="https://code.labstack.com/GIzH7jnS" rel="noreferrer">Try online</a></strong></p>
-<h4> Comment 118415842 Peter Mortensen: </h4>An explanation would be in order. E.g, what is the idea and how is it different from the previous 50 answers 11 years later?<br><h4> Comment 120033907 tripleee: </h4>This is identical to <a href="https://stackoverflow.com/a/58212263">your own answer from a few days earlier</a> only with even less detail.<br>------------------------------------------------------------------ <br><h3> Answer 72216447 Mr. Day: </h3><p>You can try using <code>os.system()</code> for running external commands.</p>
+<h4> Peter Mortensen, Comment 118415842 Score: 0: </h4>An explanation would be in order. E.g, what is the idea and how is it different from the previous 50 answers 11 years later?<br><h4> tripleee, Comment 120033907 Score: 0: </h4>This is identical to <a href="https://stackoverflow.com/a/58212263">your own answer from a few days earlier</a> only with even less detail.<br>------------------------------------------------------------------ <br><h3> Mr. Day, Id: 72216447, Score: 5: </h3><p>You can try using <code>os.system()</code> for running external commands.</p>
 <p>Example:</p>
 <pre><code>import os
 
@@ -1140,7 +1140,7 @@ except:
 </code></pre>
 <p>In the example, the script imports <code>os</code> and tries to run the command listed in <code>os.system()</code>. If the command was to fail then it would print &quot;Error running command&quot; without the script stopping due to the error.</p>
 <p>And yes, it’s just that simple!</p>
------------------------------------------------------------------- <br><h3> Answer 31618111 Asif Hasnain: </h3><p>Using the <code>Popen</code> function of the <code>subprocess</code> Python module is the simplest way of running Linux commands. In that, the <code>Popen.communicate()</code> function will give your commands output. For example</p>
+------------------------------------------------------------------ <br><h3> Asif Hasnain, Id: 31618111, Score: 4: </h3><p>Using the <code>Popen</code> function of the <code>subprocess</code> Python module is the simplest way of running Linux commands. In that, the <code>Popen.communicate()</code> function will give your commands output. For example</p>
 
 <pre><code>import subprocess
 
@@ -1149,7 +1149,7 @@ process = subprocess.Popen(..)   # Pass command and arguments to the function
 stdout, stderr = process.communicate()   # Get command output and error
 ..
 </code></pre>
-<h4> Comment 94039076 tripleee: </h4>This is no longer true, and probably wasn&#39;t when this answer was posted. You should prefer <code>subprocess.check_call()</code> and friends unless you absolutely need the lower-level control of the more-complex <code>Popen()</code>. In recent Python versions, the go-to workhorse is <code>subprocess.run()</code><br>------------------------------------------------------------------ <br><h3> Answer 59050139 Trect: </h3><p><code>os.popen()</code> is the easiest and the most safest way to execute a command. You can execute any command that you run on the command line. In addition you will also be able to capture the output of the command using <code>os.popen().read()</code></p>
+<h4> tripleee, Comment 94039076 Score: 0: </h4>This is no longer true, and probably wasn&#39;t when this answer was posted. You should prefer <code>subprocess.check_call()</code> and friends unless you absolutely need the lower-level control of the more-complex <code>Popen()</code>. In recent Python versions, the go-to workhorse is <code>subprocess.run()</code><br>------------------------------------------------------------------ <br><h3> Trect, Id: 59050139, Score: 4: </h3><p><code>os.popen()</code> is the easiest and the most safest way to execute a command. You can execute any command that you run on the command line. In addition you will also be able to capture the output of the command using <code>os.popen().read()</code></p>
 
 <p>You can do it like this:</p>
 
@@ -1165,7 +1165,7 @@ output = os.popen('ls').read()
 print (output)
 # Outputs list of files in the directory
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 60427071 Kashif Iftikhar: </h3><p>There are a number of ways of <em>calling</em> an external <em>command</em> from Python. There are some functions and modules with the good helper functions that can make it really easy. But the recommended thing among all is the <code>subprocess</code> module.</p>
+------------------------------------------------------------------ <br><h3> Kashif Iftikhar, Id: 60427071, Score: 4: </h3><p>There are a number of ways of <em>calling</em> an external <em>command</em> from Python. There are some functions and modules with the good helper functions that can make it really easy. But the recommended thing among all is the <code>subprocess</code> module.</p>
 <pre><code>import subprocess as s
 s.call([&quot;command.exe&quot;, &quot;...&quot;])
 </code></pre>
@@ -1183,7 +1183,7 @@ s.call([&quot;command.exe&quot;, &quot;...&quot;])
 <pre><code>p=s.Popen(&quot;...&quot;)
 </code></pre>
 <p>It does not wait for the running process to finish also it's not going to throw any exception immediately but it gives you an object that will let you do things like wait for it to finish, let you communicate to it, you can redirect standard input, standard output if you want to display output somewhere else and a lot more.</p>
------------------------------------------------------------------- <br><h3> Answer 36913076 Viswesn: </h3><p>I would recommend the following method 'run' and it will help us in getting <a href="https://en.wikipedia.org/wiki/Standard_streams#Standard_output_.28stdout.29" rel="nofollow noreferrer">standard output</a>, <a href="https://en.wikipedia.org/wiki/Standard_streams#Standard_error_(stderr)" rel="nofollow noreferrer">standard error</a> and exit status as a dictionary; the caller of this can read the dictionary return by 'run' method to know the actual state of the process.</p>
+------------------------------------------------------------------ <br><h3> Viswesn, Id: 36913076, Score: 3: </h3><p>I would recommend the following method 'run' and it will help us in getting <a href="https://en.wikipedia.org/wiki/Standard_streams#Standard_output_.28stdout.29" rel="nofollow noreferrer">standard output</a>, <a href="https://en.wikipedia.org/wiki/Standard_streams#Standard_error_(stderr)" rel="nofollow noreferrer">standard error</a> and exit status as a dictionary; the caller of this can read the dictionary return by 'run' method to know the actual state of the process.</p>
 <pre><code>  def run (cmd):
        print &quot;+ DEBUG exec({0})&quot;.format(cmd)
        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, shell=True)
@@ -1195,7 +1195,7 @@ s.call([&quot;command.exe&quot;, &quot;...&quot;])
        return dict({'output': out, 'error': err, 'status': ret})
   #end
 </code></pre>
-<h4> Comment 94039494 tripleee: </h4>This incompletely reimplements something like <code>subprocess.run()</code>. You should particularly avoid <code>shell=True</code> when it&#39;s not strictly necessary.<br><h4> Comment 118415430 Peter Mortensen: </h4>What is <code>#end</code> for?<br>------------------------------------------------------------------ <br><h3> Answer 58212263 Vishal: </h3><p>Python 3.5+</p>
+<h4> tripleee, Comment 94039494 Score: 1: </h4>This incompletely reimplements something like <code>subprocess.run()</code>. You should particularly avoid <code>shell=True</code> when it&#39;s not strictly necessary.<br><h4> Peter Mortensen, Comment 118415430 Score: 0: </h4>What is <code>#end</code> for?<br>------------------------------------------------------------------ <br><h3> Vishal, Id: 58212263, Score: 3: </h3><p>Python 3.5+</p>
 
 <pre class="lang-py prettyprint-override"><code>import subprocess
 
@@ -1204,7 +1204,7 @@ print(p.stdout.decode(), p.stderr.decode())
 </code></pre>
 
 <p><a href="https://code.labstack.com/GIzH7jnS" rel="nofollow noreferrer"><strong>Try online</strong></a></p>
------------------------------------------------------------------- <br><h3> Answer 69012133 Bilal Ahmed Yaseen: </h3><p>You can run any command using <em><strong>Popen</strong></em> from the <em><strong>subprocess</strong></em> module.</p>
+------------------------------------------------------------------ <br><h3> Bilal Ahmed Yaseen, Id: 69012133, Score: 3: </h3><p>You can run any command using <em><strong>Popen</strong></em> from the <em><strong>subprocess</strong></em> module.</p>
 <pre><code>from subprocess import Popen
 </code></pre>
 <p>First of all, a command object is created with all arguments which you want to run. For example, in the snippet below, the <em>gunicorm</em> command object has been formed with all the arguments:</p>
@@ -1229,7 +1229,7 @@ print(p.stdout.decode(), p.stderr.decode())
 <p>And you can wait till the completion of above command's execution:</p>
 <pre><code>process.wait()
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 70789418 Badr Elmers: </h3><p>Here there are a lot of answers, but none fulfilled all my needs.</p>
+------------------------------------------------------------------ <br><h3> Badr Elmers, Id: 70789418, Score: 3: </h3><p>Here there are a lot of answers, but none fulfilled all my needs.</p>
 <ul>
 <li>I need to run the command and capture the <strong>output</strong> and <strong>exit code</strong>.</li>
 <li>I need to <strong>timeout</strong> the executed program and <strong>force</strong> it to exit if timeout is reached, and <strong>kill all its child processes</strong>.</li>
@@ -1344,7 +1344,7 @@ print(f)
 <li>and because the timeout argument of this function is useless in Windows, it does not kill the child processes of the executed command.</li>
 <li>if you use the <code>capture_output</code> + <code>timeout</code> argument, it will hang if there is a child process still running. And it is still broken in Windows, for which the <a href="https://bugs.python.org/issue31447" rel="nofollow noreferrer">issue 31447</a> is <a href="https://bugs.python.org/issue32795" rel="nofollow noreferrer">still open</a>.</li>
 </ul>
-<h4> Comment 127834268 bfontaine: </h4>I removed the &quot;2022 answer&quot; because it’s misleading. In 2022 you don’t support winxp nor Python 2 and you use <code>subprocess.run()</code>. The question is not &quot;how do I run system commands on old platforms&quot; but &quot;how do I run system commands&quot;, period.<br>------------------------------------------------------------------ <br><h3> Answer 46921537 Asav Patel: </h3><p>I have written a wrapper to handle errors and redirecting output and other stuff.</p>
+<h4> bfontaine, Comment 127834268 Score: 1: </h4>I removed the &quot;2022 answer&quot; because it’s misleading. In 2022 you don’t support winxp nor Python 2 and you use <code>subprocess.run()</code>. The question is not &quot;how do I run system commands on old platforms&quot; but &quot;how do I run system commands&quot;, period.<br>------------------------------------------------------------------ <br><h3> Asav Patel, Id: 46921537, Score: 2: </h3><p>I have written a wrapper to handle errors and redirecting output and other stuff.</p>
 
 <pre><code>import shlex
 import psutil
@@ -1388,13 +1388,13 @@ def call_cmd(cmd, stdout=sys.stdout, quiet=False, shell=False, raise_exceptions=
 stdout = 'out.txt'
 call_cmd(cmd, stdout)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 56842257 Zach Valenta: </h3><p><a href="https://github.com/aeroxis/sultan" rel="nofollow noreferrer">Sultan</a> is a recent-ish package meant for this purpose. It provides some niceties around managing user privileges and adding helpful error messages.</p>
+------------------------------------------------------------------ <br><h3> Zach Valenta, Id: 56842257, Score: 1: </h3><p><a href="https://github.com/aeroxis/sultan" rel="nofollow noreferrer">Sultan</a> is a recent-ish package meant for this purpose. It provides some niceties around managing user privileges and adding helpful error messages.</p>
 <pre class="lang-py prettyprint-override"><code>from sultan.api import Sultan
 
 with Sultan.load(sudo=True, hostname=&quot;myserver.com&quot;) as sultan:
   sultan.yum(&quot;install -y tree&quot;).run()
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 75282403 Muhammad Abdullah: </h3><p>Here is a Python script that will run the command on Ubuntu, while also showing the logs in real-time:</p>
+------------------------------------------------------------------ <br><h3> Muhammad Abdullah, Id: 75282403, Score: 0: </h3><p>Here is a Python script that will run the command on Ubuntu, while also showing the logs in real-time:</p>
 <pre class="lang-py prettyprint-override"><code>command = 'your command here'    
 process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     while True:
@@ -1411,7 +1411,7 @@ process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=s
         print(&quot;Command failed.&quot;)
 
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 76755082 poorya: </h3><p>Using the Python subprocess module to execute shell commands and write the output to a file.</p>
+------------------------------------------------------------------ <br><h3> poorya, Id: 76755082, Score: 0: </h3><p>Using the Python subprocess module to execute shell commands and write the output to a file.</p>
 <p>The below script will run the <strong>ps -ef</strong> command, filter lines containing <strong>python3</strong>, and write them to a file called <strong>python_processes.txt</strong>. Note that the code does not handle any exceptions that might occur during execution.</p>
 <pre><code>import subprocess
 
@@ -1436,8 +1436,8 @@ else:
 
 
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 77720259 KaiLando: </h3><p>I would recommend using <code>os.system(&quot;command&quot;)</code> from my experience.</p>
-<h4> Comment 137021743 Eric Aya: </h4>Solution already given in the most upvoted <a href="https://stackoverflow.com/a/89237/2227743">answer</a><br>------------------------------------------------------------------ <br><h3> Answer 61307412 ivanmara: </h3><p>I use this for Python 3.6+:</p>
+------------------------------------------------------------------ <br><h3> KaiLando, Id: 77720259, Score: -1: </h3><p>I would recommend using <code>os.system(&quot;command&quot;)</code> from my experience.</p>
+<h4> Eric Aya, Comment 137021743 Score: 1: </h4>Solution already given in the most upvoted <a href="https://stackoverflow.com/a/89237/2227743">answer</a><br>------------------------------------------------------------------ <br><h3> ivanmara, Id: 61307412, Score: -2: </h3><p>I use this for Python 3.6+:</p>
 <pre><code>import subprocess
 def execute(cmd):
     &quot;&quot;&quot;
@@ -1454,4 +1454,4 @@ def execute(cmd):
     return result.rstrip().decode(&quot;utf-8&quot;), serror.rstrip().decode(&quot;utf-8&quot;)
 # def
 </code></pre>
-<h4> Comment 108457518 user5994461: </h4>Don&#39;t use set <code>shell=True</code> to run commands, it opens the program to command injection vulnerabilities. You&#39;re supposed to pass the command as a list with arguments <code>cmd=[&quot;&#47;bin&#47;echo&quot;, &quot;hello word&quot;]</code>. <a href="https://docs.python.org/3/library/subprocess.html#security-considerations" rel="nofollow noreferrer">docs.python.org/3/library/&hellip;</a><br>
+<h4> user5994461, Comment 108457518 Score: 1: </h4>Don&#39;t use set <code>shell=True</code> to run commands, it opens the program to command injection vulnerabilities. You&#39;re supposed to pass the command as a list with arguments <code>cmd=[&quot;&#47;bin&#47;echo&quot;, &quot;hello word&quot;]</code>. <a href="https://docs.python.org/3/library/subprocess.html#security-considerations" rel="nofollow noreferrer">docs.python.org/3/library/&hellip;</a><br>

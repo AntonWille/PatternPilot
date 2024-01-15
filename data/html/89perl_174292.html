@@ -1,4 +1,4 @@
- <h2> Title: What is the best way to delete a value from an array in Perl? </h2> <h3> user21246, question_id: 174292 </h3>Score: 89, Tags: {arrays,perl} <br><p>The array has lots of data and I need to delete two elements. </p>
+ <h2> Title: What is the best way to delete a value from an array in Perl? </h2> <h4> user21246, question_id: 174292 </h4>Score: 89, Tags: {arrays,perl} <br><p>The array has lots of data and I need to delete two elements. </p>
 
 <p>Below is the code snippet I am using,</p>
 
@@ -6,7 +6,7 @@
 my $element_omitted = 5;
 @array = grep { $_ != $element_omitted } @array;
 </code></pre>
-<h4> Comment 53270058 Medlock Perlman: </h4>This deletes three elements.<br><h4> Comment 76555915 taiko: </h4>needed top remove all non-file item form directory listing and                     &quot;   array = grep { -f $_ } array   &quot; worked like a charm for me :)<br>------------------------------------------------------------------ <br><h3> Answer 174313 SquareCog: </h3><p>Use splice if you already know the index of the element you want to delete.</p>
+<h4> Medlock Perlman, Id: 53270058 Score: 4: </h4>This deletes three elements.<br><h4> taiko, Id: 76555915 Score: 0: </h4>needed top remove all non-file item form directory listing and                     &quot;   array = grep { -f $_ } array   &quot; worked like a charm for me :)<br>------------------------------------------------------------------ <br><h3> SquareCog, Id: 174313, Score: 95: </h3><p>Use splice if you already know the index of the element you want to delete.</p>
 
 <p>Grep works if you are searching.</p>
 
@@ -30,18 +30,18 @@ Deleting all occurrences is very similar, except you will want to get all indexe
 <p>The rest is left as an excercise for the reader -- remember that the array changes as you splice it!</p>
 
 <p><strong>Edit2</strong> John Siracusa correctly pointed out I had a bug in my example.. fixed, sorry about that.</p>
-<h4> Comment 24195634 Amir.F: </h4>if the string is not found, the loop will get stuck, so do my $index = 0;     my $count = scalar @arr;     $index++ until $arr[$index] eq &#39;foo&#39; or $index==$count;     splice(@arr, $index, 1);<br><h4> Comment 71620711 Reflective: </h4>or <code>my ($index) = grep { $arr[$_] eq &#39;foo&#39; } 0..$#arr; if (defined $index) {splice(@arr, $index, 1);  }</code> - for the first match<br>------------------------------------------------------------------ <br><h3> Answer 174298 spoulson: </h3><p><a href="http://www.perlmonks.org/?node=perlfunc%3Asplice" rel="noreferrer">splice</a> will remove array element(s) by index.  Use grep, as in your example, to search and remove.</p>
-<h4> Comment 59026 user21246: </h4>Thanks spoulson. I donno the indices that I have to delete and so I had to resort to grep.<br>------------------------------------------------------------------ <br><h3> Answer 57323341 Chetan: </h3><p>You can simply do this:</p>
+<h4> Amir.F, Comment 24195634 Score: 15: </h4>if the string is not found, the loop will get stuck, so do my $index = 0;     my $count = scalar @arr;     $index++ until $arr[$index] eq &#39;foo&#39; or $index==$count;     splice(@arr, $index, 1);<br><h4> Reflective, Comment 71620711 Score: 2: </h4>or <code>my ($index) = grep { $arr[$_] eq &#39;foo&#39; } 0..$#arr; if (defined $index) {splice(@arr, $index, 1);  }</code> - for the first match<br>------------------------------------------------------------------ <br><h3> spoulson, Id: 174298, Score: 15: </h3><p><a href="http://www.perlmonks.org/?node=perlfunc%3Asplice" rel="noreferrer">splice</a> will remove array element(s) by index.  Use grep, as in your example, to search and remove.</p>
+<h4> user21246, Comment 59026 Score: 0: </h4>Thanks spoulson. I donno the indices that I have to delete and so I had to resort to grep.<br>------------------------------------------------------------------ <br><h3> Chetan, Id: 57323341, Score: 12: </h3><p>You can simply do this:</p>
 
 <pre><code>my $input_Color = 'Green';
 my @array = qw(Red Blue Green Yellow Black);
 @array = grep {!/$input_Color/} @array;
 print "@array";
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 174353 tvanfosson: </h3><p>Is this something you are going to be doing a lot?  If so, you may want to consider a different data structure.  Grep is going to search the entire array every time and for a large array could be quite costly.  If speed is an issue then you may want to consider using a Hash instead.</p>
+------------------------------------------------------------------ <br><h3> tvanfosson, Id: 174353, Score: 8: </h3><p>Is this something you are going to be doing a lot?  If so, you may want to consider a different data structure.  Grep is going to search the entire array every time and for a large array could be quite costly.  If speed is an issue then you may want to consider using a Hash instead.</p>
 
 <p>In your example, the key would be the number and the value would be the count of elements of that number.</p>
------------------------------------------------------------------- <br><h3> Answer 14191738 dean: </h3><p>if you change</p>
+------------------------------------------------------------------ <br><h3> dean, Id: 14191738, Score: 5: </h3><p>if you change</p>
 
 <pre><code>my @del_indexes = grep { $arr[$_] eq 'foo' } 0..$#arr;
 </code></pre>
@@ -58,13 +58,13 @@ Putting a splice() in a foreach loop cleans up @arr. Relatively simple and reada
    splice (@arr,$item,1);
 }
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 47399712 oryan_dunn: </h3><p>You could use array slicing instead of splicing.  Grep to return the indices you want keep and use slicing:</p>
+------------------------------------------------------------------ <br><h3> oryan_dunn, Id: 47399712, Score: 5: </h3><p>You could use array slicing instead of splicing.  Grep to return the indices you want keep and use slicing:</p>
 <pre><code>my @arr = ...;
 # run through each item.
 my @indicesToKeep = grep { $arr[$_] ne 'foo' } 0..$#arr;
 @arr = @arr[@indicesToKeep];
 </code></pre>
-<h4> Comment 83145492 Keve: </h4>I particularly like the logic and elegance of this approach.<br><h4> Comment 105011390 soger: </h4>Yes indeed, you can even write it as a one-liner like: <code>@arr = @arr[grep ...]</code> which I particularly like. I&#39;m not sure how efficient it is, but I&#39;m gonna start using it because it can&#39;t be worse than the other solutions.<br>------------------------------------------------------------------ <br><h3> Answer 36719021 Federico: </h3><p>The best I found was a combination of "undef" and "grep":</p>
+<h4> Keve, Comment 83145492 Score: 0: </h4>I particularly like the logic and elegance of this approach.<br><h4> soger, Comment 105011390 Score: 0: </h4>Yes indeed, you can even write it as a one-liner like: <code>@arr = @arr[grep ...]</code> which I particularly like. I&#39;m not sure how efficient it is, but I&#39;m gonna start using it because it can&#39;t be worse than the other solutions.<br>------------------------------------------------------------------ <br><h3> Federico, Id: 36719021, Score: 4: </h3><p>The best I found was a combination of "undef" and "grep":</p>
 
 <pre><code>foreach $index ( @list_of_indexes_to_be_skiped ) {
       undef($array[$index]);
@@ -74,7 +74,7 @@ my @indicesToKeep = grep { $arr[$_] ne 'foo' } 0..$#arr;
 
 <p>That does the trick!
 Federico</p>
-<h4> Comment 76127242 Deanna: </h4>@BoontaweeHome, the <code>grep</code> at the end then removes them.<br><h4> Comment 116167462 brian d foy: </h4>If you already know the index, just use <code>splice</code>.<br><h4> Comment 63082928 Boontawee Home: </h4>undef set the element value to null. The total elements (size) still the same.<br>------------------------------------------------------------------ <br><h3> Answer 174860 Axeman: </h3><h2>I think your solution is the simplest and most maintainable.</h2>
+<h4> Deanna, Comment 76127242 Score: 1: </h4>@BoontaweeHome, the <code>grep</code> at the end then removes them.<br><h4> brian d foy, Comment 116167462 Score: 1: </h4>If you already know the index, just use <code>splice</code>.<br><h4> Boontawee Home, Comment 63082928 Score: 0: </h4>undef set the element value to null. The total elements (size) still the same.<br>------------------------------------------------------------------ <br><h3> Axeman, Id: 174860, Score: 3: </h3><h2>I think your solution is the simplest and most maintainable.</h2>
 
 <p>The rest of the post documents the difficulty of turning tests on elements into <code>splice</code> offsets. Thus, making it a more <em>complete</em> answer. </p>
 
@@ -98,7 +98,7 @@ Federico</p>
     return;
 }
 </code></pre>
-<h4> Comment 63870 Axeman: </h4>Somebody deleted my comment that you clearly did not read the text.<br><h4> Comment 62341 Randal Schwartz: </h4>A simple &quot;grep&quot; is going to be a lot easier to understand and more efficient than that.<br>------------------------------------------------------------------ <br><h3> Answer 11906012 Tom Lime: </h3><p>Delete all occurrences of 'something' if array.</p>
+<h4> Axeman, Comment 63870 Score: 5: </h4>Somebody deleted my comment that you clearly did not read the text.<br><h4> Randal Schwartz, Comment 62341 Score: 3: </h4>A simple &quot;grep&quot; is going to be a lot easier to understand and more efficient than that.<br>------------------------------------------------------------------ <br><h3> Tom Lime, Id: 11906012, Score: 2: </h3><p>Delete all occurrences of 'something' if array.</p>
 
 <p><strong>Based on SquareCog answer's:</strong></p>
 
@@ -113,12 +113,12 @@ print join("\n", @arr);
 </code></pre>
 
 <p>Each time we remove index from <code>@arr</code>, the next correct index to delete will be <code>$_-current_loop_step</code>.</p>
------------------------------------------------------------------- <br><h3> Answer 23017956 Rich: </h3><p>You can use the non-capturing group and a pipe delim list of items to remove.</p>
+------------------------------------------------------------------ <br><h3> Rich, Id: 23017956, Score: 2: </h3><p>You can use the non-capturing group and a pipe delim list of items to remove.</p>
 
 <pre><code>
 perl -le '@ar=(1 .. 20);@x=(8,10,3,17);$x=join("|",@x);@ar=grep{!/^(?:$x)$/o} @ar;print "@ar"'
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 15381061 BBT: </h3><p>A similar code I once wrote to remove strings not starting with SB.1 from an array of strings</p>
+------------------------------------------------------------------ <br><h3> BBT, Id: 15381061, Score: 0: </h3><p>A similar code I once wrote to remove strings not starting with SB.1 from an array of strings</p>
 
 <pre><code>my @adoSymbols=('SB.1000','RT.10000','PC.10000');
 ##Remove items from an array from backward
@@ -126,13 +126,13 @@ for(my $i=$#adoSymbols;$i&gt;=0;$i--) {
     unless ($adoSymbols[$i] =~ m/^SB\.1/) {splice(@adoSymbols,$i,1);}
 }
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 14766395 Ariel Monaco: </h3><p>I use:</p>
+------------------------------------------------------------------ <br><h3> Ariel Monaco, Id: 14766395, Score: 1: </h3><p>I use:</p>
 
 <pre><code>delete $array[$index];
 </code></pre>
 
 <p>Perldoc <a href="http://perldoc.perl.org/functions/delete.html" rel="nofollow"><strong>delete</strong></a>.</p>
-<h4> Comment 21143454 D&#233;j&#224; vu: </h4><i>delete</i> on array value is likely to be deprecated (see your doc)<br><h4> Comment 37992592 Rooster: </h4>this just deletes the value stored at that array index.  at least in my version of perl, (5.14)<br><h4> Comment 79284280 mivk: </h4>This does NOT really delete what you think. It only deletes the value, making it <code>undef</code>. Besides, from the doc linked by ring&#248; : &quot;WARNING: Calling delete on array values is strongly discouraged. The notion of deleting or checking the existence of Perl array elements is not conceptually coherent, and can lead to surprising behavior.&quot; (the previous paragraph in the doc has all the gory details).<br><h4> Comment 135666434 Ariel Monaco: </h4>my original answer is from 10 years ago<br>------------------------------------------------------------------ <br><h3> Answer 54716603 Gilles Maisonneuve: </h3><p>Just to be sure I have benchmarked grep and map solutions, first searching for indexes of matched elements (those to remove) and then directly removing the elements by grep without searching for the indexes.
+<h4> D&#233;j&#224; vu, Comment 21143454 Score: 10: </h4><i>delete</i> on array value is likely to be deprecated (see your doc)<br><h4> Rooster, Comment 37992592 Score: 3: </h4>this just deletes the value stored at that array index.  at least in my version of perl, (5.14)<br><h4> mivk, Comment 79284280 Score: 0: </h4>This does NOT really delete what you think. It only deletes the value, making it <code>undef</code>. Besides, from the doc linked by ring&#248; : &quot;WARNING: Calling delete on array values is strongly discouraged. The notion of deleting or checking the existence of Perl array elements is not conceptually coherent, and can lead to surprising behavior.&quot; (the previous paragraph in the doc has all the gory details).<br><h4> Ariel Monaco, Comment 135666434 Score: 0: </h4>my original answer is from 10 years ago<br>------------------------------------------------------------------ <br><h3> Gilles Maisonneuve, Id: 54716603, Score: 1: </h3><p>Just to be sure I have benchmarked grep and map solutions, first searching for indexes of matched elements (those to remove) and then directly removing the elements by grep without searching for the indexes.
 I appears that the first solution proposed by Sam when asking his question was already the fastest.</p>
 
 <pre><code>    use Benchmark;
@@ -174,8 +174,8 @@ Ashrunk = B C D E F G H I J K L M N
 function using either grep or map defined indexes. Just grep-remove directly.</p>
 
 <p>Before testing I was thinking "map1" would be the most efficient... I should more often rely on Benchmark I guess. ;-)</p>
------------------------------------------------------------------- <br><h3> Answer 174334 Powerlord: </h3><p>If you know the array index, you can <a href="http://perldoc.perl.org/functions/delete.html" rel="nofollow noreferrer">delete()</a> it.  The difference between splice() and delete() is that delete() does not renumber the remaining elements of the array.</p>
-<h4> Comment 59528 Powerlord: </h4>I actually meant renumber, which according to Perldoc, splice() does.<br>------------------------------------------------------------------ <br><h3> Answer 67238432 Jacques: </h3><p>This works well too:</p>
+------------------------------------------------------------------ <br><h3> Powerlord, Id: 174334, Score: 0: </h3><p>If you know the array index, you can <a href="http://perldoc.perl.org/functions/delete.html" rel="nofollow noreferrer">delete()</a> it.  The difference between splice() and delete() is that delete() does not renumber the remaining elements of the array.</p>
+<h4> Powerlord, Comment 59528 Score: 0: </h4>I actually meant renumber, which according to Perldoc, splice() does.<br>------------------------------------------------------------------ <br><h3> Jacques, Id: 67238432, Score: 0: </h3><p>This works well too:</p>
 <pre><code>my @array = (1,2,3,4,5,5,6,5,4,9);
 my $element_omitted = 5;
 for( my $i = 0; $i &lt; scalar( @array ); $i++ )

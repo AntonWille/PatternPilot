@@ -1,4 +1,4 @@
- <h2> Title: How to break out from a ruby block? </h2> <h3> user169930, question_id: 1402757 </h3>Score: 461, Tags: {ruby} <br><p>Here is <code>Bar#do_things</code>:</p>
+ <h2> Title: How to break out from a ruby block? </h2> <h4> user169930, question_id: 1402757 </h4>Score: 461, Tags: {ruby} <br><p>Here is <code>Bar#do_things</code>:</p>
 
 <pre><code>class Bar   
   def do_things
@@ -28,7 +28,7 @@ end
 </code></pre>
 
 <p>I thought about using raise, but I am trying to make it generic, so I don't want to put anything any specific in <code>Foo</code>.</p>
------------------------------------------------------------------- <br><h3> Answer 1402764 JRL: </h3><p>Use the keyword  <code>next</code>. If you do not want to continue to the next item, use <code>break</code>.</p>
+------------------------------------------------------------------ <br><h3> JRL, Id: 1402764, Score: 801: </h3><p>Use the keyword  <code>next</code>. If you do not want to continue to the next item, use <code>break</code>.</p>
 
 <p>When <code>next</code> is used within a block, it causes the block to exit immediately, returning control to the iterator method, which may then begin a new iteration by invoking the block again:</p>
 
@@ -58,7 +58,7 @@ puts "Good bye"              # ...then control is transferred here
   nil  # If we didn't find the element, return nil
 end
 </code></pre>
-<h4> Comment 37026229 Ajedi32: </h4>There&#39;s also a keyword called <code>redo</code>, which basically just moves execution back to the top of the block within the current iteration.<br><h4> Comment 21136794 finiteloop: </h4><code>next</code>, <code>break</code>, <code>return</code>, you can&#39;t compare<br><h4> Comment 1244303 user169930: </h4>thanks, but next only moves to the next item in the array. is it possible to exit?<br><h4> Comment 69183037 Sam YC: </h4>hi, <code>returning control to the iterator method</code>, if the method that execute the block doesn&#39;t have iterator outside, how <code>next, break</code> behave? Are they the same?<br><h4> Comment 1244469 Marcel Jackwerth: </h4>You have to call next with the return value. &quot;def f; x = yield; puts x; end&quot; &quot;f do next 3; puts &quot;o&quot;; end&quot; This prints 3 (but no &quot;o&quot;) on the console.<br><h4> Comment 24615640 Tyler Holien: </h4>I added an answer expanding on the comment @MarcelJackwerth added about using <code>next</code> or <code>break</code> with an argument.<br><h4> Comment 51581322 red-o-alf: </h4>A little side question: would it still be ok to use break in a File block like this: <code>File.foreach(filename) { break if condition }</code> ? Would that leave the file opened?<br>------------------------------------------------------------------ <br><h3> Answer 10117277 Don Law: </h3><p>I wanted to just be able to break out of a block - sort of like a forward goto, not really related to a loop.  In fact, I want to break of of a block that is in a loop without terminating the loop.  To do that, I made the block a one-iteration loop:</p>
+<h4> Ajedi32, Comment 37026229 Score: 9: </h4>There&#39;s also a keyword called <code>redo</code>, which basically just moves execution back to the top of the block within the current iteration.<br><h4> finiteloop, Comment 21136794 Score: 5: </h4><code>next</code>, <code>break</code>, <code>return</code>, you can&#39;t compare<br><h4> user169930, Comment 1244303 Score: 2: </h4>thanks, but next only moves to the next item in the array. is it possible to exit?<br><h4> Sam YC, Comment 69183037 Score: 1: </h4>hi, <code>returning control to the iterator method</code>, if the method that execute the block doesn&#39;t have iterator outside, how <code>next, break</code> behave? Are they the same?<br><h4> Marcel Jackwerth, Comment 1244469 Score: 0: </h4>You have to call next with the return value. &quot;def f; x = yield; puts x; end&quot; &quot;f do next 3; puts &quot;o&quot;; end&quot; This prints 3 (but no &quot;o&quot;) on the console.<br><h4> Tyler Holien, Comment 24615640 Score: 0: </h4>I added an answer expanding on the comment @MarcelJackwerth added about using <code>next</code> or <code>break</code> with an argument.<br><h4> red-o-alf, Comment 51581322 Score: 0: </h4>A little side question: would it still be ok to use break in a File block like this: <code>File.foreach(filename) { break if condition }</code> ? Would that leave the file opened?<br>------------------------------------------------------------------ <br><h3> Don Law, Id: 10117277, Score: 70: </h3><p>I wanted to just be able to break out of a block - sort of like a forward goto, not really related to a loop.  In fact, I want to break of of a block that is in a loop without terminating the loop.  To do that, I made the block a one-iteration loop:</p>
 
 <pre><code>for b in 1..2 do
     puts b
@@ -72,7 +72,7 @@ end
 </code></pre>
 
 <p>Hope this helps the next googler that lands here based on the subject line.</p>
-<h4> Comment 18799795 Alex Nye: </h4>This was the only response that answered the question as it was put.  Deserves more points.  Thanks.<br><h4> Comment 36841056 G. Allen Morris III: </h4>This works the same for both break and next.  If the false is changed to true then next will stay in the look and break will break out.<br>------------------------------------------------------------------ <br><h3> Answer 11678342 Tyler Holien: </h3><p>If you want your block to return a useful value (e.g. when using <code>#map</code>, <code>#inject</code>, etc.), <code>next</code> and <code>break</code> also accept an argument.</p>
+<h4> Alex Nye, Comment 18799795 Score: 5: </h4>This was the only response that answered the question as it was put.  Deserves more points.  Thanks.<br><h4> G. Allen Morris III, Comment 36841056 Score: 0: </h4>This works the same for both break and next.  If the false is changed to true then next will stay in the look and break will break out.<br>------------------------------------------------------------------ <br><h3> Tyler Holien, Id: 11678342, Score: 42: </h3><p>If you want your block to return a useful value (e.g. when using <code>#map</code>, <code>#inject</code>, etc.), <code>next</code> and <code>break</code> also accept an argument.</p>
 
 <p>Consider the following:</p>
 
@@ -112,8 +112,8 @@ def extracted_logic(x)
   1
 end
 </code></pre>
-<h4> Comment 38226910 Mike Graf: </h4>could you please update w/ a specific example using <code>break</code> (probably just replace one of your <code>next</code> with <code>break</code> ..<br><h4> Comment 33420563 rkallensee: </h4>Thanks for the hint with the argument for <code>break</code>!<br><h4> Comment 67836476 akostadinov: </h4>One very interesting thing. <code>break something</code> works, <code>break(something)</code> works but <code>true &amp;&amp; break(somehting)</code> yields a syntax error. Just FYI. If condition is needed, then <code>if</code> or <code>unless</code> needs to be used.<br>------------------------------------------------------------------ <br><h3> Answer 1402889 AShelly: </h3><p>use the keyword <code>break</code> instead of <code>return</code></p>
------------------------------------------------------------------- <br><h3> Answer 1403781 August Lilleaas: </h3><p>Perhaps you can use the built-in methods for finding particular items in an Array, instead of <code>each</code>-ing <code>targets</code> and doing everything by hand. A few examples:</p>
+<h4> Mike Graf, Comment 38226910 Score: 2: </h4>could you please update w/ a specific example using <code>break</code> (probably just replace one of your <code>next</code> with <code>break</code> ..<br><h4> rkallensee, Comment 33420563 Score: 1: </h4>Thanks for the hint with the argument for <code>break</code>!<br><h4> akostadinov, Comment 67836476 Score: 0: </h4>One very interesting thing. <code>break something</code> works, <code>break(something)</code> works but <code>true &amp;&amp; break(somehting)</code> yields a syntax error. Just FYI. If condition is needed, then <code>if</code> or <code>unless</code> needs to be used.<br>------------------------------------------------------------------ <br><h3> AShelly, Id: 1402889, Score: 23: </h3><p>use the keyword <code>break</code> instead of <code>return</code></p>
+------------------------------------------------------------------ <br><h3> August Lilleaas, Id: 1403781, Score: 8: </h3><p>Perhaps you can use the built-in methods for finding particular items in an Array, instead of <code>each</code>-ing <code>targets</code> and doing everything by hand. A few examples:</p>
 
 <pre><code>class Array
   def first_frog
@@ -153,7 +153,7 @@ class Foo
   end
 end
 </code></pre>
-<h4> Comment 18622021 wberry: </h4>Rails does it, so why can&#39;t he?<br><h4> Comment 63492214 blm768: </h4>@wberry That&#39;s not to say that it necessarily <i>should</i>. ;) In general, though, it&#39;s best to avoid monkey patching core classes unless you have a pretty good reason (i.e. adding some very useful <i>generalizable</i> functionality that lots of other code will find useful). Even then, tread lightly because once a class is heavily monkey-patched, it&#39;s easy for libraries to start walking over each other and causing some extremely odd behavior.<br><h4> Comment 17755261 mrbrdo: </h4>Don&#39;t add arbitrary methods like that to the Array class! That&#39;s really bad practice.<br>------------------------------------------------------------------ <br><h3> Answer 23922630 G. Allen Morris III: </h3><p><code>next</code> and <code>break</code> seem to do the correct thing in this simplified example!</p>
+<h4> wberry, Comment 18622021 Score: 3: </h4>Rails does it, so why can&#39;t he?<br><h4> blm768, Comment 63492214 Score: 2: </h4>@wberry That&#39;s not to say that it necessarily <i>should</i>. ;) In general, though, it&#39;s best to avoid monkey patching core classes unless you have a pretty good reason (i.e. adding some very useful <i>generalizable</i> functionality that lots of other code will find useful). Even then, tread lightly because once a class is heavily monkey-patched, it&#39;s easy for libraries to start walking over each other and causing some extremely odd behavior.<br><h4> mrbrdo, Comment 17755261 Score: 2: </h4>Don&#39;t add arbitrary methods like that to the Array class! That&#39;s really bad practice.<br>------------------------------------------------------------------ <br><h3> G. Allen Morris III, Id: 23922630, Score: 2: </h3><p><code>next</code> and <code>break</code> seem to do the correct thing in this simplified example!</p>
 
 <pre><code>class Bar
   def self.do_things
@@ -181,7 +181,7 @@ Bar.do_things
 </code></pre>
 
 <p>output: 1 3 4 5 6 7 8</p>
-<h4> Comment 59742546 Ben Aubin: </h4>break ends immediately - next continues to the next iteration.<br>------------------------------------------------------------------ <br><h3> Answer 71075077 smithkm: </h3><p>You have four ways to unwind the stack in 'non-exceptional' ways:  <code>next</code>, <code>break</code>, <code>return</code>, and <code>throw</code>.</p>
+<h4> Ben Aubin, Comment 59742546 Score: 2: </h4>break ends immediately - next continues to the next iteration.<br>------------------------------------------------------------------ <br><h3> smithkm, Id: 71075077, Score: 2: </h3><p>You have four ways to unwind the stack in 'non-exceptional' ways:  <code>next</code>, <code>break</code>, <code>return</code>, and <code>throw</code>.</p>
 <p><code>next</code> will cause the block to return.</p>
 <p><code>break</code> will cause the method that yielded to the block to return.</p>
 <p><code>return</code> will cause the method where the block is defined to return.</p>
@@ -290,10 +290,10 @@ puts &quot;* Done&quot;
 &lt; withThrow
 * Done
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 44524785 Kiry Meas: </h3><p>To break out from a ruby block simply use <s><code>return</code> keyword <code>return if value.nil?</code></s> <code>next</code>.</p>
+------------------------------------------------------------------ <br><h3> Kiry Meas, Id: 44524785, Score: -4: </h3><p>To break out from a ruby block simply use <s><code>return</code> keyword <code>return if value.nil?</code></s> <code>next</code>.</p>
 <ul>
 <li><code>next</code> terminates lambda, block, or proc it is in.</li>
 <li><code>break</code> terminates the method that yielded to the block or invoked the proc or lambda it is in.</li>
 </ul>
 <p>Credit to: <a href="https://medium.com/tilthat/ruby-block-return-break-next-101815cda709" rel="nofollow noreferrer">Ruby block return, break, next</a></p>
-<h4> Comment 81495981 interestedparty333: </h4>Doesn&#39;t <code>return</code> exit the function?<br><h4> Comment 126420103 Almokhtar: </h4>shouldn&#39;t use return to exit a block in ruby !<br><h4> Comment 126435648 Kiry Meas: </h4>I stand corrected.<br>
+<h4> interestedparty333, Comment 81495981 Score: 4: </h4>Doesn&#39;t <code>return</code> exit the function?<br><h4> Almokhtar, Comment 126420103 Score: 1: </h4>shouldn&#39;t use return to exit a block in ruby !<br><h4> Kiry Meas, Comment 126435648 Score: 0: </h4>I stand corrected.<br>

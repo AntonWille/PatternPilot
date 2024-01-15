@@ -1,5 +1,5 @@
- <h2> Title: How can I add new keys to a dictionary? </h2> <h3> lfaraone, question_id: 1024847 </h3>Score: 3503, Tags: {python,dictionary,lookup} <br><p>How do I add a new key to an existing dictionary? It doesn't have an <code>.add()</code> method.</p>
------------------------------------------------------------------- <br><h3> Answer 1024851 Paolo Bergantino: </h3><p>You create a new key/value pair on a dictionary by assigning a value to that key</p>
+ <h2> Title: How can I add new keys to a dictionary? </h2> <h4> lfaraone, question_id: 1024847 </h4>Score: 3503, Tags: {python,dictionary,lookup} <br><p>How do I add a new key to an existing dictionary? It doesn't have an <code>.add()</code> method.</p>
+------------------------------------------------------------------ <br><h3> Paolo Bergantino, Id: 1024851, Score: 4363: </h3><p>You create a new key/value pair on a dictionary by assigning a value to that key</p>
 <pre><code>d = {'key': 'value'}
 print(d)  # {'key': 'value'}
 
@@ -8,7 +8,7 @@ d['mynewkey'] = 'mynewvalue'
 print(d)  # {'key': 'value', 'mynewkey': 'mynewvalue'}
 </code></pre>
 <p>If the key doesn't exist, it's added and points to that value. If it exists, the current value it points to is overwritten.</p>
-<h4> Comment 95273513 hegash: </h4>What is the difference between this and the <code>.update()</code> method? Which is better when?<br><h4> Comment 96121821 bgusach: </h4>@hegash the <code>d[key]=val</code> syntax as it is shorter and can handle any object as key (as long it is hashable), and only sets one value, whereas the <code>.update(key1=val1, key2=val2)</code> is nicer if you want to set multiple values at the same time, as long as the keys are strings (since kwargs are converted to strings). <code>dict.update</code> can also take another dictionary, but I personally prefer not to explicitly create a new dictionary in order to update another one.<br><h4> Comment 121260350 Łukasz Kwieciński: </h4>@Selfcontrol7 <code>append</code> is not a dict&#39;s method, it&#39;s a method for lists, it adds a value at the end of the list.<br><h4> Comment 117328364 Kots: </h4>Based on <code>If it exists, the current value it points to is overwritten.</code> how can i make it elegantly check if the key i m trying to add info on, already exists and then raise exception?<br><h4> Comment 116674959 Selfcontrol7: </h4>Please, can anyone can explaine the difference between this answer and append() e.g: a_dict[&quot;a&quot;].append(&quot;hello&quot;)<br><h4> Comment 108756463 Juan-Kabbali: </h4>how can i add an element in a nested dict.  Like php <code>$foo[ ] = [ . . . . ]</code><br><h4> Comment 125334535 Marcelo Guedes: </h4>@Kots the append will add any value like it is, if you append a list, they will add a list in the second element. The focus now is add another field with dict format, &quot;key:value&quot;, not any element.<br><h4> Comment 130097330 OysterShucker: </h4>@Kots <code>yourdict.get(&#39;keyname&#39;, None)</code> will return <code>None</code> if either the key does not exist or the value of the key was already <code>None</code><br>------------------------------------------------------------------ <br><h3> Answer 8381589 Yugal Jindle: </h3><p>I feel like consolidating info about Python dictionaries:</p>
+<h4> hegash, Comment 95273513 Score: 37: </h4>What is the difference between this and the <code>.update()</code> method? Which is better when?<br><h4> bgusach, Comment 96121821 Score: 33: </h4>@hegash the <code>d[key]=val</code> syntax as it is shorter and can handle any object as key (as long it is hashable), and only sets one value, whereas the <code>.update(key1=val1, key2=val2)</code> is nicer if you want to set multiple values at the same time, as long as the keys are strings (since kwargs are converted to strings). <code>dict.update</code> can also take another dictionary, but I personally prefer not to explicitly create a new dictionary in order to update another one.<br><h4> Łukasz Kwieciński, Comment 121260350 Score: 1: </h4>@Selfcontrol7 <code>append</code> is not a dict&#39;s method, it&#39;s a method for lists, it adds a value at the end of the list.<br><h4> Kots, Comment 117328364 Score: 1: </h4>Based on <code>If it exists, the current value it points to is overwritten.</code> how can i make it elegantly check if the key i m trying to add info on, already exists and then raise exception?<br><h4> Selfcontrol7, Comment 116674959 Score: 0: </h4>Please, can anyone can explaine the difference between this answer and append() e.g: a_dict[&quot;a&quot;].append(&quot;hello&quot;)<br><h4> Juan-Kabbali, Comment 108756463 Score: 0: </h4>how can i add an element in a nested dict.  Like php <code>$foo[ ] = [ . . . . ]</code><br><h4> Marcelo Guedes, Comment 125334535 Score: 0: </h4>@Kots the append will add any value like it is, if you append a list, they will add a list in the second element. The focus now is add another field with dict format, &quot;key:value&quot;, not any element.<br><h4> OysterShucker, Comment 130097330 Score: 0: </h4>@Kots <code>yourdict.get(&#39;keyname&#39;, None)</code> will return <code>None</code> if either the key does not exist or the value of the key was already <code>None</code><br>------------------------------------------------------------------ <br><h3> Yugal Jindle, Id: 8381589, Score: 1301: </h3><p>I feel like consolidating info about Python dictionaries:</p>
 <h2>Creating an empty dictionary</h2>
 <pre><code>data = {}
 # OR
@@ -67,7 +67,7 @@ for value in d.values(): # Iterates just through value, ignoring the keys
 <h2>Create a dictionary from two lists</h2>
 <pre><code>data = dict(zip(list_with_keys, list_with_values))
 </code></pre>
-<h4> Comment 121158971 kdb: </h4>Would be good to mention for the various options of &quot;update one entry&quot;, that the ones using &quot;update&quot; have the overhead of creating a temporary dictionary.<br><h4> Comment 117308805 WestCoastProjects: </h4>The &quot;OR&quot; operator <code>|</code> in 3.9 appears to solve my issue with python dicts not having any builder pattern.<br>------------------------------------------------------------------ <br><h3> Answer 1165836 user142911: </h3><p>To add multiple keys simultaneously, use <a href="https://docs.python.org/library/stdtypes.html#dict.update" rel="noreferrer"><code>dict.update()</code></a>:</p>
+<h4> kdb, Comment 121158971 Score: 1: </h4>Would be good to mention for the various options of &quot;update one entry&quot;, that the ones using &quot;update&quot; have the overhead of creating a temporary dictionary.<br><h4> WestCoastProjects, Comment 117308805 Score: 1: </h4>The &quot;OR&quot; operator <code>|</code> in 3.9 appears to solve my issue with python dicts not having any builder pattern.<br>------------------------------------------------------------------ <br><h3> user142911, Id: 1165836, Score: 1231: </h3><p>To add multiple keys simultaneously, use <a href="https://docs.python.org/library/stdtypes.html#dict.update" rel="noreferrer"><code>dict.update()</code></a>:</p>
 
 <pre><code>&gt;&gt;&gt; x = {1:2}
 &gt;&gt;&gt; print(x)
@@ -80,7 +80,7 @@ for value in d.values(): # Iterates just through value, ignoring the keys
 </code></pre>
 
 <p>For adding a single key, the accepted answer has less computational overhead.</p>
------------------------------------------------------------------- <br><h3> Answer 27208535 Russia Must Remove Putin: </h3><blockquote>
+------------------------------------------------------------------ <br><h3> Russia Must Remove Putin, Id: 27208535, Score: 172: </h3><blockquote>
 <h1>&quot;Is it possible to add a key to a Python dictionary after it has been created? It doesn't seem to have an .add() method.&quot;</h1>
 </blockquote>
 <p>Yes it is possible, and it does have a method that implements this, but you don't want to use it directly.</p>
@@ -136,13 +136,13 @@ for value in d.values(): # Iterates just through value, ignoring the keys
 0.005071878433227539
 </code></pre>
 <p>So we see that using the subscript notation is actually much faster than using <code>__setitem__</code>. Doing the Pythonic thing, that is, using the language in the way it was intended to be used, usually is both more readable and computationally efficient.</p>
-<h4> Comment 106252688 holdenweb: </h4>The difference is rather less marked in 2020 (on my machine, 1.35 ms subscripting vs 2ms for <code>d.__setitem__</code>), though the conclusion (and especially the last sentence) remains sound. Hoisting the method name lookup out of the loop reduced time to about 1.65 ms; the remaining difference is likely largely due to unavoidable Python call mechanism overhead.<br>------------------------------------------------------------------ <br><h3> Answer 15994607 Colonel Panic: </h3><p>The conventional syntax is <code>d[key] = value</code>, but if your keyboard is missing the square bracket keys you could also do:</p>
+<h4> holdenweb, Comment 106252688 Score: 1: </h4>The difference is rather less marked in 2020 (on my machine, 1.35 ms subscripting vs 2ms for <code>d.__setitem__</code>), though the conclusion (and especially the last sentence) remains sound. Hoisting the method name lookup out of the loop reduced time to about 1.65 ms; the remaining difference is likely largely due to unavoidable Python call mechanism overhead.<br>------------------------------------------------------------------ <br><h3> Colonel Panic, Id: 15994607, Score: 67: </h3><p>The conventional syntax is <code>d[key] = value</code>, but if your keyboard is missing the square bracket keys you could also do:</p>
 <pre><code>d.__setitem__(key, value)
 </code></pre>
 <p>In fact, defining <code>__getitem__</code> and <code>__setitem__</code> methods is how you can make your own class support the  square bracket syntax. See <em><a href="https://diveintopython3.net/special-method-names.html#acts-like-dict" rel="noreferrer">Dive Into Python, Classes That Act Like Dictionaries</a></em>.</p>
------------------------------------------------------------------- <br><h3> Answer 1024850 Jason C: </h3><pre><code>dictionary[key] = value
+------------------------------------------------------------------ <br><h3> Jason C, Id: 1024850, Score: 123: </h3><pre><code>dictionary[key] = value
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 10339748 Asher: </h3><p>If you want to add a dictionary within a dictionary you can do it this way. </p>
+------------------------------------------------------------------ <br><h3> Asher, Id: 10339748, Score: 67: </h3><p>If you want to add a dictionary within a dictionary you can do it this way. </p>
 
 <p>Example: Add a new entry to your dictionary &amp; sub dictionary</p>
 
@@ -164,7 +164,7 @@ print (dictionary)
 </code></pre>
 
 <p>before adding entries.</p>
------------------------------------------------------------------- <br><h3> Answer 16750088 kiriloff: </h3><p>You can create one:</p>
+------------------------------------------------------------------ <br><h3> kiriloff, Id: 16750088, Score: 45: </h3><p>You can create one:</p>
 
 <pre><code>class myDict(dict):
 
@@ -187,7 +187,7 @@ print(myd)
 <pre><code>&gt;&gt;&gt; 
 {'apples': 6, 'bananas': 3}
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 18294122 Brent Bradburn: </h3><p><a href="https://stackoverflow.com/questions/38987/how-can-i-merge-union-two-python-dictionaries-in-a-single-expression">This popular question</a> addresses <em>functional</em> methods of merging dictionaries <code>a</code> and <code>b</code>.</p>
+------------------------------------------------------------------ <br><h3> Brent Bradburn, Id: 18294122, Score: 37: </h3><p><a href="https://stackoverflow.com/questions/38987/how-can-i-merge-union-two-python-dictionaries-in-a-single-expression">This popular question</a> addresses <em>functional</em> methods of merging dictionaries <code>a</code> and <code>b</code>.</p>
 
 <p>Here are some of the more straightforward methods (tested in Python 3)...</p>
 
@@ -212,7 +212,7 @@ c = dict( i for d in [a,b] for i in d.items() )
 
 c = functional_dict_add( a, 'd', 'dog' )
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 48232916 campeterson: </h3><p>Let's pretend you want to live in the immutable world and do <em>not</em> want to modify the original but want to create a new <code>dict</code> that is the result of adding a new key to the original.</p>
+------------------------------------------------------------------ <br><h3> campeterson, Id: 48232916, Score: 37: </h3><p>Let's pretend you want to live in the immutable world and do <em>not</em> want to modify the original but want to create a new <code>dict</code> that is the result of adding a new key to the original.</p>
 <p><strong>In Python 3.5+ you can do:</strong></p>
 <pre><code>params = {'a': 1, 'b': 2}
 new_params = {**params, **{'c': 3}}
@@ -236,7 +236,7 @@ new_params = params.copy()
 new_params.update({'c': 3})
 </code></pre>
 <p>Reference: <em><a href="https://stackoverflow.com/questions/2255878/what-does-mean-in-the-expression-dictd1-d2/2255892#2255892">What does `**` mean in the expression `dict(d1, **d2)`?</a></em></p>
------------------------------------------------------------------- <br><h3> Answer 46891314 Michael Ekoka: </h3><p>There is also the strangely named, oddly behaved, and yet still handy <a href="https://docs.python.org/3/library/stdtypes.html#dict.setdefault" rel="noreferrer"><code>dict.setdefault()</code></a>.</p>
+------------------------------------------------------------------ <br><h3> Michael Ekoka, Id: 46891314, Score: 26: </h3><p>There is also the strangely named, oddly behaved, and yet still handy <a href="https://docs.python.org/3/library/stdtypes.html#dict.setdefault" rel="noreferrer"><code>dict.setdefault()</code></a>.</p>
 <p>This</p>
 <pre><code>value = my_dict.setdefault(key, default)
 </code></pre>
@@ -258,7 +258,7 @@ except KeyError: # key not found
 &gt;&gt;&gt; print(mydict)
 {'a':1, 'b':2, 'c':3, 'd':4} # existing key was ignored
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 69412024 cs95: </h3><blockquote>
+------------------------------------------------------------------ <br><h3> cs95, Id: 69412024, Score: 21: </h3><blockquote>
 <p>This question has already been answered ad nauseam, but since my (now deleted)
 <a href="https://stackoverflow.com/questions/1024847/how-can-i-add-new-keys-to-a-dictionary?noredirect=1#comment94551424_1024847">comment</a>
 gained a lot of traction, here it is as an answer:</p>
@@ -272,7 +272,7 @@ gained a lot of traction, here it is as an answer:</p>
 <pre><code>new_dict = dict(mydict, new_key=new_val)
 </code></pre>
 <p>Note that with this approach, your key will need to follow the <a href="https://docs.python.org/3/reference/lexical_analysis.html#identifiers" rel="nofollow noreferrer">rules of valid identifier names</a> in Python.</p>
------------------------------------------------------------------- <br><h3> Answer 52756111 Burak &#214;zdemir: </h3><p>If you're not joining two dictionaries, but adding new key-value pairs to a dictionary, then using the subscript notation seems like the best way.</p>
+------------------------------------------------------------------ <br><h3> Burak &#214;zdemir, Id: 52756111, Score: 10: </h3><p>If you're not joining two dictionaries, but adding new key-value pairs to a dictionary, then using the subscript notation seems like the best way.</p>
 
 <pre><code>import timeit
 
@@ -284,7 +284,7 @@ timeit.timeit('dictionary = {"karga": 1, "darga": 2}; dictionary["aaa"] = 123123
 </code></pre>
 
 <p>However, if you'd like to add, for example, thousands of new key-value pairs, you should consider using the <code>update()</code> method.</p>
------------------------------------------------------------------- <br><h3> Answer 55338408 Agus Mathew: </h3><p>First to check whether the key already exists:</p>
+------------------------------------------------------------------ <br><h3> Agus Mathew, Id: 55338408, Score: 7: </h3><p>First to check whether the key already exists:</p>
 <pre><code>a={1:2,3:4}
 a.get(1)
 2
@@ -292,7 +292,7 @@ a.get(5)
 None
 </code></pre>
 <p>Then you can add the new key and value.</p>
------------------------------------------------------------------- <br><h3> Answer 58926921 ingyhere: </h3><p>Here's another way that I didn't see here: </p>
+------------------------------------------------------------------ <br><h3> ingyhere, Id: 58926921, Score: 9: </h3><p>Here's another way that I didn't see here: </p>
 
 <pre><code>&gt;&gt;&gt; foo = dict(a=1,b=2)
 &gt;&gt;&gt; foo
@@ -318,7 +318,7 @@ None
 </code></pre>
 
 <p>The above is using dictionary comprehension.</p>
------------------------------------------------------------------- <br><h3> Answer 60049491 Susan: </h3><p>Add a dictionary <em>(key,value)</em> class.</p>
+------------------------------------------------------------------ <br><h3> Susan, Id: 60049491, Score: 6: </h3><p>Add a dictionary <em>(key,value)</em> class.</p>
 <pre><code>class myDict(dict):
 
     def __init__(self):
@@ -349,7 +349,7 @@ print('\n', myd)
 myd.add(name, 2)
 print(myd)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 57682416 m_____z: </h3><p>I think it would also be useful to point out Python's <strong><a href="https://docs.python.org/3/library/collections.html" rel="noreferrer"><code>collections</code></a></strong> module that consists of many useful dictionary subclasses and wrappers that simplify the <strong>addition and modification of data types in a dictionary</strong>, specifically <a href="https://docs.python.org/3/library/collections.html#collections.defaultdict" rel="noreferrer"><strong><code>defaultdict</code></strong></a>:</p>
+------------------------------------------------------------------ <br><h3> m_____z, Id: 57682416, Score: 5: </h3><p>I think it would also be useful to point out Python's <strong><a href="https://docs.python.org/3/library/collections.html" rel="noreferrer"><code>collections</code></a></strong> module that consists of many useful dictionary subclasses and wrappers that simplify the <strong>addition and modification of data types in a dictionary</strong>, specifically <a href="https://docs.python.org/3/library/collections.html#collections.defaultdict" rel="noreferrer"><strong><code>defaultdict</code></strong></a>:</p>
 
 <blockquote>
   <p>dict subclass that calls a factory function to supply missing values</p>
@@ -390,7 +390,7 @@ defaultdict(&lt;class 'list'&gt;, {'key': [1]})
 </code></pre>
 
 <p>Adding an element automatically initialises the list.</p>
------------------------------------------------------------------- <br><h3> Answer 72570068 dataninsight: </h3><h1>Adding keys to dictionary without using add</h1>
+------------------------------------------------------------------ <br><h3> dataninsight, Id: 72570068, Score: 5: </h3><h1>Adding keys to dictionary without using add</h1>
 <pre><code>        # Inserting/Updating single value
         # subscript notation method
         d['mynewkey'] = 'mynewvalue' # Updates if 'a' exists, else adds 'a'
@@ -417,7 +417,7 @@ defaultdict(&lt;class 'list'&gt;, {'key': [1]})
         # Create a dictionary from two lists
         data = dict(zip(list_with_keys, list_with_values))
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 76587283 cottontail: </h3><h4><code>update()</code> and inplace merge operator (<code>|=</code>)</h4>
+------------------------------------------------------------------ <br><h3> cottontail, Id: 76587283, Score: 1: </h3><h4><code>update()</code> and inplace merge operator (<code>|=</code>)</h4>
 <p>A dictionary can be updated in-place via  <code>|=</code> and <code>update()</code> by a list of tuples as well.</p>
 <pre class="lang-py prettyprint-override"><code>d = {'a': 1} 
 d |= [('b', 2), ('c', 3)]
@@ -445,10 +445,10 @@ mydict['address']['work'] = '123 A St'                  # &lt;---- OK
 <pre class="lang-py prettyprint-override"><code>mydict.setdefault('address', {})['work'] = '123 A St'   # &lt;---- OK
 </code></pre>
 <p>The reason it works is that a default value of empty dict (<code>{}</code>) was passed to <code>.setdefault</code>, so when it is time to add the key-value pair to it, it is already initialized.</p>
------------------------------------------------------------------- <br><h3> Answer 75601589 Anton Shepelev: </h3><p>You can write a function for doing that, e.g.:</p>
+------------------------------------------------------------------ <br><h3> Anton Shepelev, Id: 75601589, Score: -1: </h3><p>You can write a function for doing that, e.g.:</p>
 <pre><code>def dict_ins( d, key, value ):
     if key in d: raise Exception('This key is already in the dictionary.')
     d[key] = value
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 73924595 Egidius: </h3><p>dico[&quot;new key&quot;] = &quot;value&quot;</p>
-<h4> Comment 130528542 Mechanic Pig: </h4>-1. This is almost a code dump that currently accepts the answer (and was published many years ago). There is no improvement or new information, and no explanation, so I think it is <i>not useful</i>.<br>
+------------------------------------------------------------------ <br><h3> Egidius, Id: 73924595, Score: -3: </h3><p>dico[&quot;new key&quot;] = &quot;value&quot;</p>
+<h4> Mechanic Pig, Comment 130528542 Score: 3: </h4>-1. This is almost a code dump that currently accepts the answer (and was published many years ago). There is no improvement or new information, and no explanation, so I think it is <i>not useful</i>.<br>

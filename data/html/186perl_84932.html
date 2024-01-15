@@ -1,7 +1,7 @@
- <h2> Title: How do I get the full path to a Perl script that is executing? </h2> <h3> Chris Madden, question_id: 84932 </h3>Score: 186, Tags: {perl,path,location} <br><p>I have Perl script and need to determine the full path and filename of the script during execution. I discovered that depending on how you call the script <code>$0</code> varies and sometimes contains the <code>fullpath+filename</code> and sometimes just <code>filename</code>. Because the working directory can vary as well I can't think of a way to reliably get the <code>fullpath+filename</code> of the script.</p>
+ <h2> Title: How do I get the full path to a Perl script that is executing? </h2> <h4> Chris Madden, question_id: 84932 </h4>Score: 186, Tags: {perl,path,location} <br><p>I have Perl script and need to determine the full path and filename of the script during execution. I discovered that depending on how you call the script <code>$0</code> varies and sometimes contains the <code>fullpath+filename</code> and sometimes just <code>filename</code>. Because the working directory can vary as well I can't think of a way to reliably get the <code>fullpath+filename</code> of the script.</p>
 
 <p>Anyone got a solution?</p>
-<h4> Comment 115176336 user1210923: </h4>I know this was a long time ago but I was just looking for a perl windows way of doing this and am quite happy with my solution   #!/usr/bin/perl -w 	my @catalog=<code>dir</code>; 	$myHome = substr($catalog[3],14); 	$myHome = &amp;rtrim($myHome); 	print qq(&lt;$myHome&gt;\n); # Right trim function to remove trailing whitespace sub rtrim { 	my $string = shift; 	$string =~ s/\s+$//; 	return $string; } just thought I&#39;d share<br>------------------------------------------------------------------ <br><h3> Answer 90721 Drew Stephens: </h3><p>There are a few ways:</p>
+<h4> user1210923, Id: 115176336 Score: 0: </h4>I know this was a long time ago but I was just looking for a perl windows way of doing this and am quite happy with my solution   #!/usr/bin/perl -w 	my @catalog=<code>dir</code>; 	$myHome = substr($catalog[3],14); 	$myHome = &amp;rtrim($myHome); 	print qq(&lt;$myHome&gt;\n); # Right trim function to remove trailing whitespace sub rtrim { 	my $string = shift; 	$string =~ s/\s+$//; 	return $string; } just thought I&#39;d share<br>------------------------------------------------------------------ <br><h3> Drew Stephens, Id: 90721, Score: 284: </h3><p>There are a few ways:</p>
 
 <ul>
 <li><a href="http://perldoc.perl.org/perlvar.html#$0" rel="noreferrer"><code>$0</code></a> is the currently executing script as provided by POSIX, relative to the current working directory if the script is at or below the CWD</li>
@@ -15,7 +15,7 @@
 <pre><code>use File::Basename;
 my $dirname = dirname(__FILE__);
 </code></pre>
-<h4> Comment 35398300 DavidGamba: </h4><code>dirname(__FILE__)</code> doesn&#39;t follow symlinks, so if you linked the executable file and where hoping to find the location of some other file in the install location you need to check <code>if( -l __FILE__)</code> and then <code>dirname(readlink(__FILE__))</code>.<br><h4> Comment 22102194 Aftershock: </h4>It looks like abs_path needs to be used with _____FILE_____ as it may contain the name only with the path.<br><h4> Comment 22190600 Izkata: </h4>@vicTROLLA Probably because the biggest recommendation from this answer (using dirname with <code>__FILE__</code>) doesn&#39;t work quite as expected?  I end up with the relative path from where the script was executed, while the accepted answer gives me the full absolute path.<br><h4> Comment 60466574 Drew Stephens: </h4>@IliaRostovtsev You can find when a module was first included in the standard modules with this incantation: <code>perl -e &#39;use Module::CoreList; print Module::CoreList-&gt;first_release(&quot;File::Basename&quot;);&#39;; echo</code>. For <code>File::Basename</code> that was Perl 5.0.0, which was released in the late &#39;90s—I think it&#39;s save to use by now.<br><h4> Comment 66485387 Grant Bowman: </h4>So here is what worked for me, putting it all together with @Aftershock (thanks) to answer the original question.          <code>use Cwd &#39;abs_path&#39;;       use File::Basename;      my $start;       if ( -l __FILE__ ) { $start=dirname(readlink(__FILE__)); } else { $start=dirname(__FILE__); }       my $fullpath = abs_path($start).&#39;&#47;&#39;;       my $filename= basename($start);       print &quot;$fullpath$filename&quot;;</code><br><h4> Comment 10939116 Caterham: </h4>This is really the best solution, especially if you already have a modified $0<br><h4> Comment 21869794 vicTROLLA: </h4>Upvote. Not really sure why this answer was not accepted as the above accepted answer is not functional considering it involves stripping the script name off the end of the path.<br><h4> Comment 114870996 Mark Reed: </h4>Worth mentioning here that <code>__FILE__</code> is <i>not</i> always an absolute path.<br><h4> Comment 92720502 David Tonhofer: </h4><code>dirname</code> is said to involve &quot;quirks&quot; in the Perl documentation, and it is recommended to use <code>fileparse</code>. So basically <code>abs_path((fileparse(__FILE__))[1])</code> should give the path.<br><h4> Comment 105142189 Georgy Vladimirov: </h4>I would like to add an important thing to keep in mind that is tangental to this problem. That is, people usually want to find the directory of the running script, so that they can include some modules relative to the script&#39;s path, i.e. they want to add a <code>use lib ( &quot;$dirname&#47;lib&quot; )</code>. In those cases, it is important to put the <code>my $dirname = dirname(__FILE__);</code> inside a <code>BEGIN { ... }</code> block before the <code>use lib</code>, so that it will execute at compile time before that (normally <code>use</code> directives happen at compile time, so you need <code>BEGIN</code> to force the order of execution.<br><h4> Comment 112374836 user3673: </h4>Doesn&#39;t work: <code>$ cat &gt;testdirname use File::Basename; print dirname(__FILE__); $ perl testdirname .$ perl -v  This is perl 5, version 28, subversion 1 (v5.28.1) built for x86_64-linux-gnu-thread-multi</code><br><h4> Comment 113618926 Lily Ballard: </h4>@DavidTonhofer Surely you do <code>abs_path</code> first, otherwise if the file itself is a symlink you won&#39;t be resolving that symlink, since you&#39;re only resolving the directory. That would be <code>(fileparse(abs_path(__FILE__)))[1]</code><br><h4> Comment 119577865 Steven Fisher: </h4>@MarkReed Yes, in my case it was the filename only.<br><h4> Comment 39416713 Sos: </h4>newbie here: although your solution worked (seeing as I could open files in that directory), is it normal that when I <code>dd $dirname</code> or <code>print $dirname</code> I get &#39;.&#39; as output?<br><h4> Comment 46522537 kbro: </h4>I have a script that&#39;s being run from another script using require &#39;script.pl&#39; so $0 give me the path to the calling script, not the called one.  __FILE__ gives the right answer in this case.<br><h4> Comment 60458540 Ilia Ross: </h4>How safe is it to use <code>File::Basename;</code>, meaning when this module started to be shipped with Perl core? Is it possible that some old Perl versions wouldn&#39;t have it. How to check it?<br>------------------------------------------------------------------ <br><h3> Answer 84959 Ovid: </h3><p>$0 is typically the name of your program, so how about this?</p>
+<h4> DavidGamba, Comment 35398300 Score: 13: </h4><code>dirname(__FILE__)</code> doesn&#39;t follow symlinks, so if you linked the executable file and where hoping to find the location of some other file in the install location you need to check <code>if( -l __FILE__)</code> and then <code>dirname(readlink(__FILE__))</code>.<br><h4> Aftershock, Comment 22102194 Score: 10: </h4>It looks like abs_path needs to be used with _____FILE_____ as it may contain the name only with the path.<br><h4> Izkata, Comment 22190600 Score: 6: </h4>@vicTROLLA Probably because the biggest recommendation from this answer (using dirname with <code>__FILE__</code>) doesn&#39;t work quite as expected?  I end up with the relative path from where the script was executed, while the accepted answer gives me the full absolute path.<br><h4> Drew Stephens, Comment 60466574 Score: 4: </h4>@IliaRostovtsev You can find when a module was first included in the standard modules with this incantation: <code>perl -e &#39;use Module::CoreList; print Module::CoreList-&gt;first_release(&quot;File::Basename&quot;);&#39;; echo</code>. For <code>File::Basename</code> that was Perl 5.0.0, which was released in the late &#39;90s—I think it&#39;s save to use by now.<br><h4> Grant Bowman, Comment 66485387 Score: 2: </h4>So here is what worked for me, putting it all together with @Aftershock (thanks) to answer the original question.          <code>use Cwd &#39;abs_path&#39;;       use File::Basename;      my $start;       if ( -l __FILE__ ) { $start=dirname(readlink(__FILE__)); } else { $start=dirname(__FILE__); }       my $fullpath = abs_path($start).&#39;&#47;&#39;;       my $filename= basename($start);       print &quot;$fullpath$filename&quot;;</code><br><h4> Caterham, Comment 10939116 Score: 2: </h4>This is really the best solution, especially if you already have a modified $0<br><h4> vicTROLLA, Comment 21869794 Score: 1: </h4>Upvote. Not really sure why this answer was not accepted as the above accepted answer is not functional considering it involves stripping the script name off the end of the path.<br><h4> Mark Reed, Comment 114870996 Score: 1: </h4>Worth mentioning here that <code>__FILE__</code> is <i>not</i> always an absolute path.<br><h4> David Tonhofer, Comment 92720502 Score: 1: </h4><code>dirname</code> is said to involve &quot;quirks&quot; in the Perl documentation, and it is recommended to use <code>fileparse</code>. So basically <code>abs_path((fileparse(__FILE__))[1])</code> should give the path.<br><h4> Georgy Vladimirov, Comment 105142189 Score: 1: </h4>I would like to add an important thing to keep in mind that is tangental to this problem. That is, people usually want to find the directory of the running script, so that they can include some modules relative to the script&#39;s path, i.e. they want to add a <code>use lib ( &quot;$dirname&#47;lib&quot; )</code>. In those cases, it is important to put the <code>my $dirname = dirname(__FILE__);</code> inside a <code>BEGIN { ... }</code> block before the <code>use lib</code>, so that it will execute at compile time before that (normally <code>use</code> directives happen at compile time, so you need <code>BEGIN</code> to force the order of execution.<br><h4> user3673, Comment 112374836 Score: 1: </h4>Doesn&#39;t work: <code>$ cat &gt;testdirname use File::Basename; print dirname(__FILE__); $ perl testdirname .$ perl -v  This is perl 5, version 28, subversion 1 (v5.28.1) built for x86_64-linux-gnu-thread-multi</code><br><h4> Lily Ballard, Comment 113618926 Score: 0: </h4>@DavidTonhofer Surely you do <code>abs_path</code> first, otherwise if the file itself is a symlink you won&#39;t be resolving that symlink, since you&#39;re only resolving the directory. That would be <code>(fileparse(abs_path(__FILE__)))[1]</code><br><h4> Steven Fisher, Comment 119577865 Score: 0: </h4>@MarkReed Yes, in my case it was the filename only.<br><h4> Sos, Comment 39416713 Score: 0: </h4>newbie here: although your solution worked (seeing as I could open files in that directory), is it normal that when I <code>dd $dirname</code> or <code>print $dirname</code> I get &#39;.&#39; as output?<br><h4> kbro, Comment 46522537 Score: 0: </h4>I have a script that&#39;s being run from another script using require &#39;script.pl&#39; so $0 give me the path to the calling script, not the called one.  __FILE__ gives the right answer in this case.<br><h4> Ilia Ross, Comment 60458540 Score: 0: </h4>How safe is it to use <code>File::Basename;</code>, meaning when this module started to be shipped with Perl core? Is it possible that some old Perl versions wouldn&#39;t have it. How to check it?<br>------------------------------------------------------------------ <br><h3> Ovid, Id: 84959, Score: 150: </h3><p>$0 is typically the name of your program, so how about this?</p>
 
 <pre><code>use Cwd 'abs_path';
 print abs_path($0);
@@ -24,11 +24,11 @@ print abs_path($0);
 <p>Seems to me that this should work as abs_path knows if you are using a relative or absolute path.</p>
 
 <p><strong>Update</strong> For anyone reading this years later, you should read <a href="https://stackoverflow.com/a/90721/2877364">Drew's answer</a>. It's much better than mine.</p>
-<h4> Comment 11260 Chris Madden: </h4>Small comment, on activestate perl on windows $0 typically contains backslashes and abs_path returned forward slashes, so a quick &quot;tr /\//\\/;&quot; was needed to fix it.<br><h4> Comment 17540729 vol7ron: </h4>wanted to add that there&#39;s a <code>realpath</code>, which is a synonym to <code>abs_path</code>, incase you prefer the no-underscore name<br><h4> Comment 57333954 GreenGiant: </h4>@leonbloy When you execute a script inline (with <code>-e</code>), I believe perl creates a temp file to store your inline script. Looks like the location, in your case, is <code>&#47;tmp</code>. What did you expect the result to be?<br><h4> Comment 36390725 leonbloy: </h4>Other problem I have: <code>perl -e &#39;use Cwd &quot;abs_path&quot;;print abs_path($0);&#39;</code>  prints <code>&#47;tmp&#47;-e</code><br><h4> Comment 33604806 Znik: </h4>@Chris , did you report bug to Cwd module maintainer? It seems like Windows adoption bug.<br><h4> Comment 35816728 Scott Chu: </h4>This reports an error &quot;opendir(test.pl/..): is not a directory at test.pl line 8!<br><h4> Comment 78541708 Richlv: </h4>@GreenGiant, it uses the current directory in that case - but I guess @leonbloy did not expect to see <code>-e</code> appended to the path.<br><h4> Comment 37697880 William Barrett: </h4>This worked fine for me under Windows 7.  However, the path did not contain any links.<br>------------------------------------------------------------------ <br><h3> Answer 85070 Mark: </h3><pre><code>use File::Spec;
+<h4> Chris Madden, Comment 11260 Score: 12: </h4>Small comment, on activestate perl on windows $0 typically contains backslashes and abs_path returned forward slashes, so a quick &quot;tr /\//\\/;&quot; was needed to fix it.<br><h4> vol7ron, Comment 17540729 Score: 3: </h4>wanted to add that there&#39;s a <code>realpath</code>, which is a synonym to <code>abs_path</code>, incase you prefer the no-underscore name<br><h4> GreenGiant, Comment 57333954 Score: 2: </h4>@leonbloy When you execute a script inline (with <code>-e</code>), I believe perl creates a temp file to store your inline script. Looks like the location, in your case, is <code>&#47;tmp</code>. What did you expect the result to be?<br><h4> leonbloy, Comment 36390725 Score: 1: </h4>Other problem I have: <code>perl -e &#39;use Cwd &quot;abs_path&quot;;print abs_path($0);&#39;</code>  prints <code>&#47;tmp&#47;-e</code><br><h4> Znik, Comment 33604806 Score: 0: </h4>@Chris , did you report bug to Cwd module maintainer? It seems like Windows adoption bug.<br><h4> Scott Chu, Comment 35816728 Score: 0: </h4>This reports an error &quot;opendir(test.pl/..): is not a directory at test.pl line 8!<br><h4> Richlv, Comment 78541708 Score: 0: </h4>@GreenGiant, it uses the current directory in that case - but I guess @leonbloy did not expect to see <code>-e</code> appended to the path.<br><h4> William Barrett, Comment 37697880 Score: 0: </h4>This worked fine for me under Windows 7.  However, the path did not contain any links.<br>------------------------------------------------------------------ <br><h3> Mark, Id: 85070, Score: 39: </h3><pre><code>use File::Spec;
 File::Spec-&gt;rel2abs( __FILE__ );
 </code></pre>
 <p><a href="http://perldoc.perl.org/File/Spec/Unix.html" rel="nofollow noreferrer">http://perldoc.perl.org/File/Spec/Unix.html</a></p>
-<h4> Comment 102833888 David H.: </h4>Then wrap in dirname() to get the absolute path - just what I needed!<br>------------------------------------------------------------------ <br><h3> Answer 84982 bmdhacks: </h3><p>I think the module you're looking for is FindBin:</p>
+<h4> David H., Comment 102833888 Score: 0: </h4>Then wrap in dirname() to get the absolute path - just what I needed!<br>------------------------------------------------------------------ <br><h3> bmdhacks, Id: 84982, Score: 16: </h3><p>I think the module you're looking for is FindBin:</p>
 
 <pre><code>#!/usr/bin/perl
 use FindBin;
@@ -36,7 +36,7 @@ use FindBin;
 $0 = "stealth";
 print "The actual path to this is: $FindBin::Bin/$FindBin::Script\n";
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 85037 Benjamin W. Smith: </h3><p>You could use <a href="http://search.cpan.org/~tty/kurila-1.13_0/lib/FindBin.pm" rel="noreferrer">FindBin</a>, <a href="http://perldoc.perl.org/Cwd.html" rel="noreferrer">Cwd</a>, <a href="http://perldoc.perl.org/File/Basename.html" rel="noreferrer">File::Basename</a>, or a combination of them.  They're all in the base distribution of Perl IIRC.</p>
+------------------------------------------------------------------ <br><h3> Benjamin W. Smith, Id: 85037, Score: 11: </h3><p>You could use <a href="http://search.cpan.org/~tty/kurila-1.13_0/lib/FindBin.pm" rel="noreferrer">FindBin</a>, <a href="http://perldoc.perl.org/Cwd.html" rel="noreferrer">Cwd</a>, <a href="http://perldoc.perl.org/File/Basename.html" rel="noreferrer">File::Basename</a>, or a combination of them.  They're all in the base distribution of Perl IIRC.</p>
 
 <p>I used Cwd in the past:</p>
 
@@ -46,12 +46,12 @@ print "The actual path to this is: $FindBin::Bin/$FindBin::Script\n";
 my $path = abs_path($0);
 print "$path\n";
 </code></pre>
-<h4> Comment 33605345 Znik: </h4>@bmdhacks, you&#39;re right. Presumption is, you didn&#39;t change 0$. For example you do work above as soon as script starts (in initialization block), or elsewhere when you don&#39;t change $0. But $0 is excellent way to change process description visible under &#39;ps&#39; unix tool :) This can show curren process status, etc. This is depended on programmer purpose :)<br>------------------------------------------------------------------ <br><h3> Answer 90769 Eric Wilhelm: </h3><p>Getting the absolute path to <code>$0</code> or <code>__FILE__</code> is what you want.  The only trouble is if someone did a <code>chdir()</code> and the <code>$0</code> was relative -- then you need to get the absolute path in a <code>BEGIN{}</code> to prevent any surprises.</p>
+<h4> Znik, Comment 33605345 Score: 1: </h4>@bmdhacks, you&#39;re right. Presumption is, you didn&#39;t change 0$. For example you do work above as soon as script starts (in initialization block), or elsewhere when you don&#39;t change $0. But $0 is excellent way to change process description visible under &#39;ps&#39; unix tool :) This can show curren process status, etc. This is depended on programmer purpose :)<br>------------------------------------------------------------------ <br><h3> Eric Wilhelm, Id: 90769, Score: 10: </h3><p>Getting the absolute path to <code>$0</code> or <code>__FILE__</code> is what you want.  The only trouble is if someone did a <code>chdir()</code> and the <code>$0</code> was relative -- then you need to get the absolute path in a <code>BEGIN{}</code> to prevent any surprises.</p>
 
 <p><code>FindBin</code> tries to go one better and grovel around in the <code>$PATH</code> for something matching the <code>basename($0)</code>, but there are times when that does far-too-surprising things (specifically:  when the file is "right in front of you" in the cwd.)</p>
 
 <p><code>File::Fu</code> has <code>File::Fu-&gt;program_name</code> and <code>File::Fu-&gt;program_dir</code> for this.</p>
-<h4> Comment 11659167 SamB: </h4>Is it really likely that anyone would be so foolish as to (permanently) <code>chdir()</code> at compile time?<br><h4> Comment 33605374 Znik: </h4>Simply do all works based on current dir and $0 at the script begin.<br>------------------------------------------------------------------ <br><h3> Answer 84973 Sean: </h3><p>Have you tried:</p>
+<h4> SamB, Comment 11659167 Score: 0: </h4>Is it really likely that anyone would be so foolish as to (permanently) <code>chdir()</code> at compile time?<br><h4> Znik, Comment 33605374 Score: 0: </h4>Simply do all works based on current dir and $0 at the script begin.<br>------------------------------------------------------------------ <br><h3> Sean, Id: 84973, Score: 6: </h3><p>Have you tried:</p>
 
 <pre><code>$ENV{'SCRIPT_NAME'}
 </code></pre>
@@ -63,12 +63,12 @@ print "The script is located in $Bin.\n";
 </code></pre>
 
 <p>It really depends on how it's being called and if it's CGI or being run from a normal shell, etc.</p>
-<h4> Comment 33605129 Znik: </h4>Bad idea because SCRIPT_NAME enviroment is depended on shell you are using. This is complete incompatibile with windows cmd.exe, and incompatibile when you call script directly from other binaries. There is no warranty this wariable is set. Above ways are much more usable.<br><h4> Comment 32641682 Putnik: </h4>$ENV{&#39;SCRIPT_NAME&#39;} is empty when the script is running at console<br>------------------------------------------------------------------ <br><h3> Answer 85264 wnoise: </h3><p>Some short background:</p>
+<h4> Znik, Comment 33605129 Score: 1: </h4>Bad idea because SCRIPT_NAME enviroment is depended on shell you are using. This is complete incompatibile with windows cmd.exe, and incompatibile when you call script directly from other binaries. There is no warranty this wariable is set. Above ways are much more usable.<br><h4> Putnik, Comment 32641682 Score: 0: </h4>$ENV{&#39;SCRIPT_NAME&#39;} is empty when the script is running at console<br>------------------------------------------------------------------ <br><h3> wnoise, Id: 85264, Score: 8: </h3><p>Some short background:</p>
 
 <p>Unfortunately the Unix API doesn't provide a running program with the full path to the executable.  In fact, the program executing yours can provide whatever it wants in the field that normally tells your program what it is.  There are, as all the answers point out, various heuristics for finding likely candidates.  But nothing short of searching the entire filesystem will always work, and even that will fail if the executable is moved or removed.</p>
 
 <p>But you don't want the Perl executable, which is what's actually running, but the script it is executing.  And Perl needs to know where the script is to find it.  It stores this in <code>__FILE__</code>, while <code>$0</code> is from the Unix API.  This can still be a relative path, so take Mark's suggestion and canonize it with <code>File::Spec-&gt;rel2abs( __FILE__ );</code></p>
-<h4> Comment 68032420 felwithe: </h4><code>__FILE__</code> still gives me a relative path. i.e. &#39;.&#39;.<br>------------------------------------------------------------------ <br><h3> Answer 17735548 Matt: </h3><p>In order to get the path to the directory containing my script I used a combination of answers given already.</p>
+<h4> felwithe, Comment 68032420 Score: 0: </h4><code>__FILE__</code> still gives me a relative path. i.e. &#39;.&#39;.<br>------------------------------------------------------------------ <br><h3> Matt, Id: 17735548, Score: 6: </h3><p>In order to get the path to the directory containing my script I used a combination of answers given already.</p>
 
 <pre><code>#!/usr/bin/perl
 use strict;
@@ -78,13 +78,13 @@ use File::Basename;
 
 my $dir = dirname(File::Spec-&gt;rel2abs(__FILE__));
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 85098 moritz: </h3><p><a href="http://perldoc.perl.org/perlfaq8.html" rel="nofollow noreferrer">perlfaq8</a> answers a very similar question with using the <code>rel2abs()</code> function on <code>$0</code>. That function can be found in File::Spec.</p>
------------------------------------------------------------------- <br><h3> Answer 24515046 daniel souza: </h3><p>There's no need to use external modules, with just one line you can have the file name and relative path. If you are using modules and need to apply a path relative to the script directory, the relative path is enough.</p>
+------------------------------------------------------------------ <br><h3> moritz, Id: 85098, Score: 2: </h3><p><a href="http://perldoc.perl.org/perlfaq8.html" rel="nofollow noreferrer">perlfaq8</a> answers a very similar question with using the <code>rel2abs()</code> function on <code>$0</code>. That function can be found in File::Spec.</p>
+------------------------------------------------------------------ <br><h3> daniel souza, Id: 24515046, Score: 2: </h3><p>There's no need to use external modules, with just one line you can have the file name and relative path. If you are using modules and need to apply a path relative to the script directory, the relative path is enough.</p>
 
 <pre><code>$0 =~ m/(.+)[\/\\](.+)$/;
 print "full path: $1, file name: $2\n";
 </code></pre>
-<h4> Comment 63541416 Keve: </h4>It does not provide the proper full path of the script if you run it like &quot;./myscript.pl&quot;, as it would only show &quot;.&quot; instead. But I still like this solution.<br>------------------------------------------------------------------ <br><h3> Answer 5516160 Yong Li: </h3><p>Are you looking for this?:</p>
+<h4> Keve, Comment 63541416 Score: 0: </h4>It does not provide the proper full path of the script if you run it like &quot;./myscript.pl&quot;, as it would only show &quot;.&quot; instead. But I still like this solution.<br>------------------------------------------------------------------ <br><h3> Yong Li, Id: 5516160, Score: 1: </h3><p>Are you looking for this?:</p>
 
 <pre><code>my $thisfile = $1 if $0 =~
 /\\([^\\]*)$|\/([^\/]*)$/;
@@ -99,7 +99,7 @@ now.\n";
 </code></pre>
 
 <p>It works on both Windows and Unix.</p>
------------------------------------------------------------------- <br><h3> Answer 13566423 mkc: </h3><pre><code>#!/usr/bin/perl -w
+------------------------------------------------------------------ <br><h3> mkc, Id: 13566423, Score: 1: </h3><pre><code>#!/usr/bin/perl -w
 use strict;
 
 
@@ -131,7 +131,7 @@ print "\n$path\n";
 </code></pre>
 
 <p>:DD</p>
-<h4> Comment 18587714 Lee Taylor: </h4>Please don&#39;t just answer with code. Please explain why this is the correct answer.<br>------------------------------------------------------------------ <br><h3> Answer 23149908 DavidGamba: </h3><p>The problem with just using <code>dirname(__FILE__)</code> is that it doesn't follow symlinks. I had to use this for my script to follow the symlink to the actual file location.</p>
+<h4> Lee Taylor, Comment 18587714 Score: 4: </h4>Please don&#39;t just answer with code. Please explain why this is the correct answer.<br>------------------------------------------------------------------ <br><h3> DavidGamba, Id: 23149908, Score: 1: </h3><p>The problem with just using <code>dirname(__FILE__)</code> is that it doesn't follow symlinks. I had to use this for my script to follow the symlink to the actual file location.</p>
 
 <pre><code>use File::Basename;
 my $script_dir = undef;
@@ -142,7 +142,7 @@ else {
   $script_dir = dirname(__FILE__);
 }
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 6997006 Yordan Georgiev: </h3><pre><code>use strict ; use warnings ; use Cwd 'abs_path';
+------------------------------------------------------------------ <br><h3> Yordan Georgiev, Id: 6997006, Score: 0: </h3><pre><code>use strict ; use warnings ; use Cwd 'abs_path';
     sub ResolveMyProductBaseDir { 
 
         # Start - Resolve the ProductBaseDir
@@ -162,7 +162,7 @@ else {
         return $ProductBaseDir ; 
     } #eof sub 
 </code></pre>
-<h4> Comment 26892223 the Tin Man: </h4>While a source-only answer might solve the user&#39;s question, it doesn&#39;t help them understand why it works. You&#39;ve given the user a fish, but instead you should teach them HOW to fish.<br>------------------------------------------------------------------ <br><h3> Answer 20565937 Jonathan: </h3><p>The problem with <code>__FILE__</code> is that it will print the core module ".pm" path not necessarily the ".cgi" or  ".pl" script path that is running. I guess it depends on what your goal is.</p>
+<h4> the Tin Man, Comment 26892223 Score: 0: </h4>While a source-only answer might solve the user&#39;s question, it doesn&#39;t help them understand why it works. You&#39;ve given the user a fish, but instead you should teach them HOW to fish.<br>------------------------------------------------------------------ <br><h3> Jonathan, Id: 20565937, Score: 0: </h3><p>The problem with <code>__FILE__</code> is that it will print the core module ".pm" path not necessarily the ".cgi" or  ".pl" script path that is running. I guess it depends on what your goal is.</p>
 
 <p>It seems to me that <a href="http://search.cpan.org/~smueller/PathTools-3.40/" rel="nofollow"><code>Cwd</code></a> just needs to be updated for mod_perl. Here is my suggestion:</p>
 
@@ -192,7 +192,7 @@ print $path;
 </code></pre>
 
 <p>Please add any suggestions.</p>
------------------------------------------------------------------- <br><h3> Answer 21605869 Putnik: </h3><p>Without any external modules, valid for shell, works well even with '../':</p>
+------------------------------------------------------------------ <br><h3> Putnik, Id: 21605869, Score: 0: </h3><p>Without any external modules, valid for shell, works well even with '../':</p>
 
 <pre><code>my $self = `pwd`;
 chomp $self;
@@ -211,7 +211,7 @@ self=/my/temp/Host/host-mod.pl
 $ /my/temp/Host$ ../Host/./host-mod.pl 
 self=/my/temp/Host/host-mod.pl
 </code></pre>
-<h4> Comment 33605645 Znik: </h4>What when you call symlink? Cwd works excellent with this case.<br>------------------------------------------------------------------ <br><h3> Answer 25663214 Elmar: </h3><p>All the library-free solutions don't actually work for more than a few ways to write a path (think ../ or /bla/x/../bin/./x/../ etc. My solution looks like below. I have one quirk: I don't have the faintest idea why I have to run the replacements twice. If I don't, I get a spurious "./" or "../". Apart from that, it seems quite robust to me.</p>
+<h4> Znik, Comment 33605645 Score: 0: </h4>What when you call symlink? Cwd works excellent with this case.<br>------------------------------------------------------------------ <br><h3> Elmar, Id: 25663214, Score: 0: </h3><p>All the library-free solutions don't actually work for more than a few ways to write a path (think ../ or /bla/x/../bin/./x/../ etc. My solution looks like below. I have one quirk: I don't have the faintest idea why I have to run the replacements twice. If I don't, I get a spurious "./" or "../". Apart from that, it seems quite robust to me.</p>
 
 <pre><code>  my $callpath = $0;
   my $pwd = `pwd`; chomp($pwd);
@@ -230,7 +230,7 @@ self=/my/temp/Host/host-mod.pl
   my $calldir = $callpath;
   $calldir =~ s/(.*)\/([^\/]+)/$1/;
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 52944919 drjumper: </h3><p>None of the "top" answers were right for me. The problem with using FindBin '$Bin' or Cwd is that they return absolute path with all symbolic links resolved. In my case I needed the exact path with symbolic links present - the same as returns Unix command "pwd" and not "pwd -P". The following function provides the solution:</p>
+------------------------------------------------------------------ <br><h3> drjumper, Id: 52944919, Score: 0: </h3><p>None of the "top" answers were right for me. The problem with using FindBin '$Bin' or Cwd is that they return absolute path with all symbolic links resolved. In my case I needed the exact path with symbolic links present - the same as returns Unix command "pwd" and not "pwd -P". The following function provides the solution:</p>
 
 <pre><code>sub get_script_full_path {
     use File::Basename;
@@ -243,7 +243,7 @@ self=/my/temp/Host/host-mod.pl
     return File::Spec-&gt;catfile($dir, basename($0));
 }
 </code></pre>
-<h4> Comment 121385901 amphetamachine: </h4>This function has a side effect of modifying working directory of the executing script.<br>------------------------------------------------------------------ <br><h3> Answer 58417063 user3228609: </h3><p>On Windows using <code>dirname</code> and <code>abs_path</code> together worked best for me.</p>
+<h4> amphetamachine, Comment 121385901 Score: 1: </h4>This function has a side effect of modifying working directory of the executing script.<br>------------------------------------------------------------------ <br><h3> user3228609, Id: 58417063, Score: 0: </h3><p>On Windows using <code>dirname</code> and <code>abs_path</code> together worked best for me.</p>
 
 <pre><code>use File::Basename;
 use Cwd qw(abs_path);
@@ -263,7 +263,7 @@ print "dirname(__FILE__) -&gt; $rel_dirname\n";
 my $full_filepath = abs_path($0);
 print "abs_path(\$0) -&gt; $full_filepath\n";
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 63550144 user3673: </h3><pre><code>use File::Basename;
+------------------------------------------------------------------ <br><h3> user3673, Id: 63550144, Score: 0: </h3><pre><code>use File::Basename;
 use Cwd 'abs_path';
 print dirname(abs_path(__FILE__)) ;
 </code></pre>
@@ -277,7 +277,7 @@ $ perl testdirname
 
 This is perl 5, version 28, subversion 1 (v5.28.1) built for x86_64-linux-gnu-thread-multi][1]
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 20349041 user3061015: </h3><p>What's wrong with <code>$^X</code> ?</p>
+------------------------------------------------------------------ <br><h3> user3061015, Id: 20349041, Score: -2: </h3><p>What's wrong with <code>$^X</code> ?</p>
 
 <pre><code>#!/usr/bin/env perl&lt;br&gt;
 print "This is executed by $^X\n";
@@ -286,5 +286,5 @@ print "This is executed by $^X\n";
 <p>Would give you the full path to the Perl binary being used.</p>
 
 <p>Evert</p>
-<h4> Comment 32641547 Putnik: </h4>It gives path to the Perl binary whilst path to a script required<br>------------------------------------------------------------------ <br><h3> Answer 84952 foxxtrot: </h3><p>On *nix, you likely have the "whereis" command, which searches your $PATH looking for a binary with a given name.  If $0 doesn't contain the full path name, running whereis $scriptname and saving the result into a variable should tell you where the script is located.</p>
-<h4> Comment 8712569 Lathan: </h4>That will not work, as $0 could also return a relative path to the file: ../perl/test.pl<br><h4> Comment 41497074 Znik: </h4>what will happen if executable script is out of PATH ?<br>
+<h4> Putnik, Comment 32641547 Score: 1: </h4>It gives path to the Perl binary whilst path to a script required<br>------------------------------------------------------------------ <br><h3> foxxtrot, Id: 84952, Score: -5: </h3><p>On *nix, you likely have the "whereis" command, which searches your $PATH looking for a binary with a given name.  If $0 doesn't contain the full path name, running whereis $scriptname and saving the result into a variable should tell you where the script is located.</p>
+<h4> Lathan, Comment 8712569 Score: 0: </h4>That will not work, as $0 could also return a relative path to the file: ../perl/test.pl<br><h4> Znik, Comment 41497074 Score: 0: </h4>what will happen if executable script is out of PATH ?<br>

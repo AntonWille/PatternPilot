@@ -1,5 +1,5 @@
- <h2> Title: How do I sleep for a millisecond in Perl? </h2> <h3> ˈoʊ sɪks, question_id: 896904 </h3>Score: 86, Tags: {perl,sleep} <br><p>How do I sleep for shorter than a second in Perl?</p>
-<h4> Comment 972271 ˈoʊ sɪks: </h4>It is because I believe this title is actually more helpful. Let me try to argument this. What B.D.F. did was duplicate the question in the title which adds no expressivity. When I was searching the web for the answer I actually looked for a millisecond sleep and not for a &quot;shorter than a second&quot; sleep. I say this version has a better chance of being hit through different google searches than B.D.F&#39;s one. Please correct me if I&#39;m wrong.<br>------------------------------------------------------------------ <br><h3> Answer 896928 Chris Lutz: </h3><p>From the Perldoc page on <a href="http://perldoc.perl.org/functions/sleep.html" rel="noreferrer">sleep</a>:</p>
+ <h2> Title: How do I sleep for a millisecond in Perl? </h2> <h4> ˈoʊ sɪks, question_id: 896904 </h4>Score: 86, Tags: {perl,sleep} <br><p>How do I sleep for shorter than a second in Perl?</p>
+<h4> ˈoʊ sɪks, Id: 972271 Score: 22: </h4>It is because I believe this title is actually more helpful. Let me try to argument this. What B.D.F. did was duplicate the question in the title which adds no expressivity. When I was searching the web for the answer I actually looked for a millisecond sleep and not for a &quot;shorter than a second&quot; sleep. I say this version has a better chance of being hit through different google searches than B.D.F&#39;s one. Please correct me if I&#39;m wrong.<br>------------------------------------------------------------------ <br><h3> Chris Lutz, Id: 896928, Score: 121: </h3><p>From the Perldoc page on <a href="http://perldoc.perl.org/functions/sleep.html" rel="noreferrer">sleep</a>:</p>
 
 <blockquote>
   <p>For delays of finer granularity than one second, the <a href="http://perldoc.perl.org/Time/HiRes.html" rel="noreferrer">Time::HiRes</a> module (from CPAN, and starting from Perl 5.8 part of the standard distribution) provides usleep().</p>
@@ -23,7 +23,7 @@ nanosleep(1000000);
 <pre><code># Sleep for 250 milliseconds
 select(undef, undef, undef, 0.25);
 </code></pre>
-<h4> Comment 704394 Chris Lutz: </h4>The page on Time::HiRes says something like &quot;if you need nanosleep(), you should reconsider whether or not Perl is the best tool for your job.&quot;<br><h4> Comment 704376 Piskvor left the building: </h4>Caveat: although you could nanosleep(1), many OSes have some minimum granularity; e.g. I believe it&#39;s 1 ms in Windows XP, so you&#39;d still sleep for a whole 1000000 ns there.<br><h4> Comment 6759903 Peter N Lewis: </h4>There is also Time::HiRes::sleep( 0.3 ) which will sleep for .3 of a second.<br>------------------------------------------------------------------ <br><h3> Answer 896923 Greg: </h3><p>Time::HiRes:</p>
+<h4> Chris Lutz, Comment 704394 Score: 14: </h4>The page on Time::HiRes says something like &quot;if you need nanosleep(), you should reconsider whether or not Perl is the best tool for your job.&quot;<br><h4> Piskvor left the building, Comment 704376 Score: 8: </h4>Caveat: although you could nanosleep(1), many OSes have some minimum granularity; e.g. I believe it&#39;s 1 ms in Windows XP, so you&#39;d still sleep for a whole 1000000 ns there.<br><h4> Peter N Lewis, Comment 6759903 Score: 7: </h4>There is also Time::HiRes::sleep( 0.3 ) which will sleep for .3 of a second.<br>------------------------------------------------------------------ <br><h3> Greg, Id: 896923, Score: 39: </h3><p>Time::HiRes:</p>
 
 <pre><code>  use Time::HiRes;
   Time::HiRes::sleep(0.1); #.1 seconds
@@ -31,20 +31,20 @@ select(undef, undef, undef, 0.25);
 </code></pre>
 
 <p><a href="http://perldoc.perl.org/Time/HiRes.html" rel="noreferrer">http://perldoc.perl.org/Time/HiRes.html</a></p>
------------------------------------------------------------------- <br><h3> Answer 897401 brian d foy: </h3><p>From <a href="http://faq.perl.org/perlfaq8.html#How_can_I_sleep_or_a" rel="noreferrer">perlfaq8</a>:</p>
+------------------------------------------------------------------ <br><h3> brian d foy, Id: 897401, Score: 13: </h3><p>From <a href="http://faq.perl.org/perlfaq8.html#How_can_I_sleep_or_a" rel="noreferrer">perlfaq8</a>:</p>
 
 <hr>
 
 <p><strong>How can I sleep() or alarm() for under a second?</strong></p>
 
 <p>If you want finer granularity than the 1 second that the sleep() function provides, the easiest way is to use the select() function as documented in select in perlfunc. Try the Time::HiRes and the BSD::Itimer modules (available from CPAN, and starting from Perl 5.8 Time::HiRes is part of the standard distribution).</p>
------------------------------------------------------------------- <br><h3> Answer 896926 TML: </h3><p>Use <a href="http://perldoc.perl.org/Time/HiRes.html" rel="noreferrer">Time::HiRes</a>.</p>
------------------------------------------------------------------- <br><h3> Answer 896927 JesperE: </h3><p>A quick googling on "perl high resolution timers" gave a reference to <a href="http://search.cpan.org/dist/Time-HiRes/HiRes.pm" rel="noreferrer">Time::HiRes</a>. Maybe that it what you want.</p>
------------------------------------------------------------------- <br><h3> Answer 42427840 Tim Tian: </h3><pre><code>system "sleep 0.1";
+------------------------------------------------------------------ <br><h3> TML, Id: 896926, Score: 7: </h3><p>Use <a href="http://perldoc.perl.org/Time/HiRes.html" rel="noreferrer">Time::HiRes</a>.</p>
+------------------------------------------------------------------ <br><h3> JesperE, Id: 896927, Score: 5: </h3><p>A quick googling on "perl high resolution timers" gave a reference to <a href="http://search.cpan.org/dist/Time-HiRes/HiRes.pm" rel="noreferrer">Time::HiRes</a>. Maybe that it what you want.</p>
+------------------------------------------------------------------ <br><h3> Tim Tian, Id: 42427840, Score: 2: </h3><pre><code>system "sleep 0.1";
 </code></pre>
 
 <p>does the trick.</p>
-<h4> Comment 114834541 Jimmy Koerting: </h4>not really perl, but helpfull if you don&#39;t want to install Time::HiRes but need some sleeps smaller than 1 second but <b>don&#39;t forget</b>, that spawning a shell for this takes time itself, so you can&#39;t count on accuracy!<br><h4> Comment 136786764 Otheus: </h4>works on linux and many systems with modern GNU <code>sleep</code> utillity installed, but will fail on BSD, MacOS, busybox-Linux, etc.  (Actually, it may work on BSD/MacOS depending on which sleep is part of the distribution)<br><h4> Comment 91783212 PiotrK: </h4>It actually worked for me (not elegant, but for debug purposes it seems to work).<br>------------------------------------------------------------------ <br><h3> Answer 77589923 Otheus: </h3><p>For 1-liner on the CLI (for systems that don't have GNU's <code>sleep</code>:</p>
+<h4> Jimmy Koerting, Comment 114834541 Score: 1: </h4>not really perl, but helpfull if you don&#39;t want to install Time::HiRes but need some sleeps smaller than 1 second but <b>don&#39;t forget</b>, that spawning a shell for this takes time itself, so you can&#39;t count on accuracy!<br><h4> Otheus, Comment 136786764 Score: 0: </h4>works on linux and many systems with modern GNU <code>sleep</code> utillity installed, but will fail on BSD, MacOS, busybox-Linux, etc.  (Actually, it may work on BSD/MacOS depending on which sleep is part of the distribution)<br><h4> PiotrK, Comment 91783212 Score: 0: </h4>It actually worked for me (not elegant, but for debug purposes it seems to work).<br>------------------------------------------------------------------ <br><h3> Otheus, Id: 77589923, Score: 0: </h3><p>For 1-liner on the CLI (for systems that don't have GNU's <code>sleep</code>:</p>
 <pre><code>perl -MTime::HiRes=usleep -e 'usleep(1000000);';
 </code></pre>
 <p>will sleep 1s. You can verify this by prefixing <code>time</code> to the command. So to convert from microseconds to milliseconds, multiply your expected milliseconds by 1000.</p>

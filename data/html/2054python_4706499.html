@@ -1,10 +1,10 @@
- <h2> Title: How do I append to a file? </h2> <h3> user502039, question_id: 4706499 </h3>Score: 2054, Tags: {python,file,append} <br><p>How do I append to a file instead of overwriting it?</p>
------------------------------------------------------------------- <br><h3> Answer 4706520 Petter: </h3><p>Set the mode in <a href="https://docs.python.org/3/library/functions.html#open" rel="noreferrer"><code>open()</code></a> to <code>&quot;a&quot;</code> (append) instead of <code>&quot;w&quot;</code> (write):</p>
+ <h2> Title: How do I append to a file? </h2> <h4> user502039, question_id: 4706499 </h4>Score: 2054, Tags: {python,file,append} <br><p>How do I append to a file instead of overwriting it?</p>
+------------------------------------------------------------------ <br><h3> Petter, Id: 4706520, Score: 3064: </h3><p>Set the mode in <a href="https://docs.python.org/3/library/functions.html#open" rel="noreferrer"><code>open()</code></a> to <code>&quot;a&quot;</code> (append) instead of <code>&quot;w&quot;</code> (write):</p>
 <pre class="lang-py prettyprint-override"><code>with open(&quot;test.txt&quot;, &quot;a&quot;) as myfile:
     myfile.write(&quot;appended text&quot;)
 </code></pre>
 <p>The <a href="https://docs.python.org/3/library/functions.html#open" rel="noreferrer">documentation</a> lists all the available modes.</p>
-<h4> Comment 24726149 Petter: </h4>bluewoodtree: The benefits are similar to that of RAII in C++. If you forget close(), it might take a while before the file is actually closed. It is easier that you might think to forget it when the code has multiple exit points, exceptions and so on.<br><h4> Comment 8186823 Dan: </h4><a href="http://docs.python.org/tutorial/inputoutput.html" rel="nofollow noreferrer">This</a> from the tutorial may be useful as well.<br><h4> Comment 111515073 Brian: </h4>There is a functional difference besides just remembering to close. <code>with</code> opens a context manager which will close the file even if there is an error between opening and <code>close()</code>.<br><h4> Comment 116497923 Timo: </h4>One could easy do <code>with open(&quot;test.txt&quot;) as myfile: myfile.write(&quot;appended text&quot;,&#39;a&#39;)</code>, but a is needed in open.<br><h4> Comment 120653863 ー PupSoZeyDe ー: </h4>@Timo TypeError: TextIOWrapper.write() takes exactly one argument (2 given)<br><h4> Comment 127225777 Daniel: </h4>This might be useful if you want to write to a new line each time.  <a href="https://stackoverflow.com/a/33591893/6749790">stackoverflow.com/a/33591893/6749790</a><br>------------------------------------------------------------------ <br><h3> Answer 4706519 sinelaw: </h3><p>You need to open the file in append mode, by setting "a" or "ab" as the mode. See <em><a href="https://docs.python.org/2/library/functions.html#open" rel="noreferrer">open()</a></em>.</p>
+<h4> Petter, Comment 24726149 Score: 93: </h4>bluewoodtree: The benefits are similar to that of RAII in C++. If you forget close(), it might take a while before the file is actually closed. It is easier that you might think to forget it when the code has multiple exit points, exceptions and so on.<br><h4> Dan, Comment 8186823 Score: 14: </h4><a href="http://docs.python.org/tutorial/inputoutput.html" rel="nofollow noreferrer">This</a> from the tutorial may be useful as well.<br><h4> Brian, Comment 111515073 Score: 14: </h4>There is a functional difference besides just remembering to close. <code>with</code> opens a context manager which will close the file even if there is an error between opening and <code>close()</code>.<br><h4> Timo, Comment 116497923 Score: 0: </h4>One could easy do <code>with open(&quot;test.txt&quot;) as myfile: myfile.write(&quot;appended text&quot;,&#39;a&#39;)</code>, but a is needed in open.<br><h4> ー PupSoZeyDe ー, Comment 120653863 Score: 0: </h4>@Timo TypeError: TextIOWrapper.write() takes exactly one argument (2 given)<br><h4> Daniel, Comment 127225777 Score: 0: </h4>This might be useful if you want to write to a new line each time.  <a href="https://stackoverflow.com/a/33591893/6749790">stackoverflow.com/a/33591893/6749790</a><br>------------------------------------------------------------------ <br><h3> sinelaw, Id: 4706519, Score: 264: </h3><p>You need to open the file in append mode, by setting "a" or "ab" as the mode. See <em><a href="https://docs.python.org/2/library/functions.html#open" rel="noreferrer">open()</a></em>.</p>
 
 <p>When you open with "a" mode, the write position will <strong>always</strong> be at the end of the file (an append). You can open with "a+" to allow reading, seek backwards and read (but all writes will still be at the end of the file!).</p>
 
@@ -59,7 +59,7 @@
 &gt;&gt;&gt; open("test","rb").read()
 'testkoko'
 </code></pre>
-<h4> Comment 123141590 Rick Moritz: </h4>So this implies, that multiple handles can be held across multiple processes, without any write conflicts?<br>------------------------------------------------------------------ <br><h3> Answer 46980522 Cleve Green: </h3><p>Python has many variations off of the main three modes, these three modes are:</p>
+<h4> Rick Moritz, Comment 123141590 Score: 0: </h4>So this implies, that multiple handles can be held across multiple processes, without any write conflicts?<br>------------------------------------------------------------------ <br><h3> Cleve Green, Id: 46980522, Score: 49: </h3><p>Python has many variations off of the main three modes, these three modes are:</p>
 
 <pre><code>'w'   write text
 'r'   read text
@@ -88,7 +88,7 @@ f.write('whatever you want to write here (in append mode) here.')
 'wb+' read + write binary
 'ab+' append + read binary
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 26833243 Seth Connell: </h3><p>I always do this,</p>
+------------------------------------------------------------------ <br><h3> Seth Connell, Id: 26833243, Score: 59: </h3><p>I always do this,</p>
 
 <pre><code>f = open('filename.txt', 'a')
 f.write("stuff")
@@ -96,21 +96,21 @@ f.close()
 </code></pre>
 
 <p>It's simple, but very useful.</p>
-<h4> Comment 44929032 Sam Redway: </h4>its a little nicer and a little bit safer to write: with open(&#39;filename&#39;,&#39;a&#39;) as f: f.write(&#39;stuff&#39;)<br>------------------------------------------------------------------ <br><h3> Answer 4706565 istruble: </h3><p>You probably want to pass <code>"a"</code> as the mode argument.  See the docs for <a href="http://docs.python.org/library/functions.html#open" rel="noreferrer">open()</a>.</p>
+<h4> Sam Redway, Comment 44929032 Score: 27: </h4>its a little nicer and a little bit safer to write: with open(&#39;filename&#39;,&#39;a&#39;) as f: f.write(&#39;stuff&#39;)<br>------------------------------------------------------------------ <br><h3> istruble, Id: 4706565, Score: 41: </h3><p>You probably want to pass <code>"a"</code> as the mode argument.  See the docs for <a href="http://docs.python.org/library/functions.html#open" rel="noreferrer">open()</a>.</p>
 
 <pre><code>with open("foo", "a") as f:
     f.write("cool beans...")
 </code></pre>
 
 <p>There are other permutations of the mode argument for updating (+), truncating (w) and binary (b) mode but starting with just <code>"a"</code> is your best bet.</p>
-<h4> Comment 5195504 Mark Tolonen: </h4><code>file</code> shadows a built-in function.  Don&#39;t use it for variables.<br><h4> Comment 43779799 jfs: </h4>@MarkTolonen: <code>file</code> is no longer a builtin in Python 3. <a href="http://stackoverflow.com/a/11942631/4279">Even in Python 2, it is used very rarely</a>. Opening a file is a common operation. It is ok to use <code>file</code> name here on both Python 2 and 3. <a href="https://www.python.org/dev/peps/pep-0008/#a-foolish-consistency-is-the-hobgoblin-of-little-minds" rel="nofollow noreferrer">Know when to be inconsistent.</a><br>------------------------------------------------------------------ <br><h3> Answer 59703557 Alaa M.: </h3><p>You can also do it with <code>print</code> instead of <code>write</code>:</p>
+<h4> Mark Tolonen, Comment 5195504 Score: 21: </h4><code>file</code> shadows a built-in function.  Don&#39;t use it for variables.<br><h4> jfs, Comment 43779799 Score: 15: </h4>@MarkTolonen: <code>file</code> is no longer a builtin in Python 3. <a href="http://stackoverflow.com/a/11942631/4279">Even in Python 2, it is used very rarely</a>. Opening a file is a common operation. It is ok to use <code>file</code> name here on both Python 2 and 3. <a href="https://www.python.org/dev/peps/pep-0008/#a-foolish-consistency-is-the-hobgoblin-of-little-minds" rel="nofollow noreferrer">Know when to be inconsistent.</a><br>------------------------------------------------------------------ <br><h3> Alaa M., Id: 59703557, Score: 25: </h3><p>You can also do it with <code>print</code> instead of <code>write</code>:</p>
 
 <pre><code>with open('test.txt', 'a') as f:
     print('appended text', file=f)
 </code></pre>
 
 <p>If <strong>test.txt</strong> doesn't exist, it will be created...</p>
------------------------------------------------------------------- <br><h3> Answer 41382974 K.Suthagar: </h3><p>when we using this line <code>open(filename, "a")</code>, that <code>a</code> indicates the appending the file, that means allow to insert extra data to the existing file.</p>
+------------------------------------------------------------------ <br><h3> K.Suthagar, Id: 41382974, Score: 15: </h3><p>when we using this line <code>open(filename, "a")</code>, that <code>a</code> indicates the appending the file, that means allow to insert extra data to the existing file.</p>
 
 <p>You can just use this following lines to append the text in your file</p>
 
@@ -121,7 +121,7 @@ f.close()
 FileSave("test.txt","test1 \n")
 FileSave("test.txt","test2 \n")
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 54584404 Primusa: </h3><p>You can also open the file in <code>r+</code> mode and then set the file position to the end of the file.</p>
+------------------------------------------------------------------ <br><h3> Primusa, Id: 54584404, Score: 8: </h3><p>You can also open the file in <code>r+</code> mode and then set the file position to the end of the file.</p>
 
 <pre><code>import os
 
@@ -131,7 +131,7 @@ with open('text.txt', 'r+') as f:
 </code></pre>
 
 <p>Opening the file in <code>r+</code> mode will let you write to other file positions besides the end, while <code>a</code> and <code>a+</code> force writing to the end.</p>
------------------------------------------------------------------- <br><h3> Answer 56301530 Alec: </h3><p>The <code>'a'</code> parameter signifies append mode. If you don't want to use <code>with open</code> each time, you can easily write a function to do it for you:</p>
+------------------------------------------------------------------ <br><h3> Alec, Id: 56301530, Score: 12: </h3><p>The <code>'a'</code> parameter signifies append mode. If you don't want to use <code>with open</code> each time, you can easily write a function to do it for you:</p>
 
 <pre><code>def append(txt='\nFunction Successfully Executed', file):
     with open(file, 'a') as f:
@@ -152,7 +152,7 @@ with open(file, 'r+') as f:
 <hr>
 
 <p><sup>†</sup> <a href="https://stackoverflow.com/a/54584404/7583953">Credit for this function goes to @Primusa</a></p>
------------------------------------------------------------------- <br><h3> Answer 53862966 nima moradi: </h3><p>if you want to append to a file </p>
+------------------------------------------------------------------ <br><h3> nima moradi, Id: 53862966, Score: 6: </h3><p>if you want to append to a file </p>
 
 <pre><code>with open("test.txt", "a") as myfile:
     myfile.write("append me")
@@ -176,7 +176,7 @@ If file does not exist, it creates a new file.
 'b' This opens in binary mode.
 '+' This will open a file for reading and writing (updating)
 </pre>
------------------------------------------------------------------- <br><h3> Answer 64081807 Walt Howard: </h3><p><em><strong>If multiple processes are writing to the file</strong></em>, you must use append mode or the data will be scrambled. Append mode will make the operating system put every write, at the end of the file irrespective of where the writer thinks his position in the file is. This is a common issue for multi-process services like nginx or apache where multiple instances of the same process, are writing to the same log
+------------------------------------------------------------------ <br><h3> Walt Howard, Id: 64081807, Score: 5: </h3><p><em><strong>If multiple processes are writing to the file</strong></em>, you must use append mode or the data will be scrambled. Append mode will make the operating system put every write, at the end of the file irrespective of where the writer thinks his position in the file is. This is a common issue for multi-process services like nginx or apache where multiple instances of the same process, are writing to the same log
 file. Consider what happens if you try to seek, then write:</p>
 <pre><code>Example does not work well with multiple processes: 
 
@@ -192,7 +192,7 @@ writer1: write data at position 1000    writer1's data overwrites writer2's data
 </code></pre>
 <p>Append most does <strong>not</strong> mean, &quot;open file, go to end of the file once after opening it&quot;. It means, &quot;open file, every write I do will be at the end of the file&quot;.</p>
 <p>WARNING: For this to work you must write all your record in one shot, in one write call. If you split the data between multiple writes, other writers can and will get their writes in between yours and mangle your data.</p>
------------------------------------------------------------------- <br><h3> Answer 59309810 mattc-7: </h3><p>The simplest way to append more text to the end of a file would be to use:</p>
+------------------------------------------------------------------ <br><h3> mattc-7, Id: 59309810, Score: -4: </h3><p>The simplest way to append more text to the end of a file would be to use:</p>
 
 <pre><code>with open('/path/to/file', 'a+') as file:
     file.write("Additions to file")
@@ -202,7 +202,7 @@ file.close()
 <p>The <code>a+</code> in the <code>open(...)</code> statement instructs to open the file in append mode and allows read and write access.</p>
 
 <p>It is also always good practice to use <code>file.close()</code> to close any files that you have opened once you are done using them.</p>
-<h4> Comment 107607829 Erik Knowles: </h4>&quot;file.close&quot; is automatically called at the end of the &quot;with&quot; block, which is the advantage of the keyword.  Also, the OP asked about opening a file for appending. The &quot;+&quot; mode isn&#39;t necessary unless you want to read as well.<br>------------------------------------------------------------------ <br><h3> Answer 74118831 Karl Knechtel: </h3><p>Sometimes, beginners have this problem because they attempt to open and write to a file in a loop:</p>
+<h4> Erik Knowles, Comment 107607829 Score: 8: </h4>&quot;file.close&quot; is automatically called at the end of the &quot;with&quot; block, which is the advantage of the keyword.  Also, the OP asked about opening a file for appending. The &quot;+&quot; mode isn&#39;t necessary unless you want to read as well.<br>------------------------------------------------------------------ <br><h3> Karl Knechtel, Id: 74118831, Score: -5: </h3><p>Sometimes, beginners have this problem because they attempt to open and write to a file in a loop:</p>
 <pre class="lang-py prettyprint-override"><code>for item in my_data:
     with open('results.txt', 'w') as f:
         f.write(some_calculation(item))
@@ -214,4 +214,4 @@ file.close()
     for item in my_data:
         f.write(some_calculation(item))
 </code></pre>
-<h4> Comment 132192242 crasu: </h4>This is not really answering the question.<br><h4> Comment 132194757 Karl Knechtel: </h4>I wrote it because this Q&amp;A sometimes gets used as a duplicate when beginners have a debugging question caused by this issue.<br>
+<h4> crasu, Comment 132192242 Score: 0: </h4>This is not really answering the question.<br><h4> Karl Knechtel, Comment 132194757 Score: 0: </h4>I wrote it because this Q&amp;A sometimes gets used as a duplicate when beginners have a debugging question caused by this issue.<br>

@@ -1,4 +1,4 @@
- <h2> Title: What does the &quot;yield&quot; keyword do in Python? </h2> <h3> Alex. S., question_id: 231767 </h3>Score: 12820, Tags: {python,iterator,generator,yield} <br><p>What is the use of the <code>yield</code> keyword in Python? What does it do?</p>
+ <h2> Title: What does the &quot;yield&quot; keyword do in Python? </h2> <h4> Alex. S., question_id: 231767 </h4>Score: 12820, Tags: {python,iterator,generator,yield} <br><p>What is the use of the <code>yield</code> keyword in Python? What does it do?</p>
 <p>For example, I'm trying to understand this code<sup><strong>1</strong></sup>:</p>
 <pre><code>def _get_child_candidates(self, distance, min_dist, max_dist):
     if self._leftchild and distance - max_dist &lt; self._median:
@@ -21,7 +21,7 @@ Is a list returned? A single element? Is it called again? When will subsequent c
 <hr />
 <sub>
 1. This piece of code was written by Jochen Schulz (jrschulz), who made a great Python library for metric spaces. This is the link to the complete source: <a href="https://well-adjusted.de/~jrspieker/mspace/" rel="noreferrer">Module mspace</a>.</sub> 
-<h4> Comment 135498556 Sadegh Moayedizadeh: </h4><a href="https://realpython.com/introduction-to-python-generators/" rel="nofollow noreferrer">Here</a> you can read a full explanation.<br>------------------------------------------------------------------ <br><h3> Answer 231855 Bite code: </h3><p>To understand what <code>yield</code> does, you must understand what <em>generators</em> are. And before you can understand generators, you must understand <em>iterables</em>.</p>
+<h4> Sadegh Moayedizadeh, Id: 135498556 Score: 0: </h4><a href="https://realpython.com/introduction-to-python-generators/" rel="nofollow noreferrer">Here</a> you can read a full explanation.<br>------------------------------------------------------------------ <br><h3> Bite code, Id: 231855, Score: 17893: </h3><p>To understand what <code>yield</code> does, you must understand what <em>generators</em> are. And before you can understand generators, you must understand <em>iterables</em>.</p>
 <h2>Iterables</h2>
 <p>When you create a list, you can read its items one by one. Reading its items one by one is called iteration:</p>
 <pre><code>&gt;&gt;&gt; mylist = [1, 2, 3]
@@ -216,7 +216,7 @@ Chain two generators? Group values in a nested list with a one-liner? <code>Map 
 <p>Iteration is a process implying iterables (implementing the <code>__iter__()</code> method) and iterators (implementing the <code>__next__()</code> method).
 Iterables are any objects you can get an iterator from. Iterators are objects that let you iterate on iterables.</p>
 <p>There is more about it in this article about <a href="https://web.archive.org/web/20201109034340/http://effbot.org/zone/python-for-statement.htm" rel="noreferrer">how <code>for</code> loops work</a>.</p>
-<h4> Comment 75308701 Matthias Fripp: </h4><code>yield</code> is not as magical this answer suggests. When you call a function that contains a <code>yield</code> statement anywhere, you get a generator object, but no code runs. Then each time you extract an object from the generator, Python executes code in the function until it comes to a <code>yield</code> statement, then pauses and delivers the object. When you extract another object, Python resumes just after the <code>yield</code> and continues until it reaches another <code>yield</code> (often the same one, but one iteration later). This continues until the function runs off the end, at which point the generator is deemed exhausted.<br><h4> Comment 84633217 picmate 涅: </h4>&quot;These iterables are handy... but you store all the values in memory and this is not always what you want&quot;, is either wrong or confusing. An iterable returns an iterator upon calling the iter() on the iterable, and an iterator doesn&#39;t always have to store its values in memory, depending on the implementation of the <b>iter</b> method, it can also generate values in the sequence on demand.<br><h4> Comment 110055463 alani: </h4>@MatthiasFripp &quot;This continues until the function runs off the end&quot; -- or it encounters a <code>return</code> statement. (<code>return</code> is permitted in a function containing <code>yield</code>, provided that it does not specify a return value.)<br><h4> Comment 109059326 WoJ: </h4>It would be nice to add to this <b>great</b> answer why <i>It is just the same except you used <code>()</code> instead of <code>[]</code></i>, specifically what <code>()</code> is (there may be confusion with a tuple).<br><h4> Comment 115124375 Jacob Ward: </h4>The yield statement suspends function’s execution and sends a value back to the caller, but retains enough state to enable function to resume where it is left off. When resumed, the function continues execution immediately after the last yield run. This allows its code to produce a series of values over time, rather than computing them at once and sending them back like a list.<br><h4> Comment 120922923 Zaffer: </h4>So yield anywhere in a function makes the function a generator, which is basically an iterable of yields from a function?<br><h4> Comment 124661216 chepner: </h4>@Zaffer Basically. Each call to the function creates a new <code>generator</code> object based on the generator function which can be iterated over independently. I sometimes wish there was a separate keyword like <code>codef</code> to define such functions, so that <code>yield</code> in a <code>def</code> would be a syntax error. (It <i>used</i> to be a syntax error to use both <code>return</code> and <code>yield</code> in the same function, but then <code>return</code> was allowed as a shortcut for raising <code>StopIteration</code>.)<br><h4> Comment 129982122 Karl Knechtel: </h4>Interestingly, at least two different people used the <code>Bank</code> example from this answer... to ask duplicate questions about the meaning/necessity of <code>self</code>.<br><h4> Comment 129554534 Parisa Khateri: </h4>Where <code>yield</code> is defined:  <code>&gt;&gt;&gt; def create_generator(): ...    mylist = range(3)</code> should be:  <code>&gt;&gt;&gt; def create_generator(): ...    mylist = (x*x for x in range(3))</code> instead.<br>------------------------------------------------------------------ <br><h3> Answer 237028 user28409: </h3><h2>Shortcut to understanding <code>yield</code></h2>
+<h4> Matthias Fripp, Comment 75308701 Score: 747: </h4><code>yield</code> is not as magical this answer suggests. When you call a function that contains a <code>yield</code> statement anywhere, you get a generator object, but no code runs. Then each time you extract an object from the generator, Python executes code in the function until it comes to a <code>yield</code> statement, then pauses and delivers the object. When you extract another object, Python resumes just after the <code>yield</code> and continues until it reaches another <code>yield</code> (often the same one, but one iteration later). This continues until the function runs off the end, at which point the generator is deemed exhausted.<br><h4> picmate 涅, Comment 84633217 Score: 86: </h4>&quot;These iterables are handy... but you store all the values in memory and this is not always what you want&quot;, is either wrong or confusing. An iterable returns an iterator upon calling the iter() on the iterable, and an iterator doesn&#39;t always have to store its values in memory, depending on the implementation of the <b>iter</b> method, it can also generate values in the sequence on demand.<br><h4> alani, Comment 110055463 Score: 46: </h4>@MatthiasFripp &quot;This continues until the function runs off the end&quot; -- or it encounters a <code>return</code> statement. (<code>return</code> is permitted in a function containing <code>yield</code>, provided that it does not specify a return value.)<br><h4> WoJ, Comment 109059326 Score: 34: </h4>It would be nice to add to this <b>great</b> answer why <i>It is just the same except you used <code>()</code> instead of <code>[]</code></i>, specifically what <code>()</code> is (there may be confusion with a tuple).<br><h4> Jacob Ward, Comment 115124375 Score: 19: </h4>The yield statement suspends function’s execution and sends a value back to the caller, but retains enough state to enable function to resume where it is left off. When resumed, the function continues execution immediately after the last yield run. This allows its code to produce a series of values over time, rather than computing them at once and sending them back like a list.<br><h4> Zaffer, Comment 120922923 Score: 6: </h4>So yield anywhere in a function makes the function a generator, which is basically an iterable of yields from a function?<br><h4> chepner, Comment 124661216 Score: 4: </h4>@Zaffer Basically. Each call to the function creates a new <code>generator</code> object based on the generator function which can be iterated over independently. I sometimes wish there was a separate keyword like <code>codef</code> to define such functions, so that <code>yield</code> in a <code>def</code> would be a syntax error. (It <i>used</i> to be a syntax error to use both <code>return</code> and <code>yield</code> in the same function, but then <code>return</code> was allowed as a shortcut for raising <code>StopIteration</code>.)<br><h4> Karl Knechtel, Comment 129982122 Score: 3: </h4>Interestingly, at least two different people used the <code>Bank</code> example from this answer... to ask duplicate questions about the meaning/necessity of <code>self</code>.<br><h4> Parisa Khateri, Comment 129554534 Score: 0: </h4>Where <code>yield</code> is defined:  <code>&gt;&gt;&gt; def create_generator(): ...    mylist = range(3)</code> should be:  <code>&gt;&gt;&gt; def create_generator(): ...    mylist = (x*x for x in range(3))</code> instead.<br>------------------------------------------------------------------ <br><h3> user28409, Id: 237028, Score: 2528: </h3><h2>Shortcut to understanding <code>yield</code></h2>
 <p>When you see a function with <code>yield</code> statements, apply this easy trick to understand what will happen:</p>
 <ol>
 <li>Insert a line <code>result = []</code> at the start of the function.</li>
@@ -262,7 +262,7 @@ for item in f123():
 <p>So the generator object is sort of like an adapter - at one end it exhibits the iterator protocol, by exposing <code>__iter__()</code> and <code>next()</code> methods to keep the <code>for</code> loop happy. At the other end, however, it runs the function just enough to get the next value out of it and puts it back in suspended mode.</p>
 <h2>Why use generators?</h2>
 <p>Usually, you can write code that doesn't use generators but implements the same logic. One option is to use the temporary list 'trick' I mentioned before. That will not work in all cases, for e.g. if you have infinite loops, or it may make inefficient use of memory when you have a really long list. The other approach is to implement a new iterable class <code>SomethingIter</code> that keeps the state in instance members and performs the next logical step in its <code>next()</code> (or <code>__next__()</code> in Python 3) method. Depending on the logic, the code inside the <code>next()</code> method may end up looking very complex and prone to bugs. Here generators provide a clean and easy solution.</p>
-<h4> Comment 76206780 DanielSank: </h4><i>&quot;When you see a function with yield statements, apply this easy trick to understand what will happen&quot;</i> Doesn&#39;t this completely ignore the fact that you can <code>send</code> into a generator, which is a huge part of the point of generators?<br><h4> Comment 79407236 Pedro: </h4>&quot;it could be a for loop, but it could also be code like <code>otherlist.extend(mylist)</code>&quot; -&gt; This is incorrect. <code>extend()</code> modifies the list in-place and does not return an iterable. Trying to loop over <code>otherlist.extend(mylist)</code> will fail with a <code>TypeError</code> because <code>extend()</code> implicitly returns <code>None</code>, and you can&#39;t loop over <code>None</code>.<br><h4> Comment 82933650 today: </h4>@pedro You have misunderstood that sentence. It means that python performs the two mentioned steps on <code>mylist</code> (not on <code>otherlist</code>) when executing <code>otherlist.extend(mylist)</code>.<br>------------------------------------------------------------------ <br><h3> Answer 231801 Jason Baker: </h3><p>Think of it this way:</p>
+<h4> DanielSank, Comment 76206780 Score: 43: </h4><i>&quot;When you see a function with yield statements, apply this easy trick to understand what will happen&quot;</i> Doesn&#39;t this completely ignore the fact that you can <code>send</code> into a generator, which is a huge part of the point of generators?<br><h4> Pedro, Comment 79407236 Score: 18: </h4>&quot;it could be a for loop, but it could also be code like <code>otherlist.extend(mylist)</code>&quot; -&gt; This is incorrect. <code>extend()</code> modifies the list in-place and does not return an iterable. Trying to loop over <code>otherlist.extend(mylist)</code> will fail with a <code>TypeError</code> because <code>extend()</code> implicitly returns <code>None</code>, and you can&#39;t loop over <code>None</code>.<br><h4> today, Comment 82933650 Score: 16: </h4>@pedro You have misunderstood that sentence. It means that python performs the two mentioned steps on <code>mylist</code> (not on <code>otherlist</code>) when executing <code>otherlist.extend(mylist)</code>.<br>------------------------------------------------------------------ <br><h3> Jason Baker, Id: 231801, Score: 763: </h3><p>Think of it this way:</p>
 
 <p>An iterator is just a fancy sounding term for an object that has a <code>next()</code> method.  So a yield-ed function ends up being something like this:</p>
 
@@ -321,7 +321,7 @@ except StopIteration:
 <p>Does that make more sense or just confuse you more?  :)</p>
 
 <p>I should note that this <em>is</em> an oversimplification for illustrative purposes. :)</p>
-<h4> Comment 74681581 Peter: </h4>I tried this example in Python 3.6 and if I create <code>iterator = some_function()</code>, the variable <code>iterator</code> does not have a function called <code>next()</code> anymore, but only a <code>__next__()</code> function. Thought I&#39;d mention it.<br><h4> Comment 113829987 gioxc88: </h4>Unfortunately this answer is not true at all. This is not what python interpreter does with generators. It is not creating a class starting from the generator function and implement <code>__iter__</code> and <code>__next__</code>. What it is acutally doing under the hood is explained in this post <a href="https://stackoverflow.com/questions/45723893/how-does-a-generator-function-work-internally#comment78413677_45727729" title="how does a generator function work internally%23comment78413677_45727729">stackoverflow.com/questions/45723893/&hellip;</a>. To cite @Raymond Hettinger  <i>&quot;generators are not implemented internally as shown in your pure python class. Instead, they share most of the same logic as regular functions&quot;</i><br><h4> Comment 100409 jfs: </h4><code>__getitem__</code> could be defined instead of <code>__iter__</code>. For example: <code>class it: pass; it.__getitem__ = lambda self, i: i*10 if i &lt; 10 else [][0]; for i in it(): print(i)</code>, It will print: 0, 10, 20, ..., 90<br><h4> Comment 109209205 SystematicDisintegration: </h4>Where does the <code>for</code> loop implementation you wrote call the <code>__iter__</code> method of <code>iterator</code>, the instantiated instance  of <code>it</code>?<br>------------------------------------------------------------------ <br><h3> Answer 6400990 ninjagecko: </h3>
+<h4> Peter, Comment 74681581 Score: 37: </h4>I tried this example in Python 3.6 and if I create <code>iterator = some_function()</code>, the variable <code>iterator</code> does not have a function called <code>next()</code> anymore, but only a <code>__next__()</code> function. Thought I&#39;d mention it.<br><h4> gioxc88, Comment 113829987 Score: 2: </h4>Unfortunately this answer is not true at all. This is not what python interpreter does with generators. It is not creating a class starting from the generator function and implement <code>__iter__</code> and <code>__next__</code>. What it is acutally doing under the hood is explained in this post <a href="https://stackoverflow.com/questions/45723893/how-does-a-generator-function-work-internally#comment78413677_45727729" title="how does a generator function work internally%23comment78413677_45727729">stackoverflow.com/questions/45723893/&hellip;</a>. To cite @Raymond Hettinger  <i>&quot;generators are not implemented internally as shown in your pure python class. Instead, they share most of the same logic as regular functions&quot;</i><br><h4> jfs, Comment 100409 Score: 1: </h4><code>__getitem__</code> could be defined instead of <code>__iter__</code>. For example: <code>class it: pass; it.__getitem__ = lambda self, i: i*10 if i &lt; 10 else [][0]; for i in it(): print(i)</code>, It will print: 0, 10, 20, ..., 90<br><h4> SystematicDisintegration, Comment 109209205 Score: 0: </h4>Where does the <code>for</code> loop implementation you wrote call the <code>__iter__</code> method of <code>iterator</code>, the instantiated instance  of <code>it</code>?<br>------------------------------------------------------------------ <br><h3> ninjagecko, Id: 6400990, Score: 655: </h3>
 <p>The <code>yield</code> keyword is reduced to two simple facts:</p>
 <ol>
 <li>If the compiler detects the <code>yield</code> keyword <em>anywhere</em> inside a function, that function no longer returns via the <code>return</code> statement. <em><strong>Instead</strong></em>, it <strong>immediately</strong> returns a <strong>lazy &quot;pending list&quot; object</strong> called a generator</li>
@@ -441,7 +441,7 @@ successStatus = coroutine.send(userResponse)
 []
 </code></pre>
 <p>... then remember that a generator is an <em>iterator</em>; that is, it is one-time-use. If you want to reuse it, you should call <code>myRange(...)</code> again. If you need to use the result twice, convert the result to a list and store it in a variable <code>x = list(myRange(5))</code>. Those who absolutely need to clone a generator (for example, who are doing terrifyingly hackish metaprogramming) can use <a href="https://docs.python.org/2/library/itertools.html#itertools.tee" rel="noreferrer"><code>itertools.tee</code></a> (<a href="https://docs.python.org/3/library/itertools.html#itertools.tee" rel="noreferrer">still works in Python 3</a>) if absolutely necessary, since the <a href="https://www.python.org/dev/peps/pep-0323/" rel="noreferrer">copyable iterator Python PEP standards proposal</a> has been deferred.</p>
------------------------------------------------------------------- <br><h3> Answer 31042491 Russia Must Remove Putin: </h3><blockquote>
+------------------------------------------------------------------ <br><h3> Russia Must Remove Putin, Id: 31042491, Score: 564: </h3><blockquote>
 <p><strong>What does the <code>yield</code> keyword do in Python?</strong></p>
 </blockquote>
 <h1>Answer Outline/Summary</h1>
@@ -679,12 +679,12 @@ one might receive it. To send data, one must be able to assign it to something, 
 for that, a statement just won't work.</sub></p>
 </li>
 </ol>
------------------------------------------------------------------- <br><h3> Answer 231778 Douglas Mayle: </h3><p><code>yield</code> is just like <code>return</code> - it returns whatever you tell it to (as a generator). The difference is that the next time you call the generator, execution starts from the last call to the <code>yield</code> statement. Unlike return, <strong>the stack frame is not cleaned up when a yield occurs, however control is transferred back to the caller, so its state will resume the next time the function is called.</strong></p>
+------------------------------------------------------------------ <br><h3> Douglas Mayle, Id: 231778, Score: 456: </h3><p><code>yield</code> is just like <code>return</code> - it returns whatever you tell it to (as a generator). The difference is that the next time you call the generator, execution starts from the last call to the <code>yield</code> statement. Unlike return, <strong>the stack frame is not cleaned up when a yield occurs, however control is transferred back to the caller, so its state will resume the next time the function is called.</strong></p>
 
 <p>In the case of your code, the function <code>get_child_candidates</code> is acting like an iterator so that when you extend your list, it adds one element at a time to the new list.</p>
 
 <p><code>list.extend</code> calls an iterator until it's exhausted. In the case of the code sample you posted, it would be much clearer to just return a tuple and append that to the list.</p>
-<h4> Comment 99470 kurosch: </h4>This is close, but not correct.  Every time you call a function with a yield statement in it, it returns a brand new generator object.  It&#39;s only when you call that generator&#39;s .next() method that execution resumes after the last yield.<br>------------------------------------------------------------------ <br><h3> Answer 232853 Claudiu: </h3><p>There's one extra thing to mention: a function that yields doesn't actually have to terminate. I've written code like this:</p>
+<h4> kurosch, Comment 99470 Score: 132: </h4>This is close, but not correct.  Every time you call a function with a yield statement in it, it returns a brand new generator object.  It&#39;s only when you call that generator&#39;s .next() method that execution resumes after the last yield.<br>------------------------------------------------------------------ <br><h3> Claudiu, Id: 232853, Score: 317: </h3><p>There's one extra thing to mention: a function that yields doesn't actually have to terminate. I've written code like this:</p>
 
 <pre><code>def fib():
     last, cur = 0, 1
@@ -701,7 +701,7 @@ for that, a statement just won't work.</sub></p>
 </code></pre>
 
 <p>It really helps simplify some problems, and makes some things easier to work with. </p>
------------------------------------------------------------------- <br><h3> Answer 14404292 Daniel: </h3><p>For those who prefer a minimal working example, meditate on this interactive Python session:</p>
+------------------------------------------------------------------ <br><h3> Daniel, Id: 14404292, Score: 309: </h3><p>For those who prefer a minimal working example, meditate on this interactive Python session:</p>
 
 <pre><code>&gt;&gt;&gt; def f():
 ...   yield 1
@@ -720,7 +720,7 @@ for that, a statement just won't work.</sub></p>
 ... 
 &gt;&gt;&gt; # Note that this time nothing was printed
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 36220775 Bob Stein: </h3><p><strong>TL;DR</strong></p>
+------------------------------------------------------------------ <br><h3> Bob Stein, Id: 36220775, Score: 290: </h3><p><strong>TL;DR</strong></p>
 
 <h1>Instead of this:</h1>
 
@@ -817,7 +817,7 @@ for that, a statement just won't work.</sub></p>
 </blockquote>
 
 <p>...relinquish CPU execution until the iterator advances.</p>
-<h4> Comment 133161762 D-odu: </h4>I like people like yourself. Explaining things clearly without unnecessary jargon<br><h4> Comment 133164280 Bob Stein: </h4>@D-odu if I&#39;ve earned your compliment, the real people to thank are the many whose eyes have glazed over listening to me. I&#39;ll take credit for noticing and trying to avoid that.<br>------------------------------------------------------------------ <br><h3> Answer 14352675 RBansal: </h3><p>Yield gives you a generator. </p>
+<h4> D-odu, Comment 133161762 Score: 2: </h4>I like people like yourself. Explaining things clearly without unnecessary jargon<br><h4> Bob Stein, Comment 133164280 Score: 1: </h4>@D-odu if I&#39;ve earned your compliment, the real people to thank are the many whose eyes have glazed over listening to me. I&#39;ll take credit for noticing and trying to avoid that.<br>------------------------------------------------------------------ <br><h3> RBansal, Id: 14352675, Score: 246: </h3><p>Yield gives you a generator. </p>
 
 <pre><code>def get_odd_numbers(i):
     return range(1, i, 2)
@@ -845,10 +845,10 @@ bar.next()
 <p>Again, this is a pretty contrived example, you probably would use itertools if you really wanted to count to 50 billion. :)</p>
 
 <p>This is the most simple use case of generators. As you said, it can be used to write efficient permutations, using yield to push things up through the call stack instead of using some sort of stack variable. Generators can also be used for specialized tree traversal, and all manner of other things.</p>
-<h4> Comment 97303895 It&#39;sNotALie.: </h4>Just a note - in Python 3, <code>range</code> also returns a generator instead of a list, so you&#39;d also see a similar idea, except that <code>__repr__</code>/<code>__str__</code> are overridden to show a nicer result, in this case <code>range(1, 10, 2)</code>.<br>------------------------------------------------------------------ <br><h3> Answer 231788 Jon Skeet: </h3><p>It's returning a generator. I'm not particularly familiar with Python, but I believe it's the same kind of thing as <a href="http://csharpindepth.com/Articles/Chapter11/StreamingAndIterators.aspx" rel="noreferrer">C#'s iterator blocks</a> if you're familiar with those.</p>
+<h4> It&#39;sNotALie., Comment 97303895 Score: 4: </h4>Just a note - in Python 3, <code>range</code> also returns a generator instead of a list, so you&#39;d also see a similar idea, except that <code>__repr__</code>/<code>__str__</code> are overridden to show a nicer result, in this case <code>range(1, 10, 2)</code>.<br>------------------------------------------------------------------ <br><h3> Jon Skeet, Id: 231788, Score: 245: </h3><p>It's returning a generator. I'm not particularly familiar with Python, but I believe it's the same kind of thing as <a href="http://csharpindepth.com/Articles/Chapter11/StreamingAndIterators.aspx" rel="noreferrer">C#'s iterator blocks</a> if you're familiar with those.</p>
 
 <p>The key idea is that the compiler/interpreter/whatever does some trickery so that as far as the caller is concerned, they can keep calling next() and it will keep returning values - <em>as if the generator method was paused</em>. Now obviously you can't really "pause" a method, so the compiler builds a state machine for you to remember where you currently are and what the local variables etc look like. This is much easier than writing an iterator yourself.</p>
-<h4> Comment 134643665 tzot: </h4>Actually, the method <i>is</i> paused; the <i>state machine</i> that keeps local variables and the “program counter” is the call frame object itself, because it lives in the heap and not in the stack.<br>------------------------------------------------------------------ <br><h3> Answer 232111 tzot: </h3><p>Here is an example in plain language. I will provide a correspondence between high-level human concepts to low-level Python concepts.</p>
+<h4> tzot, Comment 134643665 Score: 0: </h4>Actually, the method <i>is</i> paused; the <i>state machine</i> that keeps local variables and the “program counter” is the call frame object itself, because it lives in the heap and not in the stack.<br>------------------------------------------------------------------ <br><h3> tzot, Id: 232111, Score: 218: </h3><p>Here is an example in plain language. I will provide a correspondence between high-level human concepts to low-level Python concepts.</p>
 <p>I want to operate on a sequence of numbers, but I don't want to bother myself with the creation of that sequence, I want only to focus on the operation I want to do. So, I do the following:</p>
 <ul>
 <li>I call you and tell you that I want a sequence of numbers that are calculated in a specific way, and I let you know what the algorithm is. <br/>
@@ -870,7 +870,7 @@ The generator function does not need to raise the exception. It's raised automat
 <p>it doesn't matter if <code>sequence</code> is a list, a string, a dictionary or a generator <em>object</em> like described above; the result is the same: you read items off a sequence one by one.</p>
 <p>Note that <code>def</code>ining a function that contains a <code>yield</code> keyword is not the only way to create a generator; it's just the easiest way to create one.</p>
 <p>For more accurate information, read about <a href="http://docs.python.org/library/stdtypes.html#iterator-types" rel="nofollow noreferrer">iterator types</a>, the <a href="http://docs.python.org/reference/simple_stmts.html#yield" rel="nofollow noreferrer">yield statement</a>, and <a href="http://docs.python.org/glossary.html#term-generator" rel="nofollow noreferrer">generators</a> in the Python documentation.</p>
------------------------------------------------------------------- <br><h3> Answer 15814755 aestrivex: </h3><p>There is one type of answer that I don't feel has been given yet, among the many great answers that describe how to use generators. Here is the programming language theory answer:</p>
+------------------------------------------------------------------ <br><h3> aestrivex, Id: 15814755, Score: 217: </h3><p>There is one type of answer that I don't feel has been given yet, among the many great answers that describe how to use generators. Here is the programming language theory answer:</p>
 
 <p>The <code>yield</code> statement in Python returns a generator. A generator in Python is a function that returns <i>continuations</i> (and specifically a type of coroutine, but continuations represent the more general mechanism to understand what is going on).</p>
 
@@ -928,7 +928,7 @@ The generator function does not need to raise the exception. It's raised automat
 </code></pre>
 
 <p>Remember that this is just pseudocode and the actual implementation of generators in Python is more complex. But as an exercise to understand what is going on, try to use continuation passing style to implement generator objects without use of the <code>yield</code> keyword.</p>
------------------------------------------------------------------- <br><h3> Answer 21541902 Mike McKerns: </h3><p>While a lot of answers show why you'd use a <code>yield</code> to create a generator, there are more uses for <code>yield</code>.  It's quite easy to make a coroutine, which enables the passing of information between two blocks of code.  I won't repeat any of the fine examples that have already been given about using <code>yield</code> to create a generator.</p>
+------------------------------------------------------------------ <br><h3> Mike McKerns, Id: 21541902, Score: 169: </h3><p>While a lot of answers show why you'd use a <code>yield</code> to create a generator, there are more uses for <code>yield</code>.  It's quite easy to make a coroutine, which enables the passing of information between two blocks of code.  I won't repeat any of the fine examples that have already been given about using <code>yield</code> to create a generator.</p>
 
 <p>To help understand what a <code>yield</code> does in the following code, you can use your finger to trace the cycle through any code that has a <code>yield</code>.  Every time your finger hits the <code>yield</code>, you have to wait for a <code>next</code> or a <code>send</code> to be entered.  When a <code>next</code> is called, you trace through the code until you hit the <code>yield</code>… the code on the right of the <code>yield</code> is evaluated and returned to the caller… then you wait.  When <code>next</code> is called again, you perform another loop through the code.  However, you'll note that in a coroutine, <code>yield</code> can also be used with a <code>send</code>… which will send a value from the caller <em>into</em> the yielding function. If a <code>send</code> is given, then <code>yield</code> receives the value sent, and spits it out the left hand side… then the trace through the code progresses until you hit the <code>yield</code> again (returning the value at the end, as if <code>next</code> was called).</p>
 
@@ -952,7 +952,7 @@ Received hello
 2
 &gt;&gt;&gt; sequence.close()
 </code></pre>
-<h4> Comment 55942433 00prometheus: </h4>Cute! A <a href="https://en.wikipedia.org/wiki/Trampoline_(computing)" rel="nofollow noreferrer">trampoline</a> (in the Lisp sense). Not often one sees those!<br>------------------------------------------------------------------ <br><h3> Answer 24944096 Sławomir Lenart: </h3><p>There is another <code>yield</code> use and meaning (since Python 3.3):</p>
+<h4> 00prometheus, Comment 55942433 Score: 3: </h4>Cute! A <a href="https://en.wikipedia.org/wiki/Trampoline_(computing)" rel="nofollow noreferrer">trampoline</a> (in the Lisp sense). Not often one sees those!<br>------------------------------------------------------------------ <br><h3> Sławomir Lenart, Id: 24944096, Score: 165: </h3><p>There is another <code>yield</code> use and meaning (since Python 3.3):</p>
 <pre><code>yield from &lt;expr&gt;
 </code></pre>
 <p>From <em><a href="http://www.python.org/dev/peps/pep-0380/" rel="noreferrer">PEP 380 -- Syntax for Delegating to a Subgenerator</a></em>:</p>
@@ -966,7 +966,7 @@ Received hello
    await blocking_action()
 </code></pre>
 <p>to avoid coroutines being confused with a regular generator (today <code>yield</code> is used in both).</p>
------------------------------------------------------------------- <br><h3> Answer 47285378 Wizard: </h3><p>All great answers, however a bit difficult for newbies.</p>
+------------------------------------------------------------------ <br><h3> Wizard, Id: 47285378, Score: 153: </h3><p>All great answers, however a bit difficult for newbies.</p>
 
 <p>I assume you have learned the <code>return</code> statement.</p>
 
@@ -1044,7 +1044,7 @@ Out[16]: [0, 1, 2]
 <li><code>return</code> and <code>yield</code> are twins</li>
 <li><code>list</code> and <code>generator</code> are twins</li>
 </ul>
-<h4> Comment 90923314 Mike S: </h4>This is understandable, but one major difference is that you can have multiple yields in a function/method. The analogy totally breaks down at that point. Yield remembers its place in a function, so the next time you call next(), your function continues on to the next <code>yield</code>. This is important, I think, and should be expressed.<br>------------------------------------------------------------------ <br><h3> Answer 18365578 alinsoar: </h3><p>From a programming viewpoint, the iterators are implemented as <a href="http://en.wikipedia.org/wiki/Thunk_(functional_programming)" rel="nofollow noreferrer">thunks</a>.</p>
+<h4> Mike S, Comment 90923314 Score: 3: </h4>This is understandable, but one major difference is that you can have multiple yields in a function/method. The analogy totally breaks down at that point. Yield remembers its place in a function, so the next time you call next(), your function continues on to the next <code>yield</code>. This is important, I think, and should be expressed.<br>------------------------------------------------------------------ <br><h3> alinsoar, Id: 18365578, Score: 139: </h3><p>From a programming viewpoint, the iterators are implemented as <a href="http://en.wikipedia.org/wiki/Thunk_(functional_programming)" rel="nofollow noreferrer">thunks</a>.</p>
 <p>Behind the <code>yield</code> syntax there must be a semantics.  It is important to understand the semantic concept behind the syntax.  For example, if you want to create a closure, there is <code>lambda</code> and <code>def</code>.  Is a generator simply a closure? Does a generator save the stack?  For sure it does not save the stack as <code>call-with-current-continuation</code> does, as python execution model is not a tree...   And for sure a generator is not a simple closure, otherwise a function and a generator would be the same concept.  So I try to figure out the concept of generator by building it from more basic concept of closure...</p>
 <p>To implement iterators, generators, and thread pools for concurrent execution, etc. as thunks, one uses <a href="https://wiki.c2.com/?ClosuresAndObjectsAreEquivalent" rel="nofollow noreferrer">messages sent to a closure object</a>, which has a dispatcher, and the <a href="http://en.wikipedia.org/wiki/Message_passing" rel="nofollow noreferrer">dispatcher answers to &quot;messages&quot;</a>.</p>
 <p><a href="https://docs.python.org/3/library/functions.html#next" rel="nofollow noreferrer">&quot;<em>next</em>&quot;</a> is a message sent to a closure, created by the &quot;<em>iter</em>&quot; call.</p>
@@ -1090,7 +1090,7 @@ Out[16]: [0, 1, 2]
 -&gt;
 </code></pre>
 </blockquote>
------------------------------------------------------------------- <br><h3> Answer 12716515 Dustin Getz: </h3><p>Here are some Python examples of how to actually implement generators as if Python did not provide syntactic sugar for them:</p>
+------------------------------------------------------------------ <br><h3> Dustin Getz, Id: 12716515, Score: 132: </h3><p>Here are some Python examples of how to actually implement generators as if Python did not provide syntactic sugar for them:</p>
 
 <p><strong>As a Python generator:</strong></p>
 
@@ -1135,12 +1135,12 @@ assert [1,1,2,3,5] == ftake(fib_gen2(), 5)
 
 assert [1,1,2,3,5] == ftake(fib_gen3(), 5)
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 14554322 johnzachary: </h3><p>I was going to post "read page 19 of Beazley's 'Python: Essential Reference' for a quick description of generators", but so many others have posted good descriptions already.</p>
+------------------------------------------------------------------ <br><h3> johnzachary, Id: 14554322, Score: 121: </h3><p>I was going to post "read page 19 of Beazley's 'Python: Essential Reference' for a quick description of generators", but so many others have posted good descriptions already.</p>
 
 <p>Also, note that <code>yield</code> can be used in coroutines as the dual of their use in generator functions.  Although it isn't the same use as your code snippet, <code>(yield)</code> can be used as an expression in a function.  When a caller sends a value to the method using the <code>send()</code> method, then the coroutine will execute until the next <code>(yield)</code> statement is encountered.</p>
 
 <p>Generators and coroutines are a cool way to set up data-flow type applications.  I thought it would be worthwhile knowing about the other use of the <code>yield</code> statement in functions.</p>
------------------------------------------------------------------- <br><h3> Answer 20704301 Engin OZTURK: </h3><p>Here is a simple example:</p>
+------------------------------------------------------------------ <br><h3> Engin OZTURK, Id: 20704301, Score: 103: </h3><p>Here is a simple example:</p>
 <pre><code>def isPrimeNumber(n):
     print &quot;isPrimeNumber({}) call&quot;.format(n)
     if n==1:
@@ -1189,7 +1189,7 @@ isPrimeNumber(11) call
 </code></pre>
 <p>I am not a Python developer, but it looks to me <code>yield</code> holds the position of program flow and the next loop start from &quot;yield&quot; position. It seems like it is waiting at that position, and just before that, returning a value outside, and next time continues to work.</p>
 <p>It seems to be an interesting and nice ability :D</p>
-<h4> Comment 89241413 Engin OZTURK: </h4>You are correct. But what is the effect on flow which is to see the behaviour of &quot;yield&quot; ? I can change the algorithm in the name of mathmatics. Will it help to get different assessment of &quot;yield&quot; ?<br>------------------------------------------------------------------ <br><h3> Answer 17113322 Evgeni Sergeev: </h3><p>Here is a mental image of what <code>yield</code> does.</p>
+<h4> Engin OZTURK, Comment 89241413 Score: 0: </h4>You are correct. But what is the effect on flow which is to see the behaviour of &quot;yield&quot; ? I can change the algorithm in the name of mathmatics. Will it help to get different assessment of &quot;yield&quot; ?<br>------------------------------------------------------------------ <br><h3> Evgeni Sergeev, Id: 17113322, Score: 88: </h3><p>Here is a mental image of what <code>yield</code> does.</p>
 
 <p>I like to think of a thread as having a stack (even when it's not implemented that way).</p>
 
@@ -1238,7 +1238,7 @@ def yielderFunction():
 </code></pre>
 
 <p>The <code>gi_code</code> and <code>gi_frame</code> fields are where the frozen state is stored. Exploring them with <code>dir(..)</code>, we can confirm that our mental model above is credible.</p>
------------------------------------------------------------------- <br><h3> Answer 55314423 Rafael: </h3><img src="https://i.stack.imgur.com/AJZlN.png" width="300" />
+------------------------------------------------------------------ <br><h3> Rafael, Id: 55314423, Score: 84: </h3><img src="https://i.stack.imgur.com/AJZlN.png" width="300" />
 <p>Imagine that you have created a remarkable machine that is capable of generating thousands and thousands of lightbulbs per day. The machine generates these lightbulbs in boxes with a unique serial number. You don't have enough space to store all of these lightbulbs at the same time, so you would like to adjust it to generate lightbulbs on-demand.</p>
 <p>Python generators don't differ much from this concept. Imagine that you have a function called <code>barcode_generator</code> that generates unique serial numbers for the boxes. Obviously, you can have a huge number of such barcodes returned by the function, subject to the hardware (RAM) limitations. A wiser, and space efficient, option is to generate those serial numbers on-demand.</p>
 <p>Machine's code:</p>
@@ -1272,7 +1272,7 @@ while True:
 <p><strong>In other words, a generator <em>looks like</em> a function but <em>behaves like</em> an iterator.</strong></p>
 <h1>Real-world application?</h1>
 <p>Finally, real-world applications? They are usually useful when you work with big sequences. Imagine reading a <em>huge</em> file from disk with billions of records. Reading the entire file in memory, before you can work with its content, will probably be infeasible (i.e., you will run out of memory).</p>
------------------------------------------------------------------- <br><h3> Answer 41426583 Gavriel Cohen: </h3><p>An easy example to understand what it is: <code>yield</code></p>
+------------------------------------------------------------------ <br><h3> Gavriel Cohen, Id: 41426583, Score: 80: </h3><p>An easy example to understand what it is: <code>yield</code></p>
 
 <pre><code>def f123():
     for _ in range(4):
@@ -1288,7 +1288,7 @@ for i in f123():
 
 <pre><code>1 2 1 2 1 2 1 2
 </code></pre>
-<h4> Comment 106237799 user9074332: </h4>are you sure about that output?  wouldnt that only be printed on a single line if you ran that print statement using <code>print(i, end=&#39; &#39;)</code>?  Otherwise, i believe the default behavior would put each number on a new line<br><h4> Comment 106255539 Gavriel Cohen: </h4>@user9074332, You&#39;re right, but it is written on one line to facilitate understanding<br>------------------------------------------------------------------ <br><h3> Answer 31692481 Mangu Singh Rajpurohit: </h3><p>Like every answer suggests, <code>yield</code> is used for creating a sequence generator. It's used for generating some sequence dynamically. For example, while reading a file line by line on a network, you can use the <code>yield</code> function as follows:</p>
+<h4> user9074332, Comment 106237799 Score: 8: </h4>are you sure about that output?  wouldnt that only be printed on a single line if you ran that print statement using <code>print(i, end=&#39; &#39;)</code>?  Otherwise, i believe the default behavior would put each number on a new line<br><h4> Gavriel Cohen, Comment 106255539 Score: 3: </h4>@user9074332, You&#39;re right, but it is written on one line to facilitate understanding<br>------------------------------------------------------------------ <br><h3> Mangu Singh Rajpurohit, Id: 31692481, Score: 76: </h3><p>Like every answer suggests, <code>yield</code> is used for creating a sequence generator. It's used for generating some sequence dynamically. For example, while reading a file line by line on a network, you can use the <code>yield</code> function as follows:</p>
 
 <pre><code>def getNextLines():
    while con.isOpen():
@@ -1324,7 +1324,7 @@ for i in simpleYield():
 "third time"
 "Now some useful value 12"
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 36214653 smwikipedia: </h3><p>(My below answer only speaks from the perspective of using Python generator, not the <a href="https://stackoverflow.com/questions/8389812/how-are-generators-and-coroutines-implemented-in-cpython">underlying implementation of generator mechanism</a>, which involves some tricks of stack and heap manipulation.)</p>
+------------------------------------------------------------------ <br><h3> smwikipedia, Id: 36214653, Score: 74: </h3><p>(My below answer only speaks from the perspective of using Python generator, not the <a href="https://stackoverflow.com/questions/8389812/how-are-generators-and-coroutines-implemented-in-cpython">underlying implementation of generator mechanism</a>, which involves some tricks of stack and heap manipulation.)</p>
 
 <p>When <code>yield</code> is used instead of a <code>return</code> in a python function, that function is turned into something special called <code>generator function</code>. That function will return an object of <code>generator</code> type. <strong>The <code>yield</code> keyword is a flag to notify the python compiler to treat such function specially.</strong> Normal functions will terminate once some value is returned from it. But with the help of the compiler, the generator function <strong>can be thought of</strong> as resumable. That is, the execution context will be restored and the execution will continue from last run. Until you explicitly call return, which will raise a <code>StopIteration</code> exception (which is also part of the iterator protocol), or reach the end of the function. I found a lot of references about <code>generator</code> but this <a href="https://docs.python.org/dev/howto/functional.html#generators" rel="noreferrer">one</a> from the <code>functional programming perspective</code> is the most digestable.</p>
 
@@ -1341,7 +1341,7 @@ the so-called <code>generator function</code>. But under the hood, the returned 
 </ol>
 
 <p>Either way, an iterator is created, i.e. some object that can give you the data you want. The OO approach may be a bit complex. Anyway, which one to use is up to you.</p>
------------------------------------------------------------------- <br><h3> Answer 40022748 redbandit: </h3><p>In summary, the <code>yield</code> statement transforms your function into a factory that produces a special object called a <code>generator</code> which wraps around the body of your original function. When the <code>generator</code> is iterated, it executes your function  until it reaches the next <code>yield</code> then suspends execution and evaluates to the value passed to <code>yield</code>. It repeats this process on each iteration until the path of execution exits the function. For instance,</p>
+------------------------------------------------------------------ <br><h3> redbandit, Id: 40022748, Score: 73: </h3><p>In summary, the <code>yield</code> statement transforms your function into a factory that produces a special object called a <code>generator</code> which wraps around the body of your original function. When the <code>generator</code> is iterated, it executes your function  until it reaches the next <code>yield</code> then suspends execution and evaluates to the value passed to <code>yield</code>. It repeats this process on each iteration until the path of execution exits the function. For instance,</p>
 
 <pre><code>def simple_generator():
     yield 'one'
@@ -1399,8 +1399,8 @@ for i in myRangeSmart(10):
 </code></pre>
 
 <p>Now upon each iteration a function on the generator called <code>next()</code> executes the function until it either reaches a 'yield' statement in which it stops and  'yields' the value or reaches the end of the function. In this case on the first call, <code>next()</code> executes up to the yield statement and yield 'n', on the next call it will execute the  increment statement, jump back to the 'while', evaluate it, and if true, it will stop and yield 'n' again, it will continue that way until the while condition returns false and the generator jumps to the end of the function.</p>
------------------------------------------------------------------- <br><h3> Answer 33788856 Bahtiyar &#214;zdere: </h3><p>The <code>yield</code> keyword simply collects returning results. Think of <code>yield</code> like <code>return +=</code></p>
------------------------------------------------------------------- <br><h3> Answer 32331953 Kaleem Ullah: </h3><p><strong>Yield is an object</strong></p>
+------------------------------------------------------------------ <br><h3> Bahtiyar &#214;zdere, Id: 33788856, Score: 57: </h3><p>The <code>yield</code> keyword simply collects returning results. Think of <code>yield</code> like <code>return +=</code></p>
+------------------------------------------------------------------ <br><h3> Kaleem Ullah, Id: 32331953, Score: 69: </h3><p><strong>Yield is an object</strong></p>
 
 <p>A <code>return</code> in a function will return a single value.</p>
 
@@ -1416,7 +1416,7 @@ for i in myRangeSmart(10):
 <p>That is, it will run the code in your function from the beginning until it hits <code>yield</code>. Then, it’ll return the first value of the loop.</p>
 
 <p>Then, every other call will run the loop you have written in the function one more time, returning the next value until there isn't any value to return.</p>
------------------------------------------------------------------- <br><h3> Answer 39425637 Tom Fuller: </h3><p>Many people use <code>return</code> rather than <code>yield</code>, but in some cases <code>yield</code> can be more efficient and easier to work with.</p>
+------------------------------------------------------------------ <br><h3> Tom Fuller, Id: 39425637, Score: 67: </h3><p>Many people use <code>return</code> rather than <code>yield</code>, but in some cases <code>yield</code> can be more efficient and easier to work with.</p>
 
 <p>Here is an example which <code>yield</code> is definitely best for:</p>
 
@@ -1473,7 +1473,7 @@ for i in dates_generator:
 <p>As you can see both functions do the same thing. The only difference is <code>return_dates()</code> gives a list and <code>yield_dates()</code> gives a generator.</p>
 
 <p>A real life example would be something like reading a file line by line or if you just want to make a generator.</p>
------------------------------------------------------------------- <br><h3> Answer 37964180 Christophe Roussy: </h3><p>Yet another TL;DR</p>
+------------------------------------------------------------------ <br><h3> Christophe Roussy, Id: 37964180, Score: 50: </h3><p>Yet another TL;DR</p>
 
 <p><strong>Iterator on list</strong>: <code>next()</code> returns the next element of the list</p>
 
@@ -1482,8 +1482,8 @@ for i in dates_generator:
 <p>You can see the yield/generator as a way to manually run the <strong>control flow</strong> from outside (like continue loop one step), by calling <code>next</code>, however complex the flow.</p>
 
 <p><strong>Note</strong>: The generator is <strong>NOT</strong> a normal function. It remembers the previous state like local variables (stack). See other answers or articles for detailed explanation. The generator can only be <strong>iterated on once</strong>. You could do without <code>yield</code>, but it would not be as nice, so it can be considered 'very nice' language sugar.</p>
------------------------------------------------------------------- <br><h3> Answer 30341713 Will: </h3><p><code>yield</code> is like a return element for a function. The difference is, that the <code>yield</code> element turns a function into a generator. A generator behaves just like a function until something is 'yielded'. The generator stops until it is next called, and continues from exactly the same point as it started. You can get a sequence of all the 'yielded' values in one, by calling <code>list(generator())</code>.</p>
------------------------------------------------------------------- <br><h3> Answer 35526740 Dimitris Fasarakis Hilliard: </h3><p>Here's a simple <code>yield</code> based approach, to compute the fibonacci series, explained:</p>
+------------------------------------------------------------------ <br><h3> Will, Id: 30341713, Score: 55: </h3><p><code>yield</code> is like a return element for a function. The difference is, that the <code>yield</code> element turns a function into a generator. A generator behaves just like a function until something is 'yielded'. The generator stops until it is next called, and continues from exactly the same point as it started. You can get a sequence of all the 'yielded' values in one, by calling <code>list(generator())</code>.</p>
+------------------------------------------------------------------ <br><h3> Dimitris Fasarakis Hilliard, Id: 35526740, Score: 46: </h3><p>Here's a simple <code>yield</code> based approach, to compute the fibonacci series, explained:</p>
 
 <pre><code>def fib(limit=50):
     a, b = 0, 1
@@ -1575,7 +1575,7 @@ Then I'll pause for a while
 </code></pre>
 
 <p>The generator remembers it was paused at <code>yield value</code> and resumes from there. The next message is printed and the search for the <code>yield</code> statement to pause at it performed again (due to the <code>while</code> loop).</p>
------------------------------------------------------------------- <br><h3> Answer 43698502 Ahmad Ismail: </h3><p><strong>yield</strong> is similar to return. The difference is: </p>
+------------------------------------------------------------------ <br><h3> Ahmad Ismail, Id: 43698502, Score: 39: </h3><p><strong>yield</strong> is similar to return. The difference is: </p>
 
 <p><strong>yield</strong> makes a function iterable (in the following example <code>primes(n = 1)</code> function becomes iterable).<br>
 What it essentially means is the next time the function is called, it will continue from where it left (which is after the line of <code>yield expression</code>).</p>
@@ -1603,7 +1603,7 @@ for n in primes():
 
 <pre><code>n += 1  
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 52244968 Andy Jazz: </h3><p>In Python <code>generators</code> (a special type of <code>iterators</code>) are used to generate series of values and <code>yield</code> keyword is just like the <code>return</code> keyword of generator functions. </p>
+------------------------------------------------------------------ <br><h3> Andy Jazz, Id: 52244968, Score: 31: </h3><p>In Python <code>generators</code> (a special type of <code>iterators</code>) are used to generate series of values and <code>yield</code> keyword is just like the <code>return</code> keyword of generator functions. </p>
 
 <p><strong>The other fascinating thing <code>yield</code> keyword  does is saving the <code>state</code> of a generator function</strong>. </p>
 
@@ -1623,7 +1623,7 @@ def printSuccessivePrimes(iterations, base=10):
     for power in range(iterations):
         print(primeGenerator.send(base ** power))
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 54826880 thavan: </h3><p><code>yield</code> yields something. It's like somebody asks you to make 5 cupcakes. If you are done with at least one cupcake, you can give it to them to eat while you make other cakes.</p>
+------------------------------------------------------------------ <br><h3> thavan, Id: 54826880, Score: 30: </h3><p><code>yield</code> yields something. It's like somebody asks you to make 5 cupcakes. If you are done with at least one cupcake, you can give it to them to eat while you make other cakes.</p>
 
 <pre><code>In [4]: def make_cake(numbers):
    ...:     for i in range(numbers):
@@ -1701,7 +1701,7 @@ Out[27]: 'mJbYRMNo'
 </code></pre>
 
 <p>Here <code>rpg</code> is a generator, which can generate an infinite number of random passwords. So we can also say that generators are useful when we don't know the length of the sequence, unlike list which has a finite number of elements.</p>
------------------------------------------------------------------- <br><h3> Answer 46543549 Chen A.: </h3><p>All of the answers here are great; but only one of them (the most voted one) relates to <strong>how your code works</strong>. Others are relating to <em>generators</em> in general, and how they work.</p>
+------------------------------------------------------------------ <br><h3> Chen A., Id: 46543549, Score: 22: </h3><p>All of the answers here are great; but only one of them (the most voted one) relates to <strong>how your code works</strong>. Others are relating to <em>generators</em> in general, and how they work.</p>
 
 <p>So I won't repeat what generators are or what yields do; I think these are covered by great existing answers. However, after spending few hours trying to understand a similar code to yours, I'll break it down how it works.</p>
 
@@ -1767,7 +1767,7 @@ for element in it:
 <p>Your code example did something similar in a different technique: it populated a <strong>one-element list</strong> for every child, then on the next iteration it pops it and run the function code on the current object (hence the <code>self</code>).</p>
 
 <p>I hope this contributed a little to this legendary topic. I spent several good hours drawing this process to understand it.</p>
------------------------------------------------------------------- <br><h3> Answer 63533381 Aaron_ab: </h3><h2>Can also send data back to the generator!</h2>
+------------------------------------------------------------------ <br><h3> Aaron_ab, Id: 63533381, Score: 16: </h3><h2>Can also send data back to the generator!</h2>
 <p>Indeed, as many answers here explain, using <code>yield</code> creates a <code>generator</code>.</p>
 <p>You can use the <code>yield</code> keyword to <strong>send data back to a &quot;live&quot; generator</strong>.</p>
 <h3>Example:</h3>
@@ -1795,7 +1795,7 @@ Unknown word...
 </code></pre>
 <h3>To summarise:</h3>
 <p>use <code>send</code> method inside a generator to send data back to the generator. To allow that, a <code>(yield)</code> is used.</p>
------------------------------------------------------------------- <br><h3> Answer 70521893 yash bhangare: </h3><p>The <code>yield</code> keyword in Python used to exit from the code without disturbing the state of local variables and when again the function is called the execution starts from the last point where we left the code.</p>
+------------------------------------------------------------------ <br><h3> yash bhangare, Id: 70521893, Score: 17: </h3><p>The <code>yield</code> keyword in Python used to exit from the code without disturbing the state of local variables and when again the function is called the execution starts from the last point where we left the code.</p>
 <p>The below example demonstrates the working of <code>yield</code>:</p>
 <pre><code>def counter():
     x=2
@@ -1814,7 +1814,7 @@ for y in counter():
 3
 4
 </code></pre>
-<h4> Comment 125825540 pippo1980: </h4>what is the meaning of x=2 x=x+1 in your code ?<br><h4> Comment 127426368 Mavaddat Javid: </h4>@pippo1980 it is just to show that <code>x</code> in the <code>counter()</code> is not affected by the changes to <code>x</code> in the outer scope.<br>------------------------------------------------------------------ <br><h3> Answer 59785342 Swati Srivastava: </h3><p>yield in python is in a way similar to the return statement, except for some differences. If multiple values have to be returned from a function, return statement will return all the values as a list and it has to be stored in the memory in the caller block. But what if we don't want to use extra memory? Instead, we want to get the value from the function when we need it. This is where yield comes in. Consider the following function :-</p>
+<h4> pippo1980, Comment 125825540 Score: 6: </h4>what is the meaning of x=2 x=x+1 in your code ?<br><h4> Mavaddat Javid, Comment 127426368 Score: 1: </h4>@pippo1980 it is just to show that <code>x</code> in the <code>counter()</code> is not affected by the changes to <code>x</code> in the outer scope.<br>------------------------------------------------------------------ <br><h3> Swati Srivastava, Id: 59785342, Score: 12: </h3><p>yield in python is in a way similar to the return statement, except for some differences. If multiple values have to be returned from a function, return statement will return all the values as a list and it has to be stored in the memory in the caller block. But what if we don't want to use extra memory? Instead, we want to get the value from the function when we need it. This is where yield comes in. Consider the following function :-</p>
 
 <pre><code>def fun():
    yield 1
@@ -1844,7 +1844,7 @@ Third value printing
 </code></pre>
 
 <p>As can be seen from above, yield returns a value to its caller, but when the function is called again, it doesn't start from the first statement, but from the statement right after the yield. In the above example, "First value printing" was printed and the function was called. 1 was returned and printed. Then "Second value printing" was printed and again fun() was called. Instead of printing 1 (the first statement), it returned 2, i.e., the statement just after yield 1. The same process is repeated further.</p>
-<h4> Comment 108841467 Funny Geeks: </h4>If you try to run this code, the <code>print(fun())</code> does not print numbers. Instead, it prints the representation of the generator object returned by <code>fun()</code> (something along the lines of <code>&lt;generator object fun at 0x6fffffe795c8&gt;</code>)<br><h4> Comment 108902900 Swati Srivastava: </h4>@FunnyGeeks I ran the same code on Jupyter Notebook, and it works fine. Also, the point here was to explain the working of yield keyword. The snippet is just for demo purpose.<br><h4> Comment 108931558 Funny Geeks: </h4>I tried it in python2 and python3 in my cygwin console. It didn&#39;t work. <a href="https://github.com/ImAmARobot/PythonTest" rel="nofollow noreferrer">github.com/ImAmARobot/PythonTest</a><br>------------------------------------------------------------------ <br><h3> Answer 69427199 ToTamire: </h3><h1>Simple answer</h1>
+<h4> Funny Geeks, Comment 108841467 Score: 0: </h4>If you try to run this code, the <code>print(fun())</code> does not print numbers. Instead, it prints the representation of the generator object returned by <code>fun()</code> (something along the lines of <code>&lt;generator object fun at 0x6fffffe795c8&gt;</code>)<br><h4> Swati Srivastava, Comment 108902900 Score: 0: </h4>@FunnyGeeks I ran the same code on Jupyter Notebook, and it works fine. Also, the point here was to explain the working of yield keyword. The snippet is just for demo purpose.<br><h4> Funny Geeks, Comment 108931558 Score: 0: </h4>I tried it in python2 and python3 in my cygwin console. It didn&#39;t work. <a href="https://github.com/ImAmARobot/PythonTest" rel="nofollow noreferrer">github.com/ImAmARobot/PythonTest</a><br>------------------------------------------------------------------ <br><h3> ToTamire, Id: 69427199, Score: 9: </h3><h1>Simple answer</h1>
 <p>When function contains at least one <code>yield</code> statement, the function automaticly becomes generator function. When you call generator function, python executes code in the generator function until <code>yield</code> statement occur. <code>yield</code> statement freezes the function with all its internal states. When you call generator function again, python continues execution of code in the generator function from frozen position, until <code>yield</code> statement occur again and again. The generator function executes code until generator function runs out without <code>yield</code> statement.</p>
 <h1>Benchmark</h1>
 <p>Create a list and return it:</p>
@@ -1931,7 +1931,7 @@ Line #    Mem usage    Increment  Occurences   Line Contents
 </code></pre>
 <h1>Summary</h1>
 <p>The generator function needs a little more time to execute, than function which returns a list but it use much less memory.</p>
------------------------------------------------------------------- <br><h3> Answer 69893671 Ted Shaneyfelt: </h3><p>A simple use case:</p>
+------------------------------------------------------------------ <br><h3> Ted Shaneyfelt, Id: 69893671, Score: 8: </h3><p>A simple use case:</p>
 <pre><code>&gt;&gt;&gt; def foo():
     yield 100
     yield 20
@@ -1948,7 +1948,7 @@ Line #    Mem usage    Increment  Occurences   Line Contents
 <p>How it works: when called, the function returns an object immediately. The object can be passed to the next() function. Whenever the next() function is called, your function runs up until the next yield and provides the return value for the next() function.</p>
 <p>Under the hood, the for loop recognizes that the object is a generator object and uses next() to get the next value.</p>
 <p>In some languages like ES6 and higher, it's implemented a little differently so next is a member function of the generator object, and you could pass values from the caller every time it gets the next value. So if result is the generator then you could do something like y = result.next(555), and the program yielding values could say something like z = yield 999. The value of y would be 999 that next gets from the yield, and the value of z would be 555 that yield gets from the next. Python get and send methods have a similar effect.</p>
------------------------------------------------------------------- <br><h3> Answer 67976136 Mayank Maheshwari: </h3><p>Usually, it's used to create an iterator out of function.
+------------------------------------------------------------------ <br><h3> Mayank Maheshwari, Id: 67976136, Score: 5: </h3><p>Usually, it's used to create an iterator out of function.
 Think 'yield' as an append() to your function and your function as an array.
 And if certain criteria meet, you can add that value in your function to make it an iterator.</p>
 <pre><code>arr=[]
@@ -1962,7 +1962,7 @@ def func():
 <p>the output will be the same for both.</p>
 <p>The main advantage of using yield is to creating iterators.
 Iterators don’t compute the value of each item when instantiated. They only compute it when you ask for it. This is known as lazy evaluation.</p>
-<h4> Comment 122569817 jiten: </h4>+1. Thanks for easy explanation, but request more as how in your or post&#39;s code, easy evaluation is being done. See no way how your two codes work differently.<br>------------------------------------------------------------------ <br><h3> Answer 70233705 michalmonday: </h3><p>Generators allow to get individual processed items immediately (without the need to wait for the whole collection to be processed). This is illustrated in the example below.</p>
+<h4> jiten, Comment 122569817 Score: 0: </h4>+1. Thanks for easy explanation, but request more as how in your or post&#39;s code, easy evaluation is being done. See no way how your two codes work differently.<br>------------------------------------------------------------------ <br><h3> michalmonday, Id: 70233705, Score: 5: </h3><p>Generators allow to get individual processed items immediately (without the need to wait for the whole collection to be processed). This is illustrated in the example below.</p>
 <pre class="lang-py prettyprint-override"><code>import time
 
 def get_gen():
@@ -2014,7 +2014,7 @@ result arrived after: 10 seconds
 result arrived after: 10 seconds
 result arrived after: 10 seconds
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 70617027 Vinod Srivastav: </h3><h2>What does the <code>Yield</code> Keyword do ?</h2>
+------------------------------------------------------------------ <br><h3> Vinod Srivastav, Id: 70617027, Score: 5: </h3><h2>What does the <code>Yield</code> Keyword do ?</h2>
 <blockquote>
 <p><code>yield</code> keyword is used to create a generator function. A type of function that is memory efficient and can be used like an iterator object.</p>
 </blockquote>
@@ -2044,7 +2044,7 @@ print(next(g)) #will print 2
 print(next(g)) #will print 3 and so on
 
 </code></pre>
------------------------------------------------------------------- <br><h3> Answer 74055463 Roland: </h3><p><code>yield</code> allows you to write smarter <code>for</code>-loops by factoring out the looping part to a separate method for easy reuse.</p>
+------------------------------------------------------------------ <br><h3> Roland, Id: 74055463, Score: 5: </h3><p><code>yield</code> allows you to write smarter <code>for</code>-loops by factoring out the looping part to a separate method for easy reuse.</p>
 <p>Suppose you need to loop over all non-blank rows of a spreadsheet and do something with each row.</p>
 <pre><code>for i, row in df.iterrows(): #from the panda package for reading excel 
   if row = blank: # pseudo code, check if row is non-blank...
@@ -2076,7 +2076,7 @@ for i, row in valid_rows():
 nr_valid_rows = len(list(valid_rows()))
 </code></pre>
 <p>That is all there is. Note that I have not used jargon like iterator, generator, protocol, co-routine. I think that this simple example applies to a lot of our day to day coding.</p>
------------------------------------------------------------------- <br><h3> Answer 67970221 Siva Sankar: </h3><p>Function - returns.</p>
+------------------------------------------------------------------ <br><h3> Siva Sankar, Id: 67970221, Score: 3: </h3><p>Function - returns.</p>
 <p>Generator - yields (contains one or more yields and zero or more returns).</p>
 <pre><code>names = ['Sam', 'Sarah', 'Thomas', 'James']
 
@@ -2127,7 +2127,7 @@ for processed_data in function():
 </code></pre>
 <p>Note:
 Yield should not be in the try ... finally construct.</p>
------------------------------------------------------------------- <br><h3> Answer 72334132 Raymond Hettinger: </h3><h2>Key points</h2>
+------------------------------------------------------------------ <br><h3> Raymond Hettinger, Id: 72334132, Score: 3: </h3><h2>Key points</h2>
 <ul>
 <li><p>The <a href="https://docs.python.org/3/reference/grammar.html" rel="nofollow noreferrer">grammar for Python</a> uses the presence of the <code>yield</code> keyword to make a function that returns a <a href="https://docs.python.org/3/glossary.html#term-generator" rel="nofollow noreferrer">generator</a>.</p>
 </li>
@@ -2192,14 +2192,14 @@ StopIteration
 30
 </code></pre>
 <p>A person could write a book about all this, but these are the key points.  When I teach Python courses, I've found that this is a minimal sufficient explanation to build understand and start using it right away.  In particular, the trick of writing a function with <code>print</code>, testing it, and then converting to <code>yield</code> seems to work well with all levels of Python programmers.</p>
------------------------------------------------------------------- <br><h3> Answer 73924762 My Car: </h3><p><strong>What Is Yield In Python?</strong></p>
+------------------------------------------------------------------ <br><h3> My Car, Id: 73924762, Score: 3: </h3><p><strong>What Is Yield In Python?</strong></p>
 <p>The Yield keyword in Python is similar to a return statement used for returning values or objects in Python. However, there is a slight difference. The yield statement returns a generator object to the one who calls the function which contains yield, instead of simply returning a value.</p>
 <p>Inside a program, when you call a function that has a yield statement, as soon as a yield is encountered, the execution of the function stops and returns an object of the generator to the function caller. In simpler words, the yield keyword will convert an expression that is specified along with it to a generator object and return it to the caller. Hence, if you want to get the values stored inside the generator object, you need to iterate over it.</p>
 <p>It will not destroy the local variables’ states. Whenever a function is called, the execution will start from the last yield expression. Please note that a function that contains a yield keyword is known as a generator function.</p>
 <p>When you use a function with a return value, every time you call the function, it starts with a new set of variables. In contrast, if you use a generator function instead of a normal function, the execution will start right from where it left last.</p>
 <p>If you want to return multiple values from a function, you can use generator functions with yield keywords. The yield expressions return multiple values. They return one value, then wait, save the local state, and resume again.</p>
 <p>Source: <a href="https://www.simplilearn.com/tutorials/python-tutorial/yield-in-python" rel="nofollow noreferrer">https://www.simplilearn.com/tutorials/python-tutorial/yield-in-python</a></p>
------------------------------------------------------------------- <br><h3> Answer 74338534 Super Kai - Kazuya Ito: </h3><p><strong><code>yield</code></strong>:</p>
+------------------------------------------------------------------ <br><h3> Super Kai - Kazuya Ito, Id: 74338534, Score: 3: </h3><p><strong><code>yield</code></strong>:</p>
 <ul>
 <li>can return a value multiple times from a function by stopping the function.</li>
 <li>can use <code>from</code> with it like <code>yield from</code>.</li>
@@ -2260,7 +2260,7 @@ Traceback (most recent call last):
           ^^^^^^^
 StopIteration: Five
 </code></pre>
-<h4> Comment 132790833 juanpa.arrivillaga: </h4><code># &#39;Five&#39; cannot be got</code> well, it can, if you catch the <code>StopIteration</code> error and look at the <code>.args[0]</code><br>------------------------------------------------------------------ <br><h3> Answer 70516941 Conjure.Li: </h3><p>To understand its yield function, one must understand what a generator is. Moreover, before understanding generators, you must understand <em>iterables</em>.
+<h4> juanpa.arrivillaga, Comment 132790833 Score: 0: </h4><code># &#39;Five&#39; cannot be got</code> well, it can, if you catch the <code>StopIteration</code> error and look at the <code>.args[0]</code><br>------------------------------------------------------------------ <br><h3> Conjure.Li, Id: 70516941, Score: 1: </h3><p>To understand its yield function, one must understand what a generator is. Moreover, before understanding generators, you must understand <em>iterables</em>.
 Iterable: iterable
 To create a list, you naturally need to be able to read each element one by one. The process of reading its items one by one is called iteration:</p>
 <pre><code>&gt;&gt;&gt; mylist = [1, 2, 3]
