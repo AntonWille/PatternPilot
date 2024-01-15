@@ -2,12 +2,9 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 
 def fetch_question(engine, question_id):
-    query = text("SELECT * FROM questions WHERE question_id = :qid")
-    result = engine.execute(query, qid=question_id).fetchone()
-    if result:
-        return dict(result)
-    else:
-        return None
+    query = f"SELECT * FROM questions WHERE question_id = {question_id}"
+    df = pd.DataFrame(engine.execute(text(query)))
+    return df.iloc[0].to_dict()
 
 def fetch_answers(engine, question_id):
     query = f"SELECT * FROM answers WHERE question_id = {question_id}"
