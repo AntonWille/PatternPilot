@@ -1,4 +1,4 @@
-## The meat of the issue
+## Codes
 
 ### This is the way
 So far the most promising part of "culture", almost every post talks implicitly or explicitly about this. Large differences can be found, and a lot of controversy, discussion and disagreement within the community. My initial characterization was that Python is one the strong end of "there is one way to do it", or better phrased "there should be one obvious way on how to solve things", while Perl embraces the freedom to explicitly say "there is more than one way to do it".
