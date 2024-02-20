@@ -1,11 +1,11 @@
- <h2> Title: How do I pick randomly from an array? </h2> <h4> Paul Hoffer, question_id: 3482149 </h4>Score: 646, Tags: {ruby,arrays,random} <br><p>I want to know if there is a much cleaner way of doing this. Basically, I want to pick a random element from an array of variable length.  Normally, I would do it like this:</p>
+ <h2> Title: How do I pick randomly from an array? </h2> <h4> Paul Hoffer, question_id: 3482149, created_at: 2010-08-14 05:26:49+00:00 </h4>Score: 646, Tags: {ruby,arrays,random} <br><p>I want to know if there is a much cleaner way of doing this. Basically, I want to pick a random element from an array of variable length.  Normally, I would do it like this:</p>
 
 <pre><code>myArray = ["stuff", "widget", "ruby", "goodies", "java", "emerald", "etc" ]
 item = myArray[rand(myarray.length)]
 </code></pre>
 
 <p>Is there something that is more readable / simpler to replace the second line? Or is that the best way to do it. I suppose you could do <code>myArray.shuffle.first</code>, but I only saw <code>#shuffle</code> a few minutes ago on SO, I haven't actually used it yet.</p>
-<h4> Derek Organ, Id: 10618864 Score: 13: </h4>Good Answer below but a general point about shuffle. I would imagine suffling the full array would be much more intensive than just getting a random number so it wouldn&#39;t be a good direction to go.<br>------------------------------------------------------------------ <br><h3> Marc-Andr&#233; Lafortune, Id: 3483802, Score: 1268: </h3><p>Just use <a href="http://ruby-doc.org/core-1.9.3/Array.html#method-i-sample" rel="noreferrer"><code>Array#sample</code></a>:</p>
+<h4> Comment by Derek Organ, Score: 13, Id: 10618864, created_at: 2011-12-19 18:50:28+00:00 </h4>Good Answer below but a general point about shuffle. I would imagine suffling the full array would be much more intensive than just getting a random number so it wouldn&#39;t be a good direction to go.<hr><h3> ✔️ Answer by Marc-Andr&#233; Lafortune, Id: 3483802, Score: 1269, created_at: 2010-08-14 14:39:35+00:00 </h3><p>Just use <a href="http://ruby-doc.org/core-1.9.3/Array.html#method-i-sample" rel="noreferrer"><code>Array#sample</code></a>:</p>
 
 <pre><code>[:foo, :bar].sample # =&gt; :foo, or :bar :-)
 </code></pre>
@@ -15,8 +15,17 @@ item = myArray[rand(myarray.length)]
 <p>Note that in Ruby 1.8.7 it exists under the unfortunate name <code>choice</code>; it was renamed in later version so you shouldn't use that.</p>
 
 <p>Although not useful in this case, <code>sample</code> accepts a number argument in case you want a number of distinct samples.</p>
-<h4> Marc-Andr&#233; Lafortune, Comment 31070630 Score: 1: </h4>@Purplejacket: Yes, but it might not be the best way to do this. <code>ActiveRecord::Relation</code> will delegate the call to an array, so it will load all the records and then pick one randomly.<br><h4> Paul Hoffer, Comment 3639623 Score: 1: </h4>I should have known that you would have a perfect answer for me (since most Ruby questions I browse here have your input somewhere). I am glad you pointed out the versioning; I am using 1.9.2. apidock (mladen&#39;s comment) does not have sample; neither does ruby-doc. In your opinion, what is the best reference for Ruby, updated to 1.9?<br><h4> Purplejacket, Comment 31071526 Score: 0: </h4>@Marc-Andr&#233;Lafortune: that is an excellent point!!  A more optimized approach might be some inline SQL combined with this:  <a href="http://stackoverflow.com/questions/580639/how-to-randomly-select-rows-in-sql" title="how to randomly select rows in sql">stackoverflow.com/questions/580639/&hellip;</a><br><h4> Purplejacket, Comment 31052451 Score: 0: </h4>Conveniently, you can also use <code>sample</code> on an <code>ActiveRecord::Relation</code>; e.g. <code>@joe.pencils.sample</code> will randomly choose a writing implement from Joe&#39;s pencil collection (assuming normal Rails stuff here).<br><h4> Henley Wing Chiu, Comment 19438552 Score: 0: </h4>.sample is such an non obvious method name. I loved choice much better. Change it back Ruby developers!<br>------------------------------------------------------------------ <br><h3> beesasoh, Id: 17469994, Score: 103: </h3><p><code>myArray.sample(x)</code> can also help you to get x random elements from the array.</p>
-<h4> Ekkstein, Comment 82265147 Score: 8: </h4>@Redithion It&#39;s also worth noting, that the difference between: my_array.sample(1) == [sample] and my_array.sample == sample to provide explicitly what you mean<br>------------------------------------------------------------------ <br><h3> Mike Rapadas, Id: 19220172, Score: 17: </h3><h1>Random Number of Random Items from an Array</h1>
+<h4> Comment by Marc-Andr&#233; Lafortune, Score: 1, Id: 31070630, created_at: 2013-12-23 03:30:56+00:00 </h4>@Purplejacket: Yes, but it might not be the best way to do this. <code>ActiveRecord::Relation</code> will delegate the call to an array, so it will load all the records and then pick one randomly.<h4> Comment by Paul Hoffer, Score: 1, Id: 3639623, created_at: 2010-08-15 01:15:11+00:00 </h4>I should have known that you would have a perfect answer for me (since most Ruby questions I browse here have your input somewhere). I am glad you pointed out the versioning; I am using 1.9.2. apidock (mladen&#39;s comment) does not have sample; neither does ruby-doc. In your opinion, what is the best reference for Ruby, updated to 1.9?<h4> Comment by Henley Wing Chiu, Score: 0, Id: 19438552, created_at: 2012-12-28 01:36:44+00:00 </h4>.sample is such an non obvious method name. I loved choice much better. Change it back Ruby developers!<h4> Comment by Purplejacket, Score: 0, Id: 31071526, created_at: 2013-12-23 04:38:08+00:00 </h4>@Marc-Andr&#233;Lafortune: that is an excellent point!!  A more optimized approach might be some inline SQL combined with this:  <a href="http://stackoverflow.com/questions/580639/how-to-randomly-select-rows-in-sql" title="how to randomly select rows in sql">stackoverflow.com/questions/580639/&hellip;</a><h4> Comment by Purplejacket, Score: 0, Id: 31052451, created_at: 2013-12-22 05:49:34+00:00 </h4>Conveniently, you can also use <code>sample</code> on an <code>ActiveRecord::Relation</code>; e.g. <code>@joe.pencils.sample</code> will randomly choose a writing implement from Joe&#39;s pencil collection (assuming normal Rails stuff here).<hr><h3>  Answer by beesasoh, Id: 17469994, Score: 103, created_at: 2013-07-04 12:11:34+00:00 </h3><p><code>myArray.sample(x)</code> can also help you to get x random elements from the array.</p>
+<h4> Comment by Ekkstein, Score: 8, Id: 82265147, created_at: 2017-12-05 12:22:19+00:00 </h4>@Redithion It&#39;s also worth noting, that the difference between: my_array.sample(1) == [sample] and my_array.sample == sample to provide explicitly what you mean<hr><h3>  Answer by JJ21, Id: 19509009, Score: 23, created_at: 2013-10-22 04:31:31+00:00 </h3><pre><code>myArray.sample
+</code></pre>
+
+<p>will return 1 random value.</p>
+
+<pre><code>myArray.shuffle.first
+</code></pre>
+
+<p>will also return 1 random value.</p>
+<h4> Comment by superluminary, Score: 31, Id: 30379975, created_at: 2013-12-03 13:09:59+00:00 </h4>The shuffle is superfluous.<h4> Comment by Filip Bartuzi, Score: 1, Id: 41654362, created_at: 2014-10-22 16:15:33+00:00 </h4>Technically this random method is correct too <a href="http://stackoverflow.com/a/84747/2047418">stackoverflow.com/a/84747/2047418</a><hr><h3>  Answer by Mike Rapadas, Id: 19220172, Score: 17, created_at: 2013-10-07 08:31:30+00:00 </h3><h1>Random Number of Random Items from an Array</h1>
 <pre><code>def random_items(array)
   array.sample(1 + rand(array.count))
 end
@@ -30,16 +39,7 @@ my_array.sample(1 + rand(my_array.count))
 =&gt; [&quot;one&quot;, &quot;three&quot;, &quot;two&quot;]
 =&gt; [&quot;two&quot;]
 </code></pre>
-<h4> sawa, Comment 66481455 Score: 0: </h4>This would never return an empty array. You need to place <code>1 +</code> in a different place.<br><h4> Mike Rapadas, Comment 39914257 Score: 0: </h4>@fwilson random collections of objects in any order. Also good for testing different combinations or generating stub data<br><h4> Tim Kretschmer, Comment 57635263 Score: 0: </h4>why not extend class Array ? [].total_random  would be way cooler. comeon its ruby. its objective!<br>------------------------------------------------------------------ <br><h3> JJ21, Id: 19509009, Score: 23: </h3><pre><code>myArray.sample
-</code></pre>
-
-<p>will return 1 random value.</p>
-
-<pre><code>myArray.shuffle.first
-</code></pre>
-
-<p>will also return 1 random value.</p>
-<h4> superluminary, Comment 30379975 Score: 31: </h4>The shuffle is superfluous.<br><h4> Filip Bartuzi, Comment 41654362 Score: 1: </h4>Technically this random method is correct too <a href="http://stackoverflow.com/a/84747/2047418">stackoverflow.com/a/84747/2047418</a><br>------------------------------------------------------------------ <br><h3> random_user_0891, Id: 72889471, Score: 5: </h3><p>Here are some benchmark tests I performed on some of the answers posted here, using <code>sample</code> was consistently faster than the rest.</p>
+<h4> Comment by Mike Rapadas, Score: 0, Id: 39914257, created_at: 2014-08-29 00:14:05+00:00 </h4>@fwilson random collections of objects in any order. Also good for testing different combinations or generating stub data<h4> Comment by Tim Kretschmer, Score: 0, Id: 57635263, created_at: 2016-01-22 16:48:02+00:00 </h4>why not extend class Array ? [].total_random  would be way cooler. comeon its ruby. its objective!<h4> Comment by sawa, Score: 0, Id: 66481455, created_at: 2016-09-20 04:53:05+00:00 </h4>This would never return an empty array. You need to place <code>1 +</code> in a different place.<hr><h3>  Answer by random_user_0891, Id: 72889471, Score: 5, created_at: 2022-07-06 20:24:47+00:00 </h3><p>Here are some benchmark tests I performed on some of the answers posted here, using <code>sample</code> was consistently faster than the rest.</p>
 <pre><code>test_arr = [&quot;stuff&quot;, &quot;widget&quot;, &quot;ruby&quot;, &quot;goodies&quot;, &quot;java&quot;, &quot;emerald&quot; ]
 
 Benchmark.ips do |x|
@@ -91,7 +91,7 @@ Comparison:
          2 - shuffle:  2661267.7 i/s - 2.82x  (± 0.00) slower
        4 - rand rand:  2351630.7 i/s - 3.19x  (± 0.00) slower
 </code></pre>
------------------------------------------------------------------- <br><h3> Muhammad Aamir, Id: 51099098, Score: 1: </h3><pre><code>arr = [1,9,5,2,4,9,5,8,7,9,0,8,2,7,5,8,0,2,9]
+<hr><h3>  Answer by Muhammad Aamir, Id: 51099098, Score: 1, created_at: 2018-06-29 09:57:07+00:00 </h3><pre><code>arr = [1,9,5,2,4,9,5,8,7,9,0,8,2,7,5,8,0,2,9]
 arr[rand(arr.count)]
 </code></pre>
 
@@ -117,7 +117,7 @@ arr[rand(arr.count)]
 </code></pre>
 
 <p>then it may return number and arr[number] contains no element.</p>
------------------------------------------------------------------- <br><h3> Charon IV, Id: 57063185, Score: -8: </h3><pre><code>class String
+<hr><h3>  Answer by Charon IV, Id: 57063185, Score: -8, created_at: 2019-07-16 18:10:58+00:00 </h3><pre><code>class String
 
   def black
     return "\e[30m#{self}\e[0m"

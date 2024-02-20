@@ -1,30 +1,23 @@
- <h2> Title: Remove duplicate elements from array in Ruby </h2> <h4> Mithun Sasidharan, question_id: 8365721 </h4>Score: 382, Tags: {ruby-on-rails,arrays,ruby,duplicates} <br><p>I have a Ruby array which contains duplicate elements.</p>
+ <h2> Title: Remove duplicate elements from array in Ruby </h2> <h4> Mithun Sasidharan, question_id: 8365721, created_at: 2011-12-03 05:23:06+00:00 </h4>Score: 382, Tags: {ruby-on-rails,arrays,ruby,duplicates} <br><p>I have a Ruby array which contains duplicate elements.</p>
 
 <pre><code>array = [1,2,2,1,4,4,5,6,7,8,5,6]
 </code></pre>
 
 <p>How can I remove all the duplicate elements from this array while retaining all unique elements without using for-loops and iteration?</p>
------------------------------------------------------------------- <br><h3> Mithun Sasidharan, Id: 8365726, Score: 812: </h3><pre><code>array = array.uniq
+<hr><h3> ✔️ Answer by Mithun Sasidharan, Id: 8365726, Score: 812, created_at: 2011-12-03 05:24:03+00:00 </h3><pre><code>array = array.uniq
 </code></pre>
 
 <p><a href="http://www.ruby-doc.org/core-1.9.3/Array.html#method-i-uniq" rel="noreferrer"><code>uniq</code></a> removes all duplicate elements and retains all unique elements in the array.</p>
 
 <p>This is one of many beauties of the Ruby language.</p>
-<h4> duykhoa, Comment 22479012 Score: 55: </h4>no, the uniq! method will return nil if the array had been unique yet Ex: a = [1,2,3,4]     a.uniq -&gt; [1,2,3,4]    but     a.uniq! -&gt; nil<br><h4> Justin L., Comment 23941144 Score: 15: </h4>i wouldn&#39;t really see this as a beauty of the ruby language...it&#39;s just the beauty of the ruby standard library?  don&#39;t get me wrong, there are a lot of beautiful things about the language.<br><h4> Adam Waite, Comment 25139293 Score: 8: </h4>write the same in Objective-C, Javascript and PHP. Then tell us that Ruby isn&#39;t a beautiful language!<br><h4> carpinchosaurio, Comment 67662719 Score: 5: </h4>about what @duykhoa says, the uniq! method returns nil, but you usually don&#39;t care about the return of a <code>.uniq!</code> it does the work on the object itself<br><h4> Blaskovicz, Comment 57918788 Score: 4: </h4>This also works for complex types:  <code>[{how:  &quot;are&quot;}, {u:&quot;doing&quot;}, {how: &quot;are&quot;}].uniq =&gt; [{:how=&gt;&quot;are&quot;}, {:u=&gt;&quot;doing&quot;}]</code><br><h4> halfbit, Comment 38279370 Score: 1: </h4>@AdamWaite: yes ruby is; but its again &quot;uniq&quot; not &quot;unique&quot; :&#39;|, I always/still fight with so little things with ruby<br><h4> Simonini, Comment 26719206 Score: 0: </h4>@AdamWaite For example in php you cant make this in easy way: &quot;If a block is given, it will use the return value of the block for comparison.&quot; And ruby syntax of array.uniq is more short, clear and coincise than php -&gt; array_unique(array).  <a href="http://ruby-doc.org/core-2.0/Array.html#method-i-uniq" rel="nofollow noreferrer">ruby-doc.org/core-2.0/Array.html#method-i-uniq</a><br><h4> taystack, Comment 61929830 Score: 0: </h4>Also, <code>.uniq!</code> is a mutator. In case you wanted to preserve your <code>array</code><br><h4> Ja͢ck, Comment 129597001 Score: 0: </h4>it should also be mentioned that a block can be given if the uniqueness constraint is more complex; for instance, you could do <code>array.uniq { |i| i % 3 }</code> to get the unique values modulo 3 (1, 2, 6)<br>------------------------------------------------------------------ <br><h3> Lri, Id: 13112875, Score: 22: </h3><p>If someone was looking for a way to remove all instances of repeated values, see "<a href="https://stackoverflow.com/questions/786879/how-can-i-efficiently-extract-repeated-elements-in-a-ruby-array">How can I efficiently extract repeated elements in a Ruby array?</a>".</p>
-
-<pre><code>a = [1, 2, 2, 3]
-counts = Hash.new(0)
-a.each { |v| counts[v] += 1 }
-p counts.select { |v, count| count == 1 }.keys # [1, 3]
-</code></pre>
-<h4> Tim Wright, Comment 80515932 Score: 4: </h4>Or could simply do       <code>a = [1, 2, 2, 3]     a.find_all { |x| a.count(x) == 1 } # [1, 3]</code><br><h4> the Tin Man, Comment 109492970 Score: 0: </h4>The linked question is not the same; It&#39;s asking how to find duplicated values and return them. The OP wants to remove duplicates.<br>------------------------------------------------------------------ <br><h3> jaredsmith, Id: 16114613, Score: 91: </h3><p>You can  return the intersection.</p>
+<h4> Comment by taystack, Score: 0, Id: 61929830, created_at: 2016-05-12 22:52:14+00:00 </h4>Also, <code>.uniq!</code> is a mutator. In case you wanted to preserve your <code>array</code><h4> Comment by duykhoa, Score: 55, Id: 22479012, created_at: 2013-04-04 08:37:42+00:00 </h4>no, the uniq! method will return nil if the array had been unique yet Ex: a = [1,2,3,4]     a.uniq -&gt; [1,2,3,4]    but     a.uniq! -&gt; nil<h4> Comment by Justin L., Score: 15, Id: 23941144, created_at: 2013-05-20 08:58:57+00:00 </h4>i wouldn&#39;t really see this as a beauty of the ruby language...it&#39;s just the beauty of the ruby standard library?  don&#39;t get me wrong, there are a lot of beautiful things about the language.<h4> Comment by Adam Waite, Score: 8, Id: 25139293, created_at: 2013-06-26 20:41:17+00:00 </h4>write the same in Objective-C, Javascript and PHP. Then tell us that Ruby isn&#39;t a beautiful language!<h4> Comment by carpinchosaurio, Score: 5, Id: 67662719, created_at: 2016-10-23 00:43:41+00:00 </h4>about what @duykhoa says, the uniq! method returns nil, but you usually don&#39;t care about the return of a <code>.uniq!</code> it does the work on the object itself<h4> Comment by Blaskovicz, Score: 4, Id: 57918788, created_at: 2016-01-30 06:29:40+00:00 </h4>This also works for complex types:  <code>[{how:  &quot;are&quot;}, {u:&quot;doing&quot;}, {how: &quot;are&quot;}].uniq =&gt; [{:how=&gt;&quot;are&quot;}, {:u=&gt;&quot;doing&quot;}]</code><h4> Comment by halfbit, Score: 1, Id: 38279370, created_at: 2014-07-10 22:14:31+00:00 </h4>@AdamWaite: yes ruby is; but its again &quot;uniq&quot; not &quot;unique&quot; :&#39;|, I always/still fight with so little things with ruby<h4> Comment by Simonini, Score: 0, Id: 26719206, created_at: 2013-08-14 08:18:00+00:00 </h4>@AdamWaite For example in php you cant make this in easy way: &quot;If a block is given, it will use the return value of the block for comparison.&quot; And ruby syntax of array.uniq is more short, clear and coincise than php -&gt; array_unique(array).  <a href="http://ruby-doc.org/core-2.0/Array.html#method-i-uniq" rel="nofollow noreferrer">ruby-doc.org/core-2.0/Array.html#method-i-uniq</a><h4> Comment by Ja͢ck, Score: 0, Id: 129597001, created_at: 2022-08-17 07:52:08+00:00 </h4>it should also be mentioned that a block can be given if the uniqueness constraint is more complex; for instance, you could do <code>array.uniq { |i| i % 3 }</code> to get the unique values modulo 3 (1, 2, 6)<hr><h3>  Answer by jaredsmith, Id: 16114613, Score: 91, created_at: 2013-04-19 22:53:29+00:00 </h3><p>You can  return the intersection.</p>
 
 <pre><code>a = [1,1,2,3]
 a &amp; a
 </code></pre>
 
 <p>This will also delete duplicates.</p>
-<h4> jaredsmith, Comment 23125724 Score: 23: </h4>I was just putting it here so whoever visits this page will see other ways of doing it as well, I was not trying to say it is better in any way.<br><h4> Fiona T, Comment 23014468 Score: 16: </h4>Functionally, this answer is correct, but I think this is markedly less readable than just using uniq.<br><h4> Cezar, Comment 26617501 Score: 5: </h4>The reason this works is because when using set operations, the resulting array is treated as a set, which is a data structure that usually has no repeat values. Using <code>a | a</code> (union) would do the same trick.<br>------------------------------------------------------------------ <br><h3> Marek Př&#237;hoda, Id: 8366502, Score: 59: </h3><p>You can remove the duplicate elements with the uniq method:</p>
+<h4> Comment by jaredsmith, Score: 23, Id: 23125724, created_at: 2013-04-23 20:08:46+00:00 </h4>I was just putting it here so whoever visits this page will see other ways of doing it as well, I was not trying to say it is better in any way.<h4> Comment by Fiona T, Score: 16, Id: 23014468, created_at: 2013-04-19 22:57:58+00:00 </h4>Functionally, this answer is correct, but I think this is markedly less readable than just using uniq.<h4> Comment by Cezar, Score: 5, Id: 26617501, created_at: 2013-08-11 03:58:16+00:00 </h4>The reason this works is because when using set operations, the resulting array is treated as a set, which is a data structure that usually has no repeat values. Using <code>a | a</code> (union) would do the same trick.<hr><h3>  Answer by Marek Př&#237;hoda, Id: 8366502, Score: 59, created_at: 2011-12-03 08:27:11+00:00 </h3><p>You can remove the duplicate elements with the uniq method:</p>
 
 <pre><code>array.uniq  # =&gt; [1, 2, 4, 5, 6, 7, 8]
 </code></pre>
@@ -38,13 +31,20 @@ a &amp; a
 
 <pre><code>a.uniq { |f| f[/\d+$/] }.map { |p| p.split(':').last }
 </code></pre>
-<h4> hdgarrood, Comment 20315925 Score: 5: </h4>I&#39;m a bit confused by this. The block is used if you need your own comparison function -- in your example, sending <code>uniq</code> to that array without a block would return the same value as it does with your block.<br>------------------------------------------------------------------ <br><h3> Finks, Id: 34626117, Score: 20: </h3><p>Just another alternative if anyone cares.</p>
+<h4> Comment by hdgarrood, Score: 5, Id: 20315925, created_at: 2013-01-28 11:35:50+00:00 </h4>I&#39;m a bit confused by this. The block is used if you need your own comparison function -- in your example, sending <code>uniq</code> to that array without a block would return the same value as it does with your block.<hr><h3>  Answer by Lri, Id: 13112875, Score: 22, created_at: 2012-10-28 20:47:09+00:00 </h3><p>If someone was looking for a way to remove all instances of repeated values, see "<a href="https://stackoverflow.com/questions/786879/how-can-i-efficiently-extract-repeated-elements-in-a-ruby-array">How can I efficiently extract repeated elements in a Ruby array?</a>".</p>
+
+<pre><code>a = [1, 2, 2, 3]
+counts = Hash.new(0)
+a.each { |v| counts[v] += 1 }
+p counts.select { |v, count| count == 1 }.keys # [1, 3]
+</code></pre>
+<h4> Comment by Tim Wright, Score: 4, Id: 80515932, created_at: 2017-10-17 07:36:35+00:00 </h4>Or could simply do       <code>a = [1, 2, 2, 3]     a.find_all { |x| a.count(x) == 1 } # [1, 3]</code><h4> Comment by the Tin Man, Score: 0, Id: 109492970, created_at: 2020-05-20 05:24:41+00:00 </h4>The linked question is not the same; It&#39;s asking how to find duplicated values and return them. The OP wants to remove duplicates.<hr><h3>  Answer by Finks, Id: 34626117, Score: 20, created_at: 2016-01-06 05:19:27+00:00 </h3><p>Just another alternative if anyone cares.</p>
 
 <p>You can also use the <code>to_set</code> method of an array which converts the Array into a Set and by definition, set elements are unique.</p>
 
 <pre><code>[1,2,3,4,5,5,5,6].to_set =&gt; [1,2,3,4,5,6]
 </code></pre>
-<h4> Jan Klimo, Comment 100242927 Score: 5: </h4>If you care about memory, <code>to_set</code> will allocate 4 objects, while <code>uniq</code> allocates one.<br><h4> iarobinson, Comment 128254095 Score: 0: </h4>Yeah, I set .uniq vs .to_set in a benchmark test and got 32 ms for .to_set and 7 ms for .uniq. In conclusion, it&#39;s way less programmatically expensive to use .uniq<br>------------------------------------------------------------------ <br><h3> Victor Cordeiro Costa, Id: 65893622, Score: 13: </h3><p>The simplest ways for me are these ones:</p>
+<h4> Comment by Jan Klimo, Score: 5, Id: 100242927, created_at: 2019-07-02 05:48:52+00:00 </h4>If you care about memory, <code>to_set</code> will allocate 4 objects, while <code>uniq</code> allocates one.<h4> Comment by iarobinson, Score: 0, Id: 128254095, created_at: 2022-06-13 16:02:09+00:00 </h4>Yeah, I set .uniq vs .to_set in a benchmark test and got 32 ms for .to_set and 7 ms for .uniq. In conclusion, it&#39;s way less programmatically expensive to use .uniq<hr><h3>  Answer by Victor Cordeiro Costa, Id: 65893622, Score: 13, created_at: 2021-01-25 23:05:36+00:00 </h3><p>The simplest ways for me are these ones:</p>
 <pre class="lang-rb prettyprint-override"><code>array = [1, 2, 2, 3]
 </code></pre>
 <h3><code>Array#to_set</code></h3>
@@ -57,25 +57,7 @@ a &amp; a
 
 # [1, 2, 3]
 </code></pre>
------------------------------------------------------------------- <br><h3> Santosh Mohanty, Id: 43733807, Score: -4: </h3><p>Try using the XOR operator, without using built-in functions:</p>
-
-<pre><code>a = [3,2,3,2,3,5,6,7].sort!
-
-result = a.reject.with_index do |ele,index|
-  res = (a[index+1] ^ ele)
-  res == 0
-end
-
-print result
-</code></pre>
-
-<p>With built-in functions:</p>
-
-<pre><code>a = [3,2,3,2,3,5,6,7]
-
-a.uniq
-</code></pre>
-<h4> Carolus, Comment 107309565 Score: 3: </h4>I haven&#39;t downvoted and I know next to nothing about Ruby, but isn&#39;t <code>.sort!</code> also an inbuilt function?<br>------------------------------------------------------------------ <br><h3> the Tin Man, Id: 61905640, Score: 3: </h3><p>Just to provide some insight:</p>
+<hr><h3>  Answer by the Tin Man, Id: 61905640, Score: 3, created_at: 2020-05-20 05:18:47+00:00 </h3><p>Just to provide some insight:</p>
 
 <pre><code>require 'fruity'
 require 'set'
@@ -142,3 +124,22 @@ end
 <li><code>finks(SHORT_ARRAY) # =&gt; #&lt;Set: {1, 2, 3}&gt;</code></li>
 <li><code>santosh_mohanty(SHORT_ARRAY) # =&gt; [1, 2, 3, 1]</code></li>
 </ul>
+<hr><h3>  Answer by Santosh Mohanty, Id: 43733807, Score: -4, created_at: 2017-05-02 08:53:34+00:00 </h3><p>Try using the XOR operator, without using built-in functions:</p>
+
+<pre><code>a = [3,2,3,2,3,5,6,7].sort!
+
+result = a.reject.with_index do |ele,index|
+  res = (a[index+1] ^ ele)
+  res == 0
+end
+
+print result
+</code></pre>
+
+<p>With built-in functions:</p>
+
+<pre><code>a = [3,2,3,2,3,5,6,7]
+
+a.uniq
+</code></pre>
+<h4> Comment by Carolus, Score: 3, Id: 107309565, created_at: 2020-03-12 12:10:49+00:00 </h4>I haven&#39;t downvoted and I know next to nothing about Ruby, but isn&#39;t <code>.sort!</code> also an inbuilt function?

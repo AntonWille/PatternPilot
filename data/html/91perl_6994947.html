@@ -1,4 +1,4 @@
- <h2> Title: How to replace a string in an existing file in Perl </h2> <h4> user831579, question_id: 6994947 </h4>Score: 91, Tags: {regex,perl} <br><p>I want to replace the word &quot;blue&quot; with &quot;red&quot; in all text files named as 1_classification.dat, 2_classification.dat and so on. I want to edit the same file so I tried the following code, but it does not work. Where am I going wrong?</p>
+ <h2> Title: How to replace a string in an existing file in Perl </h2> <h4> user831579, question_id: 6994947, created_at: 2011-08-09 10:45:25+00:00 </h4>Score: 91, Tags: {regex,perl} <br><p>I want to replace the word &quot;blue&quot; with &quot;red&quot; in all text files named as 1_classification.dat, 2_classification.dat and so on. I want to edit the same file so I tried the following code, but it does not work. Where am I going wrong?</p>
 <pre><code>@files = glob(&quot;*_classification.dat&quot;);
 foreach my $file (@files)
 {
@@ -12,7 +12,7 @@ foreach my $file (@files)
     close(IN)
 }
 </code></pre>
------------------------------------------------------------------- <br><h3> Zaid, Id: 6995010, Score: 184: </h3><p>Use a one-liner:</p>
+<hr><h3> ✔️ Answer by Zaid, Id: 6995010, Score: 186, created_at: 2011-08-09 10:49:55+00:00 </h3><p>Use a one-liner:</p>
 <pre><code>$ perl -pi.bak -e 's/blue/red/g' *_classification.dat
 </code></pre>
 <hr />
@@ -22,7 +22,7 @@ foreach my $file (@files)
 <li><code>-i</code> activates in-place editing. Files are backed up using the <code>.bak</code> extension</li>
 <li>The regex substitution acts on the implicit variable, which are the contents of the file, line-by-line</li>
 </ul>
-<h4> TLP, Comment 8350016 Score: 6: </h4>Using the <code>*</code> globbing in arguments does not seem to work in windows.<br><h4> Tan Rezaei, Comment 60867605 Score: 2: </h4>I notied that on windows I had to used double quotes around the regex<br><h4> bart, Comment 8348824 Score: 0: </h4>Yeah, or no quotes at all, if the code doesn&#39;t contain spaces.<br><h4> Zaid, Comment 104173463 Score: 0: </h4><code>glob</code> hack to support wildcard command line arguments (<code>*.dat</code>) for Windows users: <code>BEGIN { @ARGV = map +glob, @ARGV }</code><br><h4> devdoe, Comment 105550696 Score: 0: </h4>What if search and replacement strings are in variables? <code>perl -pi -e &#39;s&#47;$oldKey&#47;$trimmedNewKey&#47;g&#39; AppConstants.txt</code>, did not work for me<br><h4> Royi, Comment 108887578 Score: 0: </h4>@nr5, Look at my answer below. I had a case it didn&#39;t work for me either and the issue was the Regular Expression processing,<br><h4> geekley, Comment 115253597 Score: 0: </h4>How do I do substitution atomically (per-file, not per-line) without any backup files? Should i use -i or not? I don&#39;t understand what &quot;in-place editing&quot; means. I want to do substitution in files that I&#39;m watching for changes, so it needs to be atomic.<br><h4> drevicko, Comment 128060587 Score: 0: </h4>@nr5 The problem is that bash variables don&#39;t expand within single quoted strings. Use double quotes.<br>------------------------------------------------------------------ <br><h3> cmbryan, Id: 47664214, Score: 22: </h3><p>None of the existing answers here have provided a complete example of how to do this from within a script (not a one-liner). Here is what I did:</p>
+<h4> Comment by TLP, Score: 6, Id: 8350016, created_at: 2011-08-09 12:01:46+00:00 </h4>Using the <code>*</code> globbing in arguments does not seem to work in windows.<h4> Comment by Tan Rezaei, Score: 2, Id: 60867605, created_at: 2016-04-15 00:31:31+00:00 </h4>I notied that on windows I had to used double quotes around the regex<h4> Comment by bart, Score: 0, Id: 8348824, created_at: 2011-08-09 10:55:55+00:00 </h4>Yeah, or no quotes at all, if the code doesn&#39;t contain spaces.<h4> Comment by Zaid, Score: 0, Id: 104173463, created_at: 2019-11-20 16:27:41+00:00 </h4><code>glob</code> hack to support wildcard command line arguments (<code>*.dat</code>) for Windows users: <code>BEGIN { @ARGV = map +glob, @ARGV }</code><h4> Comment by devdoe, Score: 0, Id: 105550696, created_at: 2020-01-11 19:54:30+00:00 </h4>What if search and replacement strings are in variables? <code>perl -pi -e &#39;s&#47;$oldKey&#47;$trimmedNewKey&#47;g&#39; AppConstants.txt</code>, did not work for me<h4> Comment by Royi, Score: 0, Id: 108887578, created_at: 2020-05-02 09:05:26+00:00 </h4>@nr5, Look at my answer below. I had a case it didn&#39;t work for me either and the issue was the Regular Expression processing,<h4> Comment by geekley, Score: 0, Id: 115253597, created_at: 2020-12-08 03:00:23+00:00 </h4>How do I do substitution atomically (per-file, not per-line) without any backup files? Should i use -i or not? I don&#39;t understand what &quot;in-place editing&quot; means. I want to do substitution in files that I&#39;m watching for changes, so it needs to be atomic.<h4> Comment by drevicko, Score: 0, Id: 128060587, created_at: 2022-06-03 17:26:54+00:00 </h4>@nr5 The problem is that bash variables don&#39;t expand within single quoted strings. Use double quotes.<hr><h3>  Answer by cmbryan, Id: 47664214, Score: 22, created_at: 2017-12-05 23:11:19+00:00 </h3><p>None of the existing answers here have provided a complete example of how to do this from within a script (not a one-liner). Here is what I did:</p>
 <pre><code>rename($file, $file . '.bak');
 open(IN, '&lt;' . $file . '.bak') or die $!;
 open(OUT, '&gt;' . $file) or die $!;
@@ -34,7 +34,7 @@ while(&lt;IN&gt;)
 close(IN);
 close(OUT);
 </code></pre>
-<h4> iDoc, Comment 99033308 Score: 4: </h4>ugly misuse of $_<br>------------------------------------------------------------------ <br><h3> bart, Id: 6995074, Score: 14: </h3><blockquote>
+<h4> Comment by iDoc, Score: 4, Id: 99033308, created_at: 2019-05-19 07:50:28+00:00 </h4>ugly misuse of $_<hr><h3>  Answer by bart, Id: 6995074, Score: 14, created_at: 2011-08-09 10:55:10+00:00 </h3><blockquote>
   <p><code>$_='~s/blue/red/g';</code></p>
 </blockquote>
 
@@ -49,7 +49,7 @@ close(OUT);
 
 <pre><code>$_ =~ s/blue/red/g;
 </code></pre>
------------------------------------------------------------------- <br><h3> Royi, Id: 61556882, Score: 2: </h3><p>It can be done using a single line:</p>
+<hr><h3>  Answer by Royi, Id: 61556882, Score: 3, created_at: 2020-05-02 09:04:05+00:00 </h3><p>It can be done using a single line:</p>
 
 <pre class="lang-perl prettyprint-override"><code>perl -pi.back -e 's/oldString/newString/g;' inputFileName
 </code></pre>

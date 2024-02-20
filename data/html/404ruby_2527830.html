@@ -1,4 +1,4 @@
- <h2> Title: Ruby: Calling class method from instance </h2> <h4> Peter, question_id: 2527830 </h4>Score: 404, Tags: {ruby,class-method} <br><p>In Ruby, how do you call a class method from one of that class's instances? Say I have</p>
+ <h2> Title: Ruby: Calling class method from instance </h2> <h4> Peter, question_id: 2527830, created_at: 2010-03-27 01:48:01+00:00 </h4>Score: 404, Tags: {ruby,class-method} <br><p>In Ruby, how do you call a class method from one of that class's instances? Say I have</p>
 
 <pre><code>class Truck
   def self.default_make
@@ -15,7 +15,7 @@ end
 </code></pre>
 
 <p>the line <code>Truck.default_make</code> retrieves the default. But is there a way of saying this without mentioning <code>Truck</code>? It seems like there should be.</p>
------------------------------------------------------------------- <br><h3> Mark Rushakoff, Id: 2527911, Score: 644: </h3><p>Rather than referring to the literal name of the class, inside an instance method you can just call <code>self.class.whatever</code>.</p>
+<hr><h3> ✔️ Answer by Mark Rushakoff, Id: 2527911, Score: 646, created_at: 2010-03-27 02:33:57+00:00 </h3><p>Rather than referring to the literal name of the class, inside an instance method you can just call <code>self.class.whatever</code>.</p>
 
 <pre><code>class Foo
     def self.some_class_method
@@ -40,7 +40,7 @@ Foo.new.some_instance_method
 Class method: Foo
 Instance method: Foo
 </pre>
-<h4> Gus Shortz, Comment 24110023 Score: 31: </h4>@MattConnolly, also using <code>self.class</code> eliminates the need for search/replacing if you happen to rename the class.<br><h4> drewish, Comment 21282495 Score: 24: </h4>@MattConnolly, it&#39;s relative, if your class name is is <code>SalesforceSyncJob</code> then it&#39;s shorter ;)<br><h4> Matt Connolly, Comment 24119149 Score: 10: </h4>@GusShortz true. Also, self.class works better if there is a subclass.<br><h4> phoet, Comment 10753738 Score: 10: </h4>i would like to see some shortcut in ruby to call a class method from an instance. ie :&gt;some_class_method instead of self.class.some_class_method<br><h4> Matt Connolly, Comment 11005870 Score: 7: </h4>while this is the right answer, it&#39;s a shame that &quot;self.class&quot; is more typing and less easy to read than the class name &quot;Truck&quot;. oh well....<br><h4> David West, Comment 26316181 Score: 1: </h4>I noticed that when I was applying this, I had to define the method before I could call it later in the class. Why is that? Does anybody know if there is a reason the language is designed that way? I&#39;m using Ruby 1.8.7 in this particular instance. Has this changed in the more recent versions?<br><h4> PhilT, Comment 43146309 Score: 0: </h4>@DavidWest The class is being evaluated so you can&#39;t call something before you define it. Are you calling a class method in the class rather than inside a method in the class?<br><h4> Seth Jeffery, Comment 93136655 Score: 0: </h4>If you&#39;re in Rails and hate writing <code>self.class</code> everywhere, then try this: <code>delegate : some_class_method, to: :class</code>.<br><h4> Chris Harrison, Comment 114697474 Score: 0: </h4>I don&#39;t understand what the advantage is to something being &#39;less typing&#39; or &#39;shorter&#39;. We are not in a famine where there&#39;s a shortage of characters. Something being shorter often means it&#39;s more ambiguous.<br>------------------------------------------------------------------ <br><h3> Mark B, Id: 12857426, Score: 215: </h3><p>Using <code>self.class.blah</code> is NOT the same as using <code>ClassName.blah</code> when it comes to inheritance.</p>
+<h4> Comment by Gus Shortz, Score: 31, Id: 24110023, created_at: 2013-05-24 17:24:12+00:00 </h4>@MattConnolly, also using <code>self.class</code> eliminates the need for search/replacing if you happen to rename the class.<h4> Comment by drewish, Score: 24, Id: 21282495, created_at: 2013-02-27 21:00:40+00:00 </h4>@MattConnolly, it&#39;s relative, if your class name is is <code>SalesforceSyncJob</code> then it&#39;s shorter ;)<h4> Comment by Matt Connolly, Score: 10, Id: 24119149, created_at: 2013-05-25 01:24:18+00:00 </h4>@GusShortz true. Also, self.class works better if there is a subclass.<h4> Comment by phoet, Score: 10, Id: 10753738, created_at: 2011-12-28 11:22:57+00:00 </h4>i would like to see some shortcut in ruby to call a class method from an instance. ie :&gt;some_class_method instead of self.class.some_class_method<h4> Comment by Matt Connolly, Score: 7, Id: 11005870, created_at: 2012-01-11 11:18:38+00:00 </h4>while this is the right answer, it&#39;s a shame that &quot;self.class&quot; is more typing and less easy to read than the class name &quot;Truck&quot;. oh well....<h4> Comment by David West, Score: 1, Id: 26316181, created_at: 2013-08-01 15:10:44+00:00 </h4>I noticed that when I was applying this, I had to define the method before I could call it later in the class. Why is that? Does anybody know if there is a reason the language is designed that way? I&#39;m using Ruby 1.8.7 in this particular instance. Has this changed in the more recent versions?<h4> Comment by PhilT, Score: 0, Id: 43146309, created_at: 2014-12-07 17:31:44+00:00 </h4>@DavidWest The class is being evaluated so you can&#39;t call something before you define it. Are you calling a class method in the class rather than inside a method in the class?<h4> Comment by Seth Jeffery, Score: 0, Id: 93136655, created_at: 2018-11-02 15:07:06+00:00 </h4>If you&#39;re in Rails and hate writing <code>self.class</code> everywhere, then try this: <code>delegate : some_class_method, to: :class</code>.<h4> Comment by Chris Harrison, Score: 0, Id: 114697474, created_at: 2020-11-17 11:10:07+00:00 </h4>I don&#39;t understand what the advantage is to something being &#39;less typing&#39; or &#39;shorter&#39;. We are not in a famine where there&#39;s a shortage of characters. Something being shorter often means it&#39;s more ambiguous.<hr><h3>  Answer by Mark B, Id: 12857426, Score: 216, created_at: 2012-10-12 10:50:42+00:00 </h3><p>Using <code>self.class.blah</code> is NOT the same as using <code>ClassName.blah</code> when it comes to inheritance.</p>
 
 <pre><code>class Truck
   def self.default_make
@@ -70,7 +70,7 @@ ruby-1.9.3-p0 :022 &gt; b.make1
 ruby-1.9.3-p0 :023 &gt; b.make2
  =&gt; "mac" 
 </code></pre>
-<h4> zhon, Comment 30542857 Score: 62: </h4>This seems to be a response to to the accepted answer rather than an answer to the question.<br><h4> Matt Sanders, Comment 57480249 Score: 20: </h4>@zohn - true, but this is still useful context when considering what to use.<br><h4> nandilugio, Comment 64880932 Score: 3: </h4>@MattSanders just use a comment in those cases.<br><h4> Kaiser Shahid, Comment 83221115 Score: 1: </h4>@hlcs <code>self.class</code> is correct to preserve inheritance. even though <code>make1()</code> is defined in <code>Truck</code>, it&#39;s referencing <code>BigTruck</code>&#39;s class method.<br>------------------------------------------------------------------ <br><h3> Harish Shetty, Id: 2528001, Score: 25: </h3><p>To access a class method inside a instance method, do the following:</p>
+<h4> Comment by zhon, Score: 63, Id: 30542857, created_at: 2013-12-07 17:34:10+00:00 </h4>This seems to be a response to to the accepted answer rather than an answer to the question.<h4> Comment by Matt Sanders, Score: 20, Id: 57480249, created_at: 2016-01-19 07:34:34+00:00 </h4>@zohn - true, but this is still useful context when considering what to use.<h4> Comment by nandilugio, Score: 3, Id: 64880932, created_at: 2016-08-03 21:01:58+00:00 </h4>@MattSanders just use a comment in those cases.<h4> Comment by Kaiser Shahid, Score: 1, Id: 83221115, created_at: 2018-01-05 22:30:45+00:00 </h4>@hlcs <code>self.class</code> is correct to preserve inheritance. even though <code>make1()</code> is defined in <code>Truck</code>, it&#39;s referencing <code>BigTruck</code>&#39;s class method.<hr><h3>  Answer by Harish Shetty, Id: 2528001, Score: 25, created_at: 2010-03-27 03:13:38+00:00 </h3><p>To access a class method inside a instance method, do the following:</p>
 
 <pre><code>self.class.default_make
 </code></pre>
@@ -109,7 +109,7 @@ t.make
 t.year
 # =&gt; nil
 </code></pre>
-<h4> Harish Shetty, Comment 10762849 Score: 8: </h4>@phoet The make word denotes the make of a car(as in Toyota, BMW etc.) <a href="http://www.englishforums.com/English/AMakeOfCar/crcjb/post.htm" rel="nofollow noreferrer">englishforums.com/English/AMakeOfCar/crcjb/post.htm</a>. The nomenclature is based on user&#39;s requirement<br><h4> phoet, Comment 10753715 Score: 0: </h4>make should not be an instance method. it&#39;s more a kind of factory, that should be bound to the class rather than an instance<br>------------------------------------------------------------------ <br><h3> bbozo, Id: 14355172, Score: 12: </h3><p>If you have access to the delegate method you can do this:</p>
+<h4> Comment by Harish Shetty, Score: 8, Id: 10762849, created_at: 2011-12-28 20:56:42+00:00 </h4>@phoet The make word denotes the make of a car(as in Toyota, BMW etc.) <a href="http://www.englishforums.com/English/AMakeOfCar/crcjb/post.htm" rel="nofollow noreferrer">englishforums.com/English/AMakeOfCar/crcjb/post.htm</a>. The nomenclature is based on user&#39;s requirement<h4> Comment by phoet, Score: 0, Id: 10753715, created_at: 2011-12-28 11:21:30+00:00 </h4>make should not be an instance method. it&#39;s more a kind of factory, that should be bound to the class rather than an instance<hr><h3>  Answer by bbozo, Id: 14355172, Score: 12, created_at: 2013-01-16 09:36:27+00:00 </h3><p>If you have access to the delegate method you can do this:</p>
 
 <pre><code>[20] pry(main)&gt; class Foo
 [20] pry(main)*   def self.bar
@@ -145,9 +145,9 @@ t.year
 <p>A word of caution:</p>
 
 <p>Don't just randomly <code>delegate</code> everything that doesn't change state to class and instance because you'll start running into strange name clash issues. Do this sparingly and only after you checked nothing else is squashed.</p>
------------------------------------------------------------------- <br><h3> yfeldblum, Id: 2528036, Score: 7: </h3><pre><code>self.class.default_make
+<hr><h3>  Answer by yfeldblum, Id: 2528036, Score: 7, created_at: 2010-03-27 03:28:13+00:00 </h3><pre><code>self.class.default_make
 </code></pre>
------------------------------------------------------------------- <br><h3> Jason Machacek, Id: 2527860, Score: 4: </h3><p>You're doing it the right way.  Class methods (similar to 'static' methods in C++ or Java) aren't part of the instance, so they have to be referenced directly.</p>
+<hr><h3>  Answer by Jason Machacek, Id: 2527860, Score: 4, created_at: 2010-03-27 02:06:14+00:00 </h3><p>You're doing it the right way.  Class methods (similar to 'static' methods in C++ or Java) aren't part of the instance, so they have to be referenced directly.</p>
 
 <p>On that note, in your example you'd be better served making 'default_make' a regular method:</p>
 
@@ -205,7 +205,7 @@ myTrucks.each do |truck|
     puts truck.make
 end
 </code></pre>
-<h4> Peter, Comment 2526951 Score: 3: </h4>I disagree that <code>default_make</code> should be an instance method. Even if it&#39;s simpler for these examples, it&#39;s not the right semantics - the default is a product of the class, not objects that belong to the class.<br><h4> vish, Comment 25589590 Score: 2: </h4>I also disagree.  Whether something is a class method has nothing to do with &quot;utility&quot;.  It is about whether the method conceptually applies to the class, or an object of that class.  For example, every truck has a different serial number, so serial_number is an instance method (with corresponding instance variable).  On the other vehicle_type (which returns &quot;truck&quot;) should be a class method because that is a property of all trucks, not a particular truck<br><h4> Marlen T. B., Comment 12579989 Score: 1: </h4>@Peter would you care to explain that in simpler terms? I&#39;m just learning Ruby and Maha&#39;s answers seems perfect to me.<br><h4> Peter, Comment 12661526 Score: 1: </h4>@MarlenT.B. looking back I&#39;m not sure there&#39;s too much to be learned here - I was only arguing about where the best place to put the method was, and I don&#39;t buy my own argument as strongly anymore! :)<br>------------------------------------------------------------------ <br><h3> Alexey, Id: 24272810, Score: 3: </h3><p>One more:</p>
+<h4> Comment by Peter, Score: 3, Id: 2526951, created_at: 2010-03-27 06:26:13+00:00 </h4>I disagree that <code>default_make</code> should be an instance method. Even if it&#39;s simpler for these examples, it&#39;s not the right semantics - the default is a product of the class, not objects that belong to the class.<h4> Comment by vish, Score: 2, Id: 25589590, created_at: 2013-07-11 04:47:11+00:00 </h4>I also disagree.  Whether something is a class method has nothing to do with &quot;utility&quot;.  It is about whether the method conceptually applies to the class, or an object of that class.  For example, every truck has a different serial number, so serial_number is an instance method (with corresponding instance variable).  On the other vehicle_type (which returns &quot;truck&quot;) should be a class method because that is a property of all trucks, not a particular truck<h4> Comment by Marlen T. B., Score: 1, Id: 12579989, created_at: 2012-03-26 03:04:06+00:00 </h4>@Peter would you care to explain that in simpler terms? I&#39;m just learning Ruby and Maha&#39;s answers seems perfect to me.<h4> Comment by Peter, Score: 1, Id: 12661526, created_at: 2012-03-29 06:57:50+00:00 </h4>@MarlenT.B. looking back I&#39;m not sure there&#39;s too much to be learned here - I was only arguing about where the best place to put the method was, and I don&#39;t buy my own argument as strongly anymore! :)<hr><h3>  Answer by Alexey, Id: 24272810, Score: 3, created_at: 2014-06-17 20:33:58+00:00 </h3><p>One more:</p>
 
 <pre class="lang-rb prettyprint-override"><code>class Truck
   def self.default_make
@@ -223,20 +223,7 @@ end
 
 puts Truck.new.make # =&gt; mac
 </code></pre>
------------------------------------------------------------------- <br><h3> Daniel, Id: 24697094, Score: -7: </h3><p>Similar your question, you could use:</p>
-
-<pre><code>class Truck
-  def default_make
-    # Do something
-  end
-
-  def initialize
-    super
-    self.default_make
-  end
-end
-</code></pre>
------------------------------------------------------------------- <br><h3> captainpete, Id: 15091342, Score: 1: </h3><p>Here's an approach on how you might implement a <code>_class</code> method that works as <code>self.class</code> for this situation. Note: Do not use this in production code, this is for interest-sake :)</p>
+<hr><h3>  Answer by captainpete, Id: 15091342, Score: 1, created_at: 2013-02-26 14:16:54+00:00 </h3><p>Here's an approach on how you might implement a <code>_class</code> method that works as <code>self.class</code> for this situation. Note: Do not use this in production code, this is for interest-sake :)</p>
 
 <p>From: <a href="https://stackoverflow.com/questions/1356749/can-you-eval-code-in-the-context-of-a-caller-in-ruby/6109886#6109886">Can you eval code in the context of a caller in Ruby?</a> and also <a href="http://rubychallenger.blogspot.com.au/2011/07/caller-binding.html" rel="nofollow noreferrer">http://rubychallenger.blogspot.com.au/2011/07/caller-binding.html</a></p>
 
@@ -274,3 +261,16 @@ end
 </code></pre>
 
 <p>Maybe the right answer is to submit a patch for Ruby :)</p>
+<hr><h3>  Answer by Daniel, Id: 24697094, Score: -7, created_at: 2014-07-11 11:54:06+00:00 </h3><p>Similar your question, you could use:</p>
+
+<pre><code>class Truck
+  def default_make
+    # Do something
+  end
+
+  def initialize
+    super
+    self.default_make
+  end
+end
+</code></pre>

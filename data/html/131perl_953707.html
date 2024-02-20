@@ -1,4 +1,4 @@
- <h2> Title: In Perl, how can I read an entire file into a string? </h2> <h4> goddamnyouryan, question_id: 953707 </h4>Score: 131, Tags: {string,perl,slurp} <br><p>I'm trying to open an .html file as one big long string.  This is what I've got:</p>
+ <h2> Title: In Perl, how can I read an entire file into a string? </h2> <h4> goddamnyouryan, question_id: 953707, created_at: 2009-06-05 00:04:29+00:00 </h4>Score: 131, Tags: {string,perl,slurp} <br><p>I'm trying to open an .html file as one big long string.  This is what I've got:</p>
 
 <pre><code>open(FILE, 'index.html') or die "Can't read file 'filename' [$!]\n";  
 $document = &lt;FILE&gt;; 
@@ -20,14 +20,7 @@ print $document;
 </code></pre>
 
 <p>This way I can search the entire document more easily.</p>
-<h4> Kent Fredric, Id: 762560 Score: 8: </h4>Really should check what the definition of &quot;Cant install&quot; is, its a common problem and its commonly an argument that doesn&#39;t need to be made. <a href="http://stackoverflow.com/questions/755168/perl-myths/755179#755179-Im-Not-Allowed-to-install-modules" title="perl myths">stackoverflow.com/questions/755168/perl-myths/&hellip;</a><br><h4> goddamnyouryan, Id: 765349 Score: 1: </h4>I&#39;m actually unable to modify anything on the entire sever that this script is running on, apart from the script it self.<br><h4> Brad Gilbert, Id: 8202669 Score: 0: </h4>So you aren&#39;t allowed to add any files, anywhere on the server?<br><h4> MkV, Id: 24213602 Score: 0: </h4>FatPack modules into your script?  Also, it looks like you might be thinking of parsing HTML with regular expressions, don&#39;t.<br>------------------------------------------------------------------ <br><h3> jrockway, Id: 954130, Score: 60: </h3><p>All the posts are slightly non-idiomatic.  The idiom is:</p>
-
-<pre><code>open my $fh, '&lt;', $filename or die "error opening $filename: $!";
-my $data = do { local $/; &lt;$fh&gt; };
-</code></pre>
-
-<p>Mostly, there is no need to set $/ to <code>undef</code>.</p>
-<h4> Leonardo Herrera, Comment 827735 Score: 12: </h4>Sorry, disagree. It is much more common to be explicit when you want to change the actual behavior of a magic variable; it is a declaration of intent. Even the documentation uses &#39;local $/ = undef&#39; (see <a href="http://perldoc.perl.org/perlsub.html#Temporary-Values-via-local()" rel="nofollow noreferrer">perldoc.perl.org/perlsub.html#Temporary-Values-via-local()</a>)<br><h4> Danny, Comment 765570 Score: 3: </h4><code>local $foo = undef</code> is just the Perl Best Practice (PBP) suggested method. If we are posting snippits of code I&#39;d think doing our best to make it clear would be A Good Thing.<br><h4> jrockway, Comment 765917 Score: 3: </h4>Showing people how to write non-idiomatic code is a good thing?  If I saw &quot;local $/ = undef&quot; in code I was working on, my first action would be to publicly humiliate the author on irc.  (And I am generally not picky about &quot;style&quot; issues.)<br><h4> Telemachus, Comment 768602 Score: 1: </h4>Ok, I&#39;ll bite: what exactly is mock-worthy about &quot;local $/ = undef&quot;? If your only answer is &quot;It&#39;s non-idiomatic,&quot; then (a) I&#39;m not so sure and (b) so what? I&#39;m not so sure, because it&#39;s awfully damn common as a way to do this. And so what because it&#39;s perfectly clear and reasonably brief. You may be more picky about style issues that you think.<br><h4> jrockway, Comment 772497 Score: 1: </h4>The key is that the &quot;local $/&quot; is part of a well-known idiom.  If you are writing some random code and write &quot;local $Foo::Bar = undef;&quot;, that is fine.  But in this very special case, you might as well speak the same language as everyone else, even if it&#39;s &quot;less clear&quot; (which I don&#39;t agree with; the behavior of &quot;local&quot; is well-defined in this respect).<br><h4> Mikko Rantalainen, Comment 129791436 Score: 0: </h4>I think <code>open my $fh</code> part should be moved inside the <code>do</code> block to make Perl close the file automatically immediately after reading it. As the whole file is read at once, there&#39;s no need to keep the file open once the contents are in variable <code>$data</code>.<br><h4> Gerard ONeill, Comment 42449878 Score: 0: </h4>Adding to Leonardo Herrera&#39;s comment -- It is easier to see that you want the value to be undef..  when you set it to undef..  as opposed to you forgot to set the value when you localized the variable.  Compilers in other languages today are checking for whether or not some code path didn&#39;t set a value before using a variable; obviously depending on the fact that a not initialized variable has the the value undef breaks that.<br>------------------------------------------------------------------ <br><h3> Chas. Owens, Id: 953885, Score: 102: </h3><p>I would do it like this:</p>
+<h4> Comment by Kent Fredric, Score: 8, Id: 762560, created_at: 2009-06-05 04:47:28+00:00 </h4>Really should check what the definition of &quot;Cant install&quot; is, its a common problem and its commonly an argument that doesn&#39;t need to be made. <a href="http://stackoverflow.com/questions/755168/perl-myths/755179#755179-Im-Not-Allowed-to-install-modules" title="perl myths">stackoverflow.com/questions/755168/perl-myths/&hellip;</a><h4> Comment by goddamnyouryan, Score: 1, Id: 765349, created_at: 2009-06-05 16:34:04+00:00 </h4>I&#39;m actually unable to modify anything on the entire sever that this script is running on, apart from the script it self.<h4> Comment by Brad Gilbert, Score: 0, Id: 8202669, created_at: 2011-07-31 17:50:39+00:00 </h4>So you aren&#39;t allowed to add any files, anywhere on the server?<h4> Comment by MkV, Score: 0, Id: 24213602, created_at: 2013-05-28 20:09:50+00:00 </h4>FatPack modules into your script?  Also, it looks like you might be thinking of parsing HTML with regular expressions, don&#39;t.<hr><h3>  Answer by Chas. Owens, Id: 953885, Score: 102, created_at: 2009-06-05 01:28:49+00:00 </h3><p>I would do it like this:</p>
 
 <pre><code>my $file = "index.html";
 my $document = do {
@@ -39,7 +32,7 @@ my $document = do {
 </code></pre>
 
 <p>Note the use of the three-argument version of open. It is much safer than the old two- (or one-) argument versions. Also note the use of a lexical filehandle. Lexical filehandles are nicer than the old bareword variants, for many reasons. We are taking advantage of one of them here: they close when they go out of scope.</p>
-<h4> Danny, Comment 765548 Score: 9: </h4>This is probably the best non-cpan&#39;d way to do it as it uses both the 3 argument open as well as keeping the INPUT_RECORD_SEPARATOR ($/) variable localized to the smallest required context.<br><h4> Ωmega, Comment 133874974 Score: 0: </h4>No need to close <code>$fh</code>?<br>------------------------------------------------------------------ <br><h3> Sinan &#220;n&#252;r, Id: 953744, Score: 85: </h3><p>Add:</p>
+<h4> Comment by Danny, Score: 9, Id: 765548, created_at: 2009-06-05 17:13:58+00:00 </h4>This is probably the best non-cpan&#39;d way to do it as it uses both the 3 argument open as well as keeping the INPUT_RECORD_SEPARATOR ($/) variable localized to the smallest required context.<h4> Comment by Ωmega, Score: 0, Id: 133874974, created_at: 2023-03-31 14:15:24+00:00 </h4>No need to close <code>$fh</code>?<hr><h3> ✔️ Answer by Sinan &#220;n&#252;r, Id: 953744, Score: 85, created_at: 2009-06-05 00:18:40+00:00 </h3><p>Add:</p>
 
 <pre><code> local $/;
 </code></pre>
@@ -55,14 +48,21 @@ my $document = do {
 <p>In addition, <a href="https://metacpan.org/pod/Path::Class::File" rel="noreferrer">Path::Class::File</a> allows you to <a href="https://metacpan.org/pod/Path::Class::File#file-slurp" rel="noreferrer">slurp</a> and <a href="https://metacpan.org/pod/Path::Class::File#file-spew-content" rel="noreferrer">spew</a>.</p>
 
 <p><a href="https://metacpan.org/pod/Path::Tiny" rel="noreferrer">Path::Tiny</a> gives even more convenience methods such as <a href="https://metacpan.org/pod/Path::Tiny#slurp-slurp_raw-slurp_utf8" rel="noreferrer"><code>slurp</code>, <code>slurp_raw</code>, <code>slurp_utf8</code></a> as well as their <a href="https://metacpan.org/pod/Path::Tiny#spew-spew_raw-spew_utf8" rel="noreferrer"><code>spew</code></a> counterparts.</p>
-<h4> Danny, Comment 765553 Score: 36: </h4>You should probably explain what effects localizing $/ is going to do as well as what its purpose is.<br><h4> Brad Gilbert, Comment 8202698 Score: 12: </h4>If you&#39;re not going to explain anything about localizing <code>$&#47;</code>, you should probably add links for further information.<br><h4> dawez, Comment 13539548 Score: 7: </h4>A good step by step explanation of what is doing: { local $/; &lt;$fh&gt; } is provided here : <a href="http://www.perlmonks.org/?node_id=287647" rel="nofollow noreferrer">perlmonks.org/?node_id=287647</a><br><h4> Sigfried, Comment 107524716 Score: 0: </h4>Do any of these things work easily from the command line? I was trying to remove some multi-line whitespace followed by a particular pattern like <code>perl -pe &#39;s&#47;\s+pattern&#47;&#47;gs&#39;</code> and getting frustrated until I realized <code>-p</code> means I&#39;m only looking at one line at a time. Doh!<br><h4> HoldOffHunger, Comment 66894597 Score: 0: </h4>The first line from the Perl documentation for local: &quot;You really probably want to be using my instead...&quot;  <a href="http://perldoc.perl.org/functions/local.html" rel="nofollow noreferrer">perldoc.perl.org/functions/local.html</a><br><h4> Sinan &#220;n&#252;r, Comment 66897059 Score: 0: </h4>@HoldOffHunger So what? This is one of the places where you must use <code>local</code> ... Don&#39;t feel the need to comment or vote down an answer unless you are familiar with the programming language about which you are commenting.<br><h4> Geremia, Comment 59579877 Score: 0: </h4>Perhaps just say why you must use <code>local</code> and not <code>my</code>.<br><h4> Sinan &#220;n&#252;r, Comment 59627095 Score: 0: </h4>@Geremia A discussion of scoping is beyond the scope of this answer.<br>------------------------------------------------------------------ <br><h3> Quentin, Id: 954903, Score: 82: </h3><p>With <a href="https://metacpan.org/module/File::Slurp" rel="noreferrer">File::Slurp</a>:</p>
+<h4> Comment by Danny, Score: 36, Id: 765553, created_at: 2009-06-05 17:14:44+00:00 </h4>You should probably explain what effects localizing $/ is going to do as well as what its purpose is.<h4> Comment by Brad Gilbert, Score: 12, Id: 8202698, created_at: 2011-07-31 17:52:45+00:00 </h4>If you&#39;re not going to explain anything about localizing <code>$&#47;</code>, you should probably add links for further information.<h4> Comment by dawez, Score: 7, Id: 13539548, created_at: 2012-05-07 07:48:16+00:00 </h4>A good step by step explanation of what is doing: { local $/; &lt;$fh&gt; } is provided here : <a href="http://www.perlmonks.org/?node_id=287647" rel="nofollow noreferrer">perlmonks.org/?node_id=287647</a><h4> Comment by Geremia, Score: 0, Id: 59579877, created_at: 2016-03-12 19:47:23+00:00 </h4>Perhaps just say why you must use <code>local</code> and not <code>my</code>.<h4> Comment by Sinan &#220;n&#252;r, Score: 0, Id: 59627095, created_at: 2016-03-14 12:18:57+00:00 </h4>@Geremia A discussion of scoping is beyond the scope of this answer.<h4> Comment by HoldOffHunger, Score: 0, Id: 66894597, created_at: 2016-09-30 22:46:00+00:00 </h4>The first line from the Perl documentation for local: &quot;You really probably want to be using my instead...&quot;  <a href="http://perldoc.perl.org/functions/local.html" rel="nofollow noreferrer">perldoc.perl.org/functions/local.html</a><h4> Comment by Sinan &#220;n&#252;r, Score: 0, Id: 66897059, created_at: 2016-10-01 02:49:17+00:00 </h4>@HoldOffHunger So what? This is one of the places where you must use <code>local</code> ... Don&#39;t feel the need to comment or vote down an answer unless you are familiar with the programming language about which you are commenting.<h4> Comment by Sigfried, Score: 0, Id: 107524716, created_at: 2020-03-20 11:54:18+00:00 </h4>Do any of these things work easily from the command line? I was trying to remove some multi-line whitespace followed by a particular pattern like <code>perl -pe &#39;s&#47;\s+pattern&#47;&#47;gs&#39;</code> and getting frustrated until I realized <code>-p</code> means I&#39;m only looking at one line at a time. Doh!<hr><h3>  Answer by Quentin, Id: 954903, Score: 82, created_at: 2009-06-05 08:55:02+00:00 </h3><p>With <a href="https://metacpan.org/module/File::Slurp" rel="noreferrer">File::Slurp</a>:</p>
 
 <pre><code>use File::Slurp;
 my $text = read_file('index.html');
 </code></pre>
 
 <p><a href="http://www.perlmonks.org/?node_id=693828" rel="noreferrer">Yes, even you can use CPAN</a>.</p>
-<h4> Quentin, Comment 65681642 Score: 2: </h4>@Dmitry — So install the module. There&#39;s an install instructions link on the metacpan page I linked to from this answer.<br><h4> Trenton, Comment 51325135 Score: 0: </h4>The OP said he can&#39;t modify anything on the server. The &quot;Yes, even you can use CPAN&quot; link here shows you how to work around that limitation, in most cases.<br><h4> Dmytro, Comment 65652589 Score: 0: </h4><code>Can&#39;t locate File&#47;Slurp.pm in @INC (@INC contains: &#47;usr&#47;lib&#47;perl5&#47;5.8&#47;msys</code> :(<br>------------------------------------------------------------------ <br><h3> brian d foy, Id: 957004, Score: 19: </h3><p>From <a href="http://learn.perl.org/faq/perlfaq5.html#How-can-I-read-in-an-entire-file-all-at-once" rel="nofollow noreferrer">perlfaq5: How can I read in an entire file all at once?</a>:</p>
+<h4> Comment by Quentin, Score: 2, Id: 65681642, created_at: 2016-08-26 15:17:17+00:00 </h4>@Dmitry — So install the module. There&#39;s an install instructions link on the metacpan page I linked to from this answer.<h4> Comment by Dmytro, Score: 0, Id: 65652589, created_at: 2016-08-25 20:53:12+00:00 </h4><code>Can&#39;t locate File&#47;Slurp.pm in @INC (@INC contains: &#47;usr&#47;lib&#47;perl5&#47;5.8&#47;msys</code> :(<h4> Comment by Trenton, Score: 0, Id: 51325135, created_at: 2015-07-29 05:45:08+00:00 </h4>The OP said he can&#39;t modify anything on the server. The &quot;Yes, even you can use CPAN&quot; link here shows you how to work around that limitation, in most cases.<hr><h3>  Answer by jrockway, Id: 954130, Score: 60, created_at: 2009-06-05 03:20:56+00:00 </h3><p>All the posts are slightly non-idiomatic.  The idiom is:</p>
+
+<pre><code>open my $fh, '&lt;', $filename or die "error opening $filename: $!";
+my $data = do { local $/; &lt;$fh&gt; };
+</code></pre>
+
+<p>Mostly, there is no need to set $/ to <code>undef</code>.</p>
+<h4> Comment by Leonardo Herrera, Score: 12, Id: 827735, created_at: 2009-06-19 15:11:35+00:00 </h4>Sorry, disagree. It is much more common to be explicit when you want to change the actual behavior of a magic variable; it is a declaration of intent. Even the documentation uses &#39;local $/ = undef&#39; (see <a href="http://perldoc.perl.org/perlsub.html#Temporary-Values-via-local()" rel="nofollow noreferrer">perldoc.perl.org/perlsub.html#Temporary-Values-via-local()</a>)<h4> Comment by Danny, Score: 3, Id: 765570, created_at: 2009-06-05 17:17:01+00:00 </h4><code>local $foo = undef</code> is just the Perl Best Practice (PBP) suggested method. If we are posting snippits of code I&#39;d think doing our best to make it clear would be A Good Thing.<h4> Comment by jrockway, Score: 3, Id: 765917, created_at: 2009-06-05 18:20:13+00:00 </h4>Showing people how to write non-idiomatic code is a good thing?  If I saw &quot;local $/ = undef&quot; in code I was working on, my first action would be to publicly humiliate the author on irc.  (And I am generally not picky about &quot;style&quot; issues.)<h4> Comment by Telemachus, Score: 1, Id: 768602, created_at: 2009-06-06 15:03:17+00:00 </h4>Ok, I&#39;ll bite: what exactly is mock-worthy about &quot;local $/ = undef&quot;? If your only answer is &quot;It&#39;s non-idiomatic,&quot; then (a) I&#39;m not so sure and (b) so what? I&#39;m not so sure, because it&#39;s awfully damn common as a way to do this. And so what because it&#39;s perfectly clear and reasonably brief. You may be more picky about style issues that you think.<h4> Comment by jrockway, Score: 1, Id: 772497, created_at: 2009-06-08 08:26:59+00:00 </h4>The key is that the &quot;local $/&quot; is part of a well-known idiom.  If you are writing some random code and write &quot;local $Foo::Bar = undef;&quot;, that is fine.  But in this very special case, you might as well speak the same language as everyone else, even if it&#39;s &quot;less clear&quot; (which I don&#39;t agree with; the behavior of &quot;local&quot; is well-defined in this respect).<h4> Comment by Gerard ONeill, Score: 0, Id: 42449878, created_at: 2014-11-16 08:17:53+00:00 </h4>Adding to Leonardo Herrera&#39;s comment -- It is easier to see that you want the value to be undef..  when you set it to undef..  as opposed to you forgot to set the value when you localized the variable.  Compilers in other languages today are checking for whether or not some code path didn&#39;t set a value before using a variable; obviously depending on the fact that a not initialized variable has the the value undef breaks that.<h4> Comment by Mikko Rantalainen, Score: 0, Id: 129791436, created_at: 2022-08-26 07:44:07+00:00 </h4>I think <code>open my $fh</code> part should be moved inside the <code>do</code> block to make Perl close the file automatically immediately after reading it. As the whole file is read at once, there&#39;s no need to keep the file open once the contents are in variable <code>$data</code>.<hr><h3>  Answer by brian d foy, Id: 957004, Score: 19, created_at: 2009-06-05 17:06:47+00:00 </h3><p>From <a href="http://learn.perl.org/faq/perlfaq5.html#How-can-I-read-in-an-entire-file-all-at-once" rel="nofollow noreferrer">perlfaq5: How can I read in an entire file all at once?</a>:</p>
 
 <hr>
 
@@ -111,7 +111,7 @@ $var = &lt;INPUT&gt;;
 </code></pre>
 
 <p>The third argument tests the byte size of the data on the INPUT filehandle and reads that many bytes into the buffer $var.</p>
------------------------------------------------------------------- <br><h3> user100177, Id: 953729, Score: 8: </h3><p>A simple way is:</p>
+<hr><h3>  Answer by user100177, Id: 953729, Score: 8, created_at: 2009-06-05 00:12:26+00:00 </h3><p>A simple way is:</p>
 
 <pre><code>while (&lt;FILE&gt;) { $document .= $_ }
 </code></pre>
@@ -124,13 +124,13 @@ $var = &lt;INPUT&gt;;
     $d = &lt;F&gt;;
 }
 </code></pre>
-<h4> Brad Gilbert, Comment 8202649 Score: 1: </h4>There is a significant number of problems with both of the examples you gave. The main problem is that they are written in ancient Perl, I would recommend reading <a href="http://onyxneon.com/books/modern_perl/" rel="nofollow noreferrer">Modern Perl</a><br><h4> Joel Berger, Comment 8202902 Score: 0: </h4>@Brad, the comment was made years ago, the point still stands however. better is <code>{local $&#47;; open(my $f, &#39;&lt;&#39;, &#39;filename&#39;); $d = &lt;$f&gt;;}</code><br><h4> Brad Gilbert, Comment 8203172 Score: 0: </h4>@Joel that is only slightly better. You didn&#39;t check the output of <code>open</code> or the implicitly called <code>close</code>. <code>my $d = do{ local $&#47;; open(my $f, &#39;&lt;&#39;, &#39;filename&#39;) or die $!; my $tmp = &lt;$f&gt;; close $f or die $!; $tmp}</code>. (That still has the problem that it doesn&#39;t specify the input encoding.)<br><h4> Joel Berger, Comment 8203504 Score: 0: </h4><a href="http://p3rl.org/autodie" rel="nofollow noreferrer"><code>use autodie</code></a>, the major improvement I meant to show was the lexical filehandle and the 3 arg open. Is there some reason you are <code>do</code>ing this? why not just dump the file into a variable declared before the block?<br>------------------------------------------------------------------ <br><h3> kixx, Id: 954642, Score: 8: </h3><p>Either set <code>$/</code> to <code>undef</code> (see jrockway's answer) or just concatenate all the file's lines:</p>
+<h4> Comment by Brad Gilbert, Score: 1, Id: 8202649, created_at: 2011-07-31 17:48:31+00:00 </h4>There is a significant number of problems with both of the examples you gave. The main problem is that they are written in ancient Perl, I would recommend reading <a href="http://onyxneon.com/books/modern_perl/" rel="nofollow noreferrer">Modern Perl</a><h4> Comment by Joel Berger, Score: 0, Id: 8202902, created_at: 2011-07-31 18:18:51+00:00 </h4>@Brad, the comment was made years ago, the point still stands however. better is <code>{local $&#47;; open(my $f, &#39;&lt;&#39;, &#39;filename&#39;); $d = &lt;$f&gt;;}</code><h4> Comment by Brad Gilbert, Score: 0, Id: 8203172, created_at: 2011-07-31 18:48:33+00:00 </h4>@Joel that is only slightly better. You didn&#39;t check the output of <code>open</code> or the implicitly called <code>close</code>. <code>my $d = do{ local $&#47;; open(my $f, &#39;&lt;&#39;, &#39;filename&#39;) or die $!; my $tmp = &lt;$f&gt;; close $f or die $!; $tmp}</code>. (That still has the problem that it doesn&#39;t specify the input encoding.)<h4> Comment by Joel Berger, Score: 0, Id: 8203504, created_at: 2011-07-31 19:29:09+00:00 </h4><a href="http://p3rl.org/autodie" rel="nofollow noreferrer"><code>use autodie</code></a>, the major improvement I meant to show was the lexical filehandle and the 3 arg open. Is there some reason you are <code>do</code>ing this? why not just dump the file into a variable declared before the block?<hr><h3>  Answer by kixx, Id: 954642, Score: 8, created_at: 2009-06-05 07:24:24+00:00 </h3><p>Either set <code>$/</code> to <code>undef</code> (see jrockway's answer) or just concatenate all the file's lines:</p>
 
 <pre><code>$content = join('', &lt;$fh&gt;);
 </code></pre>
 
 <p>It's recommended to use scalars for filehandles on any Perl version that supports it.</p>
------------------------------------------------------------------- <br><h3> Geremia, Id: 35992965, Score: 6: </h3><p>Use</p>
+<hr><h3>  Answer by Geremia, Id: 35992965, Score: 6, created_at: 2016-03-14 16:29:46+00:00 </h3><p>Use</p>
 
 <pre><code> $/ = undef;
 </code></pre>
@@ -138,13 +138,13 @@ $var = &lt;INPUT&gt;;
 <p>before <code>$document = &lt;FILE&gt;;</code>. <code>$/</code> is the <em>input record separator</em>, which is a newline by default. By redefining it to <code>undef</code>, you are saying there is no field separator. This is called "slurp" mode.</p>
 
 <p><sup>Other solutions like <code>undef $/</code> and <code>local $/</code> (but not <code>my $/</code>) redeclare $/ and thus produce the same effect.</sup></p>
------------------------------------------------------------------- <br><h3> echo, Id: 16503090, Score: 5: </h3><p>Another possible way:</p>
+<hr><h3>  Answer by echo, Id: 16503090, Score: 5, created_at: 2013-05-12 00:43:03+00:00 </h3><p>Another possible way:</p>
 
 <pre><code>open my $fh, '&lt;', "filename";
 read $fh, my $string, -s $fh;
 close $fh;
 </code></pre>
------------------------------------------------------------------- <br><h3> Nathan, Id: 957062, Score: 3: </h3><p>You're only getting the first line from the diamond operator <code>&lt;FILE&gt;</code> because you're evaluating it in scalar context:</p>
+<hr><h3>  Answer by Nathan, Id: 957062, Score: 3, created_at: 2009-06-05 17:18:45+00:00 </h3><p>You're only getting the first line from the diamond operator <code>&lt;FILE&gt;</code> because you're evaluating it in scalar context:</p>
 
 <pre><code>$document = &lt;FILE&gt;; 
 </code></pre>
@@ -154,7 +154,7 @@ close $fh;
 <pre><code>@lines = &lt;FILE&gt;;
 print @lines;
 </code></pre>
-<h4> Nathan, Comment 2179120 Score: 0: </h4>Oh, thanks, I hadn&#39;t heard &quot;diamond operator&quot; before and thought they both shared the same name.  I will correct it above.<br>------------------------------------------------------------------ <br><h3> jaw, Id: 9359869, Score: 2: </h3><p>This is more of a suggestion on how <strong>NOT</strong> to do it. I've just had a bad time finding a bug in a rather big Perl application. Most of the modules had its own configuration files. To read the configuration files as-a-whole, I found this single line of Perl somewhere on the Internet:</p>
+<h4> Comment by Nathan, Score: 0, Id: 2179120, created_at: 2010-02-08 20:36:42+00:00 </h4>Oh, thanks, I hadn&#39;t heard &quot;diamond operator&quot; before and thought they both shared the same name.  I will correct it above.<hr><h3>  Answer by jaw, Id: 9359869, Score: 2, created_at: 2012-02-20 10:48:24+00:00 </h3><p>This is more of a suggestion on how <strong>NOT</strong> to do it. I've just had a bad time finding a bug in a rather big Perl application. Most of the modules had its own configuration files. To read the configuration files as-a-whole, I found this single line of Perl somewhere on the Internet:</p>
 
 <pre><code># Bad! Don't do that!
 my $content = do{local(@ARGV,$/)=$filename;&lt;&gt;};
@@ -219,23 +219,23 @@ my $content3 = do{local $/; open(my $f3, '&lt;', $filename) or die $!; my $tmp3 
 </code></pre>
 
 <p>which properly closes the file handle.</p>
------------------------------------------------------------------- <br><h3> Тима Епанчинцев, Id: 16794817, Score: 2: </h3><pre><code>open f, "test.txt"
+<hr><h3>  Answer by Тима Епанчинцев, Id: 16794817, Score: 2, created_at: 2013-05-28 14:36:46+00:00 </h3><pre><code>open f, "test.txt"
 $file = join '', &lt;f&gt;
 </code></pre>
 
 <p><code>&lt;f&gt;</code> - returns an array of lines from our file (if <code>$/</code> has the default value <code>"\n"</code>) and then <code>join ''</code> will stick this array into.</p>
------------------------------------------------------------------- <br><h3> SomethingSomething, Id: 23551519, Score: 2: </h3><p>I would do it in the simplest way, so anyone can understand what happens, even if there are smarter ways:</p>
+<hr><h3>  Answer by SomethingSomething, Id: 23551519, Score: 2, created_at: 2014-05-08 20:07:08+00:00 </h3><p>I would do it in the simplest way, so anyone can understand what happens, even if there are smarter ways:</p>
 
 <pre><code>my $text = "";
 while (my $line = &lt;FILE&gt;) {
     $text .= $line;
 }
 </code></pre>
-<h4> andru, Comment 70720221 Score: 0: </h4>All those string concatenations are going to be quite expensive. I&#39;d avoid doing this. Why tear the data apart only to put it back together?<br>------------------------------------------------------------------ <br><h3> zawy, Id: 44282306, Score: 1: </h3><p>I don't know if it's good practice, but I used to use this:</p>
+<h4> Comment by andru, Score: 0, Id: 70720221, created_at: 2017-01-20 13:10:06+00:00 </h4>All those string concatenations are going to be quite expensive. I&#39;d avoid doing this. Why tear the data apart only to put it back together?<hr><h3>  Answer by zawy, Id: 44282306, Score: 1, created_at: 2017-05-31 10:30:06+00:00 </h3><p>I don't know if it's good practice, but I used to use this:</p>
 
 <pre><code>($a=&lt;F&gt;);
 </code></pre>
------------------------------------------------------------------- <br><h3> Sheldon Juncker, Id: 20843758, Score: 0: </h3><p>You could simply create a sub-routine:</p>
+<hr><h3>  Answer by Sheldon Juncker, Id: 20843758, Score: 0, created_at: 2013-12-30 16:44:52+00:00 </h3><p>You could simply create a sub-routine:</p>
 
 <pre><code>#Get File Contents
 sub gfc
@@ -244,17 +244,17 @@ sub gfc
     join '', &lt;FC&gt;;
 }
 </code></pre>
------------------------------------------------------------------- <br><h3> user3439968, Id: 72208939, Score: 0: </h3><pre><code>use Path::Tiny qw( path );
+<hr><h3>  Answer by user3439968, Id: 72208939, Score: 0, created_at: 2022-05-12 00:38:48+00:00 </h3><pre><code>use Path::Tiny qw( path );
  
 my $file = 'data.txt';
 my $data = path($file)-&gt;slurp_utf8;
 </code></pre>
 <p>Slurp mode - reading a file in one step: <a href="https://perlmaven.com/slurp" rel="nofollow noreferrer">https://perlmaven.com/slurp</a></p>
------------------------------------------------------------------- <br><h3> Gea-Suan Lin, Id: 73531488, Score: 0: </h3><p>For a text-based file, without installing extra modules (only <a href="https://perldoc.perl.org/modules" rel="nofollow noreferrer">core</a> ones, i.e. installed by default), you can try this:</p>
+<hr><h3>  Answer by Gea-Suan Lin, Id: 73531488, Score: 0, created_at: 2022-08-29 15:58:36+00:00 </h3><p>For a text-based file, without installing extra modules (only <a href="https://perldoc.perl.org/modules" rel="nofollow noreferrer">core</a> ones, i.e. installed by default), you can try this:</p>
 <pre><code>use IO::File;
 my $content = join '', IO::File-&gt;new($filename)-&gt;getlines;
 </code></pre>
------------------------------------------------------------------- <br><h3> Elvin, Id: 73972453, Score: 0: </h3><p>One more approach:</p>
+<hr><h3>  Answer by Elvin, Id: 73972453, Score: 0, created_at: 2022-10-06 10:38:34+00:00 </h3><p>One more approach:</p>
 <pre class="lang-perl prettyprint-override"><code>sub configure_logger ( ) {
   my @configuration = DATA -&gt; getlines;
   my $configuration = join( &quot;\n&quot;, @configuration );

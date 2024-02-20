@@ -1,5 +1,5 @@
- <h2> Title: In Ruby, how do I skip a loop in a .each loop, similar to &#39;continue&#39; </h2> <h4> Blankman, question_id: 4230322 </h4>Score: 380, Tags: {ruby,loops,syntax,iteration} <br><p>In Ruby, how do I skip a loop in a <code>.each</code> loop, similar to <code>continue</code> in other languages?</p>
------------------------------------------------------------------- <br><h3> Jakub Hampl, Id: 4230350, Score: 682: </h3><p>Use <code>next</code>: </p>
+ <h2> Title: In Ruby, how do I skip a loop in a .each loop, similar to &#39;continue&#39; </h2> <h4> Blankman, question_id: 4230322, created_at: 2010-11-19 23:32:30+00:00 </h4>Score: 380, Tags: {ruby,loops,syntax,iteration} <br><p>In Ruby, how do I skip a loop in a <code>.each</code> loop, similar to <code>continue</code> in other languages?</p>
+<hr><h3> ✔️ Answer by Jakub Hampl, Id: 4230350, Score: 682, created_at: 2010-11-19 23:38:52+00:00 </h3><p>Use <code>next</code>: </p>
 
 <pre><code>(1..10).each do |a|
   next if a.even?
@@ -21,7 +21,7 @@ end
 <p>Works also for friends like <code>times</code>, <code>upto</code>, <code>downto</code>, <code>each_with_index</code>, <code>select</code>, <code>map</code> and other iterators (and more generally blocks).</p>
 
 <p>For more info see <a href="http://ruby-doc.org/docs/ProgrammingRuby/html/tut_expressions.html#UL">http://ruby-doc.org/docs/ProgrammingRuby/html/tut_expressions.html#UL</a>.</p>
-<h4> thanhnha1103, Comment 63291276 Score: 3: </h4>break is a wrong answer in this case. It stop the .each not just keep 1 loop. ;)<br><h4> Jakub Hampl, Comment 4579132 Score: 0: </h4>Yes, though break isn&#39;t that cool (and is a lot more useful ;).<br>------------------------------------------------------------------ <br><h3> Ashe, Id: 4230390, Score: 60: </h3><p><code>next</code> - it's like <code>return</code>, but for blocks! (So you can use this in any <code>proc</code>/<code>lambda</code> too.)</p>
+<h4> Comment by thanhnha1103, Score: 3, Id: 63291276, created_at: 2016-06-20 10:39:26+00:00 </h4>break is a wrong answer in this case. It stop the .each not just keep 1 loop. ;)<h4> Comment by Jakub Hampl, Score: 0, Id: 4579132, created_at: 2010-11-19 23:47:57+00:00 </h4>Yes, though break isn&#39;t that cool (and is a lot more useful ;).<hr><h3>  Answer by Ashe, Id: 4230390, Score: 60, created_at: 2010-11-19 23:48:33+00:00 </h3><p><code>next</code> - it's like <code>return</code>, but for blocks! (So you can use this in any <code>proc</code>/<code>lambda</code> too.)</p>
 
 <p>That means you can also say <code>next n</code> to "return" <code>n</code> from the block.  For instance:</p>
 
@@ -46,4 +46,4 @@ end
 </code></pre>
 
 <p><code>my_fun</code> will result in <code>"Hello."</code>, not <code>[1, "Hello.", 2]</code>, because the <code>return</code> keyword pertains to the outer <code>def</code>, not the inner block.</p>
-<h4> ANeves, Comment 28115501 Score: 1: </h4>It would be more interesting to give an example of the <code>next n</code>, instead of the <code>return foo</code>.<br><h4> Ashe, Comment 28120378 Score: 1: </h4>@ANeves thanks for feedback; have revised to better contrast <code>next</code>/<code>return</code>.<br>
+<h4> Comment by ANeves, Score: 1, Id: 28115501, created_at: 2013-09-26 12:04:19+00:00 </h4>It would be more interesting to give an example of the <code>next n</code>, instead of the <code>return foo</code>.<h4> Comment by Ashe, Score: 1, Id: 28120378, created_at: 2013-09-26 14:06:42+00:00 </h4>@ANeves thanks for feedback; have revised to better contrast <code>next</code>/<code>return</code>.

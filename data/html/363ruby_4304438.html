@@ -1,4 +1,4 @@
- <h2> Title: gem install: Failed to build gem native extension (can&#39;t find header files) </h2> <h4> Tim, question_id: 4304438 </h4>Score: 363, Tags: {mysql,ruby,rubygems} <br><p>I am using Fedora 14 and I have MySQL and MySQL server 5.1.42 installed and running.
+ <h2> Title: gem install: Failed to build gem native extension (can&#39;t find header files) </h2> <h4> Tim, question_id: 4304438, created_at: 2010-11-29 13:58:14+00:00 </h4>Score: 363, Tags: {mysql,ruby,rubygems} <br><p>I am using Fedora 14 and I have MySQL and MySQL server 5.1.42 installed and running.
 Now I tried to do this as root user:</p>
 
 <pre><code>gem install mysql
@@ -19,7 +19,7 @@ Results logged to /usr/lib/ruby/gems/1.8/gems/mysql-2.8.1/ext/mysql_api/gem_make
 </code></pre>
 
 <p>What's wrong here? In installed ruby 1.8.7. and the latest rubygems 1.3.7.</p>
-<h4> DrColossos, Id: 4673201 Score: 0: </h4>Just a quick guess: do you have the dev fileheaders for MySQL<br><h4> Tim, Id: 4673262 Score: 0: </h4>How can I get these dev fileheaders?<br><h4> Ivan Carrasco Quiroz, Id: 19823664 Score: 1: </h4>I did it in Ubuntu doing the following: apt-get install ruby-dev rubygems gem install mysql -- with-mysql-config=/usr/bin/mysql_config All works fine.<br>------------------------------------------------------------------ <br><h3> Brian Lacy, Id: 4502672, Score: 764: </h3><p>For those who may be confused by the accepted answer, as I was, you also need to have the ruby headers installed [<strong>ruby-devel</strong>].</p>
+<h4> Comment by Ivan Carrasco Quiroz, Score: 1, Id: 19823664, created_at: 2012-05-29 16:51:48+00:00 </h4>I did it in Ubuntu doing the following: apt-get install ruby-dev rubygems gem install mysql -- with-mysql-config=/usr/bin/mysql_config All works fine.<h4> Comment by DrColossos, Score: 0, Id: 4673201, created_at: 2010-11-29 14:06:51+00:00 </h4>Just a quick guess: do you have the dev fileheaders for MySQL<h4> Comment by Tim, Score: 0, Id: 4673262, created_at: 2010-11-29 14:12:47+00:00 </h4>How can I get these dev fileheaders?<hr><h3> ✔️ Answer by Brian Lacy, Id: 4502672, Score: 764, created_at: 2010-12-21 18:34:02+00:00 </h3><p>For those who may be confused by the accepted answer, as I was, you also need to have the ruby headers installed [<strong>ruby-devel</strong>].</p>
 
 <p>The article that saved my hide is <a href="http://web.archive.org/web/20130313162931/http://www.fedora-tunisia.org/?q=node/44" rel="noreferrer">here</a>.</p>
 
@@ -45,7 +45,7 @@ gem install -y mysql -- --with-mysql-config=/usr/bin/mysql_config
 </code></pre>
 
 <p>(where 2.2 is your desired Ruby version)</p>
-<h4> Jon Garvin, Comment 18739831 Score: 3: </h4>In addition to ruby-dev posted by @NoBugs above, I also needed libmysqlcient-dev on Ubuntu (12.04).  (Or, just see the Debian/Ubuntu answer by Damian Nowak below.)<br><h4> David Mason, Comment 26972646 Score: 1: </h4>Worked for me on RHEL6 when I had trouble installing jekyll.<br><h4> Jack, Comment 18009130 Score: 1: </h4>this worked when i had a problem trying to create an app using ruby on rails. it complained about how it can&#39;t install json and bundler can&#39;t continue. installing ruby-devel worked.<br><h4> Zolt&#225;n, Comment 31503564 Score: 0: </h4>This helped me install fpm, probably helps install any ruby-based software. I used <code>yum -y install gcc ruby-devel rubygems</code>.<br><h4> UserBSS1, Comment 35619739 Score: 0: </h4>Life saver. Nothing worked until I reached there before doing &quot;gem install pg&quot;. Other install I did before it: postgresql-devel, postgresql-libs, postgresql93-server<br><h4> Brian Lacy, Comment 63843331 Score: 0: </h4>@SameerAzazi thanks.. updated the link courtesy of the <a href="https://archive.org/web/" rel="nofollow noreferrer">Wayback Machine</a>.<br><h4> mltsy, Comment 80257246 Score: 0: </h4><code>apt-get install ruby2.4-dev</code> did work for me! (And my error was looking for ruby.h in <code>&#47;usr&#47;lib&#47;ruby&#47;include&#47;ruby.h</code> just for context/relevance)<br><h4> Skye Hoefling, Comment 85968410 Score: 0: </h4>This was the missing piece I needed to get it working on WSL running Ubuntu<br><h4> Zayne S Halsall, Comment 52528707 Score: 0: </h4>Not running MySQL on Fedora 22, and rubygems installed with ruby, but ruby-devel certainly worked for me.<br>------------------------------------------------------------------ <br><h3> Nowaker, Id: 4304489, Score: 93: </h3><p>Red Hat, Fedora:</p>
+<h4> Comment by Jon Garvin, Score: 3, Id: 18739831, created_at: 2012-12-01 03:58:42+00:00 </h4>In addition to ruby-dev posted by @NoBugs above, I also needed libmysqlcient-dev on Ubuntu (12.04).  (Or, just see the Debian/Ubuntu answer by Damian Nowak below.)<h4> Comment by Jack, Score: 1, Id: 18009130, created_at: 2012-11-04 20:43:46+00:00 </h4>this worked when i had a problem trying to create an app using ruby on rails. it complained about how it can&#39;t install json and bundler can&#39;t continue. installing ruby-devel worked.<h4> Comment by David Mason, Score: 1, Id: 26972646, created_at: 2013-08-21 23:57:48+00:00 </h4>Worked for me on RHEL6 when I had trouble installing jekyll.<h4> Comment by Zolt&#225;n, Score: 0, Id: 31503564, created_at: 2014-01-07 11:24:48+00:00 </h4>This helped me install fpm, probably helps install any ruby-based software. I used <code>yum -y install gcc ruby-devel rubygems</code>.<h4> Comment by UserBSS1, Score: 0, Id: 35619739, created_at: 2014-04-24 15:47:30+00:00 </h4>Life saver. Nothing worked until I reached there before doing &quot;gem install pg&quot;. Other install I did before it: postgresql-devel, postgresql-libs, postgresql93-server<h4> Comment by mltsy, Score: 0, Id: 80257246, created_at: 2017-10-09 19:49:23+00:00 </h4><code>apt-get install ruby2.4-dev</code> did work for me! (And my error was looking for ruby.h in <code>&#47;usr&#47;lib&#47;ruby&#47;include&#47;ruby.h</code> just for context/relevance)<h4> Comment by Skye Hoefling, Score: 0, Id: 85968410, created_at: 2018-03-26 01:32:11+00:00 </h4>This was the missing piece I needed to get it working on WSL running Ubuntu<h4> Comment by Brian Lacy, Score: 0, Id: 63843331, created_at: 2016-07-05 17:53:45+00:00 </h4>@SameerAzazi thanks.. updated the link courtesy of the <a href="https://archive.org/web/" rel="nofollow noreferrer">Wayback Machine</a>.<h4> Comment by Zayne S Halsall, Score: 0, Id: 52528707, created_at: 2015-09-01 08:43:12+00:00 </h4>Not running MySQL on Fedora 22, and rubygems installed with ruby, but ruby-devel certainly worked for me.<hr><h3>  Answer by Nowaker, Id: 4304489, Score: 93, created_at: 2010-11-29 14:05:58+00:00 </h3><p>Red Hat, Fedora:</p>
 
 <pre><code>yum -y install gcc mysql-devel ruby-devel rubygems
 gem install -y mysql -- --with-mysql-config=/usr/bin/mysql_config
@@ -62,11 +62,11 @@ gem install mysql
 <pre><code>pacman -S libmariadbclient
 gem install mysql
 </code></pre>
-<h4> Nowaker, Comment 4673486 Score: 1: </h4>For sure mysql-devel is needed. The question is what is needed besides. Maybe try this: <a href="http://www.fedora-tunisia.org/?q=node/44" rel="nofollow noreferrer">fedora-tunisia.org/?q=node/44</a> Let me know if it works.<br><h4> SwiftMango, Comment 20054045 Score: 0: </h4>BTW on RedHat system is <code>ruby-devel</code>.<br><h4> Kevin Brown, Comment 7356626 Score: 0: </h4>I just had this problem here: <a href="http://stackoverflow.com/questions/6297751/getting-rails-app-started-rake-dbcrate-prob" title="getting rails app started rake dbcrate prob">stackoverflow.com/questions/6297751/&hellip;</a> Good solution!<br><h4> Tim, Comment 4673290 Score: 0: </h4>Is it this one? mysql-devel.i686 : Files for development of MySQL applications<br><h4> Edward Anderson, Comment 17762212 Score: 0: </h4>What you say is required, but it&#39;s ruby-devel that&#39;s needed to fix the error message in question.<br>------------------------------------------------------------------ <br><h3> Dror S., Id: 27158307, Score: 51: </h3><p>For anyone reading this in 2015: if you happened to install the package <code>ruby2.0</code>, you need to install the matching <code>ruby2.0-dev</code> to get the appropriate Ruby headers. The same goes for <code>ruby2.1</code> and <code>ruby2.2</code>, etc. For example:</p>
+<h4> Comment by Nowaker, Score: 1, Id: 4673486, created_at: 2010-11-29 14:31:21+00:00 </h4>For sure mysql-devel is needed. The question is what is needed besides. Maybe try this: <a href="http://www.fedora-tunisia.org/?q=node/44" rel="nofollow noreferrer">fedora-tunisia.org/?q=node/44</a> Let me know if it works.<h4> Comment by Kevin Brown, Score: 0, Id: 7356626, created_at: 2011-06-09 19:16:43+00:00 </h4>I just had this problem here: <a href="http://stackoverflow.com/questions/6297751/getting-rails-app-started-rake-dbcrate-prob" title="getting rails app started rake dbcrate prob">stackoverflow.com/questions/6297751/&hellip;</a> Good solution!<h4> Comment by Edward Anderson, Score: 0, Id: 17762212, created_at: 2012-10-25 18:38:58+00:00 </h4>What you say is required, but it&#39;s ruby-devel that&#39;s needed to fix the error message in question.<h4> Comment by SwiftMango, Score: 0, Id: 20054045, created_at: 2013-01-19 02:14:31+00:00 </h4>BTW on RedHat system is <code>ruby-devel</code>.<h4> Comment by Tim, Score: 0, Id: 4673290, created_at: 2010-11-29 14:15:07+00:00 </h4>Is it this one? mysql-devel.i686 : Files for development of MySQL applications<hr><h3>  Answer by Dror S., Id: 27158307, Score: 51, created_at: 2014-11-26 20:30:05+00:00 </h3><p>For anyone reading this in 2015: if you happened to install the package <code>ruby2.0</code>, you need to install the matching <code>ruby2.0-dev</code> to get the appropriate Ruby headers. The same goes for <code>ruby2.1</code> and <code>ruby2.2</code>, etc. For example:</p>
 
 <pre><code>$ sudo apt-get install ruby2.2-dev
 </code></pre>
-<h4> Geoffrey De Smet, Comment 51247613 Score: 0: </h4>On fedora 22: <code>sudo dnf install ruby-devel</code><br><h4> nelsonenzo, Comment 57383124 Score: 0: </h4>Thank you!  ruby is so weird sometimes.<br><h4> Charles Roper, Comment 68745060 Score: 0: </h4>Same goes for ruby 2.3.<br>------------------------------------------------------------------ <br><h3> andrej, Id: 7546146, Score: 25: </h3><p>it seems that the</p>
+<h4> Comment by Geoffrey De Smet, Score: 0, Id: 51247613, created_at: 2015-07-27 10:54:38+00:00 </h4>On fedora 22: <code>sudo dnf install ruby-devel</code><h4> Comment by nelsonenzo, Score: 0, Id: 57383124, created_at: 2016-01-15 21:40:59+00:00 </h4>Thank you!  ruby is so weird sometimes.<h4> Comment by Charles Roper, Score: 0, Id: 68745060, created_at: 2016-11-23 09:10:59+00:00 </h4>Same goes for ruby 2.3.<hr><h3>  Answer by andrej, Id: 7546146, Score: 25, created_at: 2011-09-25 14:31:15+00:00 </h3><p>it seems that the</p>
 
 <pre><code>yum install ruby-devel
 </code></pre>
@@ -84,17 +84,17 @@ gem install mysql
 </code></pre>
 
 <p>to be able to build native extensions</p>
-<h4> Bruno Medeiros, Comment 14576307 Score: 1: </h4>I was getting a very wierd error, without a clear message, and it was because gcc packages were not instaled. :( This post made me remember of this basic step. ;P<br>------------------------------------------------------------------ <br><h3> Ajit Singh, Id: 32164227, Score: 10: </h3><p>MAC users may face this issue when xcode tools are not installed properly.
+<h4> Comment by Bruno Medeiros, Score: 1, Id: 14576307, created_at: 2012-06-20 16:36:44+00:00 </h4>I was getting a very wierd error, without a clear message, and it was because gcc packages were not instaled. :( This post made me remember of this basic step. ;P<hr><h3>  Answer by Ajit Singh, Id: 32164227, Score: 10, created_at: 2015-08-23 07:25:55+00:00 </h3><p>MAC users may face this issue when xcode tools are not installed properly.
 Below is the command to get rid of the issue.</p>
 
 <pre><code>xcode-select --install
 </code></pre>
-<h4> Eduard Ghinea, Comment 93343394 Score: 0: </h4>yeah, that was the problem. Thanks a lot!<br><h4> Hyder, Comment 108017080 Score: 0: </h4>And then this <code>sudo gem install -n &#47;usr&#47;local&#47;bin cocoapods</code> <i>thumbsup</i><br>------------------------------------------------------------------ <br><h3> Tim, Id: 4364978, Score: 8: </h3><p>I found the solution <a href="http://planet.mysql.com/entry/?id=23399" rel="noreferrer">here</a>.</p>
+<h4> Comment by Eduard Ghinea, Score: 0, Id: 93343394, created_at: 2018-11-09 15:11:21+00:00 </h4>yeah, that was the problem. Thanks a lot!<h4> Comment by Hyder, Score: 0, Id: 108017080, created_at: 2020-04-06 09:28:47+00:00 </h4>And then this <code>sudo gem install -n &#47;usr&#47;local&#47;bin cocoapods</code> <i>thumbsup</i><hr><h3>  Answer by Tim, Id: 4364978, Score: 8, created_at: 2010-12-06 09:37:55+00:00 </h3><p>I found the solution <a href="http://planet.mysql.com/entry/?id=23399" rel="noreferrer">here</a>.</p>
 
 <pre><code># yum install mysql-devel gcc make
 # gem install mysql -- --with-mysql-config=/usr/bin/mysql_config
 </code></pre>
------------------------------------------------------------------- <br><h3> qkrijger, Id: 15456170, Score: 8: </h3><p>This post helped me. Thanks a lot.</p>
+<hr><h3>  Answer by qkrijger, Id: 15456170, Score: 8, created_at: 2013-03-17 00:02:31+00:00 </h3><p>This post helped me. Thanks a lot.</p>
 
 <p>On Linux (Ubuntu 12.10) I needed to run</p>
 
@@ -107,17 +107,23 @@ sudo apt-get install ruby-dev
 
 <pre><code>sudo gem install jekyll
 </code></pre>
------------------------------------------------------------------- <br><h3> Hafiz Shehbaz Ali, Id: 40894504, Score: 4: </h3><p>If you have gem installed and ruby and not able to install rails, then install ruby dev lib.</p>
+<hr><h3>  Answer by Hafiz Shehbaz Ali, Id: 40894504, Score: 4, created_at: 2016-11-30 17:24:40+00:00 </h3><p>If you have gem installed and ruby and not able to install rails, then install ruby dev lib.</p>
 
 <pre><code>sudo apt-get install ruby-dev
 </code></pre>
 
 <p>It works for me. I have tried the different solution. </p>
-<h4> Hafiz Shehbaz Ali, Comment 69002846 Score: 0: </h4>I have Ubuntu 16.04LTS. I think, same will be for other previous version.<br>------------------------------------------------------------------ <br><h3> mkungla, Id: 35494200, Score: 3: </h3><p><strong>Red Hat, Fedora:</strong></p>
+<h4> Comment by Hafiz Shehbaz Ali, Score: 0, Id: 69002846, created_at: 2016-11-30 17:25:25+00:00 </h4>I have Ubuntu 16.04LTS. I think, same will be for other previous version.<hr><h3>  Answer by mkungla, Id: 35494200, Score: 3, created_at: 2016-02-18 23:00:20+00:00 </h3><p><strong>Red Hat, Fedora:</strong></p>
 
 <pre><code>sudo dnf -y install gcc-c++ redhat-rpm-config ruby-devel gcc mysql-devel rubygems
 </code></pre>
------------------------------------------------------------------- <br><h3> Mike, Id: 46018728, Score: 2: </h3><p>For those that are still experiencing problems, like I have(I am using Ubuntu 16.04), I had to put in the following commands in order to get some gems like bcrypt, pg, and others installed.  They are all similar to the ones above except for one.</p>
+<hr><h3>  Answer by Aadhya, Id: 60352221, Score: 0, created_at: 2020-02-22 12:37:50+00:00 </h3><p>You might have messed up with the RVM.</p>
+
+<p>Try to do: </p>
+
+<pre><code>\curl -sSL https://get.rvm.io | bash -s stable --rails
+</code></pre>
+<hr><h3>  Answer by Mike, Id: 46018728, Score: 2, created_at: 2017-09-02 22:22:19+00:00 </h3><p>For those that are still experiencing problems, like I have(I am using Ubuntu 16.04), I had to put in the following commands in order to get some gems like bcrypt, pg, and others installed.  They are all similar to the ones above except for one.</p>
 
 <pre><code>sudo apt-get install ruby-dev -y
 sudo apt-get install libpq-dev -y
@@ -126,7 +132,7 @@ sudo apt-get install build-essential patch -y
 </code></pre>
 
 <p>This allowed me to install gems like, PG, bcrypt, and recaptcha.</p>
------------------------------------------------------------------- <br><h3> rmpestano, Id: 52372952, Score: 2: </h3><p>You need following packages instaled:</p>
+<hr><h3>  Answer by rmpestano, Id: 52372952, Score: 2, created_at: 2018-09-17 17:27:05+00:00 </h3><p>You need following packages instaled:</p>
 
 <ul>
 <li><p>ruby-dev</p></li>
@@ -139,7 +145,7 @@ sudo apt-get install build-essential patch -y
 
 <pre><code> sudo apt install gcc ruby-dev rubygems libgmp-dev libgmp3-dev make 
 </code></pre>
------------------------------------------------------------------- <br><h3> Andrew Lobban, Id: 37078210, Score: 1: </h3><p>My initial solution was to resolve the above errors by installing <code>ruby-devel</code>, <code>patch</code> and <code>rubygems</code>. </p>
+<hr><h3>  Answer by Andrew Lobban, Id: 37078210, Score: 1, created_at: 2016-05-06 17:27:30+00:00 </h3><p>My initial solution was to resolve the above errors by installing <code>ruby-devel</code>, <code>patch</code> and <code>rubygems</code>. </p>
 
 <p>My issue was a bit different as <strong>bcrypt 3.1.11</strong> still had issues compiling and installing on Fedora 23. I needed additional packages. So after ensuring I had the above installed, I was still having issues:</p>
 
@@ -155,28 +161,22 @@ sudo apt-get install build-essential patch -y
 </ul>
 
 <p>You can find a write up here on <a href="https://developer.fedoraproject.org/tech/languages/ruby/gems-installation.html" rel="nofollow">Fedore Project</a>. You may also find answers to other needs as well.</p>
------------------------------------------------------------------- <br><h3> Viduni Wickramarachchi, Id: 43340318, Score: 1: </h3><pre><code>sudo apt-get install ruby-dev
+<hr><h3>  Answer by Viduni Wickramarachchi, Id: 43340318, Score: 1, created_at: 2017-04-11 08:15:21+00:00 </h3><pre><code>sudo apt-get install ruby-dev
 </code></pre>
 
 <p>This command solved the problem for me!</p>
------------------------------------------------------------------- <br><h3> Raul Lib&#243;rio, Id: 38864265, Score: 0: </h3><p>in openSUSE:</p>
+<hr><h3>  Answer by Raul Lib&#243;rio, Id: 38864265, Score: 0, created_at: 2016-08-10 04:29:20+00:00 </h3><p>in openSUSE:</p>
 
 <pre><code>zypper in ruby-devel
 </code></pre>
 
 <p>Works to me :)</p>
------------------------------------------------------------------- <br><h3> alvescleiton, Id: 45066529, Score: 0: </h3><p>It's necessary to install redhat-rpm-config to. I guess it solve your problem!</p>
------------------------------------------------------------------- <br><h3> Shveta Sachdeva, Id: 49617498, Score: 0: </h3><p>This worked for me:</p>
+<hr><h3>  Answer by alvescleiton, Id: 45066529, Score: 0, created_at: 2017-07-12 20:00:41+00:00 </h3><p>It's necessary to install redhat-rpm-config to. I guess it solve your problem!</p>
+<hr><h3>  Answer by Shveta Sachdeva, Id: 49617498, Score: 0, created_at: 2018-04-02 19:25:29+00:00 </h3><p>This worked for me:</p>
 
 <pre><code>yum -y install gcc mysql-devel ruby-devel rubygems
 </code></pre>
------------------------------------------------------------------- <br><h3> Aadhya, Id: 60352221, Score: 0: </h3><p>You might have messed up with the RVM.</p>
-
-<p>Try to do: </p>
-
-<pre><code>\curl -sSL https://get.rvm.io | bash -s stable --rails
-</code></pre>
------------------------------------------------------------------- <br><h3> Mareg, Id: 13763263, Score: -1: </h3><p>Just to add path to ruby.h file in my PATH<br />
+<hr><h3>  Answer by Mareg, Id: 13763263, Score: -1, created_at: 2012-12-07 12:38:32+00:00 </h3><p>Just to add path to ruby.h file in my PATH<br />
 for example: </p>
 
 <blockquote>

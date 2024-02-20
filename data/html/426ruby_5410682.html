@@ -1,10 +1,14 @@
- <h2> Title: Parsing a JSON string in Ruby </h2> <h4> Rod, question_id: 5410682 </h4>Score: 426, Tags: {ruby,json} <br><p>I have a string that I want to parse in Ruby:</p>
+ <h2> Title: Parsing a JSON string in Ruby </h2> <h4> Rod, question_id: 5410682, created_at: 2011-03-23 19:39:08+00:00 </h4>Score: 426, Tags: {ruby,json} <br><p>I have a string that I want to parse in Ruby:</p>
 
 <pre><code>string = '{"desc":{"someKey":"someValue","anotherKey":"value"},"main_item":{"stats":{"a":8,"b":12,"c":10}}}'
 </code></pre>
 
 <p>Is there an easy way to extract the data?</p>
-<h4> the Tin Man, Id: 55004101 Score: 27: </h4><i>JSON is directly supported in Ruby, and has been since at least Ruby v1.9.3, so there is no need to install a gem unless you&#39;re using something older. Simply use <code>require &#39;json&#39;</code> in your code.</i><br>------------------------------------------------------------------ <br><h3> Greg, Id: 5410713, Score: 642: </h3><p>This looks like <a href="http://www.json.org" rel="noreferrer">JavaScript Object Notation (JSON)</a>. You can parse JSON that resides in some variable, e.g. <code>json_string</code>, like so:</p>
+<h4> Comment by the Tin Man, Score: 27, Id: 55004101, created_at: 2015-11-09 17:41:17+00:00 </h4><i>JSON is directly supported in Ruby, and has been since at least Ruby v1.9.3, so there is no need to install a gem unless you&#39;re using something older. Simply use <code>require &#39;json&#39;</code> in your code.</i><hr><h3>  Answer by keymone, Id: 5410710, Score: 18, created_at: 2011-03-23 19:41:13+00:00 </h3><p>It looks like a JSON string.  You can use one of many JSON libraries and it's as simple as doing:</p>
+
+<pre><code>JSON.parse(string)
+</code></pre>
+<hr><h3> ✔️ Answer by Greg, Id: 5410713, Score: 642, created_at: 2011-03-23 19:41:42+00:00 </h3><p>This looks like <a href="http://www.json.org" rel="noreferrer">JavaScript Object Notation (JSON)</a>. You can parse JSON that resides in some variable, e.g. <code>json_string</code>, like so:</p>
 
 <pre><code>require 'json'
 JSON.parse(json_string)
@@ -20,7 +24,7 @@ JSON.parse(json_string)
 <li><a href="https://rubygems.org/gems/yajl-ruby" rel="noreferrer">YAJL C Bindings for Ruby</a></li>
 <li><a href="https://rubygems.org/gems/json-stream" rel="noreferrer">JSON::Stream</a></li>
 </ul>
-<h4> Nando, Comment 34766758 Score: 43: </h4>Also you can sets the option symbolize_names to true, in order to get keys as symbols. Exemple: <code>JSON.parse(string, symbolize_names: true) #=&gt; {key: :value}</code><br><h4> the Tin Man, Comment 55004218 Score: 33: </h4><i>JSON is directly supported in Ruby, and has been since at least Ruby v1.9.3, so there is no need to install a gem unless you&#39;re using something older. Simply use <code>require &#39;json&#39;</code> in your code.</i><br>------------------------------------------------------------------ <br><h3> nevan king, Id: 13625633, Score: 239: </h3><p>Just to extend the answers a bit with what to do with the parsed object:</p>
+<h4> Comment by Nando, Score: 43, Id: 34766758, created_at: 2014-04-02 00:25:22+00:00 </h4>Also you can sets the option symbolize_names to true, in order to get keys as symbols. Exemple: <code>JSON.parse(string, symbolize_names: true) #=&gt; {key: :value}</code><h4> Comment by the Tin Man, Score: 33, Id: 55004218, created_at: 2015-11-09 17:44:48+00:00 </h4><i>JSON is directly supported in Ruby, and has been since at least Ruby v1.9.3, so there is no need to install a gem unless you&#39;re using something older. Simply use <code>require &#39;json&#39;</code> in your code.</i><hr><h3>  Answer by nevan king, Id: 13625633, Score: 239, created_at: 2012-11-29 12:15:37+00:00 </h3><p>Just to extend the answers a bit with what to do with the parsed object:</p>
 
 <pre><code># JSON Parsing example
 require "rubygems" # don't need this if you're Ruby v1.9.3 or higher
@@ -42,7 +46,7 @@ parsed["shop"].each do |shop|
   p shop["id"]
 end
 </code></pre>
-<h4> Ziggy, Comment 31805353 Score: 9: </h4>Important note: <code>&#39;{ &quot;a&quot;: &quot;bob&quot; }&#39;</code> is valid. <code>&quot;{ &#39;a&#39;: &#39;bob&#39; }&quot;</code> is not.<br><h4> endorama, Comment 35156699 Score: 7: </h4>@LinusAn because JSON requires double quotes around strings. See string in the JSON definition ( <a href="http://www.json.org/" rel="nofollow noreferrer">json.org</a> ): &quot;A string is a sequence of zero or more Unicode characters, wrapped in double quotes, using backslash escapes.&quot;<br><h4> johnml, Comment 37246948 Score: 1: </h4>In many cases you want to wrap <code>JSON.parse</code> within a rescue block for <code>JSON::ParserError</code>.<br><h4> barlop, Comment 99388001 Score: 1: </h4>Can you make your answer complete by including a sample example data from shops.json?<br><h4> Rivenfall, Comment 59736251 Score: 0: </h4><code>JSON.parse(&quot;[#{value}]&quot;)[0]</code> to avoid the error <code>A JSON text must at least contain two octets!</code><br>------------------------------------------------------------------ <br><h3> dav_i, Id: 34295262, Score: 42: </h3><p>As of Ruby v1.9.3 you don't need to install any Gems in order to parse JSON, simply use <code>require 'json'</code>:</p>
+<h4> Comment by Ziggy, Score: 9, Id: 31805353, created_at: 2014-01-15 10:33:08+00:00 </h4>Important note: <code>&#39;{ &quot;a&quot;: &quot;bob&quot; }&#39;</code> is valid. <code>&quot;{ &#39;a&#39;: &#39;bob&#39; }&quot;</code> is not.<h4> Comment by endorama, Score: 7, Id: 35156699, created_at: 2014-04-11 14:46:31+00:00 </h4>@LinusAn because JSON requires double quotes around strings. See string in the JSON definition ( <a href="http://www.json.org/" rel="nofollow noreferrer">json.org</a> ): &quot;A string is a sequence of zero or more Unicode characters, wrapped in double quotes, using backslash escapes.&quot;<h4> Comment by johnml, Score: 1, Id: 37246948, created_at: 2014-06-10 10:48:59+00:00 </h4>In many cases you want to wrap <code>JSON.parse</code> within a rescue block for <code>JSON::ParserError</code>.<h4> Comment by barlop, Score: 1, Id: 99388001, created_at: 2019-05-31 12:04:50+00:00 </h4>Can you make your answer complete by including a sample example data from shops.json?<h4> Comment by Rivenfall, Score: 0, Id: 59736251, created_at: 2016-03-16 18:14:14+00:00 </h4><code>JSON.parse(&quot;[#{value}]&quot;)[0]</code> to avoid the error <code>A JSON text must at least contain two octets!</code><hr><h3>  Answer by dav_i, Id: 34295262, Score: 42, created_at: 2015-12-15 17:07:49+00:00 </h3><p>As of Ruby v1.9.3 you don't need to install any Gems in order to parse JSON, simply use <code>require 'json'</code>:</p>
 
 <pre><code>require 'json'
 
@@ -51,16 +55,12 @@ puts json['foo'] # prints "bar"
 </code></pre>
 
 <p>See <a href="http://ruby-doc.org/stdlib-2.0.0/libdoc/json/rdoc/JSON.html" rel="noreferrer">JSON</a> at Ruby-Doc.</p>
------------------------------------------------------------------- <br><h3> keymone, Id: 5410710, Score: 18: </h3><p>It looks like a JSON string.  You can use one of many JSON libraries and it's as simple as doing:</p>
-
-<pre><code>JSON.parse(string)
-</code></pre>
------------------------------------------------------------------- <br><h3> Adverbly, Id: 64065140, Score: 10: </h3><p>Don't see any answers here that mention parsing directly to an object other than a Hash, but it is possible using the poorly-documented object_class option(see <a href="https://ruby-doc.org/stdlib-2.7.1/libdoc/json/rdoc/JSON.html" rel="noreferrer">https://ruby-doc.org/stdlib-2.7.1/libdoc/json/rdoc/JSON.html</a>):</p>
+<hr><h3>  Answer by Adverbly, Id: 64065140, Score: 10, created_at: 2020-09-25 13:30:40+00:00 </h3><p>Don't see any answers here that mention parsing directly to an object other than a Hash, but it is possible using the poorly-documented object_class option(see <a href="https://ruby-doc.org/stdlib-2.7.1/libdoc/json/rdoc/JSON.html" rel="noreferrer">https://ruby-doc.org/stdlib-2.7.1/libdoc/json/rdoc/JSON.html</a>):</p>
 <pre><code>JSON.parse('{&quot;foo&quot;:{&quot;bar&quot;: 2}}', object_class: OpenStruct).foo.bar
 =&gt; 2
 </code></pre>
 <p>The better way to read that option is &quot;The ruby class that a json object turns into&quot;, which explains why it defaults to Hash. Likewise, there is an array_class option for json arrays.</p>
------------------------------------------------------------------- <br><h3> guy mograbi, Id: 26493639, Score: 7: </h3><p>This is a bit late but I ran into something interesting that seems important to contribute. </p>
+<hr><h3>  Answer by guy mograbi, Id: 26493639, Score: 7, created_at: 2014-10-21 18:25:03+00:00 </h3><p>This is a bit late but I ran into something interesting that seems important to contribute. </p>
 
 <p>I accidentally wrote this code, and it seems to work:</p>
 
@@ -77,12 +77,12 @@ puts configs['desc']['someKey']
 <p>I am using versions 1.8.x and 1.9.x - so the <code>json</code> library is not built in, but it is in version 2.x. </p>
 
 <p>So technically - this is the easiest way to extract the data in version lower than 2.0. </p>
-<h4> Justin Ohms, Comment 64299880 Score: 3: </h4>The reason this works is that semantically (most) JSON is valid YAML (particularly YAML 1.2)<br><h4> Nakilon, Comment 132044018 Score: 0: </h4>I get &quot;undefined method `load_file&#39; for JSON:Module&quot; on ruby 2.3.8<br><h4> the Tin Man, Comment 55004141 Score: 0: </h4>Yes, JSON is actually parsed by the Psych code, which also parses YAML in Ruby. And JSON parsing was introduced in <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/json/rdoc/index.html" rel="nofollow noreferrer">Ruby v1.9.3</a>.<br>------------------------------------------------------------------ <br><h3> damianmr, Id: 25850734, Score: 4: </h3><p>I suggest Oj as it is waaaaaay faster than the standard JSON library.</p>
+<h4> Comment by Justin Ohms, Score: 3, Id: 64299880, created_at: 2016-07-18 23:05:30+00:00 </h4>The reason this works is that semantically (most) JSON is valid YAML (particularly YAML 1.2)<h4> Comment by Nakilon, Score: 0, Id: 132044018, created_at: 2022-12-16 02:47:47+00:00 </h4>I get &quot;undefined method `load_file&#39; for JSON:Module&quot; on ruby 2.3.8<h4> Comment by the Tin Man, Score: 0, Id: 55004141, created_at: 2015-11-09 17:42:21+00:00 </h4>Yes, JSON is actually parsed by the Psych code, which also parses YAML in Ruby. And JSON parsing was introduced in <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/json/rdoc/index.html" rel="nofollow noreferrer">Ruby v1.9.3</a>.<hr><h3>  Answer by damianmr, Id: 25850734, Score: 4, created_at: 2014-09-15 14:45:13+00:00 </h3><p>I suggest Oj as it is waaaaaay faster than the standard JSON library.</p>
 
 <p><a href="https://github.com/ohler55/oj" rel="nofollow">https://github.com/ohler55/oj</a></p>
 
 <p>(<a href="https://github.com/ohler55/oj#performance-comparisons" rel="nofollow">see performance comparisons here</a>)</p>
------------------------------------------------------------------- <br><h3> Erik Madsen, Id: 69773628, Score: 3: </h3><p>If you want to deserialise to your own class instead of OpenStruct it doesn't take a lot of work to make the following possible:</p>
+<hr><h3>  Answer by Erik Madsen, Id: 69773628, Score: 3, created_at: 2021-10-29 18:58:58+00:00 </h3><p>If you want to deserialise to your own class instead of OpenStruct it doesn't take a lot of work to make the following possible:</p>
 <pre class="lang-rb prettyprint-override"><code>require 'json'
 # result is an instance of MyClass
 result = JSON.parse(some_json_string, object_class: MyClass)

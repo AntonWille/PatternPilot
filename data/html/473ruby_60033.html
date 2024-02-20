@@ -1,13 +1,11 @@
- <h2> Title: What is the easiest way to duplicate an activerecord record? </h2> <h4> Brent , question_id: 60033 </h4>Score: 473, Tags: {ruby-on-rails,ruby,rails-activerecord} <br><p>I want to make a copy of an ActiveRecord object, changing a single field in the process (in addition to the <strong>id</strong>).  What is the simplest way to accomplish this?</p>
+ <h2> Title: What is the easiest way to duplicate an activerecord record? </h2> <h4> Brent , question_id: 60033, created_at: 2008-09-12 21:48:04+00:00 </h4>Score: 473, Tags: {ruby-on-rails,ruby,rails-activerecord} <br><p>I want to make a copy of an ActiveRecord object, changing a single field in the process (in addition to the <strong>id</strong>).  What is the simplest way to accomplish this?</p>
 <p>I realize I could create a new record, and then iterate over each of the fields copying the data field-by-field - but I figured there must be an easier way to do this.</p>
 <p>Perhaps something like this:</p>
 <pre class="lang-ruby prettyprint-override"><code> new_record = Record.copy(:id)
 </code></pre>
------------------------------------------------------------------- <br><h3> Foram, Id: 54035727, Score: 6: </h3><p>In Rails 5 you can simply create duplicate object or record like this.</p>
-
-<pre><code>new_user = old_user.dup
-</code></pre>
------------------------------------------------------------------- <br><h3> Michael Sepcot, Id: 60053, Score: 707: </h3><p>To get a copy, use the <a href="https://api.rubyonrails.org/classes/ActiveRecord/Core.html#method-i-dup" rel="noreferrer">dup</a> (or clone for &lt; rails 3.1+) method:</p>
+<hr><h3>  Answer by bradgonesurfing, Id: 6957504, Score: 33, created_at: 2011-08-05 13:59:20+00:00 </h3><p>Use <a href="http://api.rubyonrails.org/classes/ActiveRecord/Core.html#method-i-dup" rel="noreferrer">ActiveRecord::Base#dup</a> if you don't want to copy the id</p>
+<h4> Comment by Dan Weaver, Score: 1, Id: 73726869, created_at: 2017-04-10 19:23:31+00:00 </h4>@Thorin as per the accepted answer above, it looks like the correct method for Rails &lt; 3.1 is <code>.clone</code><hr><h3>  Answer by raidfive, Id: 7265525, Score: 10, created_at: 2011-09-01 02:22:49+00:00 </h3><p>If you need a deep copy with associations, I recommend the <a href="https://github.com/moiristo/deep_cloneable">deep_cloneable</a> gem.</p>
+<h4> Comment by Rob, Score: 0, Id: 14381829, created_at: 2012-06-12 21:26:31+00:00 </h4>Me too. I tried this gem and it worked first time, very easy to use.<hr><h3> ✔️ Answer by Michael Sepcot, Id: 60053, Score: 707, created_at: 2008-09-12 21:56:44+00:00 </h3><p>To get a copy, use the <a href="https://api.rubyonrails.org/classes/ActiveRecord/Core.html#method-i-dup" rel="noreferrer">dup</a> (or clone for &lt; rails 3.1+) method:</p>
 <pre><code>#rails &gt;= 3.1
 new_record = old_record.dup
 
@@ -18,7 +16,7 @@ new_record = old_record.clone
 <p><a href="http://api.rubyonrails.com/classes/ActiveRecord/Base.html#M001363" rel="noreferrer">ActiveRecord overrides the built-in Object#clone</a> to give you a new (not saved to the DB) record with an unassigned ID.<br />
 Note that it does not copy associations, so you'll have to do this manually if you need to.</p>
 <p><a href="https://gist.github.com/994614" rel="noreferrer">Rails 3.1 clone is a shallow copy, use dup instead...</a></p>
-<h4> bradgonesurfing, Comment 8295197 Score: 84: </h4>Definitely DO NOT use clone. As other posters have mentioned the clone method now delegates to using Kernel#clone which will copy the id. Use ActiveRecord::Base#dup from now on<br><h4> skattyadz, Comment 7579926 Score: 12: </h4>It looks like this functionality has been replaced with dup: <a href="https://gist.github.com/994614" rel="nofollow noreferrer">gist.github.com/994614</a><br><h4> Translunar, Comment 5493096 Score: 6: </h4>Does this still work in Rails 3.1.0.beta? When I do <code>q = p.clone</code>, and then <code>p == q</code>, I get <code>true</code> back. On the other hand, if I use <code>q = p.dup</code>, I get <code>false</code> back when comparing them.<br><h4> Matt Smith, Comment 12443556 Score: 5: </h4>I have to say, this was a real pain. A simple change like this to intended functionality could cripple some important features if you didn&#39;t have good spec coverage.<br><h4> Pablo Cantero, Comment 25250859 Score: 5: </h4>An addition for <code>dup</code> or <code>clone</code> if you want to change specific attributes is to use <code>tap</code> e.g. <code>clone = record.dup.tap { |new_clone| new_clone.name = &quot;dup_#{new_clone.name}&quot; }</code><br><h4> Fabio Ros, Comment 79902027 Score: 1: </h4>After that you should <code>new_record.save!</code> to persist the object.<br><h4> Turadg, Comment 7570370 Score: 1: </h4>The <a href="http://edgeapi.rubyonrails.org/classes/ActiveResource/Base.html#method-i-clone" rel="nofollow noreferrer">Rails 3.1 docs on clone</a> say it still works, but I&#39;m using Rails 3.1.0.rc4 and even the <code>new?</code> method isn&#39;t working.<br><h4> skattyadz, Comment 7579816 Score: 0: </h4>When I try to clone and then save in Rails 3.1 RC4, I get a <code>Mysql2::Error: Duplicate entry</code> error on the primary key.<br><h4> stringo0, Comment 9632351 Score: 0: </h4>Does dup do the same pre-rails 3.1? Or is its functionality different?<br><h4> bobbdelsol, Comment 38155106 Score: 0: </h4>My test show that myrecord.clone gives me an exact copy of the record including its id.  so myrecord.save I&#39;m back where i started from.   myrecord.dup gives me and exact copy but the ID is nil.  Now myrecord.save means I have an additional copy.  It copied all the attributes including my binary data.  So use Luis&#39;s answer<br>------------------------------------------------------------------ <br><h3> Phillip Koebbe, Id: 63032, Score: 79: </h3><p>Depending on your needs and programming style, you can also use a combination of the new method of the class and merge. For lack of a better <em>simple</em> example, suppose you have a task scheduled for a certain date and you want to duplicate it to another date. The actual attributes of the task aren't important, so:</p>
+<h4> Comment by bradgonesurfing, Score: 84, Id: 8295197, created_at: 2011-08-05 13:57:23+00:00 </h4>Definitely DO NOT use clone. As other posters have mentioned the clone method now delegates to using Kernel#clone which will copy the id. Use ActiveRecord::Base#dup from now on<h4> Comment by skattyadz, Score: 12, Id: 7579926, created_at: 2011-06-23 13:01:10+00:00 </h4>It looks like this functionality has been replaced with dup: <a href="https://gist.github.com/994614" rel="nofollow noreferrer">gist.github.com/994614</a><h4> Comment by Translunar, Score: 6, Id: 5493096, created_at: 2011-02-08 02:10:19+00:00 </h4>Does this still work in Rails 3.1.0.beta? When I do <code>q = p.clone</code>, and then <code>p == q</code>, I get <code>true</code> back. On the other hand, if I use <code>q = p.dup</code>, I get <code>false</code> back when comparing them.<h4> Comment by Matt Smith, Score: 5, Id: 12443556, created_at: 2012-03-19 19:38:26+00:00 </h4>I have to say, this was a real pain. A simple change like this to intended functionality could cripple some important features if you didn&#39;t have good spec coverage.<h4> Comment by Pablo Cantero, Score: 5, Id: 25250859, created_at: 2013-06-30 16:38:12+00:00 </h4>An addition for <code>dup</code> or <code>clone</code> if you want to change specific attributes is to use <code>tap</code> e.g. <code>clone = record.dup.tap { |new_clone| new_clone.name = &quot;dup_#{new_clone.name}&quot; }</code><h4> Comment by Fabio Ros, Score: 1, Id: 79902027, created_at: 2017-09-28 15:56:52+00:00 </h4>After that you should <code>new_record.save!</code> to persist the object.<h4> Comment by Turadg, Score: 1, Id: 7570370, created_at: 2011-06-22 22:54:23+00:00 </h4>The <a href="http://edgeapi.rubyonrails.org/classes/ActiveResource/Base.html#method-i-clone" rel="nofollow noreferrer">Rails 3.1 docs on clone</a> say it still works, but I&#39;m using Rails 3.1.0.rc4 and even the <code>new?</code> method isn&#39;t working.<h4> Comment by skattyadz, Score: 0, Id: 7579816, created_at: 2011-06-23 12:55:27+00:00 </h4>When I try to clone and then save in Rails 3.1 RC4, I get a <code>Mysql2::Error: Duplicate entry</code> error on the primary key.<h4> Comment by stringo0, Score: 0, Id: 9632351, created_at: 2011-10-25 15:27:49+00:00 </h4>Does dup do the same pre-rails 3.1? Or is its functionality different?<h4> Comment by bobbdelsol, Score: 0, Id: 38155106, created_at: 2014-07-07 22:13:41+00:00 </h4>My test show that myrecord.clone gives me an exact copy of the record including its id.  so myrecord.save I&#39;m back where i started from.   myrecord.dup gives me and exact copy but the ID is nil.  Now myrecord.save means I have an additional copy.  It copied all the attributes including my binary data.  So use Luis&#39;s answer<hr><h3>  Answer by Phillip Koebbe, Id: 63032, Score: 79, created_at: 2008-09-15 13:48:34+00:00 </h3><p>Depending on your needs and programming style, you can also use a combination of the new method of the class and merge. For lack of a better <em>simple</em> example, suppose you have a task scheduled for a certain date and you want to duplicate it to another date. The actual attributes of the task aren't important, so:</p>
 
 <pre>
 old_task = Task.find(task_id)
@@ -28,7 +26,7 @@ new_task = Task.new(old_task.attributes.merge({:scheduled_on => some_new_date}))
 <p>will create a new task with <code>:id => nil</code>, <code>:scheduled_on => some_new_date</code>, and all other attributes the same as the original task. Using Task.new, you will have to explicitly call save, so if you want it saved automatically, change Task.new to Task.create.</p>
 
 <p>Peace. </p>
-<h4> bcackerman, Comment 18078269 Score: 5: </h4>Not quite sure how good of idea this is b/c you get <code>WARNING: Can&#39;t mass-assign protected attributes: id, due_date, created_at, updated_at</code> returned<br><h4> Ninigi, Comment 44840465 Score: 3: </h4>@RubenMartineJr. I know this is an old post, but yeah you can get around this by using &#39;.except&#39; on the attributes hash: new_task = Task.new(old_task.attributes.except(:attribute_you_dont_want&zwnj;&#8203;, :another_aydw).merge({:scheduled_on =&gt; some_new_date}))<br><h4> BenKoshy, Comment 60911772 Score: 2: </h4>old_task.attribtes assigns the ID field as well unfortunately. It&#39;s not working for me<br><h4> BenKoshy, Comment 60911500 Score: 0: </h4>@PhillipKoebbe thank you - but what if I want the id to not be null? I want rails to automatically assign a new id when i create the duplicate - is this possible?<br><h4> Ruben Martinez Jr., Comment 38095379 Score: 0: </h4>When I do this, I get an unknown attribute error with one column because of a column that is there due to a has_many relationship. Is there any way around this?<br>------------------------------------------------------------------ <br><h3> Vaughn Draughon, Id: 9485535, Score: 35: </h3><p>You may also like the <a href="https://rubygems.org/gems/amoeba" rel="noreferrer">Amoeba gem</a> for ActiveRecord 3.2.</p>
+<h4> Comment by bcackerman, Score: 5, Id: 18078269, created_at: 2012-11-07 06:39:25+00:00 </h4>Not quite sure how good of idea this is b/c you get <code>WARNING: Can&#39;t mass-assign protected attributes: id, due_date, created_at, updated_at</code> returned<h4> Comment by Ninigi, Score: 3, Id: 44840465, created_at: 2015-01-30 15:58:44+00:00 </h4>@RubenMartineJr. I know this is an old post, but yeah you can get around this by using &#39;.except&#39; on the attributes hash: new_task = Task.new(old_task.attributes.except(:attribute_you_dont_want&zwnj;&#8203;, :another_aydw).merge({:scheduled_on =&gt; some_new_date}))<h4> Comment by BenKoshy, Score: 2, Id: 60911772, created_at: 2016-04-16 02:33:12+00:00 </h4>old_task.attribtes assigns the ID field as well unfortunately. It&#39;s not working for me<h4> Comment by BenKoshy, Score: 0, Id: 60911500, created_at: 2016-04-16 02:04:53+00:00 </h4>@PhillipKoebbe thank you - but what if I want the id to not be null? I want rails to automatically assign a new id when i create the duplicate - is this possible?<h4> Comment by Ruben Martinez Jr., Score: 0, Id: 38095379, created_at: 2014-07-05 19:57:29+00:00 </h4>When I do this, I get an unknown attribute error with one column because of a column that is there due to a has_many relationship. Is there any way around this?<hr><h3>  Answer by Vaughn Draughon, Id: 9485535, Score: 35, created_at: 2012-02-28 16:12:44+00:00 </h3><p>You may also like the <a href="https://rubygems.org/gems/amoeba" rel="noreferrer">Amoeba gem</a> for ActiveRecord 3.2.</p>
 
 <p>In your case, you probably want to make use of the <code>nullify</code>, <code>regex</code> or <code>prefix</code> options available in the configuration DSL.</p>
 
@@ -130,13 +128,34 @@ end
 <p>The configuration DSL has yet more options, so be sure to check out the documentation.</p>
 
 <p>Enjoy! :)</p>
-<h4> Victor Cordeiro Costa, Comment 90613931 Score: 2: </h4>Just a fix here. The correct method is <code>.amoeba_dup</code>, not just <code>.dup</code>. I was trying to execute this code, but it was not working on here.<br><h4> Mohd Anas, Comment 28478585 Score: 0: </h4>Thanks it works!! But i have one question how do i add new entries with the cloning before saving the cloned object?<br>------------------------------------------------------------------ <br><h3> bradgonesurfing, Id: 6957504, Score: 33: </h3><p>Use <a href="http://api.rubyonrails.org/classes/ActiveRecord/Core.html#method-i-dup" rel="noreferrer">ActiveRecord::Base#dup</a> if you don't want to copy the id</p>
-<h4> Dan Weaver, Comment 73726869 Score: 1: </h4>@Thorin as per the accepted answer above, it looks like the correct method for Rails &lt; 3.1 is <code>.clone</code><br>------------------------------------------------------------------ <br><h3> Fran&#231;ois Beausoleil, Id: 62925, Score: 27: </h3><p>I usually just copy the attributes, changing whatever I need changing:</p>
+<h4> Comment by Victor Cordeiro Costa, Score: 2, Id: 90613931, created_at: 2018-08-13 20:05:21+00:00 </h4>Just a fix here. The correct method is <code>.amoeba_dup</code>, not just <code>.dup</code>. I was trying to execute this code, but it was not working on here.<h4> Comment by Mohd Anas, Score: 0, Id: 28478585, created_at: 2013-10-08 05:44:16+00:00 </h4>Thanks it works!! But i have one question how do i add new entries with the cloning before saving the cloned object?<hr><h3>  Answer by Fran&#231;ois Beausoleil, Id: 62925, Score: 27, created_at: 2008-09-15 13:36:15+00:00 </h3><p>I usually just copy the attributes, changing whatever I need changing:</p>
 
 <pre><code>new_user = User.new(old_user.attributes.merge(:login =&gt; "newlogin"))
 </code></pre>
-<h4> RajeshM, Comment 46368989 Score: 5: </h4>To create a new record with with Rails 4, do <code>User.create(old_user.attributes.merge({ login: &quot;newlogin&quot;, id: nil }))</code>. This will save a new user with the correct unique id.<br><h4> kucaahbe, Comment 88721673 Score: 0: </h4>Rails has <a href="http://api.rubyonrails.org/classes/Hash.html#method-i-except" rel="nofollow noreferrer">Hash#except</a> and <a href="http://api.rubyonrails.org/classes/Hash.html#method-i-slice" rel="nofollow noreferrer">Hash#slice</a>, potentially making suggested method most powerful and less error-prone. No need to add additional libs, easy to extend.<br><h4> Ruben Martinez Jr., Comment 38095340 Score: 0: </h4>When I do this, I get an <code>unknown attribute</code> error with one column because of a column that is there due to a has_many relationship. Is there any way around this?<br><h4> Ben, Comment 46337458 Score: 0: </h4>with rails4, it does not create a unique id for the record<br>------------------------------------------------------------------ <br><h3> raidfive, Id: 7265525, Score: 10: </h3><p>If you need a deep copy with associations, I recommend the <a href="https://github.com/moiristo/deep_cloneable">deep_cloneable</a> gem.</p>
-<h4> Rob, Comment 14381829 Score: 0: </h4>Me too. I tried this gem and it worked first time, very easy to use.<br>------------------------------------------------------------------ <br><h3> ThienSuBS, Id: 40329894, Score: 2: </h3><p>The easily way is:</p>
+<h4> Comment by RajeshM, Score: 5, Id: 46368989, created_at: 2015-03-15 22:03:39+00:00 </h4>To create a new record with with Rails 4, do <code>User.create(old_user.attributes.merge({ login: &quot;newlogin&quot;, id: nil }))</code>. This will save a new user with the correct unique id.<h4> Comment by kucaahbe, Score: 0, Id: 88721673, created_at: 2018-06-14 14:11:38+00:00 </h4>Rails has <a href="http://api.rubyonrails.org/classes/Hash.html#method-i-except" rel="nofollow noreferrer">Hash#except</a> and <a href="http://api.rubyonrails.org/classes/Hash.html#method-i-slice" rel="nofollow noreferrer">Hash#slice</a>, potentially making suggested method most powerful and less error-prone. No need to add additional libs, easy to extend.<h4> Comment by Ruben Martinez Jr., Score: 0, Id: 38095340, created_at: 2014-07-05 19:55:54+00:00 </h4>When I do this, I get an <code>unknown attribute</code> error with one column because of a column that is there due to a has_many relationship. Is there any way around this?<h4> Comment by Ben, Score: 0, Id: 46337458, created_at: 2015-03-14 13:48:58+00:00 </h4>with rails4, it does not create a unique id for the record<hr><h3>  Answer by Foram, Id: 54035727, Score: 6, created_at: 2019-01-04 08:56:28+00:00 </h3><p>In Rails 5 you can simply create duplicate object or record like this.</p>
+
+<pre><code>new_user = old_user.dup
+</code></pre>
+<hr><h3>  Answer by Zoran Majstorovic, Id: 51925581, Score: 3, created_at: 2018-08-20 07:04:13+00:00 </h3><p>Here is a sample of overriding ActiveRecord <code>#dup</code> method to customize instance duplication and include relation duplication as well:</p>
+
+<pre><code>class Offer &lt; ApplicationRecord
+  has_many :offer_items
+
+  def dup
+    super.tap do |new_offer|
+
+      # change title of the new instance
+      new_offer.title = "Copy of #{@offer.title}"
+
+      # duplicate offer_items as well
+      self.offer_items.each { |offer_item| new_offer.offer_items &lt;&lt; offer_item.dup }
+    end
+  end
+end
+</code></pre>
+
+<p>Note: this method doesn't require any external gem but it requires newer ActiveRecord version with <code>#dup</code> method implemented</p>
+<hr><h3>  Answer by ThienSuBS, Id: 40329894, Score: 2, created_at: 2016-10-30 13:58:00+00:00 </h3><p>The easily way is:</p>
 
 <pre><code>#your rails &gt;= 3.1 (i was done it with Rails 5.0.0.1)
   o = Model.find(id)
@@ -156,26 +175,7 @@ end
    new_record.save
  end     
 </code></pre>
------------------------------------------------------------------- <br><h3> Zoran Majstorovic, Id: 51925581, Score: 3: </h3><p>Here is a sample of overriding ActiveRecord <code>#dup</code> method to customize instance duplication and include relation duplication as well:</p>
-
-<pre><code>class Offer &lt; ApplicationRecord
-  has_many :offer_items
-
-  def dup
-    super.tap do |new_offer|
-
-      # change title of the new instance
-      new_offer.title = "Copy of #{@offer.title}"
-
-      # duplicate offer_items as well
-      self.offer_items.each { |offer_item| new_offer.offer_items &lt;&lt; offer_item.dup }
-    end
-  end
-end
-</code></pre>
-
-<p>Note: this method doesn't require any external gem but it requires newer ActiveRecord version with <code>#dup</code> method implemented</p>
------------------------------------------------------------------- <br><h3> esbanarango, Id: 33379580, Score: 0: </h3><p>You can also check the <a href="https://github.com/esbanarango/acts_as_inheritable" rel="nofollow">acts_as_inheritable</a> gem.</p>
+<hr><h3>  Answer by esbanarango, Id: 33379580, Score: 0, created_at: 2015-10-27 22:27:24+00:00 </h3><p>You can also check the <a href="https://github.com/esbanarango/acts_as_inheritable" rel="nofollow">acts_as_inheritable</a> gem.</p>
 
 <p>"Acts As Inheritable is a Ruby Gem specifically written for Rails/ActiveRecord models. It is meant to be used with the <a href="https://github.com/esbanarango/acts_as_inheritable#self-referential-association" rel="nofollow">Self-Referential Association</a>, or with a model having a parent that share the inheritable attributes. This will let you inherit any attribute or relation from the parent model."</p>
 
@@ -221,7 +221,7 @@ son.pet.inspect # =&gt; #&lt;Pet id: 2, person_id: 2, name: "Mango", breed: "Gol
 </code></pre>
 
 <p>Hope this can help you.</p>
------------------------------------------------------------------- <br><h3> Paulo Fidalgo, Id: 49322942, Score: 0: </h3><p>Since there could be more logic, when duplicating a model, I would suggest to create a new class, where you handle all the needed logic.
+<hr><h3>  Answer by Paulo Fidalgo, Id: 49322942, Score: 0, created_at: 2018-03-16 14:19:17+00:00 </h3><p>Since there could be more logic, when duplicating a model, I would suggest to create a new class, where you handle all the needed logic.
 To ease that, there's a gem that can help: <a href="https://github.com/palkan/clowne" rel="nofollow noreferrer">clowne</a></p>
 
 <p>As per their documentation examples, for a User model:</p>
@@ -288,6 +288,6 @@ cloned.profile.name
 <p><strong>For a quick and simple record I would go with:</strong></p>
 
 <p><code>Model.new(Model.last.attributes.reject {|k,_v| k.to_s == 'id'}</code></p>
------------------------------------------------------------------- <br><h3> Sachin Singh, Id: 66943947, Score: 0: </h3><p>Try rails's <code>dup</code> method:</p>
+<hr><h3>  Answer by Sachin Singh, Id: 66943947, Score: 0, created_at: 2021-04-04 17:21:36+00:00 </h3><p>Try rails's <code>dup</code> method:</p>
 <pre><code>new_record = old_record.dup.save
 </code></pre>

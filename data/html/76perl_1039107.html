@@ -1,4 +1,4 @@
- <h2> Title: How can I check if a Perl module is installed on my system from the command line? </h2> <h4> joe, question_id: 1039107 </h4>Score: 76, Tags: {perl,command-line,perl-module} <br><p>I tried to check if XML::Simple is installed in my system or not.</p>
+ <h2> Title: How can I check if a Perl module is installed on my system from the command line? </h2> <h4> joe, question_id: 1039107, created_at: 2009-06-24 15:29:35+00:00 </h4>Score: 76, Tags: {perl,command-line,perl-module} <br><p>I tried to check if XML::Simple is installed in my system or not.</p>
 
 <pre><code>perl -e 'while (&lt;@INC&gt;) { while (&lt;$_/*.pm&gt;) { print "$_\n"; } }'
 </code></pre>
@@ -11,17 +11,17 @@
 </code></pre>
 
 <p>What might be the issue?</p>
-<h4> Greg Bacon, Id: 850436 Score: 1: </h4>@Sinan: why&#39;d you retag from perl-module to perl-modules when the latter is barely used?<br><h4> Vijay, Id: 35384049 Score: 0: </h4><a href="http://theunixshell.blogspot.in/2012/12/check-for-installed-modules-in-perl.html" rel="nofollow noreferrer">theunixshell.blogspot.in/2012/12/&hellip;</a><br><h4> innaM, Id: 850135 Score: 0: </h4>@Sinan: you changed the question a bit too much. I think the original question was how to find out where a module is installed. Now it&#39;s whether a module is installed.<br><h4> innaM, Id: 850182 Score: 0: </h4>I really have no idea. But considering the current question, your answer is pretty much the best so far.  Maybe Chells can enlighten us.<br>------------------------------------------------------------------ <br><h3> Alan Haggai Alavi, Id: 1039122, Score: 112: </h3><p>You can check for a module's installation path by:</p>
+<h4> Comment by Vijay, Score: 0, Id: 35384049, created_at: 2014-04-17 19:18:21+00:00 </h4><a href="http://theunixshell.blogspot.in/2012/12/check-for-installed-modules-in-perl.html" rel="nofollow noreferrer">theunixshell.blogspot.in/2012/12/&hellip;</a><h4> Comment by Greg Bacon, Score: 1, Id: 850436, created_at: 2009-06-24 17:26:45+00:00 </h4>@Sinan: why&#39;d you retag from perl-module to perl-modules when the latter is barely used?<h4> Comment by innaM, Score: 0, Id: 850135, created_at: 2009-06-24 16:36:09+00:00 </h4>@Sinan: you changed the question a bit too much. I think the original question was how to find out where a module is installed. Now it&#39;s whether a module is installed.<h4> Comment by innaM, Score: 0, Id: 850182, created_at: 2009-06-24 16:43:50+00:00 </h4>I really have no idea. But considering the current question, your answer is pretty much the best so far.  Maybe Chells can enlighten us.<hr><h3> ✔️ Answer by Alan Haggai Alavi, Id: 1039122, Score: 112, created_at: 2009-06-24 15:32:26+00:00 </h3><p>You can check for a module's installation path by:</p>
 
 <pre><code>perldoc -l XML::Simple
 </code></pre>
 
 <p>The problem with your one-liner is that, it is not recursively traversing directories/sub-directories. Hence, you get only pragmatic module names as output.</p>
-<h4> ikegami, Comment 77988126 Score: 2: </h4>You should use <code>-lm</code> instead of <code>-l</code>. It the&#39;s same, except that it also works if the module has no POD.<br><h4> brian d foy, Comment 850763 Score: 3: </h4>This only works if the module contains Pod. Strange but true.<br><h4> user4035, Comment 112451091 Score: 2: </h4>Unfortunately, on my server perldoc is not installed: &quot;You need to install the perl-doc package to use this program.&quot;<br><h4> innaM, Comment 849848 Score: 1: </h4>Of course, this will only work if the module you are looking for contains POD.<br><h4> Alan Haggai Alavi, Comment 849977 Score: 1: </h4>@Manni: Should work with most modules (from CPAN) as all of them are documented.<br><h4> innaM, Comment 849997 Score: 1: </h4>Some of them are so well documented that they have their docs in their own .pod files. It&#39;s a nice trick that works most of the time with that one little gotcha.<br><h4> ysth, Comment 77992236 Score: 0: </h4>@briandfoy I think -l -m makes that work (and also gives the module path if they have a separate .pod file)<br>------------------------------------------------------------------ <br><h3> Sinan &#220;n&#252;r, Id: 1039262, Score: 54: </h3><p>Quick and dirty:</p>
+<h4> Comment by brian d foy, Score: 3, Id: 850763, created_at: 2009-06-24 18:22:11+00:00 </h4>This only works if the module contains Pod. Strange but true.<h4> Comment by user4035, Score: 2, Id: 112451091, created_at: 2020-08-26 07:06:54+00:00 </h4>Unfortunately, on my server perldoc is not installed: &quot;You need to install the perl-doc package to use this program.&quot;<h4> Comment by ikegami, Score: 2, Id: 77988126, created_at: 2017-08-04 18:39:38+00:00 </h4>You should use <code>-lm</code> instead of <code>-l</code>. It the&#39;s same, except that it also works if the module has no POD.<h4> Comment by innaM, Score: 1, Id: 849848, created_at: 2009-06-24 15:51:31+00:00 </h4>Of course, this will only work if the module you are looking for contains POD.<h4> Comment by Alan Haggai Alavi, Score: 1, Id: 849977, created_at: 2009-06-24 16:09:04+00:00 </h4>@Manni: Should work with most modules (from CPAN) as all of them are documented.<h4> Comment by innaM, Score: 1, Id: 849997, created_at: 2009-06-24 16:13:13+00:00 </h4>Some of them are so well documented that they have their docs in their own .pod files. It&#39;s a nice trick that works most of the time with that one little gotcha.<h4> Comment by ysth, Score: 0, Id: 77992236, created_at: 2017-08-04 21:01:09+00:00 </h4>@briandfoy I think -l -m makes that work (and also gives the module path if they have a separate .pod file)<hr><h3>  Answer by Sinan &#220;n&#252;r, Id: 1039262, Score: 54, created_at: 2009-06-24 15:55:55+00:00 </h3><p>Quick and dirty:</p>
 
 <pre><code>$ perl -MXML::Simple -e 1
 </code></pre>
-<h4> jrockway, Comment 967978 Score: 3: </h4>Although, if you want the version, most people say &quot;perl -MModule\ 999&quot;.<br><h4> Stuart Cardall, Comment 73555342 Score: 2: </h4>this answer is better suited for use in a <code>shell</code> function: <code>if ! perl -M$module -e 1 2&gt;&#47;dev&#47;null; then</code><br><h4> Lucas, Comment 15122879 Score: 2: </h4>I use this one all the time, though i usually do a <code>-e &quot;print( \&quot;got it\n\&quot; )&quot;</code><br><h4> Prashanth, Comment 119498026 Score: 0: </h4>This really helps in discarding any subsequent warnings/errors thrown if we were to use <code>cpan -l</code> to verify modules<br><h4> Sinan &#220;n&#252;r, Comment 14461580 Score: 0: </h4>To the anonymous editor: The correct way would be <code>perl -MDigest::SHA -e 1</code> rather than <code>perl -Digest::SHA -e 1</code>.<br><h4> squiguy, Comment 21352144 Score: 0: </h4>This is the one I like :).<br>------------------------------------------------------------------ <br><h3> Greg Bacon, Id: 1039193, Score: 22: </h3><pre>$ perl -MXML::Simple -le 'print $INC{"XML/Simple.pm"}'</pre>
+<h4> Comment by jrockway, Score: 3, Id: 967978, created_at: 2009-07-19 09:48:36+00:00 </h4>Although, if you want the version, most people say &quot;perl -MModule\ 999&quot;.<h4> Comment by Lucas, Score: 2, Id: 15122879, created_at: 2012-07-12 17:40:51+00:00 </h4>I use this one all the time, though i usually do a <code>-e &quot;print( \&quot;got it\n\&quot; )&quot;</code><h4> Comment by Stuart Cardall, Score: 2, Id: 73555342, created_at: 2017-04-05 22:21:42+00:00 </h4>this answer is better suited for use in a <code>shell</code> function: <code>if ! perl -M$module -e 1 2&gt;&#47;dev&#47;null; then</code><h4> Comment by Prashanth, Score: 0, Id: 119498026, created_at: 2021-05-19 16:01:51+00:00 </h4>This really helps in discarding any subsequent warnings/errors thrown if we were to use <code>cpan -l</code> to verify modules<h4> Comment by Sinan &#220;n&#252;r, Score: 0, Id: 14461580, created_at: 2012-06-15 15:48:20+00:00 </h4>To the anonymous editor: The correct way would be <code>perl -MDigest::SHA -e 1</code> rather than <code>perl -Digest::SHA -e 1</code>.<h4> Comment by squiguy, Score: 0, Id: 21352144, created_at: 2013-03-01 16:43:05+00:00 </h4>This is the one I like :).<hr><h3>  Answer by Greg Bacon, Id: 1039193, Score: 22, created_at: 2009-06-24 15:43:22+00:00 </h3><pre>$ perl -MXML::Simple -le 'print $INC{"XML/Simple.pm"}'</pre>
 
 <p>From the <a href="http://perldoc.perl.org/perlvar.html" rel="noreferrer">perlvar</a> entry on <a href="http://perldoc.perl.org/perlvar.html#%INC" rel="noreferrer"><code>%INC</code></a>:</p>
 
@@ -34,14 +34,14 @@
   
   <p>If the file was loaded via a hook (e.g. a subroutine reference, see <a href="http://perldoc.perl.org/functions/require.html" rel="noreferrer">require</a> for a description of these hooks), this hook is by default inserted into <code>%INC</code> in place of a filename. Note, however, that the hook may have set the %INC entry by itself to provide some more specific info.</p>
 </blockquote>
------------------------------------------------------------------- <br><h3> Hamidjon, Id: 15162063, Score: 19: </h3><p>For example, to check if the DBI module is installed or not, use</p>
+<hr><h3>  Answer by Hamidjon, Id: 15162063, Score: 19, created_at: 2013-03-01 16:15:10+00:00 </h3><p>For example, to check if the DBI module is installed or not, use</p>
 
 <pre><code>perl -e 'use DBI;'
 </code></pre>
 
 <p>You will see error if not installed.
 (from <a href="http://www.linuxask.com" rel="noreferrer">http://www.linuxask.com</a>)</p>
------------------------------------------------------------------- <br><h3> user80168, Id: 1039261, Score: 12: </h3><p>If you want to quickly check if a module is installed (at least on Unix systems, with <a href="http://en.wikipedia.org/wiki/Bash_%28Unix_shell%29" rel="noreferrer">Bash</a> as shell), add this to your .bashrc file:</p>
+<hr><h3>  Answer by user80168, Id: 1039261, Score: 12, created_at: 2009-06-24 15:55:39+00:00 </h3><p>If you want to quickly check if a module is installed (at least on Unix systems, with <a href="http://en.wikipedia.org/wiki/Bash_%28Unix_shell%29" rel="noreferrer">Bash</a> as shell), add this to your .bashrc file:</p>
 
 <pre><code>alias modver="perl -e\"eval qq{use \\\$ARGV[0];\\\\\\\$v=\\\\\\\$\\\${ARGV[0]}::VERSION;};\ print\\\$@?qq{No module found\\n}:\\\$v?qq{Version \\\$v\\n}:qq{Found.\\n};\"\$1"
 </code></pre>
@@ -54,14 +54,14 @@ No module found
 =&gt; modver DBI
 Version 1.607
 </code></pre>
-<h4> DS., Comment 91099650 Score: 3: </h4>This also works on Korn. But seriously, you need a hobby.<br><h4> Anthony, Comment 81177497 Score: 0: </h4>I love this. Thank you.<br>------------------------------------------------------------------ <br><h3> Salgar, Id: 1039144, Score: 9: </h3><p>What you're doing there is not recursing into directories. It is only listing the modules in the root directory of the <code>@INC</code> directory.</p>
+<h4> Comment by DS., Score: 3, Id: 91099650, created_at: 2018-08-29 10:19:28+00:00 </h4>This also works on Korn. But seriously, you need a hobby.<h4> Comment by Anthony, Score: 0, Id: 81177497, created_at: 2017-11-04 18:02:20+00:00 </h4>I love this. Thank you.<hr><h3>  Answer by Salgar, Id: 1039144, Score: 9, created_at: 2009-06-24 15:36:24+00:00 </h3><p>What you're doing there is not recursing into directories. It is only listing the modules in the root directory of the <code>@INC</code> directory.</p>
 
 <p>The module <code>XML::Simple</code> will live in one of the <code>@INC</code> paths under <code>XML/Simple.pm</code>.</p>
 
 <p>What he said above to find specific modules.</p>
 
 <p><code>CPAN</code> explains how to find all modules here, see <a href="http://www.cpan.org/misc/cpan-faq.html#How_installed_modules" rel="nofollow noreferrer">How to find installed modules</a>.</p>
------------------------------------------------------------------- <br><h3> ysth, Id: 1039248, Score: 3: </h3><blockquote>
+<hr><h3>  Answer by ysth, Id: 1039248, Score: 3, created_at: 2009-06-24 15:54:20+00:00 </h3><blockquote>
   <p>while (&lt;@INC>)</p>
 </blockquote>
 
@@ -72,19 +72,19 @@ and there seems to be no reason to avoid the safe alternative:</p>
 
 <pre><code>for (@INC)
 </code></pre>
------------------------------------------------------------------- <br><h3> Zaid, Id: 2424335, Score: 3: </h3><p>If you're running <a href="http://www.activestate.com/activeperl/" rel="nofollow noreferrer">ActivePerl</a> under Windows:</p>
+<hr><h3>  Answer by Zaid, Id: 2424335, Score: 3, created_at: 2010-03-11 11:00:27+00:00 </h3><p>If you're running <a href="http://www.activestate.com/activeperl/" rel="nofollow noreferrer">ActivePerl</a> under Windows:</p>
 
 <ul>
 <li><p><code>C:\&gt;ppm query *</code> to get a list of all installed modules</p></li>
 <li><p><code>C:\&gt;ppm query XML-Simple</code> to check if <code>XML::Simple</code> is installed</p></li>
 </ul>
------------------------------------------------------------------- <br><h3> GL2014, Id: 25336549, Score: 0: </h3><p>I believe your solution will only look in the root of each directory path contained in the @INC array.  You need something recursive, like:   </p>
+<hr><h3>  Answer by GL2014, Id: 25336549, Score: 0, created_at: 2014-08-16 03:02:37+00:00 </h3><p>I believe your solution will only look in the root of each directory path contained in the @INC array.  You need something recursive, like:   </p>
 
 <pre><code> perl -e 'foreach (@INC) {
     print `find $_ -type f -name "*.pm"`;
  }'
 </code></pre>
-<h4> amphetamachine, Comment 134007667 Score: 0: </h4>This doesn&#39;t properly quote <code>$_</code>; if it contains spaces, it&#39;ll break at the words; if it contains <code>;</code> it&#39;ll break the command (<a href="https://en.wikipedia.org/wiki/Code_injection#Shell_injection" rel="nofollow noreferrer">shell injection</a>) - quote using either <code>String::ShellQuote</code> or the not-quite optimal solution of using the <code>quotemeta</code> built-in.<br>------------------------------------------------------------------ <br><h3> G. Cito, Id: 28651174, Score: 0: </h3><p>Bravo for @user80168's solution (I'm still counting <code>\</code>'s !) but to avoid all the escaping involved with aliases and shells:</p>
+<h4> Comment by amphetamachine, Score: 0, Id: 134007667, created_at: 2023-04-10 19:09:19+00:00 </h4>This doesn&#39;t properly quote <code>$_</code>; if it contains spaces, it&#39;ll break at the words; if it contains <code>;</code> it&#39;ll break the command (<a href="https://en.wikipedia.org/wiki/Code_injection#Shell_injection" rel="nofollow noreferrer">shell injection</a>) - quote using either <code>String::ShellQuote</code> or the not-quite optimal solution of using the <code>quotemeta</code> built-in.<hr><h3>  Answer by G. Cito, Id: 28651174, Score: 0, created_at: 2015-02-21 20:49:21+00:00 </h3><p>Bravo for @user80168's solution (I'm still counting <code>\</code>'s !) but to avoid all the escaping involved with aliases and shells:</p>
 
 <pre><code>%~/ cat ~/bin/perlmod
 perl -le'eval qq{require $ARGV[0]; } 
@@ -103,6 +103,6 @@ perl -le'eval qq{require $ARGV[0]; }
 <p>This will give a useful error if the module is not installed.</p>
 
 <p>Using <code>-MModule::Runtime</code> requires it to be installed (it is not a core module).</p>
------------------------------------------------------------------- <br><h3> AJ Dhaliwal, Id: 76913015, Score: 0: </h3><p>You can use <code>cpan -D module</code>. See <a href="https://perldoc.perl.org/cpan#-D-module-%5B-module-...-%5D" rel="nofollow noreferrer">here</a></p>
+<hr><h3>  Answer by AJ Dhaliwal, Id: 76913015, Score: 0, created_at: 2023-08-16 11:12:51+00:00 </h3><p>You can use <code>cpan -D module</code>. See <a href="https://perldoc.perl.org/cpan#-D-module-%5B-module-...-%5D" rel="nofollow noreferrer">here</a></p>
 <p>In your case <code>cpan -D XML::Simple</code>.</p>
 <p>It will tell you where the module is installed as well as if it is up-to-date.</p>

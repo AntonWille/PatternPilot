@@ -1,23 +1,12 @@
- <h2> Title: Easy way to print Perl array? (with a little formatting) </h2> <h4> funk-shun, question_id: 5741101 </h4>Score: 108, Tags: {perl} <br><p>Is there an <strong>easy</strong> way to print out a Perl array with commas in between each element?</p>
+ <h2> Title: Easy way to print Perl array? (with a little formatting) </h2> <h4> funk-shun, question_id: 5741101, created_at: 2011-04-21 07:48:32+00:00 </h4>Score: 108, Tags: {perl} <br><p>Is there an <strong>easy</strong> way to print out a Perl array with commas in between each element?</p>
 
 <p>Writing a for loop to do it is pretty easy but not quite elegant....if that makes sense.</p>
------------------------------------------------------------------- <br><h3> Alex, Id: 5741144, Score: 161: </h3><p>Just use <a href="http://perldoc.perl.org/functions/join.html" rel="noreferrer"><code>join()</code></a>:</p>
+<hr><h3> ✔️ Answer by Alex, Id: 5741144, Score: 161, created_at: 2011-04-21 07:52:28+00:00 </h3><p>Just use <a href="http://perldoc.perl.org/functions/join.html" rel="noreferrer"><code>join()</code></a>:</p>
 
 <pre><code># assuming @array is your array:
 print join(", ", @array);
 </code></pre>
-<h4> Oesor, Comment 6574581 Score: 10: </h4>There&#39;s more than one way to do it.. but this is the way that doesn&#39;t make the person maintaining the code after you hate you. Yes, perldoc perlvar exists, but I&#39;d rather glance over &quot;join &#39;, &#39; @array&quot; than hit up perlvar every other line to figure out what all the esoteric variables are doing.<br><h4> musiKk, Comment 6568924 Score: 9: </h4>Or, if you want to be really dirty: <code>{local $,=&#39;, &#39;;print @array}</code>.<br><h4> Randall, Comment 22502002 Score: 4: </h4>This worked really nicely for printing the directory contents.    <code>print &quot;current directory contains &quot; . join(&#39;, &#39;, &lt;*&gt;) . &quot;\n&quot;;</code><br><h4> musiKk, Comment 6580379 Score: 0: </h4>@Oesor: That&#39;s why I called it dirty. But well, looking at the other answers, I&#39;m not really the worst offender. :)<br><h4> Alex, Comment 6580421 Score: 0: </h4>@musiKK I like it! It&#39;s something I&#39;d use if I wanted to puzzle my fellow co workers. :)<br>------------------------------------------------------------------ <br><h3> Eugene Yarmash, Id: 5741454, Score: 37: </h3><p>You can use <a href="http://search.cpan.org/perldoc?Data::Dump" rel="noreferrer"><code>Data::Dump</code></a>:</p>
-
-<pre><code>use Data::Dump qw(dump);
-my @a = (1, [2, 3], {4 =&gt; 5});
-dump(@a);
-</code></pre>
-
-<p>Produces:</p>
-
-<pre><code>"(1, [2, 3], { 4 =&gt; 5 })"
-</code></pre>
-<h4> MUY Belgium, Comment 23165589 Score: 2: </h4>On Ubuntu/Mint, install the libdata-dump-perl package.<br><h4> L&#233;o L&#233;opold Hertz 준영, Comment 48597727 Score: 2: </h4>Best answer here! Works with multidimensional arrays too. Most flexible.<br>------------------------------------------------------------------ <br><h3> DavidO, Id: 5741683, Score: 20: </h3><p>If you're coding for the kind of clarity that would be understood by someone who is just starting out with Perl, the traditional this construct says what it means, with a high degree of clarity and legibility:</p>
+<h4> Comment by Oesor, Score: 10, Id: 6574581, created_at: 2011-04-21 14:17:50+00:00 </h4>There&#39;s more than one way to do it.. but this is the way that doesn&#39;t make the person maintaining the code after you hate you. Yes, perldoc perlvar exists, but I&#39;d rather glance over &quot;join &#39;, &#39; @array&quot; than hit up perlvar every other line to figure out what all the esoteric variables are doing.<h4> Comment by musiKk, Score: 9, Id: 6568924, created_at: 2011-04-21 07:57:25+00:00 </h4>Or, if you want to be really dirty: <code>{local $,=&#39;, &#39;;print @array}</code>.<h4> Comment by Randall, Score: 4, Id: 22502002, created_at: 2013-04-04 19:03:26+00:00 </h4>This worked really nicely for printing the directory contents.    <code>print &quot;current directory contains &quot; . join(&#39;, &#39;, &lt;*&gt;) . &quot;\n&quot;;</code><h4> Comment by musiKk, Score: 0, Id: 6580379, created_at: 2011-04-21 20:03:12+00:00 </h4>@Oesor: That&#39;s why I called it dirty. But well, looking at the other answers, I&#39;m not really the worst offender. :)<h4> Comment by Alex, Score: 0, Id: 6580421, created_at: 2011-04-21 20:06:33+00:00 </h4>@musiKK I like it! It&#39;s something I&#39;d use if I wanted to puzzle my fellow co workers. :)<hr><h3>  Answer by DavidO, Id: 5741683, Score: 20, created_at: 2011-04-21 08:45:58+00:00 </h3><p>If you're coding for the kind of clarity that would be understood by someone who is just starting out with Perl, the traditional this construct says what it means, with a high degree of clarity and legibility:</p>
 
 <pre><code>$string = join ', ', @array;
 print "$string\n";
@@ -55,14 +44,25 @@ my @array = qw/ 1 2 3 4 5 /;
 <p>The special variables <code>$,</code> and <code>$"</code> are documented in <a href="http://perldoc.perl.org/perlvar.html" rel="nofollow noreferrer">perlvar</a>. The <code>local</code> keyword, and how it can be used to constrain the effects of altering a global punctuation variable's value is probably best described in <a href="http://perldoc.perl.org/perlsub.html#Temporary-Values-via-local()" rel="nofollow noreferrer">perlsub</a>.</p>
 
 <p>Enjoy!</p>
------------------------------------------------------------------- <br><h3> Andreas, Id: 5741208, Score: 10: </h3><p>Also, you may want to try <a href="http://perldoc.perl.org/Data/Dumper.html" rel="nofollow noreferrer">Data::Dumper</a>. Example:</p>
+<hr><h3>  Answer by Eugene Yarmash, Id: 5741454, Score: 37, created_at: 2011-04-21 08:24:55+00:00 </h3><p>You can use <a href="http://search.cpan.org/perldoc?Data::Dump" rel="noreferrer"><code>Data::Dump</code></a>:</p>
+
+<pre><code>use Data::Dump qw(dump);
+my @a = (1, [2, 3], {4 =&gt; 5});
+dump(@a);
+</code></pre>
+
+<p>Produces:</p>
+
+<pre><code>"(1, [2, 3], { 4 =&gt; 5 })"
+</code></pre>
+<h4> Comment by L&#233;o L&#233;opold Hertz 준영, Score: 2, Id: 48597727, created_at: 2015-05-14 22:27:06+00:00 </h4>Best answer here! Works with multidimensional arrays too. Most flexible.<h4> Comment by MUY Belgium, Score: 2, Id: 23165589, created_at: 2013-04-24 20:10:56+00:00 </h4>On Ubuntu/Mint, install the libdata-dump-perl package.<hr><h3>  Answer by Andreas, Id: 5741208, Score: 10, created_at: 2011-04-21 07:58:43+00:00 </h3><p>Also, you may want to try <a href="http://perldoc.perl.org/Data/Dumper.html" rel="nofollow noreferrer">Data::Dumper</a>. Example:</p>
 
 <pre class="lang-perl prettyprint-override"><code>use Data::Dumper;
 
 # simple procedural interface
 print Dumper($foo, $bar);
 </code></pre>
-<h4> shawnhcorey, Comment 6573780 Score: 4: </h4>Data::Dumper is a standard module and is installed along with Perl.  To get a list of all the standard pragmatics and modules, see <code>pelrdoc perlmodlib</code>.<br>------------------------------------------------------------------ <br><h3> Eugene Yarmash, Id: 17172608, Score: 7: </h3><p>For inspection/debugging check the <a href="http://search.cpan.org/perldoc?Data%3a%3aPrinter"><code>Data::Printer</code></a> module. It is meant to do one thing and one thing only:</p>
+<h4> Comment by shawnhcorey, Score: 4, Id: 6573780, created_at: 2011-04-21 13:25:18+00:00 </h4>Data::Dumper is a standard module and is installed along with Perl.  To get a list of all the standard pragmatics and modules, see <code>pelrdoc perlmodlib</code>.<hr><h3>  Answer by Eugene Yarmash, Id: 17172608, Score: 7, created_at: 2013-06-18 15:15:41+00:00 </h3><p>For inspection/debugging check the <a href="http://search.cpan.org/perldoc?Data%3a%3aPrinter"><code>Data::Printer</code></a> module. It is meant to do one thing and one thing only:</p>
 
 <blockquote>
   <p>display Perl variables and objects on screen, properly formatted (to
@@ -84,7 +84,7 @@ p @array;  # no need to pass references
        [3] "c",
    ]
 </code></pre>
-<h4> planetp, Comment 95910496 Score: 0: </h4>Under Ubuntu one can install the <code>libdata-printer-perl</code> package.<br>------------------------------------------------------------------ <br><h3> Yi Zhao, Id: 5741230, Score: 4: </h3><p>You can simply <code>print</code> it.</p>
+<h4> Comment by planetp, Score: 0, Id: 95910496, created_at: 2019-02-06 14:04:04+00:00 </h4>Under Ubuntu one can install the <code>libdata-printer-perl</code> package.<hr><h3>  Answer by Yi Zhao, Id: 5741230, Score: 4, created_at: 2011-04-21 08:02:09+00:00 </h3><p>You can simply <code>print</code> it.</p>
 
 <pre><code>@a = qw(abc def hij);
 
@@ -95,12 +95,12 @@ print "@a";
 
 <pre><code>abc def hij
 </code></pre>
-<h4> Toto, Comment 6569408 Score: 2: </h4>You have commas in the print because they are in each element of the array. You really should declare <code>use warnings;</code> and see what it says.<br>------------------------------------------------------------------ <br><h3> gleeco, Id: 5747886, Score: 2: </h3><pre><code># better than Dumper --you're ready for the WWW....
+<h4> Comment by Toto, Score: 2, Id: 6569408, created_at: 2011-04-21 08:29:20+00:00 </h4>You have commas in the print because they are in each element of the array. You really should declare <code>use warnings;</code> and see what it says.<hr><h3>  Answer by gleeco, Id: 5747886, Score: 2, created_at: 2011-04-21 17:53:13+00:00 </h3><pre><code># better than Dumper --you're ready for the WWW....
 
 use JSON::XS;
 print encode_json \@some_array
 </code></pre>
------------------------------------------------------------------- <br><h3> TVNshack, Id: 36221190, Score: 1: </h3><p>Using <code>Data::Dumper</code> :</p>
+<hr><h3>  Answer by TVNshack, Id: 36221190, Score: 1, created_at: 2016-03-25 13:47:55+00:00 </h3><p>Using <code>Data::Dumper</code> :</p>
 
 <pre><code>use strict;
 use Data::Dumper;
@@ -148,16 +148,16 @@ $GRANTs = [
             'TRIGGER'
           ];
 </code></pre>
------------------------------------------------------------------- <br><h3> 009, Id: 38532994, Score: 1: </h3><p>This might not be what you're looking for, but here's something I did for an assignment:</p>
+<hr><h3>  Answer by 009, Id: 38532994, Score: 1, created_at: 2016-07-22 18:18:30+00:00 </h3><p>This might not be what you're looking for, but here's something I did for an assignment:</p>
 
 <pre><code>$" = ", ";
 print "@ArrayName\n";
 </code></pre>
-<h4> Roman, Comment 125449240 Score: 0: </h4>Where is this $&quot; variable documented? Is there a name for it? Edit: found it here: <a href="https://perldoc.perl.org/variables" rel="nofollow noreferrer">perldoc.perl.org/variables</a><br>------------------------------------------------------------------ <br><h3> PodTech.io, Id: 44696390, Score: 1: </h3><p>Map can also be used, but sometimes hard to read when you have lots of things going on.</p>
+<h4> Comment by Roman, Score: 0, Id: 125449240, created_at: 2022-02-02 21:51:42+00:00 </h4>Where is this $&quot; variable documented? Is there a name for it? Edit: found it here: <a href="https://perldoc.perl.org/variables" rel="nofollow noreferrer">perldoc.perl.org/variables</a><hr><h3>  Answer by PodTech.io, Id: 44696390, Score: 1, created_at: 2017-06-22 10:10:46+00:00 </h3><p>Map can also be used, but sometimes hard to read when you have lots of things going on.</p>
 
 <pre><code>map{ print "element $_\n" }   @array; 
 </code></pre>
------------------------------------------------------------------- <br><h3> K.Minoda, Id: 46987532, Score: 1: </h3><p>I've not tried to run below, though. I think this's a tricky way.</p>
+<hr><h3>  Answer by K.Minoda, Id: 46987532, Score: 1, created_at: 2017-10-28 07:58:51+00:00 </h3><p>I've not tried to run below, though. I think this's a tricky way.</p>
 
 <pre><code>map{print $_;} @array;
 </code></pre>

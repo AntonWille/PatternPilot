@@ -1,4 +1,4 @@
- <h2> Title: What does the &lt;&lt;&#39;m&#39;=~m&gt;&gt; syntax mean in perl? </h2> <h4> AliceHemp, question_id: 32665616 </h4>Score: 82, Tags: {perl} <br><p>So I understand that perl has much unusual syntax, but I came across a code snippet at work that other day that has left me confused. Could someone please explain to me what it means:</p>
+ <h2> Title: What does the &lt;&lt;&#39;m&#39;=~m&gt;&gt; syntax mean in perl? </h2> <h4> AliceHemp, question_id: 32665616, created_at: 2015-09-19 07:35:12+00:00 </h4>Score: 82, Tags: {perl} <br><p>So I understand that perl has much unusual syntax, but I came across a code snippet at work that other day that has left me confused. Could someone please explain to me what it means:</p>
 
 <pre><code>&lt;&lt;'m'=~m&gt;&gt;
 print $a unless $b;
@@ -8,7 +8,7 @@ m
 </code></pre>
 
 <p>It looks like HEREDOC syntax, but not in any form I've ever seen.</p>
-<h4> Gilles &#39;SO- stop being evil&#39;, Id: 53499145 Score: 2: </h4>possible duplicate of <a href="http://stackoverflow.com/questions/5443121/understanding-strange-perl-multiline-comment-mechanism">Understanding strange Perl multiline comment mechanism</a><br><h4> aloisdg, Id: 53525430 Score: 1: </h4>You can access a list of Perl secret operators and constants <a href="http://search.cpan.org/dist/perlsecret/lib/perlsecret.pod" rel="nofollow noreferrer">here</a>.<br>------------------------------------------------------------------ <br><h3> Hayden, Id: 32665687, Score: 125: </h3><p>This <em>secret</em> syntax is known as the <a href="http://search.cpan.org/dist/perlsecret/lib/perlsecret.pod#Ornate_double-bladed_sword" rel="nofollow noreferrer">ornate double-bladed sword</a>, and is typically denoted as:</p>
+<h4> Comment by Gilles &#39;SO- stop being evil&#39;, Score: 2, Id: 53499145, created_at: 2015-09-28 20:56:24+00:00 </h4>possible duplicate of <a href="http://stackoverflow.com/questions/5443121/understanding-strange-perl-multiline-comment-mechanism">Understanding strange Perl multiline comment mechanism</a><h4> Comment by aloisdg, Score: 1, Id: 53525430, created_at: 2015-09-29 13:50:08+00:00 </h4>You can access a list of Perl secret operators and constants <a href="http://search.cpan.org/dist/perlsecret/lib/perlsecret.pod" rel="nofollow noreferrer">here</a>.<hr><h3> ✔️ Answer by Hayden, Id: 32665687, Score: 125, created_at: 2015-09-19 07:44:24+00:00 </h3><p>This <em>secret</em> syntax is known as the <a href="http://search.cpan.org/dist/perlsecret/lib/perlsecret.pod#Ornate_double-bladed_sword" rel="nofollow noreferrer">ornate double-bladed sword</a>, and is typically denoted as:</p>
 
 <pre><code>&lt;&lt;m=~m&gt;&gt;
 
@@ -48,7 +48,7 @@ END
 <p>I would not recommend using this in production code as having a string in void context can cause problems. Plus this code is a head scratcher for even the most experienced perl programmers and is pointlessly difficult to read and maintain! If you want to create proper multi-line comments then I would suggest sticking to pod as explained here <a href="https://stackoverflow.com/questions/3828205/how-do-i-enter-a-multi-line-comment-in-perl">How do I enter a multi-line comment in Perl?</a></p>
 
 <p>Hope this clears it up.</p>
------------------------------------------------------------------- <br><h3> Miguel Prz, Id: 32665739, Score: 24: </h3><p>Running <a href="http://perldoc.perl.org/B/Deparse.html">B::Deparse</a> helps a lot in order to understand how perl is handling that piece of code (assuming it is at "test.pl" file):</p>
+<hr><h3>  Answer by Miguel Prz, Id: 32665739, Score: 24, created_at: 2015-09-19 07:50:24+00:00 </h3><p>Running <a href="http://perldoc.perl.org/B/Deparse.html">B::Deparse</a> helps a lot in order to understand how perl is handling that piece of code (assuming it is at "test.pl" file):</p>
 
 <pre><code>perl -MO=Deparse  test.pl 
 </code></pre>

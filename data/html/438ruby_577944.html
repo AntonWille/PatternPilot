@@ -1,4 +1,4 @@
- <h2> Title: How to run Rake tasks from within Rake tasks? </h2> <h4> Arry, question_id: 577944 </h4>Score: 438, Tags: {ruby,rake} <br><p>I have a Rakefile that compiles the project in two ways, according to the global variable <code>$build_type</code>, which can be <code>:debug</code> or <code>:release</code> (the results go in separate directories):</p>
+ <h2> Title: How to run Rake tasks from within Rake tasks? </h2> <h4> Arry, question_id: 577944, created_at: 2009-02-23 15:13:16+00:00 </h4>Score: 438, Tags: {ruby,rake} <br><p>I have a Rakefile that compiles the project in two ways, according to the global variable <code>$build_type</code>, which can be <code>:debug</code> or <code>:release</code> (the results go in separate directories):</p>
 
 <pre><code>task :build =&gt; [:some_other_tasks] do
 end
@@ -15,16 +15,7 @@ end
 </code></pre>
 
 <p>Is there a way to call a task as if it were a method?  Or how can I achieve anything similar?</p>
-<h4> Blair Anderson, Id: 74384627 Score: 1: </h4>correct answer is <a href="http://stackoverflow.com/a/1290119/1536309">stackoverflow.com/a/1290119/1536309</a><br><h4> Joshua Pinter, Id: 93605862 Score: 0: </h4>FYI, using something like <code>Rake::Task[&quot;build&quot;].invoke</code> can be much more performant than using <code>system rake build</code> because it doesn&#39;t have to create a new thread and load up the Rails environment, which <code>system rake build</code> does have to do.<br><h4> MPritchard, Id: 21534038 Score: 0: </h4>I&#39;d go with the community vote and pick the answer upvoted 221 times (at time of writing). The original poster has left SO<br>------------------------------------------------------------------ <br><h3> Neeraj Kumar, Id: 52248494, Score: 20: </h3><pre><code>task :invoke_another_task do
-  # some code
-  Rake::Task["another:task"].invoke
-end
-</code></pre>
-<h4> Dipan Mehta, Comment 94298307 Score: 0: </h4>One of the reason why I needed a solution like this, is because rake task loading takes a lot of time. By implementing a solution like above, will it save on loading time?<br>------------------------------------------------------------------ <br><h3> Marcin Urbanski, Id: 578041, Score: 131: </h3><p>for example:</p>
-
-<pre><code>Rake::Task["db:migrate"].invoke
-</code></pre>
-<h4> Arry, Comment 392838 Score: 7: </h4>This invokes the task only if it wasn&#39;t already invoked.  But I need to invoke the tasks with all other tasks it depends on twice.<br>------------------------------------------------------------------ <br><h3> kch, Id: 1290119, Score: 669: </h3><h3>If you need the task to behave as a method, how about using an actual method?</h3>
+<h4> Comment by Blair Anderson, Score: 1, Id: 74384627, created_at: 2017-04-27 22:26:42+00:00 </h4>correct answer is <a href="http://stackoverflow.com/a/1290119/1536309">stackoverflow.com/a/1290119/1536309</a><h4> Comment by Joshua Pinter, Score: 0, Id: 93605862, created_at: 2018-11-18 19:31:11+00:00 </h4>FYI, using something like <code>Rake::Task[&quot;build&quot;].invoke</code> can be much more performant than using <code>system rake build</code> because it doesn&#39;t have to create a new thread and load up the Rails environment, which <code>system rake build</code> does have to do.<h4> Comment by MPritchard, Score: 0, Id: 21534038, created_at: 2013-03-07 08:07:30+00:00 </h4>I&#39;d go with the community vote and pick the answer upvoted 221 times (at time of writing). The original poster has left SO<hr><h3>  Answer by kch, Id: 1290119, Score: 669, created_at: 2009-08-17 20:05:41+00:00 </h3><h3>If you need the task to behave as a method, how about using an actual method?</h3>
 
 <pre><code>task :build =&gt; [:some_other_tasks] do
   build
@@ -62,7 +53,11 @@ Rake::Task["build"].invoke
 <pre><code>Rake::Task["build"].all_prerequisite_tasks.each(&amp;:reenable)
 </code></pre></li>
 </ul>
-<h4> Trotter, Comment 8704043 Score: 138: </h4>If the task in questions takes arguments, you can pass them as arguments to #invoke. Eg. <code>Rake::Task[&#39;with:args&#39;].invoke(&quot;pizza&quot;)</code><br><h4> David Tuite, Comment 7793401 Score: 101: </h4>Note that if your tasks are in namespaces, you must include the namespace when you invoke the task. Eg. <code>Rake::Task[&#39;db:reset&#39;].invoke</code><br><h4> Michael Stalker, Comment 24861797 Score: 28: </h4>If you need to set an environment variable, do that before calling invoke. For example: <code>ENV[&#39;VERSION&#39;] = &#39;20110408170816&#39;; Rake::Task[&#39;db:migrate&#39;].invoke</code> See <a href="http://rubyforge.org/pipermail/rake-devel/2009-January/000712.html" rel="nofollow noreferrer">here</a> for more explanation.<br><h4> Richard Michael, Comment 37064106 Score: 16: </h4>I recently discovered <code>#reenable()</code> doesn&#39;t re-enable pre-req&#39;s, and needed it.  <a href="https://github.com/jimweirich/rake/pull/168" rel="nofollow noreferrer">This addition</a> to Rake (&gt;= 10.3.2), <a href="http://ruby-doc.org/stdlib-2.1.1/libdoc/rake/rdoc/Rake/Task.html#method-i-all_prerequisite_tasks" rel="nofollow noreferrer"><code>#all_prerequisite_tasks()</code></a> will iterate all tasks, including pre-req&#39;s of pre-req&#39;s.  So, <code>Rake::Task[task].all_prerequisite_tasks.each &amp;:reenable</code><br><h4> Jeff, Comment 46722962 Score: 4: </h4>@kch, can you string these together (like on the commandline <code>rake db:reset db:migrate</code> for example). Can you do something like:   <code>Rake::Task[&quot;db:reset&quot;, &quot;db:migrate&quot;].invoke</code><br><h4> Ajedi32, Comment 65598693 Score: 1: </h4>Taken together, aren&#39;t these two statements effectively contradictory? &quot;This first resets the task&#39;s already_invoked state, allowing the task to then be executed again, dependencies and all [...] Notice that dependencies already invoked are not re-executed&quot; If a task has already been invoked, all of its dependencies would have had to have been invoked as well, right? So simply reenabling and then invoking will never result in any of the tasks&#39;s dependencies being re-run, unless you first reenable those tasks as well.<br>------------------------------------------------------------------ <br><h3> darkliquid, Id: 802151, Score: 61: </h3><pre><code>task :build_all do
+<h4> Comment by Trotter, Score: 138, Id: 8704043, created_at: 2011-08-30 01:01:03+00:00 </h4>If the task in questions takes arguments, you can pass them as arguments to #invoke. Eg. <code>Rake::Task[&#39;with:args&#39;].invoke(&quot;pizza&quot;)</code><h4> Comment by David Tuite, Score: 101, Id: 7793401, created_at: 2011-07-06 23:04:39+00:00 </h4>Note that if your tasks are in namespaces, you must include the namespace when you invoke the task. Eg. <code>Rake::Task[&#39;db:reset&#39;].invoke</code><h4> Comment by Michael Stalker, Score: 28, Id: 24861797, created_at: 2013-06-18 14:25:11+00:00 </h4>If you need to set an environment variable, do that before calling invoke. For example: <code>ENV[&#39;VERSION&#39;] = &#39;20110408170816&#39;; Rake::Task[&#39;db:migrate&#39;].invoke</code> See <a href="http://rubyforge.org/pipermail/rake-devel/2009-January/000712.html" rel="nofollow noreferrer">here</a> for more explanation.<h4> Comment by Richard Michael, Score: 16, Id: 37064106, created_at: 2014-06-04 15:24:43+00:00 </h4>I recently discovered <code>#reenable()</code> doesn&#39;t re-enable pre-req&#39;s, and needed it.  <a href="https://github.com/jimweirich/rake/pull/168" rel="nofollow noreferrer">This addition</a> to Rake (&gt;= 10.3.2), <a href="http://ruby-doc.org/stdlib-2.1.1/libdoc/rake/rdoc/Rake/Task.html#method-i-all_prerequisite_tasks" rel="nofollow noreferrer"><code>#all_prerequisite_tasks()</code></a> will iterate all tasks, including pre-req&#39;s of pre-req&#39;s.  So, <code>Rake::Task[task].all_prerequisite_tasks.each &amp;:reenable</code><h4> Comment by Jeff, Score: 4, Id: 46722962, created_at: 2015-03-25 15:51:50+00:00 </h4>@kch, can you string these together (like on the commandline <code>rake db:reset db:migrate</code> for example). Can you do something like:   <code>Rake::Task[&quot;db:reset&quot;, &quot;db:migrate&quot;].invoke</code><h4> Comment by Ajedi32, Score: 1, Id: 65598693, created_at: 2016-08-24 14:51:41+00:00 </h4>Taken together, aren&#39;t these two statements effectively contradictory? &quot;This first resets the task&#39;s already_invoked state, allowing the task to then be executed again, dependencies and all [...] Notice that dependencies already invoked are not re-executed&quot; If a task has already been invoked, all of its dependencies would have had to have been invoked as well, right? So simply reenabling and then invoking will never result in any of the tasks&#39;s dependencies being re-run, unless you first reenable those tasks as well.<h4> Comment by Hebron Watson, Score: 0, Id: 137112521, created_at: 2024-01-07 16:23:17+00:00 </h4>I often find these &quot;You&#39;re asking the wrong question&quot; answers to be very annoying, but here my friend, you have made an excellent point. the composition of the solution is vital and Ruby, there is quite a bit of freedom in terms of how one wants to compose one&#39;s solution. Rather than using some Rails-specific feature, why not use a feature of the language. This advice is derived from a greater and more generic rule: prefer using features found lower on tool stack.<hr><h3>  Answer by Marcin Urbanski, Id: 578041, Score: 131, created_at: 2009-02-23 15:37:15+00:00 </h3><p>for example:</p>
+
+<pre><code>Rake::Task["db:migrate"].invoke
+</code></pre>
+<h4> Comment by Arry, Score: 7, Id: 392838, created_at: 2009-02-24 08:45:39+00:00 </h4>This invokes the task only if it wasn&#39;t already invoked.  But I need to invoke the tasks with all other tasks it depends on twice.<hr><h3>  Answer by darkliquid, Id: 802151, Score: 61, created_at: 2009-04-29 12:35:15+00:00 </h3><pre><code>task :build_all do
   [ :debug, :release ].each do |t|
     $build_type = t
     Rake::Task["build"].reenable
@@ -72,14 +67,19 @@ end
 </code></pre>
 
 <p>That should sort you out, just needed the same thing myself.</p>
-<h4> kch, Comment 1120282 Score: 0: </h4>This is functional, but way too verbose. Sure there&#39;s nothing better?<br>------------------------------------------------------------------ <br><h3> pjb3, Id: 578033, Score: 14: </h3><pre><code>task :build_all do
+<h4> Comment by kch, Score: 0, Id: 1120282, created_at: 2009-08-17 19:50:25+00:00 </h4>This is functional, but way too verbose. Sure there&#39;s nothing better?<hr><h3>  Answer by Neeraj Kumar, Id: 52248494, Score: 20, created_at: 2018-09-09 20:39:30+00:00 </h3><pre><code>task :invoke_another_task do
+  # some code
+  Rake::Task["another:task"].invoke
+end
+</code></pre>
+<h4> Comment by Dipan Mehta, Score: 0, Id: 94298307, created_at: 2018-12-11 10:44:33+00:00 </h4>One of the reason why I needed a solution like this, is because rake task loading takes a lot of time. By implementing a solution like above, will it save on loading time?<hr><h3>  Answer by pjb3, Id: 578033, Score: 14, created_at: 2009-02-23 15:34:56+00:00 </h3><pre><code>task :build_all do
   [ :debug, :release ].each do |t|
     $build_type = t
     Rake::Task["build"].execute
   end
 end
 </code></pre>
-<h4> Arry, Comment 389953 Score: 0: </h4>It doesn&#39;t work, because it just executes the body of the :build task and doesn&#39;t invoke the tasks that depend on it.<br>------------------------------------------------------------------ <br><h3> bbbco, Id: 14757367, Score: 4: </h3><p>If you want each task to run regardless of any failures, you can do something like:</p>
+<h4> Comment by Arry, Score: 0, Id: 389953, created_at: 2009-02-23 15:54:55+00:00 </h4>It doesn&#39;t work, because it just executes the body of the :build task and doesn&#39;t invoke the tasks that depend on it.<hr><h3>  Answer by bbbco, Id: 14757367, Score: 4, created_at: 2013-02-07 17:35:16+00:00 </h3><p>If you want each task to run regardless of any failures, you can do something like:</p>
 
 <pre><code>task :build_all do
   [:debug, :release].each do |t| 
@@ -96,7 +96,7 @@ end
   end
 end
 </code></pre>
------------------------------------------------------------------- <br><h3> Gizmomogwai, Id: 25798186, Score: -1: </h3><p>I would suggest not to create general debug and release tasks if the project is really something that gets compiled and so results in files. You should go with file-tasks which is quite doable in your example, as you state, that your output goes into different directories.
+<hr><h3>  Answer by Gizmomogwai, Id: 25798186, Score: -1, created_at: 2014-09-11 22:51:15+00:00 </h3><p>I would suggest not to create general debug and release tasks if the project is really something that gets compiled and so results in files. You should go with file-tasks which is quite doable in your example, as you state, that your output goes into different directories.
 Say your project just compiles a test.c file to out/debug/test.out and out/release/test.out with gcc you could setup your project like this:</p>
 
 <pre><code>WAYS = ['debug', 'release']

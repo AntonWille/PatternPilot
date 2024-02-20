@@ -1,18 +1,5 @@
- <h2> Title: How do I list all files of a directory? </h2> <h4> duhhunjonn, question_id: 3207219 </h4>Score: 3466, Tags: {python,directory} <br><p>How can I list all files of a directory in Python and add them to a <code>list</code>?</p>
-<h4> rds, Id: 10886246 Score: 27: </h4>Related to <a href="http://stackoverflow.com/questions/973473/getting-a-list-of-all-subdirectories-in-the-current-directory">How to get a list of subdirectories</a><br>------------------------------------------------------------------ <br><h3> The2ndSon, Id: 24209884, Score: 12: </h3><p><strong>Returning a list of absolute filepaths, does not recurse into subdirectories</strong></p>
-
-<pre><code>L = [os.path.join(os.getcwd(),f) for f in os.listdir('.') if os.path.isfile(os.path.join(os.getcwd(),f))]
-</code></pre>
-<h4> ShadowRanger, Comment 74670067 Score: 2: </h4>Note: <code>os.path.abspath(f)</code> would be a somewhat cheaper substitute for <code>os.path.join(os.getcwd(),f)</code>.<br><h4> Martijn Pieters, Comment 94120391 Score: 1: </h4>I&#39;d be more efficient still if you started with <code>cwd = os.path.abspath(&#39;.&#39;)</code>, then used <code>cwd</code> instead of <code>&#39;.&#39;</code> and <code>os.getcwd()</code> throughout to avoid loads of redundant system calls.<br>------------------------------------------------------------------ <br><h3> Remi, Id: 21207590, Score: 192: </h3><p>A one-line solution to get <strong>only list of files</strong> (no subdirectories):</p>
-
-<pre class="lang-py prettyprint-override"><code>filenames = next(os.walk(path))[2]
-</code></pre>
-
-<p>or absolute pathnames:</p>
-
-<pre class="lang-py prettyprint-override"><code>paths = [os.path.join(path, fn) for fn in next(os.walk(path))[2]]
-</code></pre>
------------------------------------------------------------------- <br><h3> pycruft, Id: 3207973, Score: 6331: </h3><p><strong><a href="https://docs.python.org/3/library/os.html#os.listdir" rel="noreferrer" title="os.listdir"><code>os.listdir()</code></a></strong> returns everything inside a directory -- including both <strong>files</strong> and <strong>directories</strong>.</p>
+ <h2> Title: How do I list all files of a directory? </h2> <h4> duhhunjonn, question_id: 3207219, created_at: 2010-07-08 19:31:22+00:00 </h4>Score: 3466, Tags: {python,directory} <br><p>How can I list all files of a directory in Python and add them to a <code>list</code>?</p>
+<h4> Comment by rds, Score: 27, Id: 10886246, created_at: 2012-01-05 09:32:47+00:00 </h4>Related to <a href="http://stackoverflow.com/questions/973473/getting-a-list-of-all-subdirectories-in-the-current-directory">How to get a list of subdirectories</a><hr><h3>  Answer by pycruft, Id: 3207973, Score: 6364, created_at: 2010-07-08 21:01:11+00:00 </h3><p><strong><a href="https://docs.python.org/3/library/os.html#os.listdir" rel="noreferrer" title="os.listdir"><code>os.listdir()</code></a></strong> returns everything inside a directory -- including both <strong>files</strong> and <strong>directories</strong>.</p>
 <p><a href="https://docs.python.org/3/library/os.path.html#module-os.path" rel="noreferrer" title="os.path"><strong><code>os.path</code></strong></a>'s <code>isfile()</code> can be used to only list files:</p>
 <pre><code>from os import listdir
 from os.path import isfile, join
@@ -31,7 +18,7 @@ for (dirpath, dirnames, filenames) in walk(mypath):
 
 filenames = next(walk(mypath), (None, None, []))[2]  # [] if no file
 </code></pre>
-<h4> Nir, Comment 128971338 Score: 16: </h4>To get all the full paths of the files in the sub-folders, recursively: <code>[os.path.join(dirpath,f) for (dirpath, dirnames, filenames) in os.walk(mypath) for f in filenames] </code><br><h4> OrOrg, Comment 131820040 Score: 3: </h4>@Jo&#227;o V&#237;ctor Melo <code>os.walk()</code> recursively visits all subdirectories, their subdirectories, and so on. By breaking, we only visit the first directory <code>mypath</code>.<br><h4> Jo&#227;o V&#237;ctor Melo, Comment 129754186 Score: 0: </h4>Why the need of the break?<br>------------------------------------------------------------------ <br><h3> adamk, Id: 3215392, Score: 2535: </h3><p>I prefer using the <a href="https://docs.python.org/library/glob.html" rel="noreferrer"><code>glob</code></a> module, as it does pattern matching and expansion.</p>
+<h4> Comment by Nir, Score: 17, Id: 128971338, created_at: 2022-07-18 12:39:37+00:00 </h4>To get all the full paths of the files in the sub-folders, recursively: <code>[os.path.join(dirpath,f) for (dirpath, dirnames, filenames) in os.walk(mypath) for f in filenames] </code><h4> Comment by OrOrg, Score: 3, Id: 131820040, created_at: 2022-12-05 09:33:00+00:00 </h4>@Jo&#227;o V&#237;ctor Melo <code>os.walk()</code> recursively visits all subdirectories, their subdirectories, and so on. By breaking, we only visit the first directory <code>mypath</code>.<h4> Comment by Jo&#227;o V&#237;ctor Melo, Score: 0, Id: 129754186, created_at: 2022-08-24 15:36:30+00:00 </h4>Why the need of the break?<hr><h3>  Answer by adamk, Id: 3215392, Score: 2545, created_at: 2010-07-09 18:13:37+00:00 </h3><p>I prefer using the <a href="https://docs.python.org/library/glob.html" rel="noreferrer"><code>glob</code></a> module, as it does pattern matching and expansion.</p>
 <pre><code>import glob
 print(glob.glob(&quot;/home/adam/*&quot;))
 </code></pre>
@@ -49,7 +36,7 @@ print(glob.glob(&quot;/home/adam/*/*.txt&quot;))
 <p>Use <a href="https://docs.python.org/3/library/glob.html#glob.escape" rel="noreferrer"><code>glob.escape</code></a> to escape strings that are not meant to be patterns:</p>
 <pre><code>print(glob.glob(glob.escape(directory_name) + &quot;/*.txt&quot;))
 </code></pre>
-<h4> Cedric H., Comment 131326064 Score: 7: </h4><code>from glob import glob as g</code> replaces <code>glob()</code> by <code>g()</code>.<br><h4> mcp, Comment 130997046 Score: 2: </h4><code>from glob import glob</code> replaces <code>glob.glob()</code> with <code>glob()</code>.<br>------------------------------------------------------------------ <br><h3> PythonProgrammi, Id: 41447012, Score: 1554: </h3><p>list in the current directory</p>
+<h4> Comment by Cedric H., Score: 7, Id: 131326064, created_at: 2022-11-10 14:18:32+00:00 </h4><code>from glob import glob as g</code> replaces <code>glob()</code> by <code>g()</code>.<h4> Comment by mcp, Score: 3, Id: 130997046, created_at: 2022-10-25 14:03:08+00:00 </h4><code>from glob import glob</code> replaces <code>glob.glob()</code> with <code>glob()</code>.<hr><h3>  Answer by PythonProgrammi, Id: 41447012, Score: 1560, created_at: 2017-01-03 15:36:12+00:00 </h3><p>list in the current directory</p>
 <p>With <code>listdir</code> in <code>os</code> module you get the files and the folders in the current dir</p>
 <pre><code>import os
 
@@ -213,12 +200,21 @@ with os.scandir() as i:
         if entry.is_file():
             print(entry.name)
 </code></pre>
------------------------------------------------------------------- <br><h3> sepp2k, Id: 3207254, Score: 989: </h3><pre><code>import os
+<hr><h3>  Answer by sepp2k, Id: 3207254, Score: 990, created_at: 2010-07-08 19:35:33+00:00 </h3><pre><code>import os
 os.listdir("somedirectory")
 </code></pre>
 
 <p>will return a list of all files and directories in "somedirectory".</p>
-<h4> russhoppa, Comment 136368268 Score: 0: </h4>Why isn&#39;t this number one? Are there any drawbacks to this method? Seems by far the most simple.<br>------------------------------------------------------------------ <br><h3> Johnny, Id: 19308592, Score: 161: </h3><p><strong>Getting Full File Paths From a Directory and All Its Subdirectories</strong></p>
+<h4> Comment by russhoppa, Score: 0, Id: 136368268, created_at: 2023-10-24 14:57:56+00:00 </h4>Why isn&#39;t this number one? Are there any drawbacks to this method? Seems by far the most simple.<h4> Comment by CoffeeSyntax, Score: 0, Id: 137110464, created_at: 2024-01-07 09:43:13+00:00 </h4>it lists both directories and files.<hr><h3>  Answer by Remi, Id: 21207590, Score: 194, created_at: 2014-01-18 17:42:29+00:00 </h3><p>A one-line solution to get <strong>only list of files</strong> (no subdirectories):</p>
+
+<pre class="lang-py prettyprint-override"><code>filenames = next(os.walk(path))[2]
+</code></pre>
+
+<p>or absolute pathnames:</p>
+
+<pre class="lang-py prettyprint-override"><code>paths = [os.path.join(path, fn) for fn in next(os.walk(path))[2]]
+</code></pre>
+<hr><h3>  Answer by Johnny, Id: 19308592, Score: 162, created_at: 2013-10-11 00:55:16+00:00 </h3><p><strong>Getting Full File Paths From a Directory and All Its Subdirectories</strong></p>
 
 <pre><code>import os
 
@@ -263,7 +259,7 @@ full_file_paths = get_filepaths("/Users/johnny/Desktop/TEST")
 </code></pre>
 
 <p><code>/Users/johnny/Desktop/TEST/SUBFOLDER/file3.dat</code></p>
------------------------------------------------------------------- <br><h3> SZIEBERTH &#193;d&#225;m, Id: 30925692, Score: 115: </h3><p>Since version 3.4 there are builtin <em>iterators</em> for this which are a lot more efficient than <a href="http://docs.python.org/3/library/os.html#os.listdir" rel="noreferrer"><code>os.listdir()</code></a>:</p>
+<hr><h3>  Answer by SZIEBERTH &#193;d&#225;m, Id: 30925692, Score: 116, created_at: 2015-06-18 20:58:21+00:00 </h3><p>Since version 3.4 there are builtin <em>iterators</em> for this which are a lot more efficient than <a href="http://docs.python.org/3/library/os.html#os.listdir" rel="noreferrer"><code>os.listdir()</code></a>:</p>
 
 <p><a href="http://docs.python.org/3/library/pathlib.html" rel="noreferrer"><code>pathlib</code></a>: <em>New in version 3.4.</em></p>
 
@@ -282,7 +278,7 @@ full_file_paths = get_filepaths("/Users/johnny/Desktop/TEST")
 <p>Note that <a href="http://docs.python.org/3/library/os.html#os.walk" rel="noreferrer"><code>os.walk()</code></a> uses <a href="http://docs.python.org/3/library/os.html#os.scandir" rel="noreferrer"><code>os.scandir()</code></a> instead of <a href="http://docs.python.org/3/library/os.html#os.listdir" rel="noreferrer"><code>os.listdir()</code></a> from version 3.5, and its speed got increased by 2-20 times according to <a href="http://www.python.org/dev/peps/pep-0471/" rel="noreferrer">PEP 471</a>.</p>
 
 <p>Let me also recommend reading ShadowRanger's comment below.</p>
-<h4> ShadowRanger, Comment 55439897 Score: 10: </h4>Note: The <code>os.scandir</code> solution is going to be more efficient than <code>os.listdir</code> with an <code>os.path.is_file</code> check or the like, even if you need a <code>list</code> (so you don&#39;t benefit from lazy iteration), because <code>os.scandir</code> uses OS provided APIs that give you the <code>is_file</code> information for free as it iterates, no per-file round trip to the disk to <code>stat</code> them at all (on Windows, the <code>DirEntry</code>s get you complete <code>stat</code> info for free, on *NIX systems it needs to <code>stat</code> for info beyond <code>is_file</code>, <code>is_dir</code>, etc., but <code>DirEntry</code> caches on first <code>stat</code> for convenience).<br>------------------------------------------------------------------ <br><h3> CristiFati, Id: 48393588, Score: 75: </h3><h2>Preliminary notes</h2>
+<h4> Comment by ShadowRanger, Score: 10, Id: 55439897, created_at: 2015-11-20 22:38:37+00:00 </h4>Note: The <code>os.scandir</code> solution is going to be more efficient than <code>os.listdir</code> with an <code>os.path.is_file</code> check or the like, even if you need a <code>list</code> (so you don&#39;t benefit from lazy iteration), because <code>os.scandir</code> uses OS provided APIs that give you the <code>is_file</code> information for free as it iterates, no per-file round trip to the disk to <code>stat</code> them at all (on Windows, the <code>DirEntry</code>s get you complete <code>stat</code> info for free, on *NIX systems it needs to <code>stat</code> for info beyond <code>is_file</code>, <code>is_dir</code>, etc., but <code>DirEntry</code> caches on first <code>stat</code> for convenience).<hr><h3>  Answer by CristiFati, Id: 48393588, Score: 75, created_at: 2018-01-23 03:09:57+00:00 </h3><h2>Preliminary notes</h2>
 <ul>
 <li><p>Although there's a clear differentiation between <em>file</em> and <em>directory</em> terms in the question text, some may argue that directories are actually special files</p>
 </li>
@@ -939,7 +935,7 @@ dir0  dir1  dir2  dir3  file0  file1
 </code></pre>
 </blockquote>
 <p>In general, this approach is to be avoided, since if some command output format slightly differs between <em>OS</em> versions / flavors, the parsing code should be adapted as well - not to mention differences between locales.</p>
------------------------------------------------------------------- <br><h3> ArtOfWarfare, Id: 24652788, Score: 50: </h3><p>I really liked <a href="https://stackoverflow.com/a/3215392/901641">adamk's answer</a>, suggesting that you use <code>glob()</code>, from the module of the same name. This allows you to have pattern matching with <code>*</code>s.</p>
+<hr><h3>  Answer by ArtOfWarfare, Id: 24652788, Score: 50, created_at: 2014-07-09 11:43:58+00:00 </h3><p>I really liked <a href="https://stackoverflow.com/a/3215392/901641">adamk's answer</a>, suggesting that you use <code>glob()</code>, from the module of the same name. This allows you to have pattern matching with <code>*</code>s.</p>
 
 <p>But as other people pointed out in the comments, <code>glob()</code> can get tripped up over inconsistent slash directions. To help with that, I suggest you use the <code>join()</code> and <code>expanduser()</code> functions in the <code>os.path</code> module, and perhaps the <code>getcwd()</code> function in the <code>os</code> module, as well.</p>
 
@@ -982,7 +978,7 @@ glob(join(getcwd(), '*', 'wlp'))
 </code></pre>
 
 <p>Hope these examples help you see the power of a few of the functions you can find in the standard Python library modules.</p>
-<h4> ArtOfWarfare, Comment 44660535 Score: 4: </h4>Extra glob fun: starting in Python 3.5, <code>**</code> works as long as you set <code>recursive = True</code>. See the docs here: <a href="https://docs.python.org/3.5/library/glob.html#glob.glob" rel="nofollow noreferrer">docs.python.org/3.5/library/glob.html#glob.glob</a><br>------------------------------------------------------------------ <br><h3> Apogentus, Id: 24145985, Score: 40: </h3><pre><code>def list_files(path):
+<h4> Comment by ArtOfWarfare, Score: 4, Id: 44660535, created_at: 2015-01-26 03:24:41+00:00 </h4>Extra glob fun: starting in Python 3.5, <code>**</code> works as long as you set <code>recursive = True</code>. See the docs here: <a href="https://docs.python.org/3.5/library/glob.html#glob.glob" rel="nofollow noreferrer">docs.python.org/3.5/library/glob.html#glob.glob</a><hr><h3>  Answer by Apogentus, Id: 24145985, Score: 40, created_at: 2014-06-10 16:16:30+00:00 </h3><pre><code>def list_files(path):
     # returns a list of names (with extension, without full path) of all files 
     # in folder path
     files = []
@@ -991,7 +987,7 @@ glob(join(getcwd(), '*', 'wlp'))
             files.append(name)
     return files 
 </code></pre>
------------------------------------------------------------------- <br><h3> Yauhen Yakimovich, Id: 22990477, Score: 26: </h3><p>If you are looking for a Python implementation of <strong>find</strong>, this is a recipe I use rather frequently:</p>
+<hr><h3>  Answer by Yauhen Yakimovich, Id: 22990477, Score: 26, created_at: 2014-04-10 14:09:06+00:00 </h3><p>If you are looking for a Python implementation of <strong>find</strong>, this is a recipe I use rather frequently:</p>
 
 <pre><code>from findtools.find_files import (find_files, Match)
 
@@ -1004,7 +1000,7 @@ for found_file in found_files:
 </code></pre>
 
 <p>So I made a PyPI <a href="https://pypi.python.org/pypi/findtools/" rel="noreferrer">package</a> out of it and there is also a <a href="https://github.com/ewiger/findtools" rel="noreferrer">GitHub repository</a>. I hope that someone finds it potentially useful for this code.</p>
------------------------------------------------------------------- <br><h3> Andy Jazz, Id: 54107684, Score: 16: </h3><p>For greater results, you can use <code>listdir()</code> method of the <code>os</code> module along with a generator (a generator is a powerful iterator that keeps its state, remember?). The following code works fine with both versions: Python 2 and Python 3.</p>
+<hr><h3>  Answer by Andy Jazz, Id: 54107684, Score: 16, created_at: 2019-01-09 10:11:57+00:00 </h3><p>For greater results, you can use <code>listdir()</code> method of the <code>os</code> module along with a generator (a generator is a powerful iterator that keeps its state, remember?). The following code works fine with both versions: Python 2 and Python 3.</p>
 
 <p>Here's a code:</p>
 
@@ -1020,7 +1016,11 @@ for file in files("."):
 </code></pre>
 
 <p>The <code>listdir()</code> method returns the list of entries for the given directory. The method <code>os.path.isfile()</code> returns <code>True</code> if the given entry is a file. And the <code>yield</code> operator quits the func but keeps its current state, and it returns only the name of the entry detected as a file. All the above allows us to loop over the generator function.</p>
------------------------------------------------------------------- <br><h3> fralau, Id: 55321475, Score: 12: </h3><p>A wise teacher told me once that:</p>
+<hr><h3>  Answer by The2ndSon, Id: 24209884, Score: 12, created_at: 2014-06-13 16:26:01+00:00 </h3><p><strong>Returning a list of absolute filepaths, does not recurse into subdirectories</strong></p>
+
+<pre><code>L = [os.path.join(os.getcwd(),f) for f in os.listdir('.') if os.path.isfile(os.path.join(os.getcwd(),f))]
+</code></pre>
+<h4> Comment by ShadowRanger, Score: 2, Id: 74670067, created_at: 2017-05-06 00:14:04+00:00 </h4>Note: <code>os.path.abspath(f)</code> would be a somewhat cheaper substitute for <code>os.path.join(os.getcwd(),f)</code>.<h4> Comment by Martijn Pieters, Score: 1, Id: 94120391, created_at: 2018-12-05 10:46:34+00:00 </h4>I&#39;d be more efficient still if you started with <code>cwd = os.path.abspath(&#39;.&#39;)</code>, then used <code>cwd</code> instead of <code>&#39;.&#39;</code> and <code>os.getcwd()</code> throughout to avoid loads of redundant system calls.<hr><h3>  Answer by fralau, Id: 55321475, Score: 12, created_at: 2019-03-24 07:07:20+00:00 </h3><p>A wise teacher told me once that:</p>
 
 <blockquote>
   <p>When there are several established ways to do something, none of them is good for all cases.</p>
@@ -1049,7 +1049,7 @@ def dir_filter(dirname='', radical='', extension=''):
 </code></pre>
 
 <p>This solution could be easily generalized with regular expressions (and you might want to add a <code>pattern</code> argument, if you do not want your patterns to always stick to the start or end of the filename).</p>
------------------------------------------------------------------- <br><h3> pah8J, Id: 50927977, Score: 11: </h3><pre><code>import os
+<hr><h3>  Answer by pah8J, Id: 50927977, Score: 11, created_at: 2018-06-19 12:03:14+00:00 </h3><pre><code>import os
 import os.path
 
 
@@ -1067,7 +1067,7 @@ def get_files(target_dir):
 </code></pre>
 
 <p>Here I use a recursive structure.</p>
-<h4> Georgy, Comment 98992717 Score: 1: </h4>The same can be achieved just in one line with <a href="https://docs.python.org/3/library/pathlib.html" rel="nofollow noreferrer"><code>pathlib</code></a>: <code>filter(Path.is_file, Path().rglob(&#39;*&#39;))</code><br>------------------------------------------------------------------ <br><h3> shantanoo, Id: 40926538, Score: 8: </h3><p>Using generators</p>
+<h4> Comment by Georgy, Score: 1, Id: 98992717, created_at: 2019-05-17 09:37:12+00:00 </h4>The same can be achieved just in one line with <a href="https://docs.python.org/3/library/pathlib.html" rel="nofollow noreferrer"><code>pathlib</code></a>: <code>filter(Path.is_file, Path().rglob(&#39;*&#39;))</code><hr><h3>  Answer by shantanoo, Id: 40926538, Score: 8, created_at: 2016-12-02 07:01:16+00:00 </h3><p>Using generators</p>
 
 <pre><code>import os
 def get_files(search_path):
@@ -1078,7 +1078,7 @@ list_files = get_files('.')
 for filename in list_files:
     print(filename)
 </code></pre>
------------------------------------------------------------------- <br><h3> fhchl, Id: 49534391, Score: 7: </h3><p>Another very readable variant for Python 3.4+ is using pathlib.Path.glob:</p>
+<hr><h3>  Answer by fhchl, Id: 49534391, Score: 7, created_at: 2018-03-28 12:20:13+00:00 </h3><p>Another very readable variant for Python 3.4+ is using pathlib.Path.glob:</p>
 
 <pre><code>from pathlib import Path
 folder = '/foo'
@@ -1089,35 +1089,7 @@ folder = '/foo'
 
 <pre><code>[f for f in Path(folder).glob('**/*.py') if not f.is_symlink()]
 </code></pre>
------------------------------------------------------------------- <br><h3> chris-piekarski, Id: 52885096, Score: 4: </h3><p>For Python 2:</p>
-<pre><code>pip install rglob
-</code></pre>
-<p>Then do</p>
-<pre><code>import rglob
-file_list = rglob.rglob(&quot;/home/base/dir/&quot;, &quot;*&quot;)
-print file_list
-</code></pre>
-<h4> Eric, Comment 118208005 Score: 4: </h4>When an external dep can be avoided, do it. What is the added value of using an external dependency when all you need is already in the language?<br>------------------------------------------------------------------ <br><h3> MarredCheese, Id: 47703002, Score: 3: </h3><p>Here's my general-purpose function for this.  It returns a list of file paths rather than filenames since I found that to be more useful.  It has a few optional arguments that make it versatile.  For instance, I often use it with arguments like <code>pattern='*.txt'</code> or <code>subfolders=True</code>.</p>
-
-<pre><code>import os
-import fnmatch
-
-def list_paths(folder='.', pattern='*', case_sensitive=False, subfolders=False):
-    """Return a list of the file paths matching the pattern in the specified 
-    folder, optionally including files inside subfolders.
-    """
-    match = fnmatch.fnmatchcase if case_sensitive else fnmatch.fnmatch
-    walked = os.walk(folder) if subfolders else [next(os.walk(folder))]
-    return [os.path.join(root, f)
-            for root, dirnames, filenames in walked
-            for f in filenames if match(f, pattern)]
-</code></pre>
------------------------------------------------------------------- <br><h3> Vinodh Krishnaraju, Id: 47758562, Score: 3: </h3><p>I will provide a sample one liner where sourcepath and file type can be provided as input. The code returns a list of filenames with csv extension. Use <em>.</em> in case all files needs to be returned. This will also recursively scans the subdirectories. </p>
-
-<p><code>[y for x in os.walk(sourcePath) for y in glob(os.path.join(x[0], '*.csv'))]</code></p>
-
-<p>Modify file extensions and source path as needed. </p>
-<h4> Martijn Pieters, Comment 94121214 Score: 2: </h4>If you are going to use <code>glob</code>, then just use <code>glob(&#39;**&#47;*.csv&#39;, recursive=True)</code>. No need to combine this with <code>os.walk()</code> to recurse (<code>recursive</code> and <code>**</code> are supported since Python 3.5).<br>------------------------------------------------------------------ <br><h3> shaji, Id: 11647676, Score: 2: </h3><p><em><a href="http://docs.python.org/release/2.6.7/library/dircache.html" rel="nofollow noreferrer">dircache</a> is  "Deprecated since version 2.6: The dircache module has been removed in Python 3.0."</em></p>
+<hr><h3>  Answer by shaji, Id: 11647676, Score: 2, created_at: 2012-07-25 10:25:54+00:00 </h3><p><em><a href="http://docs.python.org/release/2.6.7/library/dircache.html" rel="nofollow noreferrer">dircache</a> is  "Deprecated since version 2.6: The dircache module has been removed in Python 3.0."</em></p>
 
 <pre><code>import dircache
 list = dircache.listdir(pathname)
@@ -1135,3 +1107,32 @@ while count != 0:
 
 print temp
 </code></pre>
+<hr><h3>  Answer by chris-piekarski, Id: 52885096, Score: 4, created_at: 2018-10-19 02:34:15+00:00 </h3><p>For Python 2:</p>
+<pre><code>pip install rglob
+</code></pre>
+<p>Then do</p>
+<pre><code>import rglob
+file_list = rglob.rglob(&quot;/home/base/dir/&quot;, &quot;*&quot;)
+print file_list
+</code></pre>
+<h4> Comment by Eric, Score: 4, Id: 118208005, created_at: 2021-03-30 13:45:05+00:00 </h4>When an external dep can be avoided, do it. What is the added value of using an external dependency when all you need is already in the language?<hr><h3>  Answer by MarredCheese, Id: 47703002, Score: 3, created_at: 2017-12-07 20:10:58+00:00 </h3><p>Here's my general-purpose function for this.  It returns a list of file paths rather than filenames since I found that to be more useful.  It has a few optional arguments that make it versatile.  For instance, I often use it with arguments like <code>pattern='*.txt'</code> or <code>subfolders=True</code>.</p>
+
+<pre><code>import os
+import fnmatch
+
+def list_paths(folder='.', pattern='*', case_sensitive=False, subfolders=False):
+    """Return a list of the file paths matching the pattern in the specified 
+    folder, optionally including files inside subfolders.
+    """
+    match = fnmatch.fnmatchcase if case_sensitive else fnmatch.fnmatch
+    walked = os.walk(folder) if subfolders else [next(os.walk(folder))]
+    return [os.path.join(root, f)
+            for root, dirnames, filenames in walked
+            for f in filenames if match(f, pattern)]
+</code></pre>
+<hr><h3>  Answer by Vinodh Krishnaraju, Id: 47758562, Score: 3, created_at: 2017-12-11 17:51:11+00:00 </h3><p>I will provide a sample one liner where sourcepath and file type can be provided as input. The code returns a list of filenames with csv extension. Use <em>.</em> in case all files needs to be returned. This will also recursively scans the subdirectories. </p>
+
+<p><code>[y for x in os.walk(sourcePath) for y in glob(os.path.join(x[0], '*.csv'))]</code></p>
+
+<p>Modify file extensions and source path as needed. </p>
+<h4> Comment by Martijn Pieters, Score: 2, Id: 94121214, created_at: 2018-12-05 11:09:48+00:00 </h4>If you are going to use <code>glob</code>, then just use <code>glob(&#39;**&#47;*.csv&#39;, recursive=True)</code>. No need to combine this with <code>os.walk()</code> to recurse (<code>recursive</code> and <code>**</code> are supported since Python 3.5).
