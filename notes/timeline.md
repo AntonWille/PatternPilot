@@ -47,3 +47,50 @@ Plan for the coming week:
 - Read most of the papers I only scanned so far and start framing a literature overview
 - Encode to the point of having at least half of the 300 documents
 - Rework t he coding system over the weekend
+
+## Week 5
+
+The plan to encode towards 150 documents was significantly over-ambitious. Instead I spent a lot of time searching for literature, which mostly did not yield the desired results. There does not seem to be any research closely resembling what I am doing, although I cannot be sure, as it is difficult to search for, especially with my lacking experience in the field. Primarily, I found scholars of philosophy interested in cultural aspects of programming language communities, scholars of SE and adjacent fields that apply GTM to "techy" online-communities like stack-overflow, albeit usually with a slightly different focus. Where "techy" culture is concerned, it is usally applied on a different level, for example comparing open-source vs. corporate culture, FAANG vs. start-up, "hacker" vs. "enterprise" etc.
+
+While a lot of the things found were really interesting, and could either inspire or help apply the method, it was frustrating to not find the kind of "golden goose", where some good researchers apply a similar method on similar data with a similar motive. In addition, I'm a bit nervous about finding mostly Software Engineering and Philosophy papers, as these are the two research fields I'm a bit more familiar with.
+
+I used 3 1/2 different methods to find papers:
+
+1. Search the web via google-scholar, arxiv, libgen etc.
+2. Look at literature reviews that seem promising and scan the papers reviewed there
+3. Ask people around me who might not know
+   3.5 Ask ChatGPT and Gemini to find interesting scholarship on the topic
+
+Suprisingly, method 1 and 3.5 yielded the most results here. The fact that 2. and 3. did not yield much gives me hope that I am not missing much. None of the literature reviews seem to have a category for this kind of research, and the social scientists in my circle that I asked basically said "Sounds interesting, I can't find anything either, but send me the text once you are done".
+
+## Week 6
+
+This week again was mostly spent on encoding and re-evaluating the coding system, as well as grounding and updating memos. The number of codes is up to 1000 over 45 documents. Basically, the number of codes per document goes up significantly as the code-system matures, so I will have to go back to the older documents and do some re-encoding there.
+I think I hit a bit of an emotional low-point this week, as I was very unsure if what I am doing makes sense and if it is going in an acceptable direction. Meeting my supervisor on Thursday luckily alleviated much of my concerns and reignited my motivation. Over the weekend I continued encoding and tried to formualte tenable and more concrete goals of the research.
+
+## Week 7
+
+This week was mostly spent preparing for next weeks presentation in the Research Group. First and foremost was writing a draft of a literature review and an introduction, as well as trying to close gaps in my literature review and understanding in the method. During this, I realized several mistakes I made during execution so far:
+1. I went in with quite a lot of theoretical presuppositions, not all of them clearly labelled as such.
+2. Related, I did not do Grounding in a very structured way. While it was always part of my thought process, I did not use the tools given by the method, like carefully writing Memos and noting down answers to questions.
+3. While I did perform Open Coding, it was already guided by "axis", and as such I might have missed very interesting or promising strings. This is a minor point, as I rather have too many directions thank too few, but could have made my life easier.
+
+Given these slight regrets, I spent some time writing careful memos, resorting things, and finally going through the "bin"-code that was "There's something here, I am not sure what it is" to really try to carefully encode these.
+
+## Week 8
+
+This week I presented my thesis within the seminar 'Beiträge zum Software Engineering'. This took sinificant preparation, and my main focus was on finishing the slides, double-checking that everything is correct and doing a couple of test runs to note sound too wooden. This was my first in-person presentation since 2019, so I was quite nervous before hand.
+
+The presentation itself went quite well in my opinion. Attendants were quite enthusiastic, and I received really valuable feedback and tips on how to continue. Writing the presentation itself was also really valuable, as I was able to spot flaws in my approach, increase my theoretical knowledge of the method I use, and had to "frame" my research, which will be good preparation for the final write-up.
+
+On the weekend, I mostly focused on preparing for my last math exam, but also set up the LaTeX document for the final paper, and did some minor work on the paper as well.
+
+## Week 9
+
+I was struck down by Covid this week, and could not do any work from Monday to Friday. On the weekend, the scripts were revised and the formatting issues resolved, as well as the new formatting applied to the old documents. In addition, I increased the number of documents from 100 for each tag to 300, to prepare for selective coding. Some progress was made on writing the paper itself, and I started selectively encoding documents.
+
+## Week 10
+
+## Week 11
+
+## Week 12

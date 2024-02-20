@@ -8,7 +8,7 @@ class StackOverflowAPI:
 
   def __init__(self):
     self.site = 'stackoverflow'
-    self.api_key = 'LW36V9nW1lZD0xIyeXYTMw(('
+    self.api_key = ''
     self.base_url = 'https://api.stackexchange.com/2.3/'
     logging.basicConfig(level=logging.INFO)
 
