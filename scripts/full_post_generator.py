@@ -42,18 +42,21 @@ def format_question(question):
 
 def format_comments(comments):
     text = ""
+    comments = comments.sort_values(by='creation_date')
     for _, comment in comments.iterrows():
         created_at = datetime.fromtimestamp(comment['creation_date'], timezone.utc)
+        text += '<hr style="border-top: 1px dashed #000;">'
         text += f"<h4> Comment by {comment['owner_display_name']}, Score: {comment['score']}, Id: {comment['comment_id']}, created_at: {created_at} </h4>"
         text += comment['body']
     return text
 
 def format_answers(answers, answers_comments):
     text = ""
+    answers = answers.sort_values(by='score', ascending=False)
     for _, answer in answers.iterrows():
         created_at = datetime.fromtimestamp(answer['creation_date'], timezone.utc)
         is_accepted = "✔️" if answer['is_accepted'] else ""
-        text += '<hr>'
+        text += '<hr style="border-top: 3px solid #000;">'
         text += f"<h3> {is_accepted} Answer by {answer['owner_display_name']}, Id: {answer['answer_id']}, Score: {answer['score']}, created_at: {created_at} </h3>"
         text += answer['body']
 
@@ -69,7 +72,6 @@ def create_post_file(conn, question_id):
     with open(filename, 'w') as f:
         question_text = format_question(question)
         question_comments = fetch_questions_comments(conn, question_id)
-        question_comments.sort_values(by='score', ascending=False)
 
         f.write(question_text)
 
@@ -79,10 +81,8 @@ def create_post_file(conn, question_id):
 
         answers_df = fetch_answers(conn, question_id)
         if not answers_df.empty:
-            answers_df.sort_values(by='score', ascending=False)
             answer_ids = answers_df['answer_id'].tolist()
             answer_comments = fetch_answers_comments(conn, answer_ids)
-            answer_comments.sort_values(by='score', ascending=False)
             answers_text = format_answers(answers_df, answer_comments)
             f.write(answers_text)
 
@@ -90,8 +90,8 @@ def main():
     engine = create_engine('postgresql://postgres@localhost:5432/pattern_pilot_development')
     with engine.connect() as conn:
         ids = fetch_question_ids(conn)
-        for question_id in ids:
-            create_post_file(conn, question_id)
+        for id in ids:
+            create_post_file(conn, id)
 
 if __name__ == "__main__":
     main()
