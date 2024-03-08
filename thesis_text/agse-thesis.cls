@@ -90,7 +90,9 @@
     linktocpage,
 % two lines below = do color links
     colorlinks=true,
-    citecolor=blue!20!black!30!green,
+    citecolor=blue,
+    urlcolor=blue,
+    linkcolor=blue,
 % two lines below = don't color links at all
     %colorlinks=false,
     %pdfborder={0 0 0},
@@ -104,18 +106,26 @@
 \usepackage{enumitem}
 \setlist[itemize,1]{label=$\bullet$} % avoid font warning by ensuring math mode
 
+% Pretty Box
+\RequirePackage{xcolor}
+\usepackage[most]{tcolorbox}
+
+% Block Quotes
+\usepackage{csquotes}
+\usepackage{wrapfig}
+\usepackage{pdfpages}
+
+% Remove paragraph indentation
+\setlength{\parindent}{0pt}
 % Misc
 \RequirePackage{fancyref}
 \RequirePackage{url}
 \RequirePackage{makeidx}
 
-\RequirePackage[pdftex]{graphicx}
-
 %%% BibLaTeX
-\RequirePackage[sorting=nyt]{biblatex}
+\RequirePackage[sorting=none]{biblatex}
 
 % Java Code Listing Style
-\RequirePackage{xcolor}
 \RequirePackage{listings}
 \definecolor{darkblue}{rgb}{0,0,.6}
 \definecolor{darkgreen}{rgb}{0,0.5,0}
@@ -208,9 +218,9 @@
         \vspace{4mm}
 
         \begin{tabular}{rl}
-            \ifcsdef{advisor}{Betreuer/in: & \advisor\\}{}
-            Eingereicht bei: & \firstExaminer \\
+            \ifcsdef{firstExaminer}{Erstgutachter/in: & \firstExaminer\\}{}
             \ifcsdef{secondExaminer}{Zweitgutachter/in: & \secondExaminer\\}{}
+            \ifcsdef{advisor}{Betreuer/in: & \advisor\\}{}
         \end{tabular}
 
         \vspace{4mm}

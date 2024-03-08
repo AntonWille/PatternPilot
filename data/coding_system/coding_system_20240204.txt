@@ -1,0 +1,115 @@
+Liste der Codes	Häufigkeit
+Codesystem	1054
+Testing	0
+You need excellent test coverage	2
+Testing is no panacea	1
+Mentioning other programming language	16
+You can get similar syntax by doing...	1
+Thing of other language does not exist	2
+It is differs here to (most) other languages	5
+You can do it just as well in other language	10
+Neutral comparison of pros and cons of different languages	4
+Why would I ever use X over Y?	1
+It bears some resemblance to other language	11
+Languages have differernt implementations (of same thing)	5
+I want to do it like in this other language	6
+One language implementation is good/better than the other	12
+ Talk of general Coding Principles	4
+Dynamic vs. static typing	4
+The "OOP" way of doing things	4
+Mentioning of "common wisdom"	3
+Don't reinvent the wheel	3
+Unwritten Rules of Good coding	2
+Rejection of Coding Principle (in context)	1
+Referencing external sources	0
+Referencing non-authorative Sources	0
+Referencing wikipedia	2
+referencing other forum post	24
+Referencing an article, blog post or tutorial	33
+Referencing authorative sources	27
+Referencing a conference or academic paper	2
+Referencing a published book	4
+Referencing official documentation	62
+Referencing package / tool / inofficial documentation	1
+Legacy vs. Modern Practices	5
+Feature/Library is broken	1
+Maintainability is important	1
+Refactoring Code	1
+Calling something or inquiring about modern practice	3
+Discussing Deprecation	12
+Don't do the deprecated	12
+Don't mind if I do the deprecated	1
+Mentioning modern or future options or concerns	18
+Importance of Backwards Compatibility	9
+Pragmatism vs. Purity	0
+Concern for future Coders	2
+Referencing cs theory	18
+Suggesting a pragmatic approach	3
+Lazy approach is good	2
+Messy (but it works)	8
+What should idiomatic code look like?	5
+Mentioning the Spirit of the Language	10
+Mentioning a preferred (style of) solution	10
+Calling something good style	5
+Calling something bad style	9
+Mentioning of implicit rules or conventions	9
+Claiming that there's a consensus in the community	1
+Disapproval of Convention or implicit behavior	9
+Conversational Tone	0
+Statement of Group Belonging	11
+The ruby way of doing things	1
+Talk of magic	9
+Humorous Remark	30
+Statement of Disapproval	39
+Statement of Appreciation	68
+One way vs many	0
+One way, recommended solution or best practice	6
+"Authority" says solution is bad/not recommended	1
+Mentioning best practices	1
+Calling something bad practice	2
+Answer states (that there is) a preferred solution	2
+Asking for a preferred / recommended solution	3
+Disapproval of multiple options	16
+TIMRTOWTDI	13
+Offering a different solution due to preference	4
+Answer gives multiple options or additional answer than accepte	80
+Approval of multiple ways of doing it	19
+Disapproval of recommended / preferred solution	6
+Mention Alias or equivalent alternative	6
+culture categories	0
+Efficiency	19
+Focus on performance	46
+Suggestion on how to optimize code	1
+Something else more important than performance	2
+Focus on memory efficiency	3
+Benchmarking results	12
+Short code is better	25
+Goodness	24
+truth	9
+beauty	10
+Code should be alliterative	1
+Do it in a natural way	2
+Code is elegant	5
+Code looks ugly	2
+Discussing Readability	13
+Preferring succinct option	1
+Readability is difficult here	2
+There's something here, but I'm not sure what it is	56
+Perl has very unusual syntax	1
+Rebel against authority	2
+This way of doing it is better suited for some specific case	2
+Mentioning of DevX	1
+Good to have for convenience	1
+Eplicit over implicit	1
+Disapproval of syntax	2
+Syntax is missing	1
+It gives you flexibility	3
+syntactic sugar	2
+Mentioning production code	3
+Language was designed for that stuff	3
+Things Lower than language level	9
+Rails as ruby default	2
+Usage of metaphor to explain code	4
+There's a package/module/tool for this	52
+Full disclosure: It is my package	1
+Don't use a package/module for this	8
