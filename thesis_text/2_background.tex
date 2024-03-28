@@ -1,0 +1,157 @@
+% !TeX encoding = UTF-8
+\section{Background}
+
+\subsection{Concept of a Programming Language Community (PLC)}
+
+We define a programming language community as the sum of people interacting with a given language.
+Further we can differentiate some different levels of interaction, although it is important to note
+that these are hats we put on, and an individual can be part of all three:
+
+First, there are those actively creating the language, for example by being part of the core language team, or by writing
+and maintaining popular libraries and tools.
+
+Second, there are those that are participating in the community by writing code, ranging from hobbyists to industry professionals.
+
+Finally, people are part of the community through discussion of topics ranging from philosophical to the very technical.
+This last group is the main focus of this thesis, but while we focus on the people and on the culture, it is important to
+keep in mind that the code, the software, the artifacts created in the process of software engineering, are core to our inquiry as well.
+
+\subsection{Concept of Culture}
+
+In his essay “Why Cultural Psychology?”, Richard A. Shweder gives a succinct definition of culture as
+“[\ldots] conceptions of what is true, good, beautiful, and efficient”. \cite[p.4]{schweder_why_cult} Given this maximalist definition of culture,
+much of human communication falls in at least one of these categories. In our context, some expectations can be had in
+which way these categories primarily manifest:
+
+\textbf{Truth:} Given the technical nature of most discussions in PLCs, what is true might often be self-evident and obvious.
+However, where there is disagreement, special attention should be given. Truth encompasses not only scientific or empirical
+truths but also spiritual, moral, and social truths that are accepted within a particular cultural context.
+
+\textbf{Goodness:} What is considered to be right or wrong, virtuous or sinful, just or unfair is at least influenced and informed
+by our culture. In the context of software development, oftentimes these discussions center on things like inclusiveness,
+openness, transparency, accountability, and equity. That said, most discussions at least implicitly carry some
+assumptions on what is good in them.
+
+\textbf{Beauty} includes aesthetic preferences for code such as formatting styles, naming conventions or repository
+structure, but also appreciation for elegant solutions, concise or readable code, and sometimes artistic expressions of
+code, such as code art and generative programming. Beauty is also closely related to what it means to write idiomatic
+code within a language.
+
+\textbf{Efficiency:} On the surface, efficiency might seem like a clearly measurable aspect of truth, but in reality, what we
+measure, how we measure it, and how we prioritize where different measurements conflict with each other, are often deeply cultural.
+For example, one implementation of an algorithm might be more memory efficient than the other, but also more complex,
+thus increasing mental overhead for the person implementing or maintaining it. The way
+we approach these kinds of trade-offs gives insight into what we value, and affect the end-result of any artifacts
+created during the coding process.
+\\
+Of course, none of these categories are mutually exclusive, and in discussions, it is to be expected that the norm is
+to touch multiple of these categories in a single statement.
+
+\subsection{Choice of Programming Languages}
+\label{sec:2.3}
+Some considerations were put into choosing the languages: On the one hand, it would make sense to compare languages that
+differ significantly, as it stands to reason that the accompanying cultures would show large, easy to spot differences as well.
+However, the further apart these languages are, the harder they are to compare, and the harder it is to reason about
+causes for divergences in culture.
+
+Perl, Python and Ruby are similar in quite a few regards: They were developed at similar times, with Perl being the first
+to be published in 1987. Larry Wall, the creator of Perl put it like this: At the time, there was C, which was good at
+doing complex things, so-called “manipulexity”, but required a large investment in time, and there was Shell, which
+scored high on “whipuptitude”, meaning it was very fast to develop in, but difficult to do more complex things with. For
+use-cases in the large space in-between, there were no dedicated solutions, and that was what Wall targeted with Perl. \cite[ par. 15-19]{larry_talk}
+
+When Guido van Rossum, the creator of Python was tasked with coding up utility applications and GUIs for the operating
+system Amoeba, C seemed to be too slow to develop in, while existing languages didn’t offer the ability to converse with
+the OS and other C-written applications. He writes:
+
+\begin{displayquote}
+I had this idea that given how much time we had available for Amoeba, I could actually build a whole new language, design
+and implement it from scratch, and then use it to implement our suite of tools and still be ahead of the game compared
+to a situation where we would have just clunked on writing the things we wanted to write in C.
+
+--- Guido van Rossum, \cite{severance_guido_2015}
+\end{displayquote}
+
+A bit later, in 1995, Yukihiro Matsumoto published the first version of Ruby. Later he described his motivation for
+creating Ruby the following:
+
+\begin{displayquote}
+[...] I was talking with my colleague about the possibility of an object-oriented scripting language.
+I knew Perl (Perl4, not Perl5), but I didn't like it really, because it had smell of toy language (it still has).
+The object-oriented scripting language seemed very promising.
+
+I knew Python then. But I didn't like it, because I didn't think it was a true object-oriented language---OO features
+appeared to be add-on to the language. As a language manic and OO fan for 15 years, I really wanted a genuine object-oriented,
+easy-to-use scripting language. I looked for, but couldn't find one.
+
+--- Yukihiro Matsumoto, \cite{ruby_faq}
+\end{displayquote}
+
+All three languages can be considered scripting-languages; they value fast iteration-speed and are supposed to facilitate
+prototyping, with an interpreter instead of a compiler, dynamic typing and a comparatively simple syntax.
+
+One other thing that gave shape to these communities, and therefore in a way direction to this thesis, are the oftentimes
+strong opinions on programming and language design held by their creators. Given that these creators long shaped
+the language, both through their design decisions and engagement with the community, it stands to reason that their
+opinions, philosophy and cultural context also influences the PLCs forming around them.
+
+These differences in design philosophy can serve as hints, as starting points, in our empirical investigation of
+cultural differences within these language communities, which will be discussed further in Chapters 4 and 5.
+
+\subsection{Related Work}
+
+Given the broad nature of the topic of this thesis, academic discourse relating to this thesis can be roughly divided
+into scholarship preoccupied with culture of PLCs, often from a philosophical or sociological perspective,
+and research applying similar methods to related topics, albeit with a different focus. \cite{lenberg_behavioral_2015}
+
+In the following section I will discuss some of the most relevant papers, and how they relate to this thesis.
+
+The idea that our language shapes or influences the way we think has seen significant discussion in both philosophy
+and the social sciences. \cite{li_language_2019}
+Formal languages such as programming languages are of special interest in this regard.\cite{graham_hackers_2004, iverson_notation_2007}
+
+\paragraph*{“Hermeneutic practices in software development: the case of Ada and Python” \cite{binzberger_hermeneutic_2009}}
+
+In this work, Viktor Binzberger contrasts the design and implementation of two programming languages, Ada and Python,
+to argue how “programming languages are the result of collective interpretations of the general lifeworld of programmers,
+management and political decision-makers”, and that this interpretation, resulting in design decisions, then “permeates
+the particular practices of understanding that are possible within the language framework”.\cite[ p.27]{binzberger_hermeneutic_2009}
+
+Ada, first published in 1980 is characterized as a child of Cold War Era thinking. The American Department of Defense
+grew concerned over the number of different programming languages in use in its projects, and wanted to standardize the
+processes with one language. Multiple proposals went through years of design by different committees, until finally
+published with a 335-page manual called MIL-STD-1815 in 1980. The language was promptly criticized by Tony Hoare for
+being too featureful, and thus overly complex and unreliable.\cite[ p.11, par.5]{hoare_emperor_1981}
+
+Python, on the other hand, is characterized by a culture of open-ended discussion and self-reflective conventionalization
+practices typical of the Open Source Software community.
+
+Binzberger concludes that the design philosophies behind Ada and Python are deeply influenced by their respective cultural
+backgrounds, highlighting the importance of hermeneutics in understanding the development of programming languages and
+the practice of their communities. Finally he muses that the differences in culture might be one of the reasons as to
+why Python today is ubiquitous and ADA is rather obscure.
+
+Binzberger is the only paper reviewed here that at its core focuses on the culture of programming language communities,
+and relating these communities to design decisions was an inspiration for this thesis. The other papers discussed are
+either close in methodology or topic, or offer valuable insights into some of the findings discussed in Chapter \ref{sec:5}.
+
+\paragraph*{How Developers Discuss Architecture Smells? An Exploratory Study on Stack Overflow \cite{tian_how_2019}}
+
+This work comes closest to this thesis in method, albeit with a more quantitative study design, applying a GT approach to
+discussions on Stackoverflow, in order to examine how developers perceive and discuss Architecture Smells (AS).
+The study finds that developers often use general or even vague terms to describe ASs, and mostly attribute the causes
+to violations of architecture patterns or usage of antipatterns. They note the lack of dedicated tools for detecting and
+refactoring ASs.
+
+\paragraph*{“Behavioral differences of developers in different programming languages” \cite{lenberg_behavioral_2015}}
+
+The study proposes the term Behavioral Software Engineering (BSE) to describe research preoccupied with the social and
+behavioral aspects of Software Engineering. They perform a systematic review of existing literature, highlighting gaps,
+and finding that a majority of existing research uses very narrow units of analysis with empirical methods and focuses
+on an industrial context. They recommend that future research could benefit  from being more interconnected, evaluating
+multiple units of analysis, and from becoming more interdisciplinary, by combining the expertise of both social scientists
+and software engineering researchers.
+
+Overall, the idea of examining the cultures evolving around PLCs seems to have garnered relatively little attention
+in the Software Engineering research community. While GT and similar qualitative research methods have recently become more
+wide-spread in Software Engineering, this type of interdisciplinary remains rare. \cite{lenberg_behavioral_2015}

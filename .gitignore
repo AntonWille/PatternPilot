@@ -2,7 +2,7 @@
 .DS_Store
 
 /data/html/*
-/thesis_text/*
+/thesis_text/out/*
 # Ignore bundler config.
 /.bundle
 

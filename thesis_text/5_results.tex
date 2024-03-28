@@ -1,0 +1,362 @@
+\section{Results}
+\label{sec:5}
+
+\subsection{One Way vs. Many}
+\label{sec:5.1}
+
+The motto of Perl is “There is more than one way to do it” ( TIMTOWTDI), which stands in stark contrast to one of the aphorisms
+from the Zen of Python: “There should be one - and preferably only one - obvious way to do it”.\footnote[1]{ In fact, the original
+lore behind this line comes from a T-shirt designed with the tongue-in-cheek slogan TIOOWTDI -
+There is only one way to do it. https://wiki.python.org/moin/TOOWTDI}
+
+Larry Wall, with his background in linguistics, stated that Perl embraces multiple options as it mirrors natural language more.
+The modernist attempt to find the one right solution that works for every problem fails to account for context and takes
+away freedom from the user “for their own good”. To quote directly:
+
+\begin{displayquote}
+    Modernism was based on a kind of arrogance, a set of monocultural blinders that elevated originality above all else,
+    and led designers to believe that if they thought of something cool, it must be considered universally cool.
+    That is, if something's worth doing, it's worth driving into the ground to the exclusion of all other approaches. Lo
+    ok at the use of parentheses in Lisp or the use of white space as syntax in Python. Or the mandatory use of objects
+    in many languages, including Java. All of these are ways of taking freedom away from the end user “for their own good”.
+
+    [\ldots]
+
+    In contrast, postmodernism allows for cultural and personal context in the interpretation of any work of art.
+    How you dress is your business. It's the origin of the Perl slogan: “There's More Than One Way To Do It!”
+    The reason Perl gives you more than one way to do anything is this: I truly believe computer programmers want to be
+    creative, and they may have many different reasons for wanting to write code a particular way. What you choose to
+    optimize for is your concern, not mine. I just supply the paint—you paint the picture. \cite{guru_perl}
+\end{displayquote}
+
+The creator of Ruby, Yukuihiro Matsumoto describes his design ambitions in this regard as follows:
+
+\begin{displayquote}
+    Ruby inherited the Perl philosophy of having more than one way to do the same thing. I inherited that philosophy
+    from Larry Wall, who is my hero actually. I want to make Ruby users free. I want to give them the freedom to choose.
+    People are different. People choose different criteria. But if there is a better way among many alternatives, I want
+    to encourage that way by making it comfortable. \cite{ruby_phil}
+\end{displayquote}
+
+While Guido van Rossum himself stated in the past that he considers this line in the Zen of Python a “white lie”,
+as Python often does have multiple ways of doing things, he also states that it often turns out that one way is
+objectively better. \cite{python_open_heart} And within the Python community, this line is often referenced, especially when there is seemingly
+no obvious way to do “it” (see Section \ref{sec:5.2}).
+
+\subsubsection{Preferred Solutions}
+
+On the topic of \textit{“How to determine the variable type in Python?”}, one of the top answers gives a very
+detailed account, stating in the preface:
+
+\begin{displayquote}
+    There are right ways and wrong ways to do just about everything in Python. Here's the right way:  \[\ldots\]
+
+    --- Russia Must Remove Putin ('2156python\_402504', Pos. 67)
+
+\end{displayquote}
+
+Asking for or giving a preferred way of doing things is the usual approach within the Python community, but also not
+uncommon within the Ruby community. On the question “How to check if a value exists in an array in Ruby” (1527ruby\_1986386, Pos. 1)
+one highly upvoted answer starts of by saying:
+
+\begin{displayquote}
+    Ruby has eleven methods to find elements in an array.
+
+    The preferred one is include? or, for repeated access, creat a Set and then call include? or member?.
+
+    Here are all of them:  [\ldots]
+
+    --- akuhn, (1527ruby\_1986386, Pos. 74-76)
+
+\end{displayquote}
+
+While the answer clearly recommends one of the options, it does not shy away from mentioning the others, or actively
+discourages others from using them. Eleven methods might sound like a lot, but another user promptly points out the
+frivolous nature of such a statement, also mentioning the difficulties described in Section \ref{sec:4.3.4}:
+
+\begin{displayquote}
+    How brazen to say that Ruby has exactly 11 ways to do anything! No sooner than you say that someone will point out that
+    you missed \#12, then \#13, and so on. To make my point I will suggest other ways, but first let me question the 11 ways
+    you have enumerated. First, you can hardly count index and find\_index (or find and detect) as separate methods, as they
+    are just different names for the same method. Secondly, all the expressions that end with > 0 are incorrect, which I'm
+    sure was an oversight.
+
+    --- Cary Swoveland (1527ruby\_1986386, Pos. 180)
+\end{displayquote}
+
+In Ruby, there are often multiple ways to do one thing, however, the community holds opinions on which one is appropriate
+for which situation. On the Question “How to implement Enums in Ruby?”, the accepted answer starts off with giving two options,
+and proceeds to explain which is appropriate in which situation:
+
+\begin{displayquote}
+    Two ways. Symbols (:foo notation) or constants (FOO notation).
+
+    Symbols are appropriate when you want to enhance readability without littering code with literal strings.
+
+    \texttt{postal\_code[:minnesota] $=$ "MN"}
+
+    \texttt{postal\_code[:new\_york] $=$ "NY"}
+
+    Constants are appropriate when you have an underlying value that is important. Just declare a module to hold your
+    constants and then declare the constants within that. \[\ldots\]
+
+    --- mlibby (371ruby\_75759, Pos. 10-14)
+
+\end{displayquote}
+
+Both solutions solve the same problem in different ways, however they signal a different intent to other readers,
+which we will talk about in more detail in Section \ref{sec:5.2}.
+
+In the case of Perl, this kind of strong preference was not observed. Instead, the Perl community seems to take this
+embracing of multiple ways a step further, often explicitly referencing TIMTOWTDI. Sometimes, users offer solutions
+“just for fun”, as with the question “How can I quickly sum all numbers in a file?”, where one user offers this solution:
+
+\begin{displayquote}
+    Just for fun, lets do it with PDL, Perl's array math engine!
+
+    \texttt{perl -MPDL -E 'say rcols(shift)->sum' datafile}
+
+    rcols reads columns into a matrix (1D in this case) and sum (surprise) sums all the element of the matrix.
+
+    - (252perl\_2702564, Pos. 261-263)
+\end{displayquote}
+
+This thread is of particular regard also in the way that it approaches solutions that do not use Perl - While the Tags
+request Perl or Shell, the question does not mention it specifically, and the post evolves into a sort of “show-off”,
+giving answers in many different languages, with comparisons on readability, shortness, efficiency and convenience.
+
+This openness to other tools and languages seems to be common on Questions regarding Perl. While this might be an issue
+of the way the extracted data (see \ref{sec:6.1.1}), it can at least partially be interpreted as a cultural characteristic:
+Perl users might be more comfortable in embracing other languages for a task, if they think it is more appropriate for
+the situation, in a sense seeing Perl more as “just” one of the tools on their belt.
+At the most extreme end, Perl users are unafraid to offer others the tools they can use to shoot themselves in the foot with.
+On a Question about how to find all elements between two XML tags with ReGex, one user answers:
+
+\begin{displayquote}
+    [\ldots] Doing this with regex is a rather dumb idea to begin with, but it's cheap and easy. So the brave ones that
+     would like to do the same thing I did, here you go: [\ldots]
+    --- Eugene (82perl\_13241615, Pos. 77)
+\end{displayquote}
+
+This fits well with Larry Wall's ideas on freedom and creativity, and the idea that the user should be able to choose
+themselves on how they want to approach a solution.
+
+\subsubsection{Legacy and Modern Practices}
+
+If the core language team wants to strongly discourage a way of doing things, they have a number of tools at their
+disposal to do this: A mild approach would see the documentation updated to reflect that discouragement, the feature can
+be actively deprecated, generating warnings during compilation/execution and, at the most extreme end, a feature could
+simply be removed. Both, the way language teams approach this, and how the community reacts to them differ between the
+languages studied.
+
+One topic within the Python community that (historically) seems to have not one obvious way of doing it are questions
+surrounding environments and packaging. On the question “How can I import a module dynamically given the full path?”
+eight distinct options are given, some relying on external libraries, or giving solutions for very specific use-cases
+(eg. specifically for the Python distribution Anaconda).
+
+One Comment on the question reads:
+
+\begin{displayquote}
+    Nice and simple question - and useful answers but they make me wonder what happened with the python mantra
+    "There is one obvious way" to do it.. It doesn't seem like anything like a single or a simple and obvious answer to it..
+    Seems ridiculously hacky and version-dependent for such a fundamental operation (and it looks and more bloated in
+    newer versions..).
+
+    --- (1781python\_67631, Pos. 8)
+\end{displayquote}
+
+Others agree, however, there is also one dissenting voice, saying that a) not recognizing the obvious way is more a
+skill issue, and b) there are good reasons for approving of multiple options:
+
+\begin{displayquote}
+    [\ldots] it's been made worse by constant nagging of people who couldn't be bothered to read 2 paragraphs of documentation.
+    [\ldots] Also, just because there's a new way doesn't mean there's now "two obvious ways". The old way is obvious for
+    some cases, the new way introduces ease of use to other. That's what happens when you actually care about DevX.
+
+    --- (1781python\_67631, Pos. 14)
+\end{displayquote}
+
+Indeed, the top answer gives 3 different solutions to the question, however each of these answers is for a specific
+version of Python: For Python2, 3.3-4, and 3.5+ respectively. In a sense each answer is canonical for the version it is
+referencing. Other answers either expand on the top answer by offering troubleshooting advice on specific issues that
+could go wrong, or recommend other libraries or API’s, although the latter ones are significantly lower rated.
+
+In the Python community, the transition from Python 2 to Python 3, which removed many of the canonical ways of doing things,
+and replaced them with new options, seems to have been a rather painful experience, and many questions offer version-dependent
+answers, often expressing pain about maintaining older projects. Outside of this particular issue however, few instances
+of discontent with deprecation or removal of features were observed.
+
+In Ruby, discussions around depreciation also expose a variety of views. In a discussion on if to use \texttt{before\_action} or
+\texttt{before\_filter} within Ruby on Rails, the accepted answer states:
+
+\begin{displayquote}
+    As we can see in \texttt{ActionController::Base}, \texttt{before\_action} is just a new syntax for \texttt{before\_filter}.
+
+    However the \texttt{before\_filter} syntax is deprecated in Rails 5.0 and will be removed in Rails 5.1
+
+    --- freemanoid (360ruby\_16519828, Pos. 6-7)
+\end{displayquote}
+
+Freemanoid continues in a comment on their answer to succinctly summarize a sentiment often found within the Ruby community:
+
+\begin{displayquote}
+    On the one hand deprecating has sense but on the other there is a good practice in rails and in ruby to have several
+    aliases for one method so you can use it in different contexts without loss of meaning.
+
+    --- freemanoid (360ruby\_16519828, Pos. 9)
+\end{displayquote}
+
+This kind of ‘Aliasing’ is very common in Perl and Ruby to give developers a means to more freely express themselves and
+the ability to better convey the intent of their code, which will be discussed a bit more in the next section.
+
+\subsection{Idiomatic Code}
+\label{sec:5.2}
+
+Idioms can be defined as the “specific character or individuality of a language; the manner of expression considered
+natural to or distinctive of a language”\cite{ox_dict_idiom} In the context of programming, they can be minimalistically defined as
+“commonly used coding constructs”.\cite{ajami_syntax_2019}
+
+Writing idiomatic code then, means to write code that is “natural” to the language, using the expressions of a language
+in a way that conforms to the expectations of others. Some research suggests that doing this facilitates understanding,
+and makes it easier for others to spot bugs and mistakes.\cite{hansen_what_2013} In that sense writing idiomatic code means not only following
+the syntax rules of a programming language, but also adhering to its conventions, best practices and stylistic guidelines.
+As such, to be able to write idiomatic code, just learning the syntax of a language is insufficient, the programmer also
+needs a certain degree of understanding of the language’s design philosophy and community.
+
+This of course holds an intricate relationship with our previous section on “One way vs. Many”: A language community that
+values freedom, creativity and individualism might still have idioms, but it becomes less obvious what it means to write
+idiomatic code as a whole. And on the flip side, having One Way is basically synonymous with having an idiom: For Python,
+idiomatic code is often equivalent to having a preferred or canonical way of doing things. In fact, the idea of having
+“One way to do ‘it’”, can be explained as a way to generate idioms, facilitating understanding between software developers.
+
+In discussions on StackOverflow, the term \textit{idiomatic} is often used as a shorthand to separate the good from the bad,
+the beautiful from the ugly, the simple from the complex, in a sense making it an amalgamation of our culture categories.
+Sometimes, it is used without any context at all, but where it is, it gives insights on why things are considered idioms
+outside of being common:
+
+\subsubsection{Performance and Readability}
+
+Discussions on efficiency are quite abundant across all three languages, often with suggestions on how to optimize code,
+increase memory efficiency, or reduce the number of characters. On the question “How to implement Enums in Ruby?”,
+one user vaguely tells us, that it “fits well with the Ruby spirit”, but also that it performs well:
+
+\begin{displayquote}
+    The most idiomatic way to do this is to use symbols. For example, instead of:
+
+    [\ldots]
+
+    ...you can just use symbols:
+
+    [\ldots]
+    This is a bit more open-ended than enums, but it fits well with the Ruby spirit.
+
+    Symbols also perform very well. Comparing two symbols for equality, for example, is much faster than comparing two strings.
+
+    – emk,  (371ruby\_75759, Pos. 137-152)
+\end{displayquote}
+
+While the topic of performance is interesting in and of itself, in the context of this section, it is probably more
+interesting to find out were something else is more important than performance:
+
+In a discussion on how to add a path at runtime in Python, one user laments the lack of a prepend()-function:
+
+\begin{displayquote}
+    Now if only Python lists had a prepend method so that the best choice wouldn't be ugly looking. I understand the
+    reason why prepend doesn't exist (because it would have worse run times than append), but it seems to be a moot reason.
+    Shouldn't easy to read be valued over quick to run?
+
+    - ArtOfWar (2521python\_4383571, Pos. 47)
+\end{displayquote}
+
+In this case easy to read and not being ugly is more important, a sentiment mirrored in other posts, mainly regarding
+Ruby and Python. This generally does not hold for the Perl community: While some answers do mention that they produce a
+particularly readable solution, it seems to generally be of less concern, with some half-jokingly calling it a “write-only”
+language. Where it is discussed in perl, it is often along the lines of this comment:
+
+\begin{displayquote}
+    Very readable. For perl. But yeah, it's going to have to be something like that…
+
+    - dmckee (252perl\_2702564, Pos. 460)
+\end{displayquote}
+
+\subsubsection{Idioms and Intent}
+
+On \textit{“When to use if versus unless for Perl conditionals”} (54perl\_3048726), a question also of high relevance to the
+last section on \textit{One Way vs. Many}, user MikeKulls answers that in their opinion users shouldn’t, since a) the syntax makes
+code more difficult to read, b) there is another more standard way to do it and c) using a negated if-statement is more
+consistent with other languages to use a negated if-statement.
+
+Two comments on this answer stand out, the first one humorously pointing out that the intent behind \texttt{unless} should
+generally be clear to even an unfamiliar user if done in the right circumstances:
+
+\begin{displayquote}
+    So what you're saying is \texttt{do\_use(\$feature) unless (!grep(\$\_->name ne "perl" \&\& \$\_->has\_feature(\$feature), @languages));}
+
+    Following that to its logical conclusion would have us all writing assembler or FORTRAN. :-) I think even if I'd
+    never seen Perl before I might guess correctly what unless meant.
+
+    –-- Denis Howe(54perl\_3048726, Pos. 121)
+\end{displayquote}
+
+And the second one explaining that writing idiomatic code, means using the tools unique to a language in an appropriate way:
+
+\begin{displayquote}
+    @MikeKulls Don't write Perl code as if it was any other language. Write idiomatic Perl code, making appropriate use
+    of the special tools Perl gives you that no other language does.
+
+    --– Medlock Perlman (54perl\_3048726, Pos. 125)
+\end{displayquote}
+
+On the question \textit{”How do I print to stderr in Python?”} (1751python\_5574702), the accepted answer mentions multiple
+interesting attributes for their preference:
+
+\begin{displayquote}
+    I found this to be the only one short, flexible, portable and readable:
+    \texttt{import sys}
+
+    \texttt{def eprint(*args, **kwargs):}
+
+    \texttt{print(*args, file=sys.stderr, **kwargs)}
+
+    The optional function eprint saves some repetition. It can be used in the same way as the standard print function:
+
+    [\ldots]
+
+    --- MarcH (1751python\_5574702, Pos. 14-18)
+\end{displayquote}
+
+The second highest rated answer proposes a different option, and adds an edit explaining their reasoning for this choice,
+presumably due to debate further down in the thread:
+
+\begin{displayquote}
+    \texttt{import sys}
+
+    \texttt{sys.stderr.write()}
+
+    Is my choice, just more readable and saying exactly what you intend to do and portable across versions.
+
+    Edit: being 'pythonic' is a third thought to me over readability and performance... with these two things in mind,
+    with python 80\% of your code will be pythonic. list comprehension being the 'big thing' that isn't used as often (readability).
+
+    --- Mike Ramirez(1751python\_5574702, Pos. 30-33)
+
+\end{displayquote}
+
+One user further down the thread agrees to using \texttt{sys.stderr.write()} over texttt{print()} writing:
+
+\begin{displayquote}
+    For many of us, it feels somewhat unnatural to relegate the destination to the end of the command. The alternative
+
+    \texttt{sys.stderr.write("fatal error \textbackslash n")}
+
+    looks more object oriented, and elegantly goes from the generic to the specific. But note that write is not a 1:1
+    replacement for print.
+
+    --- Joachim W (1751python\_5574702, Pos. 70-72)
+
+\end{displayquote}
+
+Indeed, while "object oriented" was only used this once in conjunction with idiomatic code, many other terms such as
+"natural", "flexible", "simple", "clean", "readable", "portable", "consistent", and "robust" were used to describe
+code that was also considered idiomatic, or pythonic, or rubyesque. This is in line with the idea that idiomatic code
+is an amagamation of many concepts related to the quality of the code, and culture of a language community.

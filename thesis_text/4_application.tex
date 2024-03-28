@@ -1,0 +1,172 @@
+% !TeX encoding = UTF-8
+\section{Application }
+
+\subsection{Data Collection}
+
+\subsubsection{Choice of Platform}
+
+As the basis for this analysis serve discussions on the QA-platform StackOverflow. StackOverflow is one of the largest
+forums for programming, with an explicit focus on technical discussion, discouraging subjective discussions and
+“chit-chat”.\cite{stack_overflow_faq}
+
+While on the surface, this might seem like a suboptimal place to investigate culture, as it seems likely to have less
+density of discussions on culture than other platforms like mailing lists or hacker-news, it offers a chance to find
+those discussions that pop up within the flow of actual problem solving: Practitioners do not join with expectations
+to talk about culture, so where these discussions “break out”, the chances are high that it is important.
+
+\subsubsection{Extracting Data}
+
+All publicly accessible data of the StackExchange-Sites is regularly published, and can either be downloaded directly,
+or interacted with through the stackAPI. Using the Python Requests-package, a class called StackOverflowAPI was created
+with 3 public methods: fetch\_questions, fetch\_answers and fetch\_comments.
+
+Each of these 3 types of posts return a body-field that contains the content of the post, formatted in html, as well
+as associated metadata like score, created\_at, and an Author-Object.
+
+Questions have tags associated with them, and of course answers. Answers can have an accepted\_answer-flag, and both
+answers and questions can have comments associated with them, as well as a comment count.
+
+To keep the number of requests to the API manageable, batching was used. The process of downloading the data was as follows:
+\begin{enumerate}
+    \item Download the 100 questions with the highest score, that include the tag respectively ‘Python’ or ‘Ruby’, or ‘Perl’
+    \item Download all associated Answers
+    \item Create a list of all ID’s, and then download all associated comments as well
+    \item Load the data into a local Postgres-Database
+    \item Use SQL for data validation
+\end{enumerate}
+
+Finally, another Python-Script assembles full documents out of all questions saved in the database in .html-files.
+Similar to the Stack Overflow default, answers are sorted by their upvote-count, while comments are displayed
+chronologically.\footnote[1]{During encoding we realized that dates are not always completely correct.
+According to the official documentation, all dates are in unix epoch time, but some comments posted closely to each other
+(and referencing one another) appear in the wrong order.}
+
+For the creation of Codes and Memos, as well as part of the analysis, the qualitative-research tool MaxQDA was used.
+The scripts created to enable the data\_export, as well as artifacts created with MaxQDA are available in the
+thesis repository. \cite[./scripts]{thesis_repo}
+
+\subsection{Open Coding}
+
+Some initial hints on what to look for were given through the categories derived from our definition of culture,
+experience with the PLCs through practice, and the idea that the opinions of the creators might influence the culture
+of their communities. Python’s language philosophy is maybe the one most concisely summed up in the collection of
+aphorisms called the Zen of Python written by Tim Peters in 2004 (see \ref{appendix:A1}). Indeed during encoding, references
+to these aphorisms as a “source of truth” could be observed, especially in the context on how to write idiomatic python code
+(as we will see in Chapter \ref{sec:5}).
+
+After a few iterations of doing open coding and attempting to connect and find categories, this early phase of coding
+yielded some rough categories, as well as a few “supplementary” codes that could offer insights into related phenomena,
+shown in Appendix \ref{appendix:A2}.
+
+Regarding the culture categories, both Truth and Goodness appeared to be implicitly contained in almost every discussion,
+which made it very difficult to find specificity in them. On the other hand, statements about efficiency and beauty seemed
+to be abundant and specific. For example, multiple people explicitly declared their answers to be one-liners, a very
+curious mark of quality for a solution.
+
+The idea of comparing \textit{“One Way vs. Many”}, also proved to be an interesting point of contention, especially within the
+Python community, with enough references in both Perl and Ruby posts to be considered a promising direction to invesitage.
+An idea that formed here early is that embracing One Way is partially an expression of a wish for authority and order, while approval
+of multiple ways is an expression of freedom and individualism, and tracking references to “authority”, or the lack
+thereof, could help explain some of the related phenomena.
+
+\textit{“Pragmatism vs. purity”}, the attitude of StackOverflow users in regards to software-quality, and context of development
+(eg. personal use vs. professional), and \textit{“Importance of Backwards Compatibility”}, seemed like interesting issues, with their
+immediate value not being apparent.
+
+\textit{Idiomatic Code} seemed like a very interesting, yet vague topic as well. Usually, where it was explicitly encountered,
+people would use it as a shorthand to divide good code and bad code without detailing what the underlying issues are.
+
+Lastly the so-called “supplementary” category included tracking things like \textit{“Comparisons to other Programming Languages”},
+the \textit{“Conversational Tone”} used in answers and comments, as well as usage of packages, libraries and external tools.
+\textit{“Humorous remarks”} (jokes), could also potentially provide an interesting window into a community’s culture, but were
+mostly tracked as a form of entertainment.
+
+\subsection{Refinement and Axial Coding}
+
+Given the broad topic at hand, despite the technical nature of StackOverflow discussions, there was no shortage of
+interesting directions to take, rather the difficulty lay in limiting the kinds of phenomena to observe, in order to
+not lose focus. At its largest extent, a total of 109 codes, sorted into various categories were concurrently part
+of the investigation. \cite[data/coding\_system]{thesis_repo}
+
+In addition to the already described concepts of the previous sections, a number of new interesting directions
+opened up as well:
+
+\subsubsection{Legacy vs. Modern Practices}
+
+The topic of backwards compatibility turned out to be part of a significantly larger topic, namely \textit{“Legacy vs. Modern Practices”}.
+While this is in itself an important, contentious and fruitful topic, it also bears importance for some of the other
+concepts, as it is often relevant in regards to having multiple different ways of doing things (see Section \ref{sec:5.1}),
+and of course is also closely related to ideas on idiomatic code: Styles change over time, and what might have been
+considered good practice in the 90s, might not be preferred today.
+
+\subsubsection{Efficiency and Beauty}
+
+Ideas on efficiency and beauty are plentiful in the discussions on Stackoverflow, and many groups of concepts, such as
+\textit{“Importance of Readability”}, \textit{“Short Code is better?”}, or \textit{“Focus on Performance”} were found.
+These also relate very  closely to questions on idiomatic code, and the kinds of trade-offs made, often relate to each other,
+where for example, writing especially fast or short code might clash with readability.
+
+\subsubsection{Authoratative Sources}
+
+The idea of \textit{“Authoritative Sources”} was split up. The usage of external references, be that the official documentation,
+tutorials or blog-posts, was tracked in its own category. While this seemed like a good idea at the time, the effort
+needed to encode these sources consistently, significantly outweighed their benefit overall.
+
+\textit{“References to abstract rules or principles”}, such as “Never run for "flexibility" until it's impossible to avoid.
+One of the unwritten rules of good coding.” (371ruby\_4763121, Pos. 52) were also tracked as an interesting appeal
+to ephemeral authority, both an expression of truth and goodness.
+
+\subsubsection{Determining what constitutes One Way}
+\label{sec:4.3.4}
+In the context of the category of \textit{One Way vs. Many}, a particularly tricky issue was determining what constitutes a
+sufficiently different approach. The Code \textit{“Answer gives multiple solutions”} denotes posts that answer the questions
+giving multiple distinct approaches, and \textit{“Answer gives option other than Accepted”} denotes posts that differ in
+approach from the top answer. Each distinct approach is only counted once, generally by vote count. The heuristic
+used to determine if an approach is fundamentally different, is if it uses another data structure, algorithm, control
+flow or library to solve the core problem of the related question. However, in some cases the question might be too
+vague to have a clear problem resolution. To illustrate the issue, here is one example:
+
+The top answer to the question \textit{“How to determine a Python variable’s type?”} indeed gives two different solutions: One,
+you can use the builtin \texttt{type()} function to return the type of a variable, and two, you can check if a variable is of a
+given type by using \texttt{isinstance()}.
+
+While these are different approaches, they actually answer different questions, and as such can’t be considered as distinct
+solutions for the same problem. However, while this answer offers \texttt{isinstance()} as the preferred function to check a type,
+a different answer suggests using assert \texttt{type(variable\_name) == int} which does the same thing as \texttt{isinstance()},
+and thus constitutes a different solution to the same problem. Yet another answer suggests using the \texttt{\_\_class\_\_}-property
+to check for type, another distinct option, although discouraged by both other commenters and the official documentation.
+In fact, sometimes it proved difficult to accept an answer as “just” a different approach, when it seemed like an
+objectively worse approach.
+
+\subsection{Selective Coding and Writing}
+
+At this point two core categories - and related categories supplementary codes - were chosen to remain in the selective
+coding process, while the rest was “deprecated”. While the topic of “Implicitness vs. Explicitness” showed great promise,
+and holds high relevance for practitioners, the complexity exceeded the scope of this thesis and would probably require
+additional data sources such as github issues and discussions on mailing lists.
+
+Instead, the focus was set on two questions: What are the attitudes towards One Way vs. Many? And what does it mean to
+ write idiomatic code?
+
+After deciding on the most promising categories for investigation, an additional 200 questions per language were extracted,
+and different methods were used to find additional relevant data for these categories:
+Some documents were chosen based on their title, as the question asked seemed especially relevant to either one of those
+categories.  For example, the question \textit{“What is the difference between `\$this`, `@that`, and `\%those` in Perl?”}
+was thought to have a high chance to offer insights into attitudes on \textit{One Way vs. Many} and the idea of idioms in Perl.
+
+In addition, keyword searches were performed to find especially relevant sections for specific codes. For example, the
+idea of calling code or the process of coding “natural” was encountered a handful of times before, and seemed very
+relevant to the question of what constitutes idiomatic code, but the underlying phenomenon, the meaning behind people
+saying this remained somewhat unclear. As such, searching for “natural” was helpful in finding relevant data, although
+naturally plenty of false positives had to be sorted out first. In the case of using key-word searches, in order to
+minimize biases emerging, all instances in the languages were investigated and encoded if appropriate.
+
+Other data was gathered to relate the findings from StackOverflow with the ideas of influential figures in the community,
+like interviews, conference speeches and books. This was an iterative process while writing the thesis: Finding references,
+relating them, writing, and filling gaps in knowledge and observation through selective encoding and reading the literature.
+Indeed, the writing process turned out to be a core exercise in relating the final concepts, and multiple changes to the code system and
+the underlying data were necessary.
+
+The core concept of questions surrounding idiomatic code, which we will be discussing in more detail in the next Chapter,
+only became apparent at the very end of the writing process, necessitating some changes, and partially explaining
+why the data overall is a bit thin.
